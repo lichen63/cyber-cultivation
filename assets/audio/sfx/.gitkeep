@@ -1,0 +1,14 @@
+# 音效文件夹
+
+这个文件夹用于存放游戏的音效文件。
+
+支持的音频格式：
+- .ogg (推荐)
+- .wav
+- .mp3
+
+请将音效文件命名为有意义的名称，例如：
+- button_click.ogg
+- success.ogg
+- error.ogg
+- notification.ogg
