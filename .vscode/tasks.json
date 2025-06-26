@@ -1,0 +1,86 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Open Godot Editor",
+      "type": "shell",
+      "command": "/Applications/Godot.app/Contents/MacOS/Godot",
+      "args": [
+        "--editor",
+        "${workspaceFolder}"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run Game",
+      "type": "shell",
+      "command": "/Applications/Godot.app/Contents/MacOS/Godot",
+      "args": [
+        "--headless",
+        "${workspaceFolder}"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run Game (Windowed)",
+      "type": "shell",
+      "command": "/Applications/Godot.app/Contents/MacOS/Godot",
+      "args": [
+        "${workspaceFolder}"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Export Game (Debug)",
+      "type": "shell",
+      "command": "/Applications/Godot.app/Contents/MacOS/Godot",
+      "args": [
+        "--headless",
+        "--export-debug",
+        "macOS",
+        "${workspaceFolder}/build/cyber-cultivation-debug.app",
+        "${workspaceFolder}"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": []
+    }
+  ]
+}

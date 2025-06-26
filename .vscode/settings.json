@@ -1,0 +1,20 @@
+{
+  "godotTools.editorPath.godot4": "/Applications/Godot.app",
+  "godotTools.debugger.port": 6007,
+  "godotTools.debugger.host": "127.0.0.1",
+  "godotTools.lsp.serverPort": 6005,
+  "godotTools.lsp.serverHost": "127.0.0.1",
+  "files.associations": {
+    "*.gd": "gdscript",
+    "*.cs": "csharp",
+    "*.tres": "godot-resource",
+    "*.tscn": "godot-scene"
+  },
+  "editor.formatOnSave": true,
+  "editor.tabSize": 4,
+  "editor.insertSpaces": false,
+  "[gdscript]": {
+    "editor.tabSize": 4,
+    "editor.insertSpaces": false
+  }
+}
