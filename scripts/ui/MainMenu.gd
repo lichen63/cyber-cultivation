@@ -1,63 +1,32 @@
 extends Control
 
 ## 主菜单控制器
-## 处理主菜单的用户交互和导航
+## 显示人形角色，透明背景
 
 # UI节点引用
-@onready var start_button: Button = $MainContainer/ButtonContainer/StartButton
-@onready var settings_button: Button = $MainContainer/ButtonContainer/SettingsButton
-@onready var companion_button: Button = $MainContainer/ButtonContainer/CompanionButton
-@onready var exit_button: Button = $MainContainer/ButtonContainer/ExitButton
+@onready var human_character: Sprite2D = $HumanCharacter
 
 func _ready() -> void:
 	"""初始化主菜单"""
-	# 设置初始焦点
-	start_button.grab_focus()
+	# 启用透明背景
+	get_viewport().transparent_bg = true
+	get_window().transparent = true
 	
-	# 设置按钮导航
-	setup_button_navigation()
+	# 确保人形角色可见
+	if human_character:
+		human_character.modulate = Color.WHITE
 	
-	# 播放背景音乐（如果有的话）
-	# AudioManager.play_background_music("main_menu")
+	# 可以添加一些简单的动画效果
+	animate_character()
 
-func setup_button_navigation() -> void:
-	"""设置按钮导航和提示"""
-	# 为按钮添加提示文本
-	start_button.tooltip_text = "开始新游戏"
-	settings_button.tooltip_text = "打开游戏设置"
-	companion_button.tooltip_text = "打开陪伴设置"
-	exit_button.tooltip_text = "退出游戏"
-	
-	# 设置键盘导航
-	start_button.focus_neighbor_bottom = settings_button.get_path()
-	settings_button.focus_neighbor_top = start_button.get_path()
-	settings_button.focus_neighbor_bottom = companion_button.get_path()
-	companion_button.focus_neighbor_top = settings_button.get_path()
-	companion_button.focus_neighbor_bottom = exit_button.get_path()
-	exit_button.focus_neighbor_top = companion_button.get_path()
-
-func _on_start_button_pressed() -> void:
-	"""开始游戏按钮点击事件"""
-	print("开始游戏")
-	# TODO: 切换到游戏场景
-	# get_tree().change_scene_to_file("res://scenes/Game.tscn")
-
-func _on_settings_button_pressed() -> void:
-	"""设置按钮点击事件"""
-	print("打开设置")
-	# TODO: 打开设置菜单
-	# get_tree().change_scene_to_file("res://scenes/ui/Settings.tscn")
-
-func _on_companion_button_pressed() -> void:
-	"""陪伴设置按钮点击事件"""
-	print("打开陪伴设置")
-	# TODO: 打开陪伴设置
-	# get_tree().change_scene_to_file("res://scenes/ui/CompanionSettings.tscn")
-
-func _on_exit_button_pressed() -> void:
-	"""退出游戏按钮点击事件"""
-	print("退出游戏")
-	get_tree().quit()
+func animate_character() -> void:
+	"""为人形角色添加简单的动画效果"""
+	if human_character:
+		# 创建一个简单的呼吸动画
+		var tween = create_tween()
+		tween.set_loops()
+		tween.tween_property(human_character, "scale", Vector2(1.05, 1.05), 2.0)
+		tween.tween_property(human_character, "scale", Vector2(1.0, 1.0), 2.0)
 
 func _input(event: InputEvent) -> void:
 	"""处理输入事件"""

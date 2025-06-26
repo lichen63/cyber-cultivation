@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="400" viewBox="0 0 200 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- 人形轮廓 -->
+  <!-- 头部 -->
+  <circle cx="100" cy="50" r="30" fill="#FFD6B8" stroke="#333" stroke-width="2"/>
+  
+  <!-- 身体 -->
+  <rect x="75" y="80" width="50" height="80" fill="#4A90E2" stroke="#333" stroke-width="2" rx="5"/>
+  
+  <!-- 左臂 -->
+  <rect x="45" y="90" width="30" height="15" fill="#FFD6B8" stroke="#333" stroke-width="2" rx="7"/>
+  <rect x="30" y="100" width="30" height="15" fill="#FFD6B8" stroke="#333" stroke-width="2" rx="7"/>
+  
+  <!-- 右臂 -->
+  <rect x="125" y="90" width="30" height="15" fill="#FFD6B8" stroke="#333" stroke-width="2" rx="7"/>
+  <rect x="140" y="100" width="30" height="15" fill="#FFD6B8" stroke="#333" stroke-width="2" rx="7"/>
+  
+  <!-- 腿部 -->
+  <rect x="80" y="160" width="15" height="80" fill="#2C3E50" stroke="#333" stroke-width="2" rx="7"/>
+  <rect x="105" y="160" width="15" height="80" fill="#2C3E50" stroke="#333" stroke-width="2" rx="7"/>
+  
+  <!-- 脚 -->
+  <ellipse cx="87.5" cy="250" rx="12" ry="8" fill="#8B4513" stroke="#333" stroke-width="2"/>
+  <ellipse cx="112.5" cy="250" rx="12" ry="8" fill="#8B4513" stroke="#333" stroke-width="2"/>
+  
+  <!-- 面部特征 -->
+  <!-- 眼睛 -->
+  <circle cx="90" cy="45" r="3" fill="#333"/>
+  <circle cx="110" cy="45" r="3" fill="#333"/>
+  
+  <!-- 鼻子 -->
+  <circle cx="100" cy="52" r="1.5" fill="#E6B89C"/>
+  
+  <!-- 嘴巴 -->
+  <path d="M 95 58 Q 100 62 105 58" stroke="#333" stroke-width="1.5" fill="none"/>
+  
+  <!-- 头发 -->
+  <path d="M 75 35 Q 100 20 125 35 Q 120 25 100 25 Q 80 25 75 35" fill="#8B4513" stroke="#333" stroke-width="1"/>
+</svg>
