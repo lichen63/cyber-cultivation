@@ -10,16 +10,11 @@ config_version=5
 
 [application]
 
-config/name="Cyber Practice"
-config/description="A cyber practice companion game"
+config/name="Cyber Cultivation"
+config/description="A cyber cultivation game"
 run/main_scene="res://scenes/MainMenu.tscn"
 config/features=PackedStringArray("4.4", "Forward Plus")
 config/icon="res://assets/icons/icon.svg"
-
-[autoload]
-
-AudioManager="*res://scripts/managers/AudioManager.gd"
-CompanionManager="*res://scripts/managers/CompanionManager.gd"
 
 [display]
 

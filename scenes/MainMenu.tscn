@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://cg3gvxvr6v8t7"]
 
-[ext_resource type="Script" uid="uid://cn8h7dpeu35d7" path="res://scripts/ui/MainMenu.gd" id="1_qwert"]
-[ext_resource type="Texture2D" uid="uid://cwkhmpan6s8fk" path="res://assets/graphics/sprites/human_character.svg" id="2_human"]
+[ext_resource type="Script" uid="uid://m3h6rnoimfd2" path="res://scripts/ui/MainMenu.gd" id="1_qwert"]
+[ext_resource type="Texture2D" uid="uid://drvlrtflmcxx6" path="res://assets/graphics/sprites/human_character.svg" id="2_human"]
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3

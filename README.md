@@ -1,110 +1,30 @@
-# Cyber Practice
+# Cyber Cultivation
 
-一个基于Godot引擎开发的桌面宠物应用。
+A desktop cyber cultivation (casual) game developed with the Godot engine
 
-## 项目简介
+## Project Overview
 
-这是一个可爱的桌面宠物应用，具有以下特点：
-- 无边框小窗口，适合放在桌面任何位置
-- 透明背景，只显示人形角色
-- 轻柔的呼吸动画效果
-- 简单的陪伴互动功能
+This is a cute desktop cyber cultivation (casual) game with the following features:
+- Borderless small window, suitable for placement anywhere on the desktop
+- Simple companion interaction functionality
 
-## 项目结构
+## Development Environment
 
-```
-cyber-practice/
-├── assets/                 # 游戏资源
-│   ├── audio/             # 音频文件
-│   │   ├── music/         # 背景音乐
-│   │   └── sfx/           # 音效
-│   ├── graphics/          # 图形资源
-│   │   ├── ui/            # UI相关图片
-│   │   ├── sprites/       # 精灵图片
-│   │   └── backgrounds/   # 背景图片
-│   ├── fonts/             # 字体文件
-│   └── icons/             # 图标文件
-├── scenes/                # 场景文件
-│   └── MainMenu.tscn      # 主菜单场景（桌面宠物界面）
-├── scripts/               # 脚本文件
-│   ├── managers/          # 管理器脚本
-│   │   ├── AudioManager.gd       # 音频管理器
-│   │   └── CompanionManager.gd    # 陪伴管理器
-│   └── ui/                # UI相关脚本
-│       └── MainMenu.gd    # 主菜单脚本（桌面宠物控制器）
-├── addons/                # 插件
-├── project.godot          # 项目配置文件
-├── .gitignore            # Git忽略文件
-└── README.md             # 项目说明文档
-```
+- **Engine Version**: Godot 4.4+
+- **Platform**: Cross-platform (Windows, macOS, Linux)
+- **Language**: GDScript
 
-## 开发环境
+## Installation and Running
 
-- **引擎版本**: Godot 4.3+
-- **平台**: 跨平台（Windows, macOS, Linux）
-- **语言**: GDScript
+1. Download and install [Godot 4.4](https://godotengine.org/download)
+2. Clone this repository to your local machine
+3. Open the project in the Godot editor
+4. Click the run button to start the game
 
-## 功能特性
+## License
 
-- 网络实践陪伴体验
-- 现代UI界面
-- 跨平台支持
-- 可扩展架构
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 安装与运行
+## Contact
 
-1. 下载并安装 [Godot 4.3](https://godotengine.org/download)
-2. 克隆此仓库到本地
-3. 在Godot编辑器中打开项目
-4. 点击运行按钮开始游戏
-
-## 开发指南
-
-### 代码规范
-
-- 使用GDScript作为主要开发语言
-- 遵循Godot官方代码风格指南
-- 类名使用PascalCase
-- 变量和函数名使用snake_case
-- 常量使用SCREAMING_SNAKE_CASE
-
-### 目录说明
-
-- `assets/`: 存放所有游戏资源文件
-- `scenes/`: 存放场景文件(.tscn)
-- `scripts/`: 存放脚本文件(.gd)
-- `addons/`: 存放第三方插件
-
-### 网络实践陪伴设计原则
-
-- 寓教于乐的学习体验
-- 实践技能陪伴指导
-- 个性化学习内容
-- 循序渐进的练习节奏
-- 积极正面的学习反馈
-
-## 网络实践功能详解
-
-### 智能学习助手
-- **个性化设置**: 可自定义助手的名称和教学风格
-- **学习状态**: 助手拥有多种教学模式（指导、练习、评估、鼓励等）
-- **进度系统**: 通过学习和实践提升技能等级
-- **智能提醒**: 合理的学习提醒和复习机制
-
-### 实践体验
-- **语音指导**: 支持语音说明和引导（可开关）
-- **实时反馈**: 根据学习进度给予及时的指导建议
-- **个性化内容**: 基于用户水平调整学习内容
-- **渐进式学习**: 不急躁的循序渐进学习方式
-
-## 贡献
-
-欢迎提交Issue和Pull Request来帮助改进这个项目。
-
-## 许可证
-
-本项目采用MIT许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
-
-## 联系方式
-
-如有问题或建议，请通过GitHub Issues联系我们。
+If you have any questions or suggestions, please contact us through GitHub Issues.
