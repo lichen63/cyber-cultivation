@@ -1,6 +1,14 @@
 # Cyber Practice
 
-一个基于Godot引擎开发的网络实践陪伴游戏项目。
+一个基于Godot引擎开发的桌面宠物应用。
+
+## 项目简介
+
+这是一个可爱的桌面宠物应用，具有以下特点：
+- 无边框小窗口，适合放在桌面任何位置
+- 透明背景，只显示人形角色
+- 轻柔的呼吸动画效果
+- 简单的陪伴互动功能
 
 ## 项目结构
 
@@ -17,17 +25,13 @@ cyber-practice/
 │   ├── fonts/             # 字体文件
 │   └── icons/             # 图标文件
 ├── scenes/                # 场景文件
-│   ├── MainMenu.tscn      # 主菜单场景
-│   ├── Game.tscn          # 游戏主场景
-│   └── ui/                # UI场景
+│   └── MainMenu.tscn      # 主菜单场景（桌面宠物界面）
 ├── scripts/               # 脚本文件
 │   ├── managers/          # 管理器脚本
 │   │   ├── AudioManager.gd       # 音频管理器
 │   │   └── CompanionManager.gd    # 陪伴管理器
-│   ├── ui/                # UI相关脚本
-│   │   └── MainMenu.gd    # 主菜单脚本
-│   └── game/              # 游戏逻辑脚本
-│       └── Game.gd        # 游戏主控制器
+│   └── ui/                # UI相关脚本
+│       └── MainMenu.gd    # 主菜单脚本（桌面宠物控制器）
 ├── addons/                # 插件
 ├── project.godot          # 项目配置文件
 ├── .gitignore            # Git忽略文件
