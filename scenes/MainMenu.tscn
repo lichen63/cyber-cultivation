@@ -36,7 +36,7 @@ grow_vertical = 2
 
 [node name="Title" type="Label" parent="MainContainer"]
 layout_mode = 2
-text = "Desktop ACC Game"
+text = "Cyber Practice"
 horizontal_alignment = 1
 
 [node name="Spacer1" type="Control" parent="MainContainer"]

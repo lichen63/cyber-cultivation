@@ -4,8 +4,8 @@
 
 [application]
 
-config/name="Desktop ACC Game"
-config/description="A desktop accompany game"
+config/name="Cyber Practice"
+config/description="A cyber practice companion game"
 run/main_scene="res://scenes/MainMenu.tscn"
 config/features=PackedStringArray("4.3", "Forward Plus")
 config/icon="res://assets/icons/icon.svg"

@@ -4,7 +4,7 @@ extends Node
 ## 处理游戏中的陪伴功能和情感交互
 
 # 陪伴设置
-var companion_name: String = "小伙伴"
+var companion_name: String = "小助手"
 var companion_mood: String = "开心"
 var interaction_frequency: float = 1.0
 var voice_enabled: bool = true
