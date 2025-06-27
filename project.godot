@@ -12,14 +12,14 @@ config_version=5
 
 config/name="Cyber Cultivation"
 config/description="A cyber cultivation game"
-run/main_scene="res://scenes/MainMenu.tscn"
+run/main_scene="res://scenes/Main.tscn"
 config/features=PackedStringArray("4.4", "Forward Plus")
 config/icon="res://assets/icons/icon.svg"
 
 [display]
 
-window/size/viewport_width=300
-window/size/viewport_height=500
+window/size/viewport_width=600
+window/size/viewport_height=600
 window/size/borderless=true
 window/size/always_on_top=true
 window/size/transparent=true

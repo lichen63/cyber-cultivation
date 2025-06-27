@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://cg3gvxvr6v8t7"]
+
+[ext_resource type="Script" uid="uid://m3h6rnoimfd2" path="res://scripts/ui/Main.gd" id="1_rvslj"]
+[ext_resource type="PackedScene" uid="uid://b5q8w3x7r2m1n" path="res://scenes/Character.tscn" id="2_0bbpv"]
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_rvslj")
+
+[node name="Character" parent="." instance=ExtResource("2_0bbpv")]
