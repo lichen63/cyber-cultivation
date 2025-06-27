@@ -11,10 +11,10 @@
     "*.tscn": "godot-scene"
   },
   "editor.formatOnSave": true,
-  "editor.tabSize": 4,
-  "editor.insertSpaces": false,
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
   "[gdscript]": {
-    "editor.tabSize": 4,
-    "editor.insertSpaces": false
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true
   }
 }

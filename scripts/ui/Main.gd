@@ -1,11 +1,5 @@
 extends Control
 
-## Main menu controller
-## Display desktop pet character
-
-# UI node references
-@onready var human_character: Area2D = $HumanCharacter
-
 func _ready() -> void:
   """Initialize main menu"""
   # Enable transparent background
