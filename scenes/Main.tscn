@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://cg3gvxvr6v8t7"]
 
 [ext_resource type="Script" uid="uid://m3h6rnoimfd2" path="res://scripts/ui/Main.gd" id="1_rvslj"]
-[ext_resource type="PackedScene" uid="uid://b5q8w3x7r2m1n" path="res://scenes/Character.tscn" id="2_0bbpv"]
+[ext_resource type="Texture2D" uid="uid://xvjixclm68kd" path="res://assets/graphics/sprites/character.png" id="2_rvslj"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -12,4 +12,18 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_rvslj")
 
-[node name="Character" parent="." instance=ExtResource("2_0bbpv")]
+[node name="Character" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.503
+anchor_top = 0.514
+anchor_right = 0.503
+anchor_bottom = 0.514
+offset_left = -265.8
+offset_top = -265.4
+offset_right = 1062.2
+offset_bottom = 1062.6
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.4, 0.4)
+texture = ExtResource("2_rvslj")
