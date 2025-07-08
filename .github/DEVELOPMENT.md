@@ -4,6 +4,8 @@ This project is configured for development and debugging directly in VS Code. Th
 
 ## Development Rules
 
+- **Language Requirements**: All code and comments must be written in English only
+- **Testing Protocol**: Never automatically start the game for testing after completing a task. Always wait for explicit user approval or let the user perform manual testing
 - **No automatic README creation**: Do not add any new README files in any folder unless explicitly requested
 - All development documentation should be contained within this file or other specifically designated documentation files
 
