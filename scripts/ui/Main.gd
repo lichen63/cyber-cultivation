@@ -3,6 +3,10 @@ extends Control
 # Node references
 @onready var character_node: TextureRect = $Character
 
+# Keyboard display system
+var keyboard_display: Label
+var last_key_text: String = ""
+
 # Action button system
 var action_buttons: Array[Button] = []
 var buttons_visible: bool = false
@@ -24,6 +28,9 @@ func _ready() -> void:
   # Enable drawing for border
   set_process(true)
   
+  # Create keyboard display
+  create_keyboard_display()
+  
   # Create action buttons
   create_action_buttons()
   
@@ -32,6 +39,11 @@ func _ready() -> void:
   mouse_exited.connect(_on_window_mouse_exited)
 
 # === INPUT HANDLING ===
+
+func _input(event: InputEvent) -> void:
+  """Handle all keyboard input events"""
+  if event is InputEventKey and event.pressed:
+    update_keyboard_display(event)
 
 func _gui_input(event: InputEvent) -> void:
   """Handle mouse input for window dragging"""
@@ -70,6 +82,51 @@ func _draw() -> void:
 
 # === UI CREATION ===
 
+func create_keyboard_display() -> void:
+  """Create keyboard display label above character"""
+  keyboard_display = Label.new()
+  keyboard_display.text = "..."
+  keyboard_display.size = Vector2(200, 40)
+  
+  # Position above character (assuming character is centered)
+  var window_size = get_window().size
+  keyboard_display.position = Vector2(
+    (window_size.x - keyboard_display.size.x) / 2,
+    20 # 50 pixels from top
+  )
+  
+  # Style the label
+  style_keyboard_display()
+  
+  # Set larger font size
+  keyboard_display.add_theme_font_size_override("font_size", 24)
+  
+  # Add to scene
+  add_child(keyboard_display)
+
+func style_keyboard_display() -> void:
+  """Apply styling to keyboard display label"""
+  # Create background style
+  var style_background = StyleBoxFlat.new()
+  style_background.bg_color = Color(0.1, 0.1, 0.2, 0.8) # Dark blue-gray background
+  style_background.border_width_left = 2
+  style_background.border_width_right = 2
+  style_background.border_width_top = 2
+  style_background.border_width_bottom = 2
+  style_background.border_color = Color(0.4, 0.6, 0.9, 0.9) # Blue border
+  style_background.corner_radius_top_left = 6
+  style_background.corner_radius_top_right = 6
+  style_background.corner_radius_bottom_left = 6
+  style_background.corner_radius_bottom_right = 6
+  
+  # Apply background style
+  keyboard_display.add_theme_stylebox_override("normal", style_background)
+  
+  # Set text properties
+  keyboard_display.add_theme_color_override("font_color", Color(0.9, 0.9, 1.0, 1.0)) # Light blue-white text
+  keyboard_display.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+  keyboard_display.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+
 func create_action_buttons() -> void:
   """Create action buttons around the window border"""
   var window_size = get_window().size
@@ -79,12 +136,8 @@ func create_action_buttons() -> void:
   var top_bottom_button_width = (window_size.x - 2 * button_thickness) / 2.0
   var left_right_button_height = (window_size.y - 2 * button_thickness) / 2.0
   
-  # Button positions and sizes around the border (8 buttons total - 2 per side)
+  # Button positions and sizes around the border (6 buttons total - 2 per side, excluding top)
   var button_configs = [
-    # Top buttons (2 buttons)
-    {"pos": Vector2(button_thickness, 0), "size": Vector2(top_bottom_button_width, button_thickness)}, # Top left
-    {"pos": Vector2(button_thickness + top_bottom_button_width, 0), "size": Vector2(top_bottom_button_width, button_thickness)}, # Top right
-    
     # Right buttons (2 buttons)
     {"pos": Vector2(window_size.x - button_thickness, button_thickness), "size": Vector2(button_thickness, left_right_button_height)}, # Right top
     {"pos": Vector2(window_size.x - button_thickness, button_thickness + left_right_button_height), "size": Vector2(button_thickness, left_right_button_height)}, # Right bottom
@@ -98,8 +151,8 @@ func create_action_buttons() -> void:
     {"pos": Vector2(0, button_thickness), "size": Vector2(button_thickness, left_right_button_height)} # Left top
   ]
   
-  # Button labels for different functions (2 per side: Top, Right, Bottom, Left)
-  var labels = ["T-1", "T-2", "R-1", "R-2", "B-1", "B-2", "L-1", "L-2"]
+  # Button labels for different functions (2 per side: Right, Bottom, Left)
+  var labels = ["R-1", "R-2", "B-1", "B-2", "L-1", "L-2"]
   
   for i in range(button_configs.size()):
     var button = Button.new()
@@ -193,11 +246,96 @@ func _on_window_mouse_exited() -> void:
 
 func _on_action_button_pressed(button_index: int) -> void:
   """Handle action button presses - placeholder for future functionality"""
-  var button_names = ["Top-1", "Top-2", "Right-1", "Right-2", "Bottom-1", "Bottom-2", "Left-1", "Left-2"]
+  var button_names = ["Right-1", "Right-2", "Bottom-1", "Bottom-2", "Left-1", "Left-2"]
   print("Action button pressed: ", button_names[button_index])
   # TODO: Implement specific functionality for each action button
 
 # === UTILITY METHODS ===
+
+func update_keyboard_display(event: InputEventKey) -> void:
+  """Update keyboard display with the pressed key"""
+  var key_string = ""
+  
+  # Handle special keys
+  match event.keycode:
+    KEY_SPACE:
+      key_string = "Space"
+    KEY_ENTER:
+      key_string = "Enter"
+    KEY_TAB:
+      key_string = "Tab"
+    KEY_BACKSPACE:
+      key_string = "Backspace"
+    KEY_DELETE:
+      key_string = "Delete"
+    KEY_ESCAPE:
+      key_string = "Escape"
+    KEY_LEFT:
+      key_string = "Left"
+    KEY_RIGHT:
+      key_string = "Right"
+    KEY_UP:
+      key_string = "Up"
+    KEY_DOWN:
+      key_string = "Down"
+    KEY_SHIFT:
+      key_string = "Shift"
+    KEY_CTRL:
+      key_string = "Ctrl"
+    KEY_ALT:
+      key_string = "Alt"
+    KEY_META:
+      key_string = "Cmd"
+    KEY_CAPSLOCK:
+      key_string = "CapsLock"
+    KEY_F1:
+      key_string = "F1"
+    KEY_F2:
+      key_string = "F2"
+    KEY_F3:
+      key_string = "F3"
+    KEY_F4:
+      key_string = "F4"
+    KEY_F5:
+      key_string = "F5"
+    KEY_F6:
+      key_string = "F6"
+    KEY_F7:
+      key_string = "F7"
+    KEY_F8:
+      key_string = "F8"
+    KEY_F9:
+      key_string = "F9"
+    KEY_F10:
+      key_string = "F10"
+    KEY_F11:
+      key_string = "F11"
+    KEY_F12:
+      key_string = "F12"
+    _:
+      # For regular characters, use the unicode representation
+      if event.unicode != 0:
+        key_string = char(event.unicode)
+      else:
+        key_string = "Key: " + str(event.keycode)
+  
+  # Add modifier information
+  var modifiers = []
+  if event.shift_pressed:
+    modifiers.append("Shift")
+  if event.ctrl_pressed:
+    modifiers.append("Ctrl")
+  if event.alt_pressed:
+    modifiers.append("Alt")
+  if event.meta_pressed:
+    modifiers.append("Cmd")
+  
+  if modifiers.size() > 0:
+    key_string = " + ".join(modifiers) + " + " + key_string
+  
+  # Update the display
+  last_key_text = key_string
+  keyboard_display.text = key_string
 
 func show_action_buttons() -> void:
   """Make action buttons visible with fade-in animation"""
