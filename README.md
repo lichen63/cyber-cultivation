@@ -23,11 +23,18 @@ This is a cute desktop cyber cultivation (casual) game with the following featur
 
 ## TODO
 
+### Feature
+
 - [x] Initialize the game framework
 - [x] Implement the drag window feature
-- [x] Show around buttons when mouse hover on the window
-- [ ] Monitor the keyboard events and show on window
-- [ ] Monitor the mouse events and show on window
+- [x] Show control buttons when mouse hovers over the window
+- [ ] Monitor keyboard events and display them on the window
+- [ ] Monitor mouse events and display them on the window
+- [ ] Add cultivation progress bar and level system
+- [ ] Connect keyboard and mouse events to cultivation spiritual power mechanics
+- [ ] Implement auto-save functionality for cultivation progress
+
+### Bug
 
 ## License
 
