@@ -6,6 +6,9 @@ extends Control
 # Action button system
 var action_buttons: Array[Button] = []
 var buttons_visible: bool = false
+var show_tween: Tween
+var hide_tween: Tween
+var is_animating: bool = false
 
 # Window dragging system
 var is_dragging: bool = false
@@ -24,9 +27,9 @@ func _ready() -> void:
   # Create action buttons
   create_action_buttons()
   
-  # Connect mouse signals for character hover detection
-  character_node.mouse_entered.connect(_on_character_mouse_entered)
-  character_node.mouse_exited.connect(_on_character_mouse_exited)
+  # Connect mouse signals for window hover detection
+  mouse_entered.connect(_on_window_mouse_entered)
+  mouse_exited.connect(_on_window_mouse_exited)
 
 # === INPUT HANDLING ===
 
@@ -72,30 +75,31 @@ func create_action_buttons() -> void:
   var window_size = get_window().size
   var button_thickness = 50 # Thickness of the button strip
   
-  # Calculate button dimensions to fill the border areas
-  var top_bottom_button_width = (window_size.x - 2 * button_thickness) / 3.0
+  # Calculate button dimensions for 2 buttons per side
+  var top_bottom_button_width = (window_size.x - 2 * button_thickness) / 2.0
+  var left_right_button_height = (window_size.y - 2 * button_thickness) / 2.0
   
-  # Button positions and sizes around the border (8 buttons total)
+  # Button positions and sizes around the border (8 buttons total - 2 per side)
   var button_configs = [
-    # Top buttons (3 buttons)
+    # Top buttons (2 buttons)
     {"pos": Vector2(button_thickness, 0), "size": Vector2(top_bottom_button_width, button_thickness)}, # Top left
-    {"pos": Vector2(button_thickness + top_bottom_button_width, 0), "size": Vector2(top_bottom_button_width, button_thickness)}, # Top center
-    {"pos": Vector2(button_thickness + 2 * top_bottom_button_width, 0), "size": Vector2(top_bottom_button_width, button_thickness)}, # Top right
+    {"pos": Vector2(button_thickness + top_bottom_button_width, 0), "size": Vector2(top_bottom_button_width, button_thickness)}, # Top right
     
-    # Right button
-    {"pos": Vector2(window_size.x - button_thickness, button_thickness), "size": Vector2(button_thickness, window_size.y - 2 * button_thickness)}, # Right center
+    # Right buttons (2 buttons)
+    {"pos": Vector2(window_size.x - button_thickness, button_thickness), "size": Vector2(button_thickness, left_right_button_height)}, # Right top
+    {"pos": Vector2(window_size.x - button_thickness, button_thickness + left_right_button_height), "size": Vector2(button_thickness, left_right_button_height)}, # Right bottom
     
-    # Bottom buttons (3 buttons)
-    {"pos": Vector2(button_thickness + 2 * top_bottom_button_width, window_size.y - button_thickness), "size": Vector2(top_bottom_button_width, button_thickness)}, # Bottom right
-    {"pos": Vector2(button_thickness + top_bottom_button_width, window_size.y - button_thickness), "size": Vector2(top_bottom_button_width, button_thickness)}, # Bottom center
+    # Bottom buttons (2 buttons)
+    {"pos": Vector2(button_thickness + top_bottom_button_width, window_size.y - button_thickness), "size": Vector2(top_bottom_button_width, button_thickness)}, # Bottom right
     {"pos": Vector2(button_thickness, window_size.y - button_thickness), "size": Vector2(top_bottom_button_width, button_thickness)}, # Bottom left
     
-    # Left button  
-    {"pos": Vector2(0, button_thickness), "size": Vector2(button_thickness, window_size.y - 2 * button_thickness)} # Left center
+    # Left buttons (2 buttons)
+    {"pos": Vector2(0, button_thickness + left_right_button_height), "size": Vector2(button_thickness, left_right_button_height)}, # Left bottom
+    {"pos": Vector2(0, button_thickness), "size": Vector2(button_thickness, left_right_button_height)} # Left top
   ]
   
-  # Button labels for different functions
-  var labels = ["B-1", "B-2", "B-3", "B-4", "B-5", "B-6", "B-7", "B-8"]
+  # Button labels for different functions (2 per side: Top, Right, Bottom, Left)
+  var labels = ["T-1", "T-2", "R-1", "R-2", "B-1", "B-2", "L-1", "L-2"]
   
   for i in range(button_configs.size()):
     var button = Button.new()
@@ -117,17 +121,17 @@ func create_action_buttons() -> void:
 
 # === EVENT HANDLERS ===
 
-func _on_character_mouse_entered() -> void:
-  """Show action buttons when mouse enters character area"""
+func _on_window_mouse_entered() -> void:
+  """Show action buttons when mouse enters window area"""
   show_action_buttons()
 
-func _on_character_mouse_exited() -> void:
-  """Hide action buttons when mouse exits character area"""
+func _on_window_mouse_exited() -> void:
+  """Hide action buttons when mouse exits window area"""
   hide_action_buttons()
 
 func _on_action_button_pressed(button_index: int) -> void:
   """Handle action button presses - placeholder for future functionality"""
-  var button_names = ["Action-1", "Action-2", "Action-3", "Action-4", "Action-5", "Action-6", "Action-7", "Action-8"]
+  var button_names = ["Top-1", "Top-2", "Right-1", "Right-2", "Bottom-1", "Bottom-2", "Left-1", "Left-2"]
   print("Action button pressed: ", button_names[button_index])
   # TODO: Implement specific functionality for each action button
 
@@ -135,26 +139,62 @@ func _on_action_button_pressed(button_index: int) -> void:
 
 func show_action_buttons() -> void:
   """Make action buttons visible with fade-in animation"""
-  if buttons_visible:
+  if buttons_visible and not is_animating:
     return
   
+  # Stop any existing hide animation
+  if hide_tween:
+    hide_tween.kill()
+    hide_tween = null
+  
+  # If we're currently hiding, interrupt the animation and show immediately
+  if is_animating and not buttons_visible:
+    # Cancel current animation state
+    is_animating = false
+  
+  # If already visible and not animating, no need to do anything
+  if buttons_visible and not is_animating:
+    return
+    
+  is_animating = true
   buttons_visible = true
+  
   for button in action_buttons:
     button.visible = true
-    button.modulate.a = 0.0
-    
-    # Create fade-in tween
-    var tween = create_tween()
-    tween.tween_property(button, "modulate:a", 0.9, 0.3)
+  
+  # Create and save the show tween
+  show_tween = create_tween()
+  show_tween.set_parallel(true) # Allow multiple properties to animate simultaneously
+  
+  for button in action_buttons:
+    show_tween.tween_property(button, "modulate:a", 0.9, 0.3)
+  
+  # Set animation finished callback
+  show_tween.tween_callback(func(): is_animating = false).set_delay(0.3)
 
 func hide_action_buttons() -> void:
   """Hide action buttons with fade-out animation"""
-  if not buttons_visible:
+  if not buttons_visible or is_animating:
     return
   
+  # Stop any existing show animation
+  if show_tween:
+    show_tween.kill()
+    show_tween = null
+  
+  is_animating = true
   buttons_visible = false
+  
+  # Create and save the hide tween
+  hide_tween = create_tween()
+  hide_tween.set_parallel(true) # Allow multiple properties to animate simultaneously
+  
   for button in action_buttons:
-    # Create fade-out tween
-    var tween = create_tween()
-    tween.tween_property(button, "modulate:a", 0.0, 0.2)
-    tween.tween_callback(func(): button.visible = false)
+    hide_tween.tween_property(button, "modulate:a", 0.0, 2.0)
+  
+  # Set visibility to false after animation completes
+  hide_tween.tween_callback(func():
+    for button in action_buttons:
+      button.visible = false
+    is_animating = false
+  ).set_delay(2.0)
