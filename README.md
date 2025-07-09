@@ -21,6 +21,14 @@ This is a cute desktop cyber cultivation (casual) game with the following featur
 3. Open the project in the Godot editor
 4. Click the run button to start the game
 
+## TODO
+
+- [x] Initialize the game framework
+- [x] Implement the drag window feature
+- [x] Show around buttons when mouse hover on the window
+- [ ] Monitor the keyboard events and show on window
+- [ ] Monitor the mouse events and show on window
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
