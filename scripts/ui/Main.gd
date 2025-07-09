@@ -1,5 +1,16 @@
 extends Control
 
+# Custom MousePoint class for drawing the mouse point
+class MousePoint extends Control:
+  func _draw() -> void:
+    var point_color = Color(0.9, 0.3, 0.3, 0.9) # Red point
+    var point_size = 4.0
+    draw_circle(Vector2(4, 4), point_size, point_color)
+    
+    # Draw a subtle glow effect
+    var glow_color = Color(0.9, 0.3, 0.3, 0.3)
+    draw_circle(Vector2(4, 4), point_size + 2, glow_color)
+
 # Node references
 @onready var character_node: TextureRect = $Character
 
@@ -49,6 +60,13 @@ var is_animating: bool = false
 var is_dragging: bool = false
 var mouse_initial_pos: Vector2 = Vector2.ZERO
 
+# Mouse monitoring system
+var mouse_monitor_area: Panel
+var mouse_point: Control
+var mouse_point_original_pos: Vector2
+var blink_tween: Tween
+var move_tween: Tween
+
 # === LIFECYCLE METHODS ===
 
 func _ready() -> void:
@@ -65,6 +83,9 @@ func _ready() -> void:
   # Create action buttons
   create_action_buttons()
   
+  # Create mouse monitoring area
+  create_mouse_monitor()
+  
   # Connect mouse signals for window hover detection
   mouse_entered.connect(_on_window_mouse_entered)
   mouse_exited.connect(_on_window_mouse_exited)
@@ -72,12 +93,21 @@ func _ready() -> void:
 # === INPUT HANDLING ===
 
 func _input(event: InputEvent) -> void:
-  """Handle all keyboard input events"""
+  """Handle all input events - keyboard and global mouse monitoring"""
   if event is InputEventKey and event.pressed:
     update_keyboard_display(event)
+  elif event is InputEventMouseButton:
+    # Global mouse button monitoring
+    if event.pressed:
+      handle_mouse_click(event.global_position)
+    if event.double_click:
+      handle_mouse_double_click(event.global_position)
+  elif event is InputEventMouseMotion:
+    # Global mouse movement monitoring
+    handle_mouse_move(event.global_position)
 
 func _gui_input(event: InputEvent) -> void:
-  """Handle mouse input for window dragging"""
+  """Handle mouse input for window dragging only"""
   if event is InputEventMouseButton:
     if event.button_index == MOUSE_BUTTON_LEFT:
       if event.pressed:
@@ -280,6 +310,111 @@ func _on_action_button_pressed(button_index: int) -> void:
   var button_names = ["Right-1", "Right-2", "Bottom-1", "Bottom-2", "Left-1", "Left-2"]
   print("Action button pressed: ", button_names[button_index])
   # TODO: Implement specific functionality for each action button
+
+# === MOUSE MONITORING HANDLERS ===
+
+func handle_mouse_click(_mouse_pos: Vector2) -> void:
+  """Handle mouse click events - blink the point"""
+  if mouse_point:
+    # Stop any existing blink animation
+    if blink_tween:
+      blink_tween.kill()
+    
+    # Ensure point is visible before blinking
+    mouse_point.modulate.a = 1.0
+    
+    # Start blink animation
+    blink_mouse_point()
+
+func handle_mouse_move(mouse_pos: Vector2) -> void:
+  """Handle mouse move events - move the point in the same direction (global coordinates)"""
+  # Map the entire screen to the monitor area
+  var screen_size = DisplayServer.screen_get_size()
+  var relative_pos = mouse_pos / Vector2(screen_size)
+  
+  # Scale to point area within the monitor
+  var point_area_size = mouse_monitor_area.size - Vector2(16, 16) # Account for borders and label
+  var new_point_pos = Vector2(
+    clamp(relative_pos.x * point_area_size.x, 0, point_area_size.x - 8) + 8,
+    clamp(relative_pos.y * point_area_size.y, 0, point_area_size.y - 8) + 8
+  )
+  
+  # Use direct position assignment to avoid conflicts and ensure visibility
+  mouse_point.position = new_point_pos
+  # Ensure the point is visible after movement
+  mouse_point.modulate.a = 1.0
+
+func handle_mouse_double_click(_mouse_pos: Vector2) -> void:
+  """Handle double-click events - rapid blink"""
+  rapid_blink_mouse_point()
+
+func blink_mouse_point() -> void:
+  """Make the mouse point blink once"""
+  if not mouse_point:
+    return
+    
+  if blink_tween:
+    blink_tween.kill()
+  
+  # Ensure point is visible before starting animation
+  mouse_point.modulate.a = 1.0
+  
+  blink_tween = create_tween()
+  blink_tween.tween_property(mouse_point, "modulate:a", 0.2, 0.1)
+  blink_tween.tween_property(mouse_point, "modulate:a", 1.0, 0.1)
+
+func rapid_blink_mouse_point() -> void:
+  """Make the mouse point blink rapidly for double-click"""
+  if not mouse_point:
+    return
+    
+  if blink_tween:
+    blink_tween.kill()
+  
+  # Ensure point is visible before starting animation
+  mouse_point.modulate.a = 1.0
+  
+  blink_tween = create_tween()
+  # Blink 3 times rapidly
+  for i in range(3):
+    blink_tween.tween_property(mouse_point, "modulate:a", 0.1, 0.05)
+    blink_tween.tween_property(mouse_point, "modulate:a", 1.0, 0.05)
+
+func create_mouse_monitor() -> void:
+  """Create mouse monitoring area and point to the right of the character"""
+  var window_size = get_window().size
+  
+  # Create the monitoring area panel
+  mouse_monitor_area = Panel.new()
+  mouse_monitor_area.size = Vector2(150, 120)
+  mouse_monitor_area.position = Vector2(window_size.x - 170, 80) # Right side, below keyboard display
+  
+  # Style the monitoring area
+  var area_style = StyleBoxFlat.new()
+  area_style.bg_color = Color(0.15, 0.15, 0.25, 0.8) # Dark background
+  area_style.border_width_left = 2
+  area_style.border_width_right = 2
+  area_style.border_width_top = 2
+  area_style.border_width_bottom = 2
+  area_style.border_color = Color(0.4, 0.6, 0.9, 0.8) # Blue border
+  area_style.corner_radius_top_left = 8
+  area_style.corner_radius_top_right = 8
+  area_style.corner_radius_bottom_left = 8
+  area_style.corner_radius_bottom_right = 8
+  mouse_monitor_area.add_theme_stylebox_override("panel", area_style)
+  
+  # Create the mouse point
+  mouse_point = MousePoint.new()
+  mouse_point.size = Vector2(32, 32)
+  mouse_point_original_pos = Vector2(75, 60) # Center of the area
+  mouse_point.position = mouse_point_original_pos
+  mouse_point.custom_minimum_size = Vector2(32, 32)
+  
+  # Add components to the monitoring area
+  mouse_monitor_area.add_child(mouse_point)
+  
+  # Add the monitoring area to the main scene
+  add_child(mouse_monitor_area)
 
 # === UTILITY METHODS ===
 
