@@ -7,6 +7,37 @@ extends Control
 var keyboard_display: Label
 var last_key_text: String = ""
 
+# Key mapping dictionary for better performance and maintainability
+var key_name_map: Dictionary = {
+  KEY_SPACE: "Space",
+  KEY_ENTER: "Enter",
+  KEY_TAB: "Tab",
+  KEY_BACKSPACE: "Backspace",
+  KEY_DELETE: "Delete",
+  KEY_ESCAPE: "Escape",
+  KEY_LEFT: "Left",
+  KEY_RIGHT: "Right",
+  KEY_UP: "Up",
+  KEY_DOWN: "Down",
+  KEY_SHIFT: "Shift",
+  KEY_CTRL: "Ctrl",
+  KEY_ALT: "Alt",
+  KEY_META: "Cmd",
+  KEY_CAPSLOCK: "CapsLock",
+  KEY_F1: "F1",
+  KEY_F2: "F2",
+  KEY_F3: "F3",
+  KEY_F4: "F4",
+  KEY_F5: "F5",
+  KEY_F6: "F6",
+  KEY_F7: "F7",
+  KEY_F8: "F8",
+  KEY_F9: "F9",
+  KEY_F10: "F10",
+  KEY_F11: "F11",
+  KEY_F12: "F12"
+}
+
 # Action button system
 var action_buttons: Array[Button] = []
 var buttons_visible: bool = false
@@ -86,20 +117,20 @@ func create_keyboard_display() -> void:
   """Create keyboard display label above character"""
   keyboard_display = Label.new()
   keyboard_display.text = "..."
-  keyboard_display.size = Vector2(200, 40)
+  keyboard_display.size = Vector2(200, 60)
   
   # Position above character (assuming character is centered)
   var window_size = get_window().size
   keyboard_display.position = Vector2(
     (window_size.x - keyboard_display.size.x) / 2,
-    20 # 50 pixels from top
+    5 # pixels from top
   )
   
   # Style the label
   style_keyboard_display()
   
   # Set larger font size
-  keyboard_display.add_theme_font_size_override("font_size", 24)
+  keyboard_display.add_theme_font_size_override("font_size", 30)
   
   # Add to scene
   add_child(keyboard_display)
@@ -256,68 +287,15 @@ func update_keyboard_display(event: InputEventKey) -> void:
   """Update keyboard display with the pressed key"""
   var key_string = ""
   
-  # Handle special keys
-  match event.keycode:
-    KEY_SPACE:
-      key_string = "Space"
-    KEY_ENTER:
-      key_string = "Enter"
-    KEY_TAB:
-      key_string = "Tab"
-    KEY_BACKSPACE:
-      key_string = "Backspace"
-    KEY_DELETE:
-      key_string = "Delete"
-    KEY_ESCAPE:
-      key_string = "Escape"
-    KEY_LEFT:
-      key_string = "Left"
-    KEY_RIGHT:
-      key_string = "Right"
-    KEY_UP:
-      key_string = "Up"
-    KEY_DOWN:
-      key_string = "Down"
-    KEY_SHIFT:
-      key_string = "Shift"
-    KEY_CTRL:
-      key_string = "Ctrl"
-    KEY_ALT:
-      key_string = "Alt"
-    KEY_META:
-      key_string = "Cmd"
-    KEY_CAPSLOCK:
-      key_string = "CapsLock"
-    KEY_F1:
-      key_string = "F1"
-    KEY_F2:
-      key_string = "F2"
-    KEY_F3:
-      key_string = "F3"
-    KEY_F4:
-      key_string = "F4"
-    KEY_F5:
-      key_string = "F5"
-    KEY_F6:
-      key_string = "F6"
-    KEY_F7:
-      key_string = "F7"
-    KEY_F8:
-      key_string = "F8"
-    KEY_F9:
-      key_string = "F9"
-    KEY_F10:
-      key_string = "F10"
-    KEY_F11:
-      key_string = "F11"
-    KEY_F12:
-      key_string = "F12"
-    _:
-      # For regular characters, use the unicode representation
-      if event.unicode != 0:
-        key_string = char(event.unicode)
-      else:
-        key_string = "Key: " + str(event.keycode)
+  # Try to get key name from dictionary first
+  if event.keycode in key_name_map:
+    key_string = key_name_map[event.keycode]
+  else:
+    # For regular characters, use the unicode representation
+    if event.unicode != 0:
+      key_string = char(event.unicode)
+    else:
+      key_string = "Key: " + str(event.keycode)
   
   # Add modifier information
   var modifiers = []
