@@ -23,9 +23,9 @@ This is a cute desktop cyber cultivation (casual) game with the following featur
 
 ## TODO
 
-- [ ] Initialize the game framework
-- [ ] Implement the drag window feature
-- [ ] Show around buttons when mouse hover on the window
+- [x] Initialize the game framework
+- [x] Implement the drag window feature
+- [x] Show around buttons when mouse hover on the window
 - [ ] Monitor the keyboard events and show on window
 - [ ] Monitor the mouse events and show on window
 
