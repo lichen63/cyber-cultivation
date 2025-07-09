@@ -108,9 +108,8 @@ func create_action_buttons() -> void:
     button.position = button_configs[i]["pos"]
     button.visible = false # Initially hidden
     
-    # Style the button
-    button.flat = false
-    button.modulate = Color(1.0, 1.0, 1.0, 0.9)
+    # Create beautiful modern button style
+    style_button(button)
     
     # Connect button signal for future functionality
     button.pressed.connect(_on_action_button_pressed.bind(i))
@@ -118,6 +117,69 @@ func create_action_buttons() -> void:
     # Add button to scene and array
     add_child(button)
     action_buttons.append(button)
+
+func style_button(button: Button) -> void:
+  """Apply beautiful modern styling to a button"""
+  # Create custom StyleBoxFlat for normal state
+  var style_normal = StyleBoxFlat.new()
+  style_normal.bg_color = Color(0.2, 0.2, 0.3, 0.85) # Dark blue-gray with transparency
+  style_normal.border_width_left = 2
+  style_normal.border_width_right = 2
+  style_normal.border_width_top = 2
+  style_normal.border_width_bottom = 2
+  style_normal.border_color = Color(0.4, 0.6, 0.9, 0.8) # Bright blue border
+  style_normal.corner_radius_top_left = 8
+  style_normal.corner_radius_top_right = 8
+  style_normal.corner_radius_bottom_left = 8
+  style_normal.corner_radius_bottom_right = 8
+  style_normal.shadow_color = Color(0, 0, 0, 0.3)
+  style_normal.shadow_size = 4
+  style_normal.shadow_offset = Vector2(2, 2)
+  
+  # Create custom StyleBoxFlat for hover state
+  var style_hover = StyleBoxFlat.new()
+  style_hover.bg_color = Color(0.3, 0.4, 0.6, 0.9) # Lighter blue when hovered
+  style_hover.border_width_left = 2
+  style_hover.border_width_right = 2
+  style_hover.border_width_top = 2
+  style_hover.border_width_bottom = 2
+  style_hover.border_color = Color(0.5, 0.7, 1.0, 1.0) # Brighter blue border
+  style_hover.corner_radius_top_left = 8
+  style_hover.corner_radius_top_right = 8
+  style_hover.corner_radius_bottom_left = 8
+  style_hover.corner_radius_bottom_right = 8
+  style_hover.shadow_color = Color(0, 0, 0, 0.4)
+  style_hover.shadow_size = 6
+  style_hover.shadow_offset = Vector2(2, 2)
+  
+  # Create custom StyleBoxFlat for pressed state
+  var style_pressed = StyleBoxFlat.new()
+  style_pressed.bg_color = Color(0.1, 0.2, 0.4, 0.95) # Darker when pressed
+  style_pressed.border_width_left = 2
+  style_pressed.border_width_right = 2
+  style_pressed.border_width_top = 2
+  style_pressed.border_width_bottom = 2
+  style_pressed.border_color = Color(0.3, 0.5, 0.8, 1.0) # Darker blue border
+  style_pressed.corner_radius_top_left = 8
+  style_pressed.corner_radius_top_right = 8
+  style_pressed.corner_radius_bottom_left = 8
+  style_pressed.corner_radius_bottom_right = 8
+  style_pressed.shadow_color = Color(0, 0, 0, 0.2)
+  style_pressed.shadow_size = 2
+  style_pressed.shadow_offset = Vector2(1, 1)
+  
+  # Apply styles to button
+  button.add_theme_stylebox_override("normal", style_normal)
+  button.add_theme_stylebox_override("hover", style_hover)
+  button.add_theme_stylebox_override("pressed", style_pressed)
+  
+  # Set text color and font properties
+  button.add_theme_color_override("font_color", Color(0.9, 0.9, 1.0, 1.0)) # Light blue-white text
+  button.add_theme_color_override("font_hover_color", Color(1.0, 1.0, 1.0, 1.0)) # Pure white on hover
+  button.add_theme_color_override("font_pressed_color", Color(0.8, 0.9, 1.0, 1.0)) # Slightly dimmer when pressed
+  
+  # Initial transparency for animation
+  button.modulate = Color(1.0, 1.0, 1.0, 0.0)
 
 # === EVENT HANDLERS ===
 
