@@ -20,26 +20,24 @@ func _init(parent: Control):
   parent_node = parent
 
 func create_buttons() -> void:
-  """Create action buttons around the window border"""
+  """Create action buttons at the bottom of the window"""
   var window_size = parent_node.get_window().size
   
-  # Calculate button dimensions for 2 buttons on top and 2 buttons on bottom with margins
+  # Calculate button dimensions for 4 buttons on bottom with margins
   var available_width = window_size.x - (2 * UIConstants.MARGIN)
-  var button_width = available_width / UIConstants.TOP_BUTTONS_COUNT
+  var button_width = available_width / 4
   
-  # Button positions and sizes around the border (4 buttons total - 2 on top, 2 on bottom)
+  # Button positions and sizes at the bottom (4 buttons total)
   var button_configs = [
-    # Top buttons (2 buttons)
-    {"pos": Vector2(UIConstants.MARGIN, 0), "size": Vector2(button_width, UIConstants.BUTTON_THICKNESS)}, # Top left
-    {"pos": Vector2(UIConstants.MARGIN + button_width, 0), "size": Vector2(button_width, UIConstants.BUTTON_THICKNESS)}, # Top right
-    
-    # Bottom buttons (2 buttons)
-    {"pos": Vector2(UIConstants.MARGIN, window_size.y - UIConstants.BUTTON_THICKNESS), "size": Vector2(button_width, UIConstants.BUTTON_THICKNESS)}, # Bottom left
-    {"pos": Vector2(UIConstants.MARGIN + button_width, window_size.y - UIConstants.BUTTON_THICKNESS), "size": Vector2(button_width, UIConstants.BUTTON_THICKNESS)} # Bottom right
+    # Bottom buttons (4 buttons) - moved higher to avoid border overlap
+    {"pos": Vector2(UIConstants.MARGIN, window_size.y - UIConstants.BUTTON_THICKNESS - UIConstants.BORDER_WIDTH - 5), "size": Vector2(button_width, UIConstants.BUTTON_THICKNESS)}, # Bottom 1
+    {"pos": Vector2(UIConstants.MARGIN + button_width, window_size.y - UIConstants.BUTTON_THICKNESS - UIConstants.BORDER_WIDTH - 5), "size": Vector2(button_width, UIConstants.BUTTON_THICKNESS)}, # Bottom 2
+    {"pos": Vector2(UIConstants.MARGIN + (button_width * 2), window_size.y - UIConstants.BUTTON_THICKNESS - UIConstants.BORDER_WIDTH - 5), "size": Vector2(button_width, UIConstants.BUTTON_THICKNESS)}, # Bottom 3
+    {"pos": Vector2(UIConstants.MARGIN + (button_width * 3), window_size.y - UIConstants.BUTTON_THICKNESS - UIConstants.BORDER_WIDTH - 5), "size": Vector2(button_width, UIConstants.BUTTON_THICKNESS)} # Bottom 4
   ]
   
-  # Button labels for different functions (2 on top, 2 on bottom)
-  var labels = ["T-1", "T-2", "B-1", "B-2"]
+  # Button labels for different functions (4 bottom buttons)
+  var labels = ["B-1", "B-2", "B-3", "B-4"]
   
   for i in range(button_configs.size()):
     var button = Button.new()

@@ -31,7 +31,7 @@ This is a cute desktop cyber cultivation (casual) game with the following featur
 - [x] Monitor keyboard events and display them on the window
 - [x] Monitor mouse events and display them on the window
 - [x] Split script to different parts
-- [ ] Add cultivation progress bar and level system
+- [x] Add cultivation progress bar and level system
 - [ ] Connect keyboard and mouse events to cultivation spiritual power mechanics
 - [ ] Implement auto-save functionality for cultivation progress
 

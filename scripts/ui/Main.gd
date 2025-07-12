@@ -8,6 +8,7 @@ const KeyboardDisplay = preload("res://scripts/ui/KeyboardDisplay.gd")
 const MouseMonitor = preload("res://scripts/ui/MouseMonitor.gd")
 const ActionButtons = preload("res://scripts/ui/ActionButtons.gd")
 const WindowDragger = preload("res://scripts/ui/WindowDragger.gd")
+const CultivationStatus = preload("res://scripts/ui/CultivationStatus.gd")
 
 # Node references
 @onready var character_node: TextureRect = $Character
@@ -17,6 +18,7 @@ var keyboard_display: KeyboardDisplay
 var mouse_monitor: MouseMonitor
 var action_buttons: ActionButtons
 var window_dragger: WindowDragger
+var cultivation_status: CultivationStatus
 
 # === LIFECYCLE METHODS ===
 
@@ -33,6 +35,11 @@ func _ready() -> void:
 
 func initialize_components() -> void:
   """Initialize all UI components"""
+  # Create cultivation status display (top area)
+  cultivation_status = CultivationStatus.new()
+  var cultivation_ui = cultivation_status.create_ui(get_window().size)
+  add_child(cultivation_ui)
+  
   # Create keyboard display
   keyboard_display = KeyboardDisplay.new()
   keyboard_display.position_display(get_window().size)
@@ -95,6 +102,7 @@ func _on_window_mouse_exited() -> void:
 
 func _on_action_button_pressed(button_index: int) -> void:
   """Handle action button presses - placeholder for future functionality"""
-  var button_names = ["Top-1", "Top-2", "Bottom-1", "Bottom-2"]
+  var button_names = ["Bottom-1", "Bottom-2", "Bottom-3", "Bottom-4"]
   print("Action button pressed: ", button_names[button_index])
+  
   # TODO: Implement specific functionality for each action button
