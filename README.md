@@ -34,6 +34,7 @@ This is a cute desktop cyber cultivation (casual) game with the following featur
 - [x] Add cultivation progress bar and level system
 - [ ] Connect keyboard and mouse events to cultivation spiritual power mechanics
 - [ ] Implement auto-save functionality for cultivation progress
+- [ ] Fix all warnings
 
 ### Bugs
 

@@ -6,6 +6,9 @@ extends RefCounted
 const UIConstants = preload("res://scripts/ui/UIConstants.gd")
 const UIStyler = preload("res://scripts/ui/UIStyler.gd")
 
+# Constants
+const LEVEL_PREFIX = "Lv. "
+
 # Configuration
 var max_exp_per_level: Array[int] = [] # Different max exp for each level
 var max_level: int = 100
@@ -56,7 +59,7 @@ func create_ui(window_size: Vector2) -> Control:
   
   # Create level label (positioned to the left of the status bar)
   level_label = Label.new()
-  level_label.text = "Lv. " + str(current_level)
+  level_label.text = LEVEL_PREFIX + str(current_level)
   level_label.size = Vector2(100, 30)
   level_label.position = Vector2(exp_bar.position.x - 70, 4) # Aligned with exp_bar center
   style_label(level_label)
@@ -150,7 +153,7 @@ func set_level(new_level: int) -> void:
 func refresh_ui() -> void:
   """Refresh the UI display with current values"""
   if level_label:
-    level_label.text = "Level " + str(current_level)
+    level_label.text = LEVEL_PREFIX + str(current_level)
   if exp_bar:
     exp_bar.max_value = get_current_level_max_exp()
     exp_bar.value = current_exp
@@ -159,17 +162,6 @@ func refresh_ui() -> void:
       var exp_text_label = exp_bar.get_child(0) as Label
       if exp_text_label:
         exp_text_label.text = str(current_exp) + "/" + str(get_current_level_max_exp())
-
-func configure(config: Dictionary) -> void:
-  """Update configuration settings"""
-  if config.has("max_level"):
-    max_level = config["max_level"]
-    # Regenerate exp array if max level changed
-    max_exp_per_level = []
-    for level in range(1, max_level + 1):
-      var base_exp = 100
-      var exp_for_level = int(base_exp * pow(1.2, level - 1))
-      max_exp_per_level.append(exp_for_level)
   
   # Update progress bar max value if it exists
   if exp_bar:

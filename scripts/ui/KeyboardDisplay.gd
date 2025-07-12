@@ -6,6 +6,9 @@ extends Label
 const UIConstants = preload("res://scripts/ui/UIConstants.gd")
 const UIStyler = preload("res://scripts/ui/UIStyler.gd")
 
+# Reference to cultivation status for experience tracking
+var cultivation_status: CultivationStatus
+
 # Key mapping dictionary for better performance and maintainability
 var key_name_map: Dictionary = {
   KEY_SPACE: "Space",
@@ -60,6 +63,10 @@ func setup_styling() -> void:
   horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
   vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 
+func set_cultivation_status(status: CultivationStatus) -> void:
+  """Set the cultivation status reference for experience tracking"""
+  cultivation_status = status
+
 func position_display(window_size: Vector2) -> void:
   """Position keyboard display relative to window"""
   position = Vector2(
@@ -98,3 +105,7 @@ func update_display(event: InputEventKey) -> void:
   # Update the display
   last_key_text = key_string
   text = key_string
+  
+  # Award experience directly
+  if cultivation_status:
+    cultivation_status.add_experience(1)

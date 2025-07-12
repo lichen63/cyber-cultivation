@@ -6,6 +6,14 @@ extends Panel
 const UIConstants = preload("res://scripts/ui/UIConstants.gd")
 const UIStyler = preload("res://scripts/ui/UIStyler.gd")
 
+# Reference to cultivation status for experience tracking
+var cultivation_status: CultivationStatus
+
+# Mouse tracking variables
+var last_mouse_position: Vector2
+var accumulated_mouse_distance: float = 0.0
+var movement_threshold: float = 100.0
+
 # Custom MousePoint class for drawing the mouse point
 class MousePoint extends Control:
   func _draw() -> void:
@@ -22,10 +30,17 @@ func _init():
   size = Vector2(UIConstants.MOUSE_MONITOR_WIDTH, UIConstants.MOUSE_MONITOR_HEIGHT)
   setup_styling()
   create_mouse_point()
+  
+  # Initialize mouse tracking
+  last_mouse_position = DisplayServer.mouse_get_position()
 
 func setup_styling() -> void:
   """Apply styling to monitoring area"""
   add_theme_stylebox_override("panel", UIStyler.create_mouse_monitor_style())
+
+func set_cultivation_status(status: CultivationStatus) -> void:
+  """Set the cultivation status reference for experience tracking"""
+  cultivation_status = status
 
 func create_mouse_point() -> void:
   """Create the mouse point indicator"""
@@ -52,6 +67,10 @@ func update_mouse_point_position() -> void:
     
   # Get current mouse position
   var mouse_pos: Vector2i = DisplayServer.mouse_get_position()
+  var current_mouse_position = Vector2(mouse_pos)
+  
+  # Track mouse movement for experience
+  track_mouse_movement(current_mouse_position)
   
   # Map the entire screen to the monitor area
   var screen_size: Vector2i = DisplayServer.screen_get_size()
@@ -67,3 +86,17 @@ func update_mouse_point_position() -> void:
   # Set the position and ensure visibility
   mouse_point.position = new_point_pos
   mouse_point.modulate.a = 1.0
+
+func track_mouse_movement(current_mouse_position: Vector2) -> void:
+  """Track mouse movement and award experience when threshold is reached"""
+  var distance = last_mouse_position.distance_to(current_mouse_position)
+  
+  accumulated_mouse_distance += distance
+  last_mouse_position = current_mouse_position
+  
+  # Check if accumulated distance meets threshold
+  if accumulated_mouse_distance >= movement_threshold:
+    # Award experience directly
+    if cultivation_status:
+      cultivation_status.add_experience(1)
+    accumulated_mouse_distance = 0.0 # Reset accumulated distance

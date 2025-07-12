@@ -10,9 +10,6 @@ const ActionButtons = preload("res://scripts/ui/ActionButtons.gd")
 const WindowDragger = preload("res://scripts/ui/WindowDragger.gd")
 const CultivationStatus = preload("res://scripts/ui/CultivationStatus.gd")
 
-# Node references
-@onready var character_node: TextureRect = $Character
-
 # Component instances
 var keyboard_display: KeyboardDisplay
 var mouse_monitor: MouseMonitor
@@ -27,9 +24,6 @@ func _ready() -> void:
   get_viewport().transparent_bg = true
   get_window().transparent = true
   
-  # Enable drawing for border
-  set_process(true)
-  
   # Initialize all components
   initialize_components()
 
@@ -43,11 +37,15 @@ func initialize_components() -> void:
   # Create keyboard display
   keyboard_display = KeyboardDisplay.new()
   keyboard_display.position_display(get_window().size)
+  # Set cultivation status reference for experience tracking
+  keyboard_display.set_cultivation_status(cultivation_status)
   add_child(keyboard_display)
   
   # Create mouse monitoring area
   mouse_monitor = MouseMonitor.new()
   mouse_monitor.position_monitor(get_window().size)
+  # Set cultivation status reference for experience tracking
+  mouse_monitor.set_cultivation_status(cultivation_status)
   add_child(mouse_monitor)
   
   # Initialize mouse point position based on current mouse position
