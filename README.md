@@ -1,16 +1,24 @@
-# cyber_cultivation
+# Cyber Cultivation
 
-A new Flutter project.
+A flutter game with global input monitoring capabilities that work even when the game window loses focus.
 
-## Getting Started
+## Todo List
 
-This project is a starting point for a Flutter application.
+See [TODO.md](docs/TODO.md) for the complete list of planned features and known bugs.
 
-A few resources to get you started if this is your first Flutter project:
+## Quick Start
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### Prerequisites
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- **macOS**: Xcode Command Line Tools
+- **Windows**: Visual Studio Build Tools (not yet implemented)
+- **Linux**: GCC and X11 development libraries (not yet implemented)
+- **All Platforms**: Git
+
+## Contributing
+
+We welcome contributions! Please read our [Contributing Guidelines](docs/CONTRIBUTING.md) before submitting pull requests.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
