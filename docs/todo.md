@@ -1,0 +1,53 @@
+# TODO List
+
+## Features
+
+- [ ] Initialize the game framework
+- [ ] Implement the drag window feature
+- [ ] Show control buttons when mouse hovers over the window
+- [ ] Monitor keyboard events and display them on the window
+- [ ] Monitor mouse events and display them on the window
+- [ ] Split script to different parts
+- [ ] Add cultivation progress bar and level system
+- [ ] Connect keyboard and mouse events to cultivation spiritual power mechanics
+- [ ] Implement auto-save functionality for cultivation progress
+- [ ] Drag to scale in/out the game window
+- [ ] Right click to show menu list
+- [ ] Change License
+- [ ] Add contributing guidance
+- [ ] Count typing frequency/APM?
+- [ ] Add upgrade effect when level up
+- [ ] Think what should happen when player reached the max level? -> show infinite symbol
+- [ ] Use better font style
+- [ ] Localization
+- [ ] Save current window size to game_data.save
+- [ ] Add a switch for whether stick the game window on the top
+- [ ] Change level to cultivation realm
+- [ ] Use different pictures for different levels -> change to only one image, but show different effect in different realm
+- [ ] Replace the default character image -> change to make the character sprite image horizontal symmetric
+- [ ] Add a stop game script
+- [ ] Pomodoro clock
+- [ ] Pomodoro clock can get experience
+- [ ] Add equipment system
+  - [ ] Replace B-1 with equipment button, and click to show the equipment ui
+  - [ ] Equip UI contains weapon, armor, tool, accessory, each has 11 levels (same as character realm)
+  - [ ] Each equip has a background square box and shows different colors for different levels which is same as character realm
+  - [ ] show tooltip when mouse hover on the equip
+  - [ ] Save equip items to local storage
+  - [ ] Can consume exp to upgrade equip? -> need to save all before exp, and consume it to upgrade, also need to record the consumed exp
+  - [ ] Weapon is responsible for increasing exp from keyboard events
+  - [ ] Armor is responsible for increasing exp from mouse events
+  - [ ] Cultivatil tool is reponsible for increasing exp from pomodoro clock(focus time)
+  - [ ] Accessory is reponsible for reducing the needed exp for current level
+- [ ] Generate user id and save/load it in game_data.save
+- [ ] Add pet system
+- [ ] Add friends system
+- [ ] Let player customize the character image
+- [ ] Add switch for every ui in the game window, let player can customize which ui to show/hide
+- [ ] Investigate how to implement character operate virtual keyboard, refer to: https://juejin.cn/post/7497785507788488723
+  - https://github.com/ayangweb/BongoCat
+  - https://www.live2d.com/en/
+  - https://github.com/guansss/pixi-live2d-display
+- [ ] Check and show multiple screens if there are more than one screen(dependency: could we get the arrangement of the screens?)
+
+## Bugs
