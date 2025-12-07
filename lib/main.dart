@@ -82,7 +82,9 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   String _currentKey = 'Press any key...';
-  static const EventChannel _eventChannel = EventChannel('com.lichen63.cyber_cultivation/key_events');
+  static const EventChannel _eventChannel = EventChannel(
+    'com.lichen63.cyber_cultivation/key_events',
+  );
 
   @override
   void initState() {
@@ -91,15 +93,18 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _setupKeyboardListener() {
-    _eventChannel.receiveBroadcastStream().listen((dynamic event) {
-      if (event is String) {
-        setState(() {
-          _currentKey = event;
-        });
-      }
-    }, onError: (dynamic error) {
-      debugPrint('Received error: ${error.message}');
-    });
+    _eventChannel.receiveBroadcastStream().listen(
+      (dynamic event) {
+        if (event is String) {
+          setState(() {
+            _currentKey = event;
+          });
+        }
+      },
+      onError: (dynamic error) {
+        debugPrint('Received error: ${error.message}');
+      },
+    );
   }
 
   @override
@@ -133,7 +138,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         vertical: 10,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.7),
+                        color: Colors.black.withValues(alpha: 0.7),
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(color: Colors.white, width: 2),
                       ),
