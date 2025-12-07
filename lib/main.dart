@@ -16,6 +16,9 @@ void main() async {
   windowManager.waitUntilReadyToShow(windowOptions, () async {
     await windowManager.setAsFrameless();
     await windowManager.setHasShadow(false);
+    await windowManager.setMinimumSize(const Size(200, 200));
+    await windowManager.setMaximumSize(const Size(800, 800));
+    await windowManager.setAspectRatio(1.0); // Set aspect ratio to 1:1 (square)
     await windowManager.show();
     await windowManager.focus();
   });
@@ -23,10 +26,34 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> with WindowListener {
+  @override
+  void initState() {
+    super.initState();
+    windowManager.addListener(this);
+  }
+
+  @override
+  void dispose() {
+    windowManager.removeListener(this);
+    super.dispose();
+  }
+
+  @override
+  void onWindowResize() {
+    // Maintain aspect ratio during resize
+    windowManager.getSize().then((size) {
+      windowManager.setAspectRatio(1.0);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -52,7 +79,18 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: Center(child: Image.asset('assets/images/character.png')),
+      body: DragToMoveArea(
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.white, width: 6.0),
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(30.0),
+            child: Center(child: Image.asset('assets/images/character.png')),
+          ),
+        ),
+      ),
     );
   }
 }
