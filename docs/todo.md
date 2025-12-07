@@ -6,10 +6,10 @@
 - [x] Draw a rectangle border
 - [x] Can only scale with proportion
 - [x] Add a minimum and maximum size for window
-- [ ] Implement the drag window feature
-- [ ] Show control buttons when mouse hovers over the window
+- [x] Implement the drag window feature
 - [ ] Monitor keyboard events and display them on the window
 - [ ] Monitor mouse events and display them on the window
+- [ ] Show control buttons when mouse hovers over the window
 - [ ] Split script to different parts
 - [ ] Add cultivation progress bar and level system
 - [ ] Connect keyboard and mouse events to cultivation spiritual power mechanics
