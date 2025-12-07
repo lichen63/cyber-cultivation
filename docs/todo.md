@@ -2,7 +2,9 @@
 
 ## Features
 
-- [ ] Initialize the game framework
+- [x] Initialize the game framework
+- [x] Draw a rectangle border
+- [ ] can only scale with proportion
 - [ ] Implement the drag window feature
 - [ ] Show control buttons when mouse hovers over the window
 - [ ] Monitor keyboard events and display them on the window

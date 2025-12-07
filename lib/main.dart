@@ -52,7 +52,16 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: Center(child: Image.asset('assets/images/character.png')),
+      body: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.white, width: 6.0),
+          borderRadius: BorderRadius.circular(20.0),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(30.0),
+          child: Center(child: Image.asset('assets/images/character.png')),
+        ),
+      ),
     );
   }
 }
