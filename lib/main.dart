@@ -117,6 +117,7 @@ class _MyHomePageState extends State<MyHomePage> {
     for (var key in keysToMonitor) {
       final hotKey = HotKey(
         key: key,
+        modifiers: [],
         scope: HotKeyScope.system,
       );
       await hotKeyManager.register(
