@@ -124,33 +124,32 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           child: Padding(
             padding: const EdgeInsets.all(30.0),
-            child: Stack(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Center(child: Image.asset('assets/images/character.png')),
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  child: Center(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.7),
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: Colors.white, width: 2),
-                      ),
-                      child: Text(
-                        _currentKey,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.7),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.white, width: 2),
+                  ),
+                  child: Text(
+                    _currentKey,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Expanded(
+                  child: Center(
+                    child: Image.asset('assets/images/character.png'),
                   ),
                 ),
               ],
