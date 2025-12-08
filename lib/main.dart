@@ -128,7 +128,7 @@ class _MyHomePageState extends State<MyHomePage> {
               children: [
                 Center(child: Image.asset('assets/images/character.png')),
                 Positioned(
-                  bottom: 20,
+                  top: 0,
                   left: 0,
                   right: 0,
                   child: Center(
