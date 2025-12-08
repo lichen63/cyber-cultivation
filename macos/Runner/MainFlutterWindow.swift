@@ -76,6 +76,40 @@ class KeyMonitorStreamHandler: NSObject, FlutterStreamHandler {
     private var eventTap: CFMachPort?
     private var runLoopSource: CFRunLoopSource?
     private var eventSink: FlutterEventSink?
+    
+    // Keycode to string mapping dictionary
+    private static let keyCodeMap: [Int: String] = [
+        // Numbers
+        18: "1", 19: "2", 20: "3", 21: "4", 23: "5",
+        22: "6", 26: "7", 28: "8", 25: "9", 29: "0",
+        
+        // Letters
+        0: "A", 11: "B", 8: "C", 2: "D", 14: "E", 3: "F", 5: "G", 4: "H",
+        34: "I", 38: "J", 40: "K", 37: "L", 46: "M", 45: "N", 31: "O", 35: "P",
+        12: "Q", 15: "R", 1: "S", 17: "T", 32: "U", 9: "V", 13: "W", 7: "X",
+        16: "Y", 6: "Z",
+        
+        // Special keys
+        36: "Enter", 48: "Tab", 49: "Space", 51: "Backspace", 53: "Esc",
+        123: "←", 124: "→", 125: "↓", 126: "↑",
+        117: "Delete", 115: "Home", 119: "End", 116: "PageUp", 121: "PageDown",
+        
+        // Function keys
+        122: "F1", 120: "F2", 99: "F3", 118: "F4", 96: "F5", 97: "F6",
+        98: "F7", 100: "F8", 101: "F9", 109: "F10", 103: "F11", 111: "F12",
+        105: "F13", 107: "F14", 113: "F15", 106: "F16", 64: "F17", 79: "F18",
+        80: "F19", 90: "F20",
+        
+        // Punctuation
+        27: "-", 24: "=", 33: "[", 30: "]", 42: "\\",
+        41: ";", 39: "'", 43: ",", 47: ".", 44: "/", 50: "`",
+        
+        // Keypad
+        82: "Keypad 0", 83: "Keypad 1", 84: "Keypad 2", 85: "Keypad 3", 86: "Keypad 4",
+        87: "Keypad 5", 88: "Keypad 6", 89: "Keypad 7", 91: "Keypad 8", 92: "Keypad 9",
+        65: "Keypad .", 67: "Keypad *", 69: "Keypad +", 75: "Keypad /", 78: "Keypad -",
+        81: "Keypad =", 76: "Keypad Enter", 71: "Keypad Clear"
+    ]
 
     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
         self.eventSink = events
@@ -183,72 +217,6 @@ class KeyMonitorStreamHandler: NSObject, FlutterStreamHandler {
     }
     
     private func keyCodeToString(_ keyCode: Int) -> String {
-        switch keyCode {
-        // Numbers
-        case 18: return "1"
-        case 19: return "2"
-        case 20: return "3"
-        case 21: return "4"
-        case 23: return "5"
-        case 22: return "6"
-        case 26: return "7"
-        case 28: return "8"
-        case 25: return "9"
-        case 29: return "0"
-        
-        // Letters
-        case 0: return "A"
-        case 11: return "B"
-        case 8: return "C"
-        case 2: return "D"
-        case 14: return "E"
-        case 3: return "F"
-        case 5: return "G"
-        case 4: return "H"
-        case 34: return "I"
-        case 38: return "J"
-        case 40: return "K"
-        case 37: return "L"
-        case 46: return "M"
-        case 45: return "N"
-        case 31: return "O"
-        case 35: return "P"
-        case 12: return "Q"
-        case 15: return "R"
-        case 1: return "S"
-        case 17: return "T"
-        case 32: return "U"
-        case 9: return "V"
-        case 13: return "W"
-        case 7: return "X"
-        case 16: return "Y"
-        case 6: return "Z"
-        
-        // Special keys
-        case 36: return "Enter"
-        case 48: return "Tab"
-        case 49: return "Space"
-        case 51: return "Backspace"
-        case 53: return "Esc"
-        case 123: return "←"
-        case 124: return "→"
-        case 125: return "↓"
-        case 126: return "↑"
-        
-        // Punctuation
-        case 27: return "-"
-        case 24: return "="
-        case 33: return "["
-        case 30: return "]"
-        case 42: return "\\"
-        case 41: return ";"
-        case 39: return "'"
-        case 43: return ","
-        case 47: return "."
-        case 44: return "/"
-        case 50: return "`"
-        
-        default: return ""
-        }
+        return Self.keyCodeMap[keyCode] ?? ""
     }
 }
