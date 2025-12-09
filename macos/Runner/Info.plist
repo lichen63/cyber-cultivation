@@ -28,5 +28,7 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>NSAppleEventsUsageDescription</key>
+	<string>This app requires accessibility permissions to monitor keyboard shortcuts globally.</string>
 </dict>
 </plist>
