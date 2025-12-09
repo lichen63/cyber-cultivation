@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:window_manager/window_manager.dart';
 
 void main() async {
@@ -70,10 +71,46 @@ class _MyAppState extends State<MyApp> with WindowListener {
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
 
   final String title;
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  String _currentKey = 'Press any key...';
+  static const EventChannel _eventChannel = EventChannel(
+    'com.lichen63.cyber_cultivation/key_events',
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    _setupKeyboardListener();
+  }
+
+  void _setupKeyboardListener() {
+    _eventChannel.receiveBroadcastStream().listen(
+      (dynamic event) {
+        if (event is String) {
+          setState(() {
+            _currentKey = event;
+          });
+        }
+      },
+      onError: (dynamic error) {
+        debugPrint('Received error: ${error.message}');
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -87,7 +124,36 @@ class MyHomePage extends StatelessWidget {
           ),
           child: Padding(
             padding: const EdgeInsets.all(30.0),
-            child: Center(child: Image.asset('assets/images/character.png')),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.7),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.white, width: 2),
+                  ),
+                  child: Text(
+                    _currentKey,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Expanded(
+                  child: Center(
+                    child: Image.asset('assets/images/character.png'),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
