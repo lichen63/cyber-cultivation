@@ -8,8 +8,8 @@
 - [x] Add a minimum and maximum size for window
 - [x] Implement the drag window feature
 - [x] Monitor keyboard events and display them on the window
-- [ ] Make window always foreground
 - [ ] Monitor mouse events and display them on the window
+- [ ] Make window always foreground
 - [ ] Show control buttons when mouse hovers over the window
 - [ ] Split script to different parts
 - [ ] Add cultivation progress bar and level system

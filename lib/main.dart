@@ -82,14 +82,23 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   String _currentKey = 'Press any key...';
+  double _mouseX = 0;
+  double _mouseY = 0;
+  double _screenWidth = 1920;
+  double _screenHeight = 1080;
+
   static const EventChannel _eventChannel = EventChannel(
     'com.lichen63.cyber_cultivation/key_events',
+  );
+  static const EventChannel _mouseEventChannel = EventChannel(
+    'com.lichen63.cyber_cultivation/mouse_events',
   );
 
   @override
   void initState() {
     super.initState();
     _setupKeyboardListener();
+    _setupMouseListener();
   }
 
   void _setupKeyboardListener() {
@@ -103,6 +112,33 @@ class _MyHomePageState extends State<MyHomePage> {
       },
       onError: (dynamic error) {
         debugPrint('Received error: ${error.message}');
+      },
+    );
+  }
+
+  void _setupMouseListener() {
+    _mouseEventChannel.receiveBroadcastStream().listen(
+      (dynamic event) {
+        if (event is Map) {
+          setState(() {
+            // Get absolute position and screen info from native
+            final absX = (event['x'] as num?)?.toDouble() ?? 0;
+            final absY = (event['y'] as num?)?.toDouble() ?? 0;
+            final screenMinX = (event['screenMinX'] as num?)?.toDouble() ?? 0;
+            final screenMinY = (event['screenMinY'] as num?)?.toDouble() ?? 0;
+
+            // Calculate relative position in Dart
+            _mouseX = absX - screenMinX;
+            _mouseY = absY - screenMinY;
+
+            // Update current screen dimensions
+            _screenWidth = (event['screenWidth'] as num?)?.toDouble() ?? 1920;
+            _screenHeight = (event['screenHeight'] as num?)?.toDouble() ?? 1080;
+          });
+        }
+      },
+      onError: (dynamic error) {
+        debugPrint('Mouse event error: ${error.message}');
       },
     );
   }
@@ -127,29 +163,88 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.7),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.white, width: 2),
-                  ),
-                  child: Text(
-                    _currentKey,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
                 Expanded(
-                  child: Center(
-                    child: Image.asset('assets/images/character.png'),
+                  child: Row(
+                    children: [
+                      // Keyboard label on the left
+                      Expanded(
+                        child: Center(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.7),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: Colors.white, width: 2),
+                            ),
+                            child: Text(
+                              _currentKey,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                      // Character image in the middle
+                      Expanded(
+                        child: Center(
+                          child: Image.asset('assets/images/character.png'),
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                      // Screen visualization on the right
+                      Expanded(
+                        child: AspectRatio(
+                          aspectRatio: 1.0,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.white, width: 2),
+                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.black.withValues(alpha: 0.3),
+                            ),
+                            child: LayoutBuilder(
+                              builder: (context, constraints) {
+                                // Calculate the position of the red dot relative to the container
+                                // Use actual screen dimensions from native side
+                                final dotX =
+                                    (_mouseX / _screenWidth) *
+                                    constraints.maxWidth;
+                                final dotY =
+                                    (_mouseY / _screenHeight) *
+                                    constraints.maxHeight;
+                                return Stack(
+                                  children: [
+                                    // Red dot representing mouse position
+                                    Positioned(
+                                      left:
+                                          dotX.clamp(0, constraints.maxWidth) -
+                                          5,
+                                      top:
+                                          dotY.clamp(0, constraints.maxHeight) -
+                                          5,
+                                      child: Container(
+                                        width: 10,
+                                        height: 10,
+                                        decoration: const BoxDecoration(
+                                          color: Colors.red,
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
