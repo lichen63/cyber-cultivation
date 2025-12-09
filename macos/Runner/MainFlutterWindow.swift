@@ -232,35 +232,9 @@ class MouseMonitorStreamHandler: NSObject, FlutterStreamHandler {
     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
         self.eventSink = events
         
-        // Get current mouse position immediately using CGEvent
+        // Get current mouse position immediately and send it
         if let mouseLocation = CGEvent(source: nil)?.location {
-            let screens = NSScreen.screens
-            var currentScreen: NSScreen?
-            
-            // Find which screen contains the mouse
-            for screen in screens {
-                let frame = screen.frame
-                if mouseLocation.x >= frame.minX && mouseLocation.x <= frame.maxX &&
-                   mouseLocation.y >= frame.minY && mouseLocation.y <= frame.maxY {
-                    currentScreen = screen
-                    break
-                }
-            }
-            
-            if let screen = currentScreen ?? NSScreen.main {
-                let screenFrame = screen.frame
-                
-                // Send initial mouse position
-                let initialData: [String: Any] = [
-                    "x": mouseLocation.x,
-                    "y": mouseLocation.y,
-                    "screenMinX": screenFrame.minX,
-                    "screenMinY": screenFrame.minY,
-                    "screenWidth": screenFrame.width,
-                    "screenHeight": screenFrame.height
-                ]
-                events(initialData)
-            }
+            sendMouseData(location: mouseLocation, eventSink: events)
         }
         
         // Request accessibility permissions with prompt
@@ -318,16 +292,16 @@ class MouseMonitorStreamHandler: NSObject, FlutterStreamHandler {
     
     private func handleCGEvent(event: CGEvent) {
         guard let eventSink = eventSink else { return }
-        
-        let location = event.location
-        
+        sendMouseData(location: event.location, eventSink: eventSink)
+    }
+    
+    private func sendMouseData(location: CGPoint, eventSink: @escaping FlutterEventSink) {
         // Find which screen the mouse is currently on
         let screens = NSScreen.screens
         var currentScreen: NSScreen?
         
         for screen in screens {
             let frame = screen.frame
-            // Check if mouse is within this screen's bounds
             if location.x >= frame.minX && location.x <= frame.maxX &&
                location.y >= frame.minY && location.y <= frame.maxY {
                 currentScreen = screen
@@ -340,7 +314,7 @@ class MouseMonitorStreamHandler: NSObject, FlutterStreamHandler {
         
         let screenFrame = screen.frame
         
-        // Send absolute position and screen info, let Dart calculate relative position
+        // Send absolute position and screen info
         let data: [String: Any] = [
             "x": location.x,
             "y": location.y,

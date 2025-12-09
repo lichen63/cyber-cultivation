@@ -84,8 +84,8 @@ class _MyHomePageState extends State<MyHomePage> {
   String _currentKey = 'Press any key...';
   double _mouseX = 0;
   double _mouseY = 0;
-  double _screenWidth = 1920;
-  double _screenHeight = 1080;
+  double _screenWidth = 1;
+  double _screenHeight = 1;
 
   static const EventChannel _eventChannel = EventChannel(
     'com.lichen63.cyber_cultivation/key_events',
@@ -132,8 +132,8 @@ class _MyHomePageState extends State<MyHomePage> {
             _mouseY = absY - screenMinY;
 
             // Update current screen dimensions
-            _screenWidth = (event['screenWidth'] as num?)?.toDouble() ?? 1920;
-            _screenHeight = (event['screenHeight'] as num?)?.toDouble() ?? 1080;
+            _screenWidth = (event['screenWidth'] as num?)?.toDouble() ?? 1;
+            _screenHeight = (event['screenHeight'] as num?)?.toDouble() ?? 1;
           });
         }
       },
