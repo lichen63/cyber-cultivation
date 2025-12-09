@@ -186,12 +186,7 @@ class KeyMonitorStreamHandler: NSObject, FlutterStreamHandler {
     }
     
     private func formatCGEvent(keyCode: Int, flags: CGEventFlags) -> String? {
-        var parts: [String] = []
-        
-        if flags.contains(.maskCommand) { parts.append("Cmd") }
-        if flags.contains(.maskControl) { parts.append("Ctrl") }
-        if flags.contains(.maskAlternate) { parts.append("Opt") }
-        if flags.contains(.maskShift) { parts.append("Shift") }
+        var parts = getModifierParts(flags)
         
         // Map key codes to readable strings
         let keyName = keyCodeToString(keyCode)
@@ -206,6 +201,11 @@ class KeyMonitorStreamHandler: NSObject, FlutterStreamHandler {
     }
     
     private func formatModifierFlags(_ flags: CGEventFlags) -> String? {
+        let parts = getModifierParts(flags)
+        return parts.isEmpty ? nil : parts.joined(separator: " + ")
+    }
+    
+    private func getModifierParts(_ flags: CGEventFlags) -> [String] {
         var parts: [String] = []
         
         if flags.contains(.maskCommand) { parts.append("Cmd") }
@@ -213,7 +213,7 @@ class KeyMonitorStreamHandler: NSObject, FlutterStreamHandler {
         if flags.contains(.maskAlternate) { parts.append("Opt") }
         if flags.contains(.maskShift) { parts.append("Shift") }
         
-        return parts.isEmpty ? nil : parts.joined(separator: " + ")
+        return parts
     }
     
     private func keyCodeToString(_ keyCode: Int) -> String {
