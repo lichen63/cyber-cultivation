@@ -164,83 +164,82 @@ class _MyHomePageState extends State<MyHomePage> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Expanded(
-                  child: Row(
+                  child: Stack(
                     children: [
-                      // Keyboard label on the left
-                      Expanded(
-                        child: Center(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.black.withValues(alpha: 0.7),
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: Colors.white, width: 2),
-                            ),
-                            child: Text(
-                              _currentKey,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
+                      // Character image centered and larger
+                      Center(
+                        child: Image.asset(
+                          'assets/images/character.png',
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      // Keyboard label overlaid on top-left
+                      Positioned(
+                        top: 20,
+                        left: 20,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.7),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.white, width: 2),
+                          ),
+                          child: Text(
+                            _currentKey,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(width: 20),
-                      // Character image in the middle
-                      Expanded(
-                        child: Center(
-                          child: Image.asset('assets/images/character.png'),
-                        ),
-                      ),
-                      const SizedBox(width: 20),
-                      // Screen visualization on the right
-                      Expanded(
-                        child: AspectRatio(
-                          aspectRatio: 1.0,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.white, width: 2),
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.black.withValues(alpha: 0.3),
-                            ),
-                            child: LayoutBuilder(
-                              builder: (context, constraints) {
-                                // Calculate the position of the red dot relative to the container
-                                // Use actual screen dimensions from native side
-                                final dotX =
-                                    (_mouseX / _screenWidth) *
-                                    constraints.maxWidth;
-                                final dotY =
-                                    (_mouseY / _screenHeight) *
-                                    constraints.maxHeight;
-                                return Stack(
-                                  children: [
-                                    // Red dot representing mouse position
-                                    Positioned(
-                                      left:
-                                          dotX.clamp(0, constraints.maxWidth) -
-                                          5,
-                                      top:
-                                          dotY.clamp(0, constraints.maxHeight) -
-                                          5,
-                                      child: Container(
-                                        width: 10,
-                                        height: 10,
-                                        decoration: const BoxDecoration(
-                                          color: Colors.red,
-                                          shape: BoxShape.circle,
-                                        ),
+                      // Mouse visualization overlaid on top-right
+                      Positioned(
+                        top: 20,
+                        right: 20,
+                        width: 150,
+                        height: 150,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.white, width: 2),
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.black.withValues(alpha: 0.3),
+                          ),
+                          child: LayoutBuilder(
+                            builder: (context, constraints) {
+                              // Calculate the position of the red dot relative to the container
+                              // Use actual screen dimensions from native side
+                              final dotX =
+                                  (_mouseX / _screenWidth) *
+                                  constraints.maxWidth;
+                              final dotY =
+                                  (_mouseY / _screenHeight) *
+                                  constraints.maxHeight;
+                              return Stack(
+                                children: [
+                                  // Red dot representing mouse position
+                                  Positioned(
+                                    left:
+                                        dotX.clamp(0, constraints.maxWidth) - 5,
+                                    top:
+                                        dotY.clamp(0, constraints.maxHeight) -
+                                        5,
+                                    child: Container(
+                                      width: 10,
+                                      height: 10,
+                                      decoration: const BoxDecoration(
+                                        color: Colors.red,
+                                        shape: BoxShape.circle,
                                       ),
                                     ),
-                                  ],
-                                );
-                              },
-                            ),
+                                  ),
+                                ],
+                              );
+                            },
                           ),
                         ),
                       ),
