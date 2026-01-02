@@ -164,86 +164,114 @@ class _MyHomePageState extends State<MyHomePage> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Expanded(
-                  child: Stack(
-                    children: [
-                      // Character image centered and larger
-                      Center(
-                        child: Image.asset(
-                          'assets/images/character.png',
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                      // Keyboard label overlaid on top-left
-                      Positioned(
-                        top: 20,
-                        left: 20,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.7),
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Colors.white, width: 2),
-                          ),
-                          child: Text(
-                            _currentKey,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      // Calculate scale based on a reference width (e.g., 400.0)
+                      final double scale = constraints.maxWidth / 400.0;
+
+                      return Stack(
+                        children: [
+                          // Character image centered and larger
+                          Center(
+                            child: Image.asset(
+                              'assets/images/character.png',
+                              fit: BoxFit.contain,
                             ),
                           ),
-                        ),
-                      ),
-                      // Mouse visualization overlaid on top-right
-                      Positioned(
-                        top: 20,
-                        right: 20,
-                        width: 150,
-                        height: 150,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.white, width: 2),
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.black.withValues(alpha: 0.3),
-                          ),
-                          child: LayoutBuilder(
-                            builder: (context, constraints) {
-                              // Calculate the position of the red dot relative to the container
-                              // Use actual screen dimensions from native side
-                              final dotX =
-                                  (_mouseX / _screenWidth) *
-                                  constraints.maxWidth;
-                              final dotY =
-                                  (_mouseY / _screenHeight) *
-                                  constraints.maxHeight;
-                              return Stack(
-                                children: [
-                                  // Red dot representing mouse position
-                                  Positioned(
-                                    left:
-                                        dotX.clamp(0, constraints.maxWidth) - 5,
-                                    top:
-                                        dotY.clamp(0, constraints.maxHeight) -
-                                        5,
-                                    child: Container(
-                                      width: 10,
-                                      height: 10,
-                                      decoration: const BoxDecoration(
-                                        color: Colors.red,
-                                        shape: BoxShape.circle,
-                                      ),
-                                    ),
+                          // Keyboard label overlaid on top-left
+                          Positioned(
+                            top: 40 * scale,
+                            left: 0,
+                            child: Transform.scale(
+                              scale: scale,
+                              alignment: Alignment.topLeft,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withValues(alpha: 0.7),
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: Colors.white,
+                                    width: 2,
                                   ),
-                                ],
-                              );
-                            },
+                                ),
+                                child: Text(
+                                  _currentKey,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    ],
+                          // Mouse visualization overlaid on top-right
+                          Positioned(
+                            top: 40 * scale,
+                            right: 0,
+                            child: Transform.scale(
+                              scale: scale,
+                              alignment: Alignment.topRight,
+                              child: Container(
+                                width: 80,
+                                height: 80,
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.white,
+                                    width: 2,
+                                  ),
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Colors.black.withValues(alpha: 0.3),
+                                ),
+                                child: LayoutBuilder(
+                                  builder: (context, constraints) {
+                                    // Calculate the position of the red dot relative to the container
+                                    // Use actual screen dimensions from native side
+                                    final dotX =
+                                        (_mouseX / _screenWidth) *
+                                        constraints.maxWidth;
+                                    final dotY =
+                                        (_mouseY / _screenHeight) *
+                                        constraints.maxHeight;
+                                    return Stack(
+                                      children: [
+                                        // Red dot representing mouse position
+                                        Positioned(
+                                          left:
+                                              dotX.clamp(
+                                                0,
+                                                constraints.maxWidth,
+                                              ) -
+                                              5,
+                                          top:
+                                              dotY.clamp(
+                                                0,
+                                                constraints.maxHeight,
+                                              ) -
+                                              5,
+                                          child: Container(
+                                            width: 10,
+                                            height: 10,
+                                            decoration: const BoxDecoration(
+                                              color: Colors.red,
+                                              shape: BoxShape.circle,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ),
               ],

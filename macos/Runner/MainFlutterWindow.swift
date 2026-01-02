@@ -136,6 +136,14 @@ class KeyMonitorStreamHandler: NSObject, FlutterStreamHandler {
             callback: { (proxy, type, event, refcon) -> Unmanaged<CGEvent>? in
                 if let streamHandler = Unmanaged<KeyMonitorStreamHandler>.fromOpaque(refcon!).takeUnretainedValue() as KeyMonitorStreamHandler? {
                     streamHandler.handleCGEvent(event: event, type: type)
+                    
+                    // Workaround for Flutter crash with NumLock (71)
+                    if type == .keyDown {
+                        let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
+                        if keyCode == 71 && NSRunningApplication.current.isActive {
+                            return nil
+                        }
+                    }
                 }
                 return Unmanaged.passRetained(event)
             },
@@ -191,6 +199,11 @@ class KeyMonitorStreamHandler: NSObject, FlutterStreamHandler {
     private func formatCGEvent(keyCode: Int, flags: CGEventFlags) -> String? {
         var parts = getModifierParts(flags)
         
+        // Remove "Fn" if it's Keypad Clear (71) as it often reports Fn automatically
+        if keyCode == 71 {
+            parts.removeAll { $0 == "Fn" }
+        }
+        
         // Map key codes to readable strings
         let keyName = keyCodeToString(keyCode)
         if !keyName.isEmpty {
@@ -211,6 +224,8 @@ class KeyMonitorStreamHandler: NSObject, FlutterStreamHandler {
     private func getModifierParts(_ flags: CGEventFlags) -> [String] {
         var parts: [String] = []
         
+        if flags.contains(.maskAlphaShift) { parts.append("CapsLock") }
+        if flags.contains(.maskSecondaryFn) { parts.append("Fn") }
         if flags.contains(.maskCommand) { parts.append("Cmd") }
         if flags.contains(.maskControl) { parts.append("Ctrl") }
         if flags.contains(.maskAlternate) { parts.append("Opt") }
