@@ -10,7 +10,8 @@
 - [x] Monitor keyboard events and display them on the window
 - [x] Monitor mouse events and display them on the window
 - [x] Show action buttons and context menus
-- [ ] Make window always foreground
+- [x] Make window always foreground
+- [x] Refactor all UI components
 - [ ] Show control buttons when mouse hovers over the window
 - [ ] Split script to different parts
 - [ ] Add cultivation progress bar and level system
