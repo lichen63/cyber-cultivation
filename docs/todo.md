@@ -12,8 +12,6 @@
 - [x] Show action buttons and context menus
 - [x] Make window always foreground
 - [x] Refactor all UI components
-- [ ] Show control buttons when mouse hovers over the window
-- [ ] Split script to different parts
 - [ ] Add cultivation progress bar and level system
 - [ ] Connect keyboard and mouse events to cultivation spiritual power mechanics
 - [ ] Implement auto-save functionality for cultivation progress
