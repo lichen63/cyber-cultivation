@@ -12,7 +12,7 @@
 - [x] Show action buttons and context menus
 - [x] Make window always foreground
 - [x] Refactor all UI components
-- [ ] Add cultivation progress bar and level system
+- [x] Add cultivation progress bar and level system
 - [ ] Connect keyboard and mouse events to cultivation spiritual power mechanics
 - [ ] Implement auto-save functionality for cultivation progress
 - [ ] Drag to scale in/out the game window
