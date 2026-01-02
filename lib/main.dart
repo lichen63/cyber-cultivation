@@ -2,14 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:window_manager/window_manager.dart';
 
+import 'constants.dart';
+import 'widgets/character_display.dart';
+import 'widgets/keyboard_monitor.dart';
+import 'widgets/mouse_monitor.dart';
+import 'widgets/styled_button.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await windowManager.ensureInitialized();
 
   WindowOptions windowOptions = const WindowOptions(
-    size: Size(400, 400),
+    size: Size(AppConstants.defaultWindowWidth, AppConstants.defaultWindowHeight),
     center: true,
-    backgroundColor: Colors.transparent,
+    backgroundColor: AppConstants.transparentColor,
     skipTaskbar: false,
     titleBarStyle: TitleBarStyle.hidden,
   );
@@ -17,9 +23,13 @@ void main() async {
   windowManager.waitUntilReadyToShow(windowOptions, () async {
     await windowManager.setAsFrameless();
     await windowManager.setHasShadow(false);
-    await windowManager.setMinimumSize(const Size(200, 200));
-    await windowManager.setMaximumSize(const Size(800, 800));
-    await windowManager.setAspectRatio(1.0); // Set aspect ratio to 1:1 (square)
+    await windowManager.setMinimumSize(
+      const Size(AppConstants.minWindowWidth, AppConstants.minWindowHeight),
+    );
+    await windowManager.setMaximumSize(
+      const Size(AppConstants.maxWindowWidth, AppConstants.maxWindowHeight),
+    );
+    await windowManager.setAspectRatio(AppConstants.windowAspectRatio);
     await windowManager.show();
     await windowManager.focus();
   });
@@ -51,7 +61,7 @@ class _MyAppState extends State<MyApp> with WindowListener {
   void onWindowResize() {
     // Maintain aspect ratio during resize
     windowManager.getSize().then((size) {
-      windowManager.setAspectRatio(1.0);
+      windowManager.setAspectRatio(AppConstants.windowAspectRatio);
     });
   }
 
@@ -59,29 +69,27 @@ class _MyAppState extends State<MyApp> with WindowListener {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Cyber Cultivation',
+      title: AppConstants.appTitle,
       theme: ThemeData(
-        scaffoldBackgroundColor: Colors.transparent,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        canvasColor: Colors.transparent,
+        scaffoldBackgroundColor: AppConstants.transparentColor,
+        colorScheme: ColorScheme.fromSeed(seedColor: AppConstants.primarySeedColor),
+        canvasColor: AppConstants.transparentColor,
       ),
-      color: Colors.transparent,
-      home: const MyHomePage(title: 'Cyber Cultivation'),
+      color: AppConstants.transparentColor,
+      home: const MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
+  const MyHomePage({super.key});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> with WindowListener {
-  String _currentKey = 'Press any key...';
+  String _currentKey = AppConstants.defaultKeyText;
   double _mouseX = 0;
   double _mouseY = 0;
   double _screenWidth = 1;
@@ -91,19 +99,31 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
   bool _isMenuOpen = false;
 
   static const EventChannel _eventChannel = EventChannel(
-    'com.lichen63.cyber_cultivation/key_events',
+    AppConstants.keyEventsChannel,
   );
   static const EventChannel _mouseEventChannel = EventChannel(
-    'com.lichen63.cyber_cultivation/mouse_events',
+    AppConstants.mouseEventsChannel,
   );
 
   @override
   void initState() {
     super.initState();
     windowManager.addListener(this);
-    _updateWindowBounds();
     _setupKeyboardListener();
     _setupMouseListener();
+  }
+
+  @override
+  void dispose() {
+    windowManager.removeListener(this);
+    super.dispose();
+  }
+
+  @override
+  void onWindowResize() {
+    windowManager.getSize().then((size) {
+      windowManager.setAspectRatio(AppConstants.windowAspectRatio);
+    });
   }
 
   void _setupKeyboardListener() {
@@ -130,12 +150,6 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
           final screenMinX = (event['screenMinX'] as num?)?.toDouble() ?? 0;
           final screenMinY = (event['screenMinY'] as num?)?.toDouble() ?? 0;
 
-          if (mounted && _windowBounds != null && _isMenuOpen) {
-            if (!_windowBounds!.contains(Offset(absX, absY))) {
-              Navigator.of(context).pop();
-            }
-          }
-
           if (mounted) {
             setState(() {
               // Calculate relative position in Dart
@@ -161,10 +175,10 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
     });
     final result = await showMenu(
       context: context,
-      color: Colors.black.withValues(alpha: 0.7),
+      color: AppConstants.blackOverlayColor,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-        side: const BorderSide(color: Colors.white, width: 2),
+        borderRadius: BorderRadius.circular(AppConstants.smallBorderRadius),
+        side: const BorderSide(color: AppConstants.whiteColor, width: 2),
       ),
       position: RelativeRect.fromLTRB(
         position.dx,
@@ -174,21 +188,21 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
       ),
       items: [
         PopupMenuItem(
-          value: 'toggleAlwaysOnTop',
+          value: AppConstants.toggleAlwaysOnTopValue,
           child: Row(
             children: [
               SizedBox(
                 width: 24,
                 child:
                     _isAlwaysOnTop
-                        ? const Icon(Icons.check, color: Colors.white, size: 18)
+                        ? const Icon(Icons.check, color: AppConstants.whiteColor, size: 18)
                         : null,
               ),
               const SizedBox(width: 8),
               const Text(
-                'Force Foreground',
+                AppConstants.forceForegroundText,
                 style: TextStyle(
-                  color: Colors.white,
+                  color: AppConstants.whiteColor,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -204,7 +218,7 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
       });
     }
 
-    if (result == 'toggleAlwaysOnTop') {
+    if (result == AppConstants.toggleAlwaysOnTopValue) {
       _toggleAlwaysOnTop(!_isAlwaysOnTop);
     }
   }
@@ -217,61 +231,27 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
   }
 
   @override
-  void dispose() {
-    windowManager.removeListener(this);
-    super.dispose();
-  }
-
-  Rect? _windowBounds;
-
-  @override
-  void onWindowMove() {
-    _updateWindowBounds();
-  }
-
-  @override
-  void onWindowResize() {
-    _updateWindowBounds();
-  }
-
-  void _updateWindowBounds() async {
-    final bounds = await windowManager.getBounds();
-    if (mounted) {
-      setState(() {
-        _windowBounds = bounds;
-      });
-    }
-  }
-
-  Widget _buildStyledButton(String text, VoidCallback onPressed) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: Colors.black.withValues(alpha: 0.7),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Colors.white, width: 2),
-        ),
-        child: Text(
-          text,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    );
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppConstants.transparentColor,
       body: MouseRegion(
         onEnter: (_) => setState(() => _isHovering = true),
-        onExit: (_) => setState(() => _isHovering = false),
+        onExit: (event) {
+          setState(() => _isHovering = false);
+          if (_isMenuOpen) {
+            final windowSize = MediaQuery.of(context).size;
+            final windowRect = Rect.fromLTWH(
+              0,
+              0,
+              windowSize.width,
+              windowSize.height,
+            );
+            final safeRect = windowRect.inflate(10.0);
+            if (!safeRect.contains(event.position)) {
+              Navigator.of(context).pop();
+            }
+          }
+        },
         child: GestureDetector(
           onSecondaryTapUp: (details) => _showContextMenu(details.globalPosition),
           child: Stack(
@@ -279,118 +259,43 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
               DragToMoveArea(
                 child: Container(
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white, width: 6.0),
-                    borderRadius: BorderRadius.circular(20.0),
+                    border: Border.all(
+                      color: AppConstants.whiteColor,
+                      width: AppConstants.borderWidth,
+                    ),
+                    borderRadius: BorderRadius.circular(AppConstants.borderRadius),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.all(30.0),
+                    padding: const EdgeInsets.all(AppConstants.defaultPadding),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Expanded(
                           child: LayoutBuilder(
                             builder: (context, constraints) {
-                              // Calculate scale based on a reference width (e.g., 400.0)
-                              final double scale = constraints.maxWidth / 400.0;
+                              // Calculate scale based on a reference width
+                              final double scale = constraints.maxWidth / AppConstants.defaultWindowWidth;
 
                               return Stack(
                                 children: [
-                                  // Character image centered and larger
-                                  Center(
-                                    child: Image.asset(
-                                      'assets/images/character.png',
-                                      fit: BoxFit.contain,
-                                    ),
-                                  ),
-                                  // Keyboard label overlaid on top-left
+                                  const CharacterDisplay(),
                                   Positioned(
                                     top: 40 * scale,
                                     left: 0,
-                                    child: Transform.scale(
+                                    child: KeyboardMonitor(
+                                      currentKey: _currentKey,
                                       scale: scale,
-                                      alignment: Alignment.topLeft,
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                          vertical: 8,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Colors.black.withValues(alpha: 0.7),
-                                          borderRadius: BorderRadius.circular(10),
-                                          border: Border.all(
-                                            color: Colors.white,
-                                            width: 2,
-                                          ),
-                                        ),
-                                        child: Text(
-                                          _currentKey,
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
                                     ),
                                   ),
-                                  // Mouse visualization overlaid on top-right
                                   Positioned(
                                     top: 40 * scale,
                                     right: 0,
-                                    child: Transform.scale(
+                                    child: MouseMonitor(
+                                      mouseX: _mouseX,
+                                      mouseY: _mouseY,
+                                      screenWidth: _screenWidth,
+                                      screenHeight: _screenHeight,
                                       scale: scale,
-                                      alignment: Alignment.topRight,
-                                      child: Container(
-                                        width: 80,
-                                        height: 80,
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                            color: Colors.white,
-                                            width: 2,
-                                          ),
-                                          borderRadius: BorderRadius.circular(10),
-                                          color: Colors.black.withValues(alpha: 0.3),
-                                        ),
-                                        child: LayoutBuilder(
-                                          builder: (context, constraints) {
-                                            // Calculate the position of the red dot relative to the container
-                                            // Use actual screen dimensions from native side
-                                            final dotX =
-                                                (_mouseX / _screenWidth) *
-                                                constraints.maxWidth;
-                                            final dotY =
-                                                (_mouseY / _screenHeight) *
-                                                constraints.maxHeight;
-                                            return Stack(
-                                              children: [
-                                                // Red dot representing mouse position
-                                                Positioned(
-                                                  left:
-                                                      dotX.clamp(
-                                                        0,
-                                                        constraints.maxWidth,
-                                                      ) -
-                                                      5,
-                                                  top:
-                                                      dotY.clamp(
-                                                        0,
-                                                        constraints.maxHeight,
-                                                      ) -
-                                                      5,
-                                                  child: Container(
-                                                    width: 10,
-                                                    height: 10,
-                                                    decoration: const BoxDecoration(
-                                                      color: Colors.red,
-                                                      shape: BoxShape.circle,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            );
-                                          },
-                                        ),
-                                      ),
                                     ),
                                   ),
                                 ],
@@ -411,11 +316,11 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _buildStyledButton('T-1', () {}),
+                      StyledButton(text: 'T-1', onPressed: () {}),
                       const SizedBox(width: 10),
-                      _buildStyledButton('T-2', () {}),
+                      StyledButton(text: 'T-2', onPressed: () {}),
                       const SizedBox(width: 10),
-                      _buildStyledButton('T-3', () {}),
+                      StyledButton(text: 'T-3', onPressed: () {}),
                     ],
                   ),
                 ),
@@ -426,11 +331,11 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _buildStyledButton('B-1', () {}),
+                      StyledButton(text: 'B-1', onPressed: () {}),
                       const SizedBox(width: 10),
-                      _buildStyledButton('B-2', () {}),
+                      StyledButton(text: 'B-2', onPressed: () {}),
                       const SizedBox(width: 10),
-                      _buildStyledButton('B-3', () {}),
+                      StyledButton(text: 'B-3', onPressed: () {}),
                     ],
                   ),
                 ),
