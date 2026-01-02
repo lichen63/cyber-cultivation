@@ -4,6 +4,7 @@ import 'package:window_manager/window_manager.dart';
 
 import 'constants.dart';
 import 'widgets/character_display.dart';
+import 'widgets/exp_display.dart';
 import 'widgets/keyboard_monitor.dart';
 import 'widgets/mouse_monitor.dart';
 import 'widgets/styled_button.dart';
@@ -98,6 +99,12 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
   bool _isAlwaysOnTop = false;
   bool _isMenuOpen = false;
 
+  // EXP System
+  int _level = 1;
+  double _currentExp = 0;
+  double _maxExp = 100;
+  static const int _maxLevel = 100;
+
   static const EventChannel _eventChannel = EventChannel(
     AppConstants.keyEventsChannel,
   );
@@ -126,6 +133,28 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
     });
   }
 
+  void _gainExp(double amount) {
+    if (_level >= _maxLevel) return;
+
+    setState(() {
+      _currentExp += amount;
+      while (_currentExp >= _maxExp && _level < _maxLevel) {
+        _currentExp -= _maxExp;
+        _level++;
+        // Recalculate max exp for next level
+        // Using a simple compounding formula here to avoid importing math if possible, 
+        // but let's just do it properly.
+        // I will add import 'dart:math' as math; to the top later.
+        // For now, I'll use a simple multiplier.
+        _maxExp = _maxExp * 1.1; 
+      }
+      
+      if (_level >= _maxLevel) {
+        _currentExp = _maxExp;
+      }
+    });
+  }
+
   void _setupKeyboardListener() {
     _eventChannel.receiveBroadcastStream().listen(
       (dynamic event) {
@@ -133,6 +162,7 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
           setState(() {
             _currentKey = event;
           });
+          _gainExp(10);
         }
       },
       onError: (dynamic error) {
@@ -160,6 +190,7 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
               _screenWidth = (event['screenWidth'] as num?)?.toDouble() ?? 1;
               _screenHeight = (event['screenHeight'] as num?)?.toDouble() ?? 1;
             });
+            _gainExp(1);
           }
         }
       },
@@ -278,9 +309,21 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
 
                               return Stack(
                                 children: [
-                                  const CharacterDisplay(),
+                                  Column(
+                                    children: [
+                                      SizedBox(height: 30 * scale),
+                                      ExpDisplay(
+                                        level: _level,
+                                        currentExp: _currentExp,
+                                        maxExp: _maxExp,
+                                        scale: scale,
+                                      ),
+                                      SizedBox(height: 10 * scale),
+                                      const Expanded(child: CharacterDisplay()),
+                                    ],
+                                  ),
                                   Positioned(
-                                    top: 40 * scale,
+                                    top: 80 * scale,
                                     left: 0,
                                     child: KeyboardMonitor(
                                       currentKey: _currentKey,
@@ -288,7 +331,7 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
                                     ),
                                   ),
                                   Positioned(
-                                    top: 40 * scale,
+                                    top: 80 * scale,
                                     right: 0,
                                     child: MouseMonitor(
                                       mouseX: _mouseX,
