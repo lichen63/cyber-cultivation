@@ -21,4 +21,11 @@ We welcome contributions! Please read our [Contributing Guidelines](docs/CONTRIB
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **PolyForm Noncommercial License 1.0.0**.
+
+- **Non-Commercial Use**: You are free to use, modify, and distribute this software for personal, educational, or non-profit purposes.
+- **Commercial Use**: Commercial use is **strictly prohibited** without a separate commercial license from the author.
+
+If you wish to use this software commercially, please contact the author for approval.
+
+See the [LICENSE](LICENSE) file for the full license text.
