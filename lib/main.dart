@@ -1,8 +1,12 @@
+import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'constants.dart';
+import 'models/game_data.dart';
+import 'services/game_data_service.dart';
 import 'widgets/character_display.dart';
 import 'widgets/exp_display.dart';
 import 'widgets/keyboard_monitor.dart';
@@ -103,6 +107,8 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
   int _level = AppConstants.initialLevel;
   double _currentExp = 0;
   double _maxExp = AppConstants.initialMaxExp;
+  final GameDataService _gameDataService = GameDataService();
+  Timer? _saveDebounce;
 
   static const EventChannel _eventChannel = EventChannel(
     AppConstants.keyEventsChannel,
@@ -115,12 +121,14 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
   void initState() {
     super.initState();
     windowManager.addListener(this);
+    _loadGameData();
     _setupKeyboardListener();
     _setupMouseListener();
   }
 
   @override
   void dispose() {
+    _saveDebounce?.cancel();
     windowManager.removeListener(this);
     super.dispose();
   }
@@ -129,6 +137,28 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
   void onWindowResize() {
     windowManager.getSize().then((size) {
       windowManager.setAspectRatio(AppConstants.windowAspectRatio);
+    });
+  }
+
+  Future<void> _loadGameData() async {
+    final data = await _gameDataService.loadGameData();
+    if (data != null && mounted) {
+      setState(() {
+        _level = data.level;
+        _currentExp = data.currentExp;
+        // Recalculate max exp based on level
+        _maxExp = AppConstants.initialMaxExp * pow(AppConstants.expGrowthFactor, _level - 1);
+      });
+    }
+  }
+
+  void _saveGameData() {
+    if (_saveDebounce?.isActive ?? false) _saveDebounce!.cancel();
+    _saveDebounce = Timer(const Duration(seconds: 1), () {
+      _gameDataService.saveGameData(GameData(
+        level: _level,
+        currentExp: _currentExp,
+      ));
     });
   }
 
@@ -147,6 +177,7 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
         _currentExp = _maxExp;
       }
     });
+    _saveGameData();
   }
 
   void _setupKeyboardListener() {
