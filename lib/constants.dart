@@ -29,7 +29,7 @@ class AppConstants {
   static const double smallBorderRadius = 10.0;
   static const double defaultPadding = 30.0;
   static const double buttonPaddingHorizontal = 16.0;
-  static const double buttonPaddingVertical = 8.0;
+  static const double buttonPaddingVertical = 4.0;
   static const double mouseMonitorSize = 80.0;
   static const double mouseDotSize = 10.0;
   
@@ -43,4 +43,12 @@ class AppConstants {
   
   // Assets
   static const String characterImagePath = 'assets/images/character.png';
+
+  // EXP System
+  static const int initialLevel = 1;
+  static const double initialMaxExp = 100.0;
+  static const int maxLevel = 100;
+  static const double expGainPerKey = 10.0;
+  static const double expGainPerMouse = 1.0;
+  static const double expGrowthFactor = 1.1;
 }
