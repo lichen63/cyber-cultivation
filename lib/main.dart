@@ -93,14 +93,14 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> with WindowListener {
+class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBindingObserver {
   String _currentKey = AppConstants.defaultKeyText;
   double _mouseX = 0;
   double _mouseY = 0;
   double _screenWidth = 1;
   double _screenHeight = 1;
   bool _isHovering = false;
-  bool _isAlwaysOnTop = false;
+  bool _isAlwaysOnTop = true;
   bool _isMenuOpen = false;
 
   // EXP System
@@ -120,6 +120,7 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     windowManager.addListener(this);
     _loadGameData();
     _setupKeyboardListener();
@@ -128,9 +129,17 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
 
   @override
   void dispose() {
-    _saveDebounce?.cancel();
+    _saveGameData(immediate: true);
+    WidgetsBinding.instance.removeObserver(this);
     windowManager.removeListener(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.detached) {
+      _saveGameData(immediate: true);
+    }
   }
 
   @override
@@ -146,20 +155,35 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
       setState(() {
         _level = data.level;
         _currentExp = data.currentExp;
+        _isAlwaysOnTop = data.isAlwaysOnTop;
         // Recalculate max exp based on level
         _maxExp = AppConstants.initialMaxExp * pow(AppConstants.expGrowthFactor, _level - 1);
       });
+      await windowManager.setAlwaysOnTop(_isAlwaysOnTop);
+    } else {
+      // If no data found, ensure default is applied
+      await windowManager.setAlwaysOnTop(_isAlwaysOnTop);
     }
   }
 
-  void _saveGameData() {
+  void _saveGameData({bool immediate = false}) {
     if (_saveDebounce?.isActive ?? false) _saveDebounce!.cancel();
-    _saveDebounce = Timer(const Duration(seconds: 1), () {
+    
+    if (immediate) {
       _gameDataService.saveGameData(GameData(
         level: _level,
         currentExp: _currentExp,
+        isAlwaysOnTop: _isAlwaysOnTop,
       ));
-    });
+    } else {
+      _saveDebounce = Timer(const Duration(seconds: 1), () {
+        _gameDataService.saveGameData(GameData(
+          level: _level,
+          currentExp: _currentExp,
+          isAlwaysOnTop: _isAlwaysOnTop,
+        ));
+      });
+    }
   }
 
   void _gainExp(double amount) {
@@ -284,6 +308,7 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
       _isAlwaysOnTop = value;
     });
     await windowManager.setAlwaysOnTop(value);
+    _saveGameData();
   }
 
   @override
