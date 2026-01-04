@@ -1,8 +1,12 @@
+import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'constants.dart';
+import 'models/game_data.dart';
+import 'services/game_data_service.dart';
 import 'widgets/character_display.dart';
 import 'widgets/exp_display.dart';
 import 'widgets/keyboard_monitor.dart';
@@ -31,6 +35,7 @@ void main() async {
       const Size(AppConstants.maxWindowWidth, AppConstants.maxWindowHeight),
     );
     await windowManager.setAspectRatio(AppConstants.windowAspectRatio);
+    await windowManager.setOpacity(1.0);
     await windowManager.show();
     await windowManager.focus();
   });
@@ -89,20 +94,22 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> with WindowListener {
+class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBindingObserver {
   String _currentKey = AppConstants.defaultKeyText;
   double _mouseX = 0;
   double _mouseY = 0;
   double _screenWidth = 1;
   double _screenHeight = 1;
   bool _isHovering = false;
-  bool _isAlwaysOnTop = false;
+  bool _isAlwaysOnTop = true;
   bool _isMenuOpen = false;
 
   // EXP System
   int _level = AppConstants.initialLevel;
   double _currentExp = 0;
   double _maxExp = AppConstants.initialMaxExp;
+  final GameDataService _gameDataService = GameDataService();
+  Timer? _saveDebounce;
 
   static const EventChannel _eventChannel = EventChannel(
     AppConstants.keyEventsChannel,
@@ -114,15 +121,26 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     windowManager.addListener(this);
+    _loadGameData();
     _setupKeyboardListener();
     _setupMouseListener();
   }
 
   @override
   void dispose() {
+    _saveGameData(immediate: true);
+    WidgetsBinding.instance.removeObserver(this);
     windowManager.removeListener(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.detached) {
+      _saveGameData(immediate: true);
+    }
   }
 
   @override
@@ -130,6 +148,43 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
     windowManager.getSize().then((size) {
       windowManager.setAspectRatio(AppConstants.windowAspectRatio);
     });
+  }
+
+  Future<void> _loadGameData() async {
+    final data = await _gameDataService.loadGameData();
+    if (data != null && mounted) {
+      setState(() {
+        _level = data.level;
+        _currentExp = data.currentExp;
+        _isAlwaysOnTop = data.isAlwaysOnTop;
+        // Recalculate max exp based on level
+        _maxExp = AppConstants.initialMaxExp * pow(AppConstants.expGrowthFactor, _level - 1);
+      });
+      await windowManager.setAlwaysOnTop(_isAlwaysOnTop);
+    } else {
+      // If no data found, ensure default is applied
+      await windowManager.setAlwaysOnTop(_isAlwaysOnTop);
+    }
+  }
+
+  void _saveGameData({bool immediate = false}) {
+    if (_saveDebounce?.isActive ?? false) _saveDebounce!.cancel();
+    
+    if (immediate) {
+      _gameDataService.saveGameData(GameData(
+        level: _level,
+        currentExp: _currentExp,
+        isAlwaysOnTop: _isAlwaysOnTop,
+      ));
+    } else {
+      _saveDebounce = Timer(const Duration(seconds: 1), () {
+        _gameDataService.saveGameData(GameData(
+          level: _level,
+          currentExp: _currentExp,
+          isAlwaysOnTop: _isAlwaysOnTop,
+        ));
+      });
+    }
   }
 
   void _gainExp(double amount) {
@@ -147,6 +202,7 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
         _currentExp = _maxExp;
       }
     });
+    _saveGameData();
   }
 
   void _setupKeyboardListener() {
@@ -253,6 +309,7 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
       _isAlwaysOnTop = value;
     });
     await windowManager.setAlwaysOnTop(value);
+    _saveGameData();
   }
 
   @override
@@ -279,105 +336,143 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
         },
         child: GestureDetector(
           onSecondaryTapUp: (details) => _showContextMenu(details.globalPosition),
-          child: Stack(
-            children: [
-              DragToMoveArea(
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: AppConstants.whiteColor,
-                      width: AppConstants.borderWidth,
-                    ),
-                    borderRadius: BorderRadius.circular(AppConstants.borderRadius),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(AppConstants.defaultPadding),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: LayoutBuilder(
-                            builder: (context, constraints) {
-                              // Calculate scale based on a reference width
-                              final double scale = constraints.maxWidth / AppConstants.defaultWindowWidth;
-
-                              return Stack(
-                                children: [
-                                  Column(
-                                    children: [
-                                      SizedBox(height: 10 * scale),
-                                      ExpDisplay(
-                                        level: _level,
-                                        currentExp: _currentExp,
-                                        maxExp: _maxExp,
-                                        scale: scale,
-                                      ),
-                                      SizedBox(height: 10 * scale),
-                                      const Expanded(child: CharacterDisplay()),
-                                    ],
-                                  ),
-                                  Positioned(
-                                    top: 80 * scale,
-                                    left: 0,
-                                    child: KeyboardMonitor(
-                                      currentKey: _currentKey,
-                                      scale: scale,
-                                    ),
-                                  ),
-                                  Positioned(
-                                    top: 80 * scale,
-                                    right: 0,
-                                    child: MouseMonitor(
-                                      mouseX: _mouseX,
-                                      mouseY: _mouseY,
-                                      screenWidth: _screenWidth,
-                                      screenHeight: _screenHeight,
-                                      scale: scale,
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final double windowScale =
+                  constraints.maxWidth / AppConstants.defaultWindowWidth;
+              return Stack(
+                children: [
+                  DragToMoveArea(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: AppConstants.whiteColor,
+                          width: AppConstants.borderWidth * windowScale,
                         ),
-                      ],
+                        borderRadius: BorderRadius.circular(
+                          AppConstants.borderRadius * windowScale,
+                        ),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.all(
+                          AppConstants.defaultPadding * windowScale,
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: LayoutBuilder(
+                                builder: (context, constraints) {
+                                  // Calculate scale based on a reference width
+                                  final double scale =
+                                      constraints.maxWidth /
+                                      AppConstants.defaultWindowWidth;
+
+                                  return Stack(
+                                    children: [
+                                      Column(
+                                        children: [
+                                          SizedBox(height: 10 * scale),
+                                          ExpDisplay(
+                                            level: _level,
+                                            currentExp: _currentExp,
+                                            maxExp: _maxExp,
+                                            scale: scale,
+                                          ),
+                                          SizedBox(height: 10 * scale),
+                                          const Expanded(
+                                            child: CharacterDisplay(),
+                                          ),
+                                        ],
+                                      ),
+                                      Positioned(
+                                        top: 80 * scale,
+                                        left: 0,
+                                        child: KeyboardMonitor(
+                                          currentKey: _currentKey,
+                                          scale: scale,
+                                        ),
+                                      ),
+                                      Positioned(
+                                        top: 80 * scale,
+                                        right: 0,
+                                        child: MouseMonitor(
+                                          mouseX: _mouseX,
+                                          mouseY: _mouseY,
+                                          screenWidth: _screenWidth,
+                                          screenHeight: _screenHeight,
+                                          scale: scale,
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
-              if (_isHovering) ...[
-                Positioned(
-                  top: 10,
-                  left: 0,
-                  right: 0,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      StyledButton(text: 'T-1', onPressed: () {}),
-                      const SizedBox(width: 10),
-                      StyledButton(text: 'T-2', onPressed: () {}),
-                      const SizedBox(width: 10),
-                      StyledButton(text: 'T-3', onPressed: () {}),
-                    ],
-                  ),
-                ),
-                Positioned(
-                  bottom: 10,
-                  left: 0,
-                  right: 0,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      StyledButton(text: 'B-1', onPressed: () {}),
-                      const SizedBox(width: 10),
-                      StyledButton(text: 'B-2', onPressed: () {}),
-                      const SizedBox(width: 10),
-                      StyledButton(text: 'B-3', onPressed: () {}),
-                    ],
-                  ),
-                ),
-              ],
-            ],
+                  if (_isHovering) ...[
+                    Positioned(
+                      top: 10 * windowScale,
+                      left: 0,
+                      right: 0,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          StyledButton(
+                            text: 'T-1',
+                            onPressed: () {},
+                            scale: windowScale,
+                          ),
+                          SizedBox(width: 10 * windowScale),
+                          StyledButton(
+                            text: 'T-2',
+                            onPressed: () {},
+                            scale: windowScale,
+                          ),
+                          SizedBox(width: 10 * windowScale),
+                          StyledButton(
+                            text: 'T-3',
+                            onPressed: () {},
+                            scale: windowScale,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 10 * windowScale,
+                      left: 0,
+                      right: 0,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          StyledButton(
+                            text: 'B-1',
+                            onPressed: () {},
+                            scale: windowScale,
+                          ),
+                          SizedBox(width: 10 * windowScale),
+                          StyledButton(
+                            text: 'B-2',
+                            onPressed: () {},
+                            scale: windowScale,
+                          ),
+                          SizedBox(width: 10 * windowScale),
+                          StyledButton(
+                            text: 'B-3',
+                            onPressed: () {},
+                            scale: windowScale,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
+              );
+            },
           ),
         ),
       ),
