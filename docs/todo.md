@@ -13,10 +13,9 @@
 - [x] Make window always foreground
 - [x] Refactor all UI components
 - [x] Add cultivation progress bar and level system
-- [ ] Connect keyboard and mouse events to cultivation spiritual power mechanics
-- [ ] Implement auto-save functionality for cultivation progress
-- [ ] Drag to scale in/out the game window
-- [ ] Right click to show menu list
+- [x] Connect keyboard and mouse events to cultivation spiritual power mechanics
+- [x] Implement auto-save functionality for cultivation progress
+- [x] Drag to scale in/out the game window
 - [ ] Change License
 - [ ] Add contributing guidance
 - [ ] Count typing frequency/APM?
