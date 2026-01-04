@@ -16,8 +16,8 @@
 - [x] Connect keyboard and mouse events to cultivation spiritual power mechanics
 - [x] Implement auto-save functionality for cultivation progress
 - [x] Drag to scale in/out the game window
-- [ ] Change License
-- [ ] Add contributing guidance
+- [x] Change License
+- [x] Add contributing guidance
 - [ ] Count typing frequency/APM?
 - [ ] Add upgrade effect when level up
 - [ ] Think what should happen when player reached the max level? -> show infinite symbol
