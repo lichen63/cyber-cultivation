@@ -45,7 +45,7 @@ class ExpDisplay extends StatelessWidget {
           decoration: BoxDecoration(
             border: Border.all(color: AppConstants.whiteColor, width: 1),
             borderRadius: BorderRadius.circular(10 * scale),
-            color: Colors.black.withOpacity(0.5),
+            color: Colors.black.withValues(alpha: 0.5),
           ),
           child: Stack(
             children: [
