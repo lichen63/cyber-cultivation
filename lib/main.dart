@@ -305,7 +305,7 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
                                 children: [
                                   Column(
                                     children: [
-                                      SizedBox(height: 30 * scale),
+                                      SizedBox(height: 10 * scale),
                                       ExpDisplay(
                                         level: _level,
                                         currentExp: _currentExp,

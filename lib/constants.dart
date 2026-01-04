@@ -29,7 +29,7 @@ class AppConstants {
   static const double smallBorderRadius = 10.0;
   static const double defaultPadding = 30.0;
   static const double buttonPaddingHorizontal = 16.0;
-  static const double buttonPaddingVertical = 8.0;
+  static const double buttonPaddingVertical = 4.0;
   static const double mouseMonitorSize = 80.0;
   static const double mouseDotSize = 10.0;
   
