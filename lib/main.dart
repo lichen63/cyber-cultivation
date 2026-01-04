@@ -336,105 +336,143 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
         },
         child: GestureDetector(
           onSecondaryTapUp: (details) => _showContextMenu(details.globalPosition),
-          child: Stack(
-            children: [
-              DragToMoveArea(
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: AppConstants.whiteColor,
-                      width: AppConstants.borderWidth,
-                    ),
-                    borderRadius: BorderRadius.circular(AppConstants.borderRadius),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(AppConstants.defaultPadding),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: LayoutBuilder(
-                            builder: (context, constraints) {
-                              // Calculate scale based on a reference width
-                              final double scale = constraints.maxWidth / AppConstants.defaultWindowWidth;
-
-                              return Stack(
-                                children: [
-                                  Column(
-                                    children: [
-                                      SizedBox(height: 10 * scale),
-                                      ExpDisplay(
-                                        level: _level,
-                                        currentExp: _currentExp,
-                                        maxExp: _maxExp,
-                                        scale: scale,
-                                      ),
-                                      SizedBox(height: 10 * scale),
-                                      const Expanded(child: CharacterDisplay()),
-                                    ],
-                                  ),
-                                  Positioned(
-                                    top: 80 * scale,
-                                    left: 0,
-                                    child: KeyboardMonitor(
-                                      currentKey: _currentKey,
-                                      scale: scale,
-                                    ),
-                                  ),
-                                  Positioned(
-                                    top: 80 * scale,
-                                    right: 0,
-                                    child: MouseMonitor(
-                                      mouseX: _mouseX,
-                                      mouseY: _mouseY,
-                                      screenWidth: _screenWidth,
-                                      screenHeight: _screenHeight,
-                                      scale: scale,
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final double windowScale =
+                  constraints.maxWidth / AppConstants.defaultWindowWidth;
+              return Stack(
+                children: [
+                  DragToMoveArea(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: AppConstants.whiteColor,
+                          width: AppConstants.borderWidth * windowScale,
                         ),
-                      ],
+                        borderRadius: BorderRadius.circular(
+                          AppConstants.borderRadius * windowScale,
+                        ),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.all(
+                          AppConstants.defaultPadding * windowScale,
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: LayoutBuilder(
+                                builder: (context, constraints) {
+                                  // Calculate scale based on a reference width
+                                  final double scale =
+                                      constraints.maxWidth /
+                                      AppConstants.defaultWindowWidth;
+
+                                  return Stack(
+                                    children: [
+                                      Column(
+                                        children: [
+                                          SizedBox(height: 10 * scale),
+                                          ExpDisplay(
+                                            level: _level,
+                                            currentExp: _currentExp,
+                                            maxExp: _maxExp,
+                                            scale: scale,
+                                          ),
+                                          SizedBox(height: 10 * scale),
+                                          const Expanded(
+                                            child: CharacterDisplay(),
+                                          ),
+                                        ],
+                                      ),
+                                      Positioned(
+                                        top: 80 * scale,
+                                        left: 0,
+                                        child: KeyboardMonitor(
+                                          currentKey: _currentKey,
+                                          scale: scale,
+                                        ),
+                                      ),
+                                      Positioned(
+                                        top: 80 * scale,
+                                        right: 0,
+                                        child: MouseMonitor(
+                                          mouseX: _mouseX,
+                                          mouseY: _mouseY,
+                                          screenWidth: _screenWidth,
+                                          screenHeight: _screenHeight,
+                                          scale: scale,
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
-              if (_isHovering) ...[
-                Positioned(
-                  top: 10,
-                  left: 0,
-                  right: 0,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      StyledButton(text: 'T-1', onPressed: () {}),
-                      const SizedBox(width: 10),
-                      StyledButton(text: 'T-2', onPressed: () {}),
-                      const SizedBox(width: 10),
-                      StyledButton(text: 'T-3', onPressed: () {}),
-                    ],
-                  ),
-                ),
-                Positioned(
-                  bottom: 10,
-                  left: 0,
-                  right: 0,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      StyledButton(text: 'B-1', onPressed: () {}),
-                      const SizedBox(width: 10),
-                      StyledButton(text: 'B-2', onPressed: () {}),
-                      const SizedBox(width: 10),
-                      StyledButton(text: 'B-3', onPressed: () {}),
-                    ],
-                  ),
-                ),
-              ],
-            ],
+                  if (_isHovering) ...[
+                    Positioned(
+                      top: 10 * windowScale,
+                      left: 0,
+                      right: 0,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          StyledButton(
+                            text: 'T-1',
+                            onPressed: () {},
+                            scale: windowScale,
+                          ),
+                          SizedBox(width: 10 * windowScale),
+                          StyledButton(
+                            text: 'T-2',
+                            onPressed: () {},
+                            scale: windowScale,
+                          ),
+                          SizedBox(width: 10 * windowScale),
+                          StyledButton(
+                            text: 'T-3',
+                            onPressed: () {},
+                            scale: windowScale,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 10 * windowScale,
+                      left: 0,
+                      right: 0,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          StyledButton(
+                            text: 'B-1',
+                            onPressed: () {},
+                            scale: windowScale,
+                          ),
+                          SizedBox(width: 10 * windowScale),
+                          StyledButton(
+                            text: 'B-2',
+                            onPressed: () {},
+                            scale: windowScale,
+                          ),
+                          SizedBox(width: 10 * windowScale),
+                          StyledButton(
+                            text: 'B-3',
+                            onPressed: () {},
+                            scale: windowScale,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
+              );
+            },
           ),
         ),
       ),
