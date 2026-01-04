@@ -35,6 +35,7 @@ void main() async {
       const Size(AppConstants.maxWindowWidth, AppConstants.maxWindowHeight),
     );
     await windowManager.setAspectRatio(AppConstants.windowAspectRatio);
+    await windowManager.setOpacity(1.0);
     await windowManager.show();
     await windowManager.focus();
   });

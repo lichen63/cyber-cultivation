@@ -10,7 +10,7 @@ class MainFlutterWindow: NSWindow {
     let flutterViewController = FlutterViewController()
     let windowFrame = self.frame
     self.contentViewController = flutterViewController
-    self.setFrame(windowFrame, display: true)
+    self.setFrame(windowFrame, display: false)
 
     RegisterGeneratedPlugins(registry: flutterViewController)
 
@@ -25,6 +25,7 @@ class MainFlutterWindow: NSWindow {
     // Configure window for transparency
     self.isOpaque = false
     self.backgroundColor = .clear
+    self.alphaValue = 0.0 // Hide window initially to prevent flicker
     self.hasShadow = false
     
     // Configure the content view
