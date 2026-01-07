@@ -155,10 +155,16 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
     if (data != null && mounted) {
       setState(() {
         _level = data.level;
-        _currentExp = data.currentExp;
         _isAlwaysOnTop = data.isAlwaysOnTop;
-        // Recalculate max exp based on level
-        _maxExp = AppConstants.initialMaxExp * pow(AppConstants.expGrowthFactor, _level - 1);
+        
+        if (_level >= AppConstants.maxLevel) {
+          _currentExp = double.infinity;
+          _maxExp = double.infinity;
+        } else {
+          _currentExp = data.currentExp;
+          // Recalculate max exp based on level
+          _maxExp = AppConstants.initialMaxExp * pow(AppConstants.expGrowthFactor, _level - 1);
+        }
       });
       await windowManager.setAlwaysOnTop(_isAlwaysOnTop);
     } else {
@@ -199,7 +205,8 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
       }
       
       if (_level >= AppConstants.maxLevel) {
-        _currentExp = _maxExp;
+        _currentExp = double.infinity;
+        _maxExp = double.infinity;
       }
     });
     _saveGameData();
