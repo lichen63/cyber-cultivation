@@ -13,7 +13,7 @@ class GameData {
   Map<String, dynamic> toJson() {
     return {
       'level': level,
-      'currentExp': currentExp.toInt(),
+      'currentExp': currentExp.isInfinite ? 0 : currentExp.toInt(),
       'isAlwaysOnTop': isAlwaysOnTop,
     };
   }

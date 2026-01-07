@@ -17,7 +17,8 @@ class ExpDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double progress = (currentExp / maxExp).clamp(0.0, 1.0);
+    final double progress = maxExp.isInfinite ? 1.0 : (currentExp / maxExp).clamp(0.0, 1.0);
+    final String expText = maxExp.isInfinite ? '∞ / ∞' : '${currentExp.toInt()} / ${maxExp.toInt()}';
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -62,7 +63,7 @@ class ExpDisplay extends StatelessWidget {
               ),
               Center(
                 child: Text(
-                  '${currentExp.toInt()} / ${maxExp.toInt()}',
+                  expText,
                   style: TextStyle(
                     color: AppConstants.whiteColor,
                     fontSize: 12 * scale,
