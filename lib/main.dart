@@ -17,8 +17,35 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await windowManager.ensureInitialized();
 
-  WindowOptions windowOptions = const WindowOptions(
-    size: Size(AppConstants.defaultWindowWidth, AppConstants.defaultWindowHeight),
+  final gameDataService = GameDataService();
+  var gameData = await gameDataService.loadGameData();
+  bool needSave = false;
+
+  // Generate User ID if missing
+  if (gameData == null || gameData.userId == null) {
+    final userId = await gameDataService.generateUserId();
+    if (gameData == null) {
+      gameData = GameData(
+        level: AppConstants.initialLevel,
+        currentExp: 0,
+        userId: userId,
+      );
+    } else {
+      gameData = gameData.copyWith(userId: userId);
+    }
+    needSave = true;
+  }
+
+  // Initial save to ensure ID is persisted
+  if (needSave) {
+    await gameDataService.saveGameData(gameData);
+  }
+
+  final double windowWidth = gameData.windowWidth ?? AppConstants.defaultWindowWidth;
+  final double windowHeight = gameData.windowHeight ?? AppConstants.defaultWindowHeight;
+
+  WindowOptions windowOptions = WindowOptions(
+    size: Size(windowWidth, windowHeight),
     center: true,
     backgroundColor: AppConstants.transparentColor,
     skipTaskbar: false,
@@ -40,11 +67,12 @@ void main() async {
     await windowManager.focus();
   });
 
-  runApp(const MyApp());
+  runApp(MyApp(initialGameData: gameData));
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  final GameData? initialGameData;
+  const MyApp({super.key, this.initialGameData});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -82,13 +110,14 @@ class _MyAppState extends State<MyApp> with WindowListener {
         canvasColor: AppConstants.transparentColor,
       ),
       color: AppConstants.transparentColor,
-      home: const MyHomePage(),
+      home: MyHomePage(initialGameData: widget.initialGameData),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+  final GameData? initialGameData;
+  const MyHomePage({super.key, this.initialGameData});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -108,6 +137,10 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
   int _level = AppConstants.initialLevel;
   double _currentExp = 0;
   double _maxExp = AppConstants.initialMaxExp;
+  String? _userId;
+  double _windowWidth = AppConstants.defaultWindowWidth;
+  double _windowHeight = AppConstants.defaultWindowHeight;
+
   final GameDataService _gameDataService = GameDataService();
   Timer? _saveDebounce;
 
@@ -123,7 +156,13 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     windowManager.addListener(this);
-    _loadGameData();
+    
+    if (widget.initialGameData != null) {
+      _applyGameData(widget.initialGameData!);
+    } else {
+      _loadGameData();
+    }
+    
     _setupKeyboardListener();
     _setupMouseListener();
   }
@@ -147,26 +186,40 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
   void onWindowResize() {
     windowManager.getSize().then((size) {
       windowManager.setAspectRatio(AppConstants.windowAspectRatio);
+      if (mounted) {
+        _windowWidth = size.width;
+        _windowHeight = size.height;
+        if (_saveDebounce?.isActive ?? false) _saveDebounce!.cancel();
+        _saveDebounce = Timer(const Duration(seconds: 1), () => _saveGameData());
+      }
     });
+  }
+
+  void _applyGameData(GameData data) {
+    if (!mounted) return;
+    setState(() {
+      _level = data.level;
+      _isAlwaysOnTop = data.isAlwaysOnTop;
+      _userId = data.userId;
+      _windowWidth = data.windowWidth ?? AppConstants.defaultWindowWidth;
+      _windowHeight = data.windowHeight ?? AppConstants.defaultWindowHeight;
+
+      if (_level >= AppConstants.maxLevel) {
+        _currentExp = double.infinity;
+        _maxExp = double.infinity;
+      } else {
+        _currentExp = data.currentExp;
+        // Recalculate max exp based on level
+        _maxExp = AppConstants.initialMaxExp * pow(AppConstants.expGrowthFactor, _level - 1);
+      }
+    });
+    windowManager.setAlwaysOnTop(_isAlwaysOnTop);
   }
 
   Future<void> _loadGameData() async {
     final data = await _gameDataService.loadGameData();
-    if (data != null && mounted) {
-      setState(() {
-        _level = data.level;
-        _isAlwaysOnTop = data.isAlwaysOnTop;
-        
-        if (_level >= AppConstants.maxLevel) {
-          _currentExp = double.infinity;
-          _maxExp = double.infinity;
-        } else {
-          _currentExp = data.currentExp;
-          // Recalculate max exp based on level
-          _maxExp = AppConstants.initialMaxExp * pow(AppConstants.expGrowthFactor, _level - 1);
-        }
-      });
-      await windowManager.setAlwaysOnTop(_isAlwaysOnTop);
+    if (data != null) {
+      _applyGameData(data);
     } else {
       // If no data found, ensure default is applied
       await windowManager.setAlwaysOnTop(_isAlwaysOnTop);
@@ -181,6 +234,9 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
         level: _level,
         currentExp: _currentExp,
         isAlwaysOnTop: _isAlwaysOnTop,
+        windowWidth: _windowWidth,
+        windowHeight: _windowHeight,
+        userId: _userId,
       ));
     } else {
       _saveDebounce = Timer(const Duration(seconds: 1), () {
@@ -188,6 +244,9 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
           level: _level,
           currentExp: _currentExp,
           isAlwaysOnTop: _isAlwaysOnTop,
+          windowWidth: _windowWidth,
+          windowHeight: _windowHeight,
+          userId: _userId,
         ));
       });
     }
