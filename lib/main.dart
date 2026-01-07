@@ -105,6 +105,7 @@ class _MyAppState extends State<MyApp> with WindowListener {
       debugShowCheckedModeBanner: false,
       title: AppConstants.appTitle,
       theme: ThemeData(
+        fontFamily: 'NotoSansSC',
         scaffoldBackgroundColor: AppConstants.transparentColor,
         colorScheme: ColorScheme.fromSeed(seedColor: AppConstants.primarySeedColor),
         canvasColor: AppConstants.transparentColor,

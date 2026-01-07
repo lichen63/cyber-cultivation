@@ -19,9 +19,9 @@
 - [x] Change License
 - [x] Add contributing guidance
 - [x] Think what should happen when player reached the max level? -> show infinite symbol
-- [ ] Save current window size to game_data.save
-- [ ] Generate user id and save/load it in game_data.save
-- [ ] Use better font style
+- [x] Save current window size to game_data.save
+- [x] Generate user id and save/load it in game_data.save
+- [x] Use better font style
 - [ ] Localization
 - [ ] Add upgrade effect when level up
 - [ ] Change level to cultivation realm
