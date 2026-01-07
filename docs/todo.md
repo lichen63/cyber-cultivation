@@ -18,13 +18,12 @@
 - [x] Drag to scale in/out the game window
 - [x] Change License
 - [x] Add contributing guidance
-- [ ] Count typing frequency/APM?
-- [ ] Add upgrade effect when level up
-- [ ] Think what should happen when player reached the max level? -> show infinite symbol
+- [x] Think what should happen when player reached the max level? -> show infinite symbol
+- [ ] Save current window size to game_data.save
+- [ ] Generate user id and save/load it in game_data.save
 - [ ] Use better font style
 - [ ] Localization
-- [ ] Save current window size to game_data.save
-- [ ] Add a switch for whether stick the game window on the top
+- [ ] Add upgrade effect when level up
 - [ ] Change level to cultivation realm
 - [ ] Use different pictures for different levels -> change to only one image, but show different effect in different realm
 - [ ] Replace the default character image -> change to make the character sprite image horizontal symmetric
@@ -42,7 +41,6 @@
   - [ ] Armor is responsible for increasing exp from mouse events
   - [ ] Cultivatil tool is reponsible for increasing exp from pomodoro clock(focus time)
   - [ ] Accessory is reponsible for reducing the needed exp for current level
-- [ ] Generate user id and save/load it in game_data.save
 - [ ] Add pet system
 - [ ] Add friends system
 - [ ] Let player customize the character image
