@@ -64,9 +64,12 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/character.png
+    - assets/fonts/NotoSansSC-Bold.ttf
 
-  # An image asset can refer to one or more resolution-specific "variants", see
-  # https://flutter.dev/to/resolution-aware-images
+  fonts:
+    - family: NotoSansSC
+      fonts:
+        - asset: assets/fonts/NotoSansSC-Bold.ttf
 
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/to/asset-from-package
