@@ -151,6 +151,17 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
   static const EventChannel _mouseEventChannel = EventChannel(
     AppConstants.mouseEventsChannel,
   );
+  static const MethodChannel _mouseControlChannel = MethodChannel(
+    AppConstants.mouseControlChannel,
+  );
+
+  Timer? _idleCheckTimer;
+  Timer? _scheduledMoveTimer;
+  DateTime _lastMouseMoveTime = DateTime.now();
+  // Toggle for the anti-sleep feature
+  bool _enableAntiSleep = false; 
+  // Toggle moving direction to prevent cursor drift
+  bool _moveToggle = false; 
 
   @override
   void initState() {
@@ -166,10 +177,13 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
     
     _setupKeyboardListener();
     _setupMouseListener();
+    _startIdleCheck();
   }
 
   @override
   void dispose() {
+    _idleCheckTimer?.cancel();
+    _scheduledMoveTimer?.cancel();
     _saveGameData(immediate: true);
     WidgetsBinding.instance.removeObserver(this);
     windowManager.removeListener(this);
@@ -201,6 +215,7 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
     setState(() {
       _level = data.level;
       _isAlwaysOnTop = data.isAlwaysOnTop;
+      _enableAntiSleep = data.isAntiSleepEnabled;
       _userId = data.userId;
       _windowWidth = data.windowWidth ?? AppConstants.defaultWindowWidth;
       _windowHeight = data.windowHeight ?? AppConstants.defaultWindowHeight;
@@ -235,6 +250,7 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
         level: _level,
         currentExp: _currentExp,
         isAlwaysOnTop: _isAlwaysOnTop,
+        isAntiSleepEnabled: _enableAntiSleep,
         windowWidth: _windowWidth,
         windowHeight: _windowHeight,
         userId: _userId,
@@ -245,6 +261,7 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
           level: _level,
           currentExp: _currentExp,
           isAlwaysOnTop: _isAlwaysOnTop,
+          isAntiSleepEnabled: _enableAntiSleep,
           windowWidth: _windowWidth,
           windowHeight: _windowHeight,
           userId: _userId,
@@ -291,6 +308,11 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
   void _setupMouseListener() {
     _mouseEventChannel.receiveBroadcastStream().listen(
       (dynamic event) {
+        _lastMouseMoveTime = DateTime.now();
+        if (_scheduledMoveTimer?.isActive ?? false) {
+           _scheduledMoveTimer!.cancel();
+        }
+
         if (event is Map) {
           final absX = (event['x'] as num?)?.toDouble() ?? 0;
           final absY = (event['y'] as num?)?.toDouble() ?? 0;
@@ -315,6 +337,35 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
         debugPrint('Mouse event error: ${error.message}');
       },
     );
+  }
+
+  void _startIdleCheck() {
+    _idleCheckTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!_enableAntiSleep) return;
+      
+      // Calculate how long since the last mouse move
+      final diff = DateTime.now().difference(_lastMouseMoveTime);
+      
+      // If idle for more than 10 seconds
+      if (diff.inSeconds >= 10) {
+        _performMouseMove();
+      }
+    });
+  }
+
+  Future<void> _performMouseMove() async {
+    try {
+      // Toggle move direction to prevent cursor from drifting off-screen over time
+      _moveToggle = !_moveToggle;
+      final double offset = _moveToggle ? 2.0 : -2.0;
+      
+      await _mouseControlChannel.invokeMethod('moveMouse', {
+        'dx': offset,
+        'dy': offset,
+      });
+    } catch (e) {
+      debugPrint("Failed to move mouse via channel: $e");
+    }
   }
 
   void _showContextMenu(Offset position) async {
@@ -357,6 +408,27 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
             ],
           ),
         ),
+        PopupMenuItem(
+          value: AppConstants.toggleAntiSleepValue,
+          child: Row(
+            children: [
+              SizedBox(
+                width: 24,
+                child: _enableAntiSleep
+                    ? const Icon(Icons.check, color: AppConstants.whiteColor, size: 18)
+                    : null,
+              ),
+              const SizedBox(width: 8),
+              const Text(
+                AppConstants.antiSleepText,
+                style: TextStyle(
+                  color: AppConstants.whiteColor,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     );
 
@@ -368,6 +440,11 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
 
     if (result == AppConstants.toggleAlwaysOnTopValue) {
       _toggleAlwaysOnTop(!_isAlwaysOnTop);
+    } else if (result == AppConstants.toggleAntiSleepValue) {
+      setState(() {
+        _enableAntiSleep = !_enableAntiSleep;
+      });
+      _saveGameData();
     }
   }
 

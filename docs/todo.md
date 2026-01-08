@@ -22,6 +22,7 @@
 - [x] Save current window size to game_data.save
 - [x] Generate user id and save/load it in game_data.save
 - [x] Use better font style
+- [x] Add feature that move mouse intervally to block screen fall sleep
 - [ ] Localization
 - [ ] Add upgrade effect when level up
 - [ ] Change level to cultivation realm

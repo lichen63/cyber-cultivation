@@ -2,6 +2,7 @@ class GameData {
   final int level;
   final double currentExp;
   final bool isAlwaysOnTop;
+  final bool isAntiSleepEnabled;
   final double? windowWidth;
   final double? windowHeight;
   final String? userId;
@@ -10,6 +11,7 @@ class GameData {
     required this.level,
     required this.currentExp,
     this.isAlwaysOnTop = true,
+    this.isAntiSleepEnabled = false,
     this.windowWidth,
     this.windowHeight,
     this.userId,
@@ -21,6 +23,7 @@ class GameData {
       'level': level,
       'currentExp': currentExp.isInfinite ? 0 : currentExp.toInt(),
       'isAlwaysOnTop': isAlwaysOnTop,
+      'isAntiSleepEnabled': isAntiSleepEnabled,
       'windowWidth': windowWidth,
       'windowHeight': windowHeight,
       'userId': userId,
@@ -33,6 +36,7 @@ class GameData {
       level: json['level'] as int,
       currentExp: (json['currentExp'] as num).toDouble(),
       isAlwaysOnTop: json['isAlwaysOnTop'] as bool? ?? true,
+      isAntiSleepEnabled: json['isAntiSleepEnabled'] as bool? ?? false,
       windowWidth: (json['windowWidth'] as num?)?.toDouble(),
       windowHeight: (json['windowHeight'] as num?)?.toDouble(),
       userId: json['userId'] as String?,
@@ -43,6 +47,7 @@ class GameData {
     int? level,
     double? currentExp,
     bool? isAlwaysOnTop,
+    bool? isAntiSleepEnabled,
     double? windowWidth,
     double? windowHeight,
     String? userId,
@@ -51,6 +56,7 @@ class GameData {
       level: level ?? this.level,
       currentExp: currentExp ?? this.currentExp,
       isAlwaysOnTop: isAlwaysOnTop ?? this.isAlwaysOnTop,
+      isAntiSleepEnabled: isAntiSleepEnabled ?? this.isAntiSleepEnabled,
       windowWidth: windowWidth ?? this.windowWidth,
       windowHeight: windowHeight ?? this.windowHeight,
       userId: userId ?? this.userId,
