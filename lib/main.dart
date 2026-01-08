@@ -225,6 +225,17 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
   // Toggle moving direction to prevent cursor drift
   bool _moveToggle = false; 
 
+  // Pomodoro
+  Timer? _pomodoroTimer;
+  int _pomodoroSecondsRemaining = 0;
+  bool _isPomodoroActive = false;
+  // New Pomodoro State
+  int _pomodoroTotalLoops = 1;
+  int _pomodoroCurrentLoop = 1;
+  int _pomodoroWorkDurationMinutes = 25;
+  int _pomodoroRelaxDurationMinutes = 5;
+  bool _isPomodoroRelaxing = false;
+
   @override
   void initState() {
     super.initState();
@@ -246,6 +257,7 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
   void dispose() {
     _idleCheckTimer?.cancel();
     _scheduledMoveTimer?.cancel();
+    _pomodoroTimer?.cancel();
     _saveGameData(immediate: true);
     WidgetsBinding.instance.removeObserver(this);
     windowManager.removeListener(this);
@@ -349,6 +361,192 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
       }
     });
     _saveGameData();
+  }
+
+  void _showPomodoroDialog() {
+    if (_isPomodoroActive) {
+      _cancelPomodoro();
+      return;
+    }
+
+    int duration = AppConstants.defaultPomodoroDuration;
+    int relax = AppConstants.defaultRelaxDuration;
+    int loops = AppConstants.defaultPomodoroLoops;
+
+    showDialog(
+      context: context,
+      barrierColor: AppConstants.blackOverlayColor,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            final double expectedExp =
+                duration * loops * AppConstants.expGainPerMinute;
+
+            return AlertDialog(
+              backgroundColor: Colors.black.withOpacity(0.9),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+                side: const BorderSide(color: AppConstants.whiteColor, width: 2),
+              ),
+              title: const Text(
+                'Spirit Gathering Array',
+                style: TextStyle(color: Colors.cyanAccent),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildSettingRow(
+                    'Duration (min):',
+                    duration,
+                    (val) => setState(() => duration = val),
+                  ),
+                  const SizedBox(height: 10),
+                  _buildSettingRow(
+                    'Relax (min):',
+                    relax,
+                    (val) => setState(() => relax = val),
+                  ),
+                  const SizedBox(height: 10),
+                  _buildSettingRow(
+                    'Loops:',
+                    loops,
+                    (val) => setState(() => loops = val),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Expected Qi: ${expectedExp.toInt()}',
+                    style: const TextStyle(
+                      color: Colors.purpleAccent,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    _startPomodoro(
+                      workMinutes: duration,
+                      relaxMinutes: relax,
+                      loops: loops,
+                    );
+                  },
+                  child: const Text(
+                    'Start Cultivation',
+                    style: TextStyle(color: Colors.cyanAccent),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildSettingRow(String label, int value, Function(int) onChanged) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: const TextStyle(color: Colors.white)),
+        Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.remove_circle_outline, color: Colors.white),
+              onPressed: () {
+                if (value > 1) onChanged(value - 1);
+              },
+            ),
+            SizedBox(
+              width: 30,
+              child: Text(
+                value.toString(),
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.add_circle_outline, color: Colors.white),
+              onPressed: () {
+                if (value < 60) onChanged(value + 1); // Cap at 60 for simplicity
+              },
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  void _startPomodoro({
+    required int workMinutes,
+    required int relaxMinutes,
+    required int loops,
+  }) {
+    if (_isPomodoroActive) return;
+
+    setState(() {
+      _isPomodoroActive = true;
+      _pomodoroWorkDurationMinutes = workMinutes;
+      _pomodoroRelaxDurationMinutes = relaxMinutes;
+      _pomodoroTotalLoops = loops;
+      _pomodoroCurrentLoop = 1;
+      _isPomodoroRelaxing = false;
+      _pomodoroSecondsRemaining = workMinutes * 60;
+    });
+
+    _pomodoroTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        _cancelPomodoro();
+        return;
+      }
+      setState(() {
+        if (_pomodoroSecondsRemaining > 0) {
+          _pomodoroSecondsRemaining--;
+        } else {
+          // Timer finished
+          if (_isPomodoroRelaxing) {
+            // Finished Relaxing, start next Work loop
+            _isPomodoroRelaxing = false;
+            _pomodoroCurrentLoop++;
+            if (_pomodoroCurrentLoop > _pomodoroTotalLoops) {
+                // Should not happen if logic is correct, but safety catch
+                 _cancelPomodoro();
+            } else {
+                 _pomodoroSecondsRemaining = _pomodoroWorkDurationMinutes * 60;
+            }
+          } else {
+            // Finished Working
+            _gainExp(AppConstants.expGainPerMinute * _pomodoroWorkDurationMinutes);
+            
+            if (_pomodoroCurrentLoop >= _pomodoroTotalLoops) {
+              // All work done
+              _cancelPomodoro();
+            } else {
+              // Start Relax
+              _isPomodoroRelaxing = true;
+              _pomodoroSecondsRemaining = _pomodoroRelaxDurationMinutes * 60;
+            }
+          }
+        }
+      });
+    });
+  }
+
+  void _cancelPomodoro() {
+    _pomodoroTimer?.cancel();
+    _pomodoroTimer = null;
+    setState(() {
+      _isPomodoroActive = false;
+      _pomodoroSecondsRemaining = 0;
+      _isPomodoroRelaxing = false;
+      _pomodoroCurrentLoop = 1;
+    });
   }
 
   void _setupKeyboardListener() {
@@ -586,8 +784,31 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
                                             scale: scale,
                                           ),
                                           SizedBox(height: 10 * scale),
-                                          const Expanded(
-                                            child: CharacterDisplay(),
+                                          Expanded(
+                                            child: Stack(
+                                              alignment: Alignment.center,
+                                              children: [
+                                                const CharacterDisplay(),
+                                                if (_isPomodoroActive)
+                                                  SizedBox(
+                                                    width: 140 * scale,
+                                                    height: 140 * scale,
+                                                    child: CircularProgressIndicator(
+                                                      value: _pomodoroSecondsRemaining /
+                                                          ((_isPomodoroRelaxing
+                                                                  ? _pomodoroRelaxDurationMinutes
+                                                                  : _pomodoroWorkDurationMinutes) *
+                                                              60),
+                                                      strokeWidth: 4 * scale,
+                                                      color: _isPomodoroRelaxing
+                                                          ? Colors.greenAccent
+                                                          : Colors.cyanAccent,
+                                                      backgroundColor:
+                                                          Colors.white24,
+                                                    ),
+                                                  ),
+                                              ],
+                                            ),
                                           ),
                                         ],
                                       ),
@@ -629,8 +850,14 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           StyledButton(
-                            text: 'T-1',
-                            onPressed: () {},
+                            text: _isPomodoroActive
+                                ? (_isPomodoroRelaxing
+                                    ? 'Relax ${(_pomodoroSecondsRemaining ~/ 60).toString().padLeft(2, '0')}:${(_pomodoroSecondsRemaining % 60).toString().padLeft(2, '0')}'
+                                    : 'W ${_pomodoroCurrentLoop}/$_pomodoroTotalLoops ${(_pomodoroSecondsRemaining ~/ 60).toString().padLeft(2, '0')}:${(_pomodoroSecondsRemaining % 60).toString().padLeft(2, '0')}')
+                                : 'Focus',
+                            onPressed: _isPomodoroActive
+                                ? _cancelPomodoro
+                                : _showPomodoroDialog,
                             scale: windowScale,
                           ),
                           SizedBox(width: 10 * windowScale),
