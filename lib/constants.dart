@@ -16,11 +16,14 @@ class AppConstants {
   // Event Channels
   static const String keyEventsChannel = 'com.lichen63.cyber_cultivation/key_events';
   static const String mouseEventsChannel = 'com.lichen63.cyber_cultivation/mouse_events';
+  static const String mouseControlChannel = 'com.lichen63.cyber_cultivation/mouse_control';
   
   // UI Strings
   static const String defaultKeyText = 'Press any key...';
   static const String forceForegroundText = 'Force Foreground';
   static const String toggleAlwaysOnTopValue = 'toggleAlwaysOnTop';
+  static const String antiSleepText = 'Anti-Sleep';
+  static const String toggleAntiSleepValue = 'toggle_anti_sleep';
   
   // UI Dimensions
   static const double borderWidth = 6.0;
