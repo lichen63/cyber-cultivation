@@ -1,8 +1,12 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
 
 import 'constants.dart';
 import 'models/game_data.dart';
@@ -48,7 +52,7 @@ void main() async {
     size: Size(windowWidth, windowHeight),
     center: true,
     backgroundColor: AppConstants.transparentColor,
-    skipTaskbar: false,
+    skipTaskbar: true,
     titleBarStyle: TitleBarStyle.hidden,
   );
 
@@ -78,17 +82,75 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> with WindowListener {
+class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
   @override
   void initState() {
     super.initState();
     windowManager.addListener(this);
+    trayManager.addListener(this);
+    _initTray();
   }
 
   @override
   void dispose() {
     windowManager.removeListener(this);
+    trayManager.removeListener(this);
     super.dispose();
+  }
+
+  Future<void> _initTray() async {
+    String iconPath = 'assets/images/tray_icon.png';
+    if (Platform.isMacOS) {
+      iconPath = await _extractAsset(iconPath);
+    }
+    await trayManager.setIcon(iconPath);
+    
+    Menu menu = Menu(
+      items: [
+        MenuItem(
+          key: 'show_window',
+          label: 'Show Window',
+        ),
+        MenuItem.separator(),
+        MenuItem(
+          key: 'exit_app',
+          label: 'Exit',
+        ),
+      ],
+    );
+    await trayManager.setContextMenu(menu);
+  }
+
+  Future<String> _extractAsset(String assetPath) async {
+    final tempDir = await getTemporaryDirectory();
+    final fileName = p.basename(assetPath);
+    final file = File(p.join(tempDir.path, fileName));
+    
+    if (!await file.exists()) {
+      final byteData = await rootBundle.load(assetPath);
+      await file.writeAsBytes(byteData.buffer.asUint8List());
+    }
+    return file.path;
+  }
+
+  @override
+  void onTrayIconMouseDown() {
+    trayManager.popUpContextMenu();
+  }
+
+  @override
+  void onTrayIconRightMouseDown() {
+    trayManager.popUpContextMenu();
+  }
+
+  @override
+  void onTrayMenuItemClick(MenuItem menuItem) {
+    if (menuItem.key == 'show_window') {
+      windowManager.show();
+      windowManager.focus();
+    } else if (menuItem.key == 'exit_app') {
+      windowManager.close();
+    }
   }
 
   @override
