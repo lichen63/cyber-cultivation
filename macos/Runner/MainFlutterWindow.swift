@@ -20,6 +20,32 @@ class MainFlutterWindow: NSWindow {
     let mouseEventChannel = FlutterEventChannel(name: "com.lichen63.cyber_cultivation/mouse_events", binaryMessenger: flutterViewController.engine.binaryMessenger)
     mouseEventChannel.setStreamHandler(MouseMonitorStreamHandler())
 
+    let mouseControlChannel = FlutterMethodChannel(name: "com.lichen63.cyber_cultivation/mouse_control", binaryMessenger: flutterViewController.engine.binaryMessenger)
+    mouseControlChannel.setMethodCallHandler { (call, result) in
+        if call.method == "moveMouse" {
+            if let args = call.arguments as? [String: Any],
+               let dx = args["dx"] as? Double,
+               let dy = args["dy"] as? Double {
+                
+                if let currentEvent = CGEvent(source: nil) {
+                    let currentPos = currentEvent.location
+                    let newPos = CGPoint(x: currentPos.x + dx, y: currentPos.y + dy)
+                    
+                    if let moveEvent = CGEvent(mouseEventSource: nil, mouseType: .mouseMoved, mouseCursorPosition: newPos, mouseButton: .left) {
+                        moveEvent.post(tap: .cghidEventTap)
+                        result(true)
+                        return
+                    }
+                }
+                result(FlutterError(code: "EVENT_CREATION_FAILED", message: "Failed to create mouse event", details: nil))
+            } else {
+                result(FlutterError(code: "INVALID_ARGUMENTS", message: "dx and dy are required", details: nil))
+            }
+        } else {
+            result(FlutterMethodNotImplemented)
+        }
+    }
+
     super.awakeFromNib()
     
     // Configure window for transparency
