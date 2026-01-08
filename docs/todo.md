@@ -23,6 +23,7 @@
 - [x] Generate user id and save/load it in game_data.save
 - [x] Use better font style
 - [x] Add feature that move mouse intervally to block screen fall sleep
+- [x] Show an icon in the top menu system, hide the icon in dock
 - [ ] Localization
 - [ ] Add upgrade effect when level up
 - [ ] Change level to cultivation realm
