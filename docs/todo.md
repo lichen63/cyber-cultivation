@@ -32,6 +32,7 @@
 - [x] Localization
 - [x] Add switch for every ui in the game window, let player can customize which ui to show/hide
 - [ ] Add summary of keyboard/mouse events per day?
+- [ ] For all numbers, use k/m/b if they are large
 - [ ] Launch at login
 - [ ] Add upgrade effect when level up
 - [ ] Change level to cultivation realm

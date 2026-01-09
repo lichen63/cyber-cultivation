@@ -1,5 +1,5 @@
 name: cyber_cultivation
-description: "A new Flutter project."
+description: "Cyber Cultivation With Keyboard and Mouse."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -43,6 +43,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: ^0.20.2
+  fl_chart: ^1.1.1
 
 dev_dependencies:
   flutter_test:
