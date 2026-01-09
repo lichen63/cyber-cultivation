@@ -25,8 +25,8 @@
 - [x] Add feature that move mouse intervally to block screen fall sleep
 - [x] Show an icon in the top menu system, hide the icon in dock
 - [ ] Pomodoro clock
-- [ ] Replace character image
-- [ ] Make tray icon larger
+- [x] Replace character image
+- [x] Make tray icon larger
 - [ ] Add summary of keyboard/mouse events per day?
 - [ ] Add upgrade effect when level up
 - [ ] Change level to cultivation realm
