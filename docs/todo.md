@@ -24,14 +24,15 @@
 - [x] Use better font style
 - [x] Add feature that move mouse intervally to block screen fall sleep
 - [x] Show an icon in the top menu system, hide the icon in dock
-- [ ] Localization
+- [ ] Pomodoro clock
 - [ ] Add upgrade effect when level up
 - [ ] Change level to cultivation realm
 - [ ] Use different pictures for different levels -> change to only one image, but show different effect in different realm
 - [ ] Replace the default character image -> change to make the character sprite image horizontal symmetric
 - [ ] Add a stop game script
-- [ ] Pomodoro clock
 - [ ] Pomodoro clock can get experience
+- [ ] Add version control
+- [ ] Localization
 - [ ] Add equipment system
   - [ ] Replace B-1 with equipment button, and click to show the equipment ui
   - [ ] Equip UI contains weapon, armor, tool, accessory, each has 11 levels (same as character realm)

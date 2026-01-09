@@ -19,7 +19,7 @@ class AppConstants {
   static const String mouseControlChannel = 'com.lichen63.cyber_cultivation/mouse_control';
   
   // UI Strings
-  static const String defaultKeyText = 'Press any key...';
+  static const String defaultKeyText = 'Key';
   static const String forceForegroundText = 'Force Foreground';
   static const String toggleAlwaysOnTopValue = 'toggleAlwaysOnTop';
   static const String antiSleepText = 'Anti-Sleep';
@@ -54,4 +54,9 @@ class AppConstants {
   static const double expGainPerKey = 10.0;
   static const double expGainPerMouse = 1.0;
   static const double expGrowthFactor = 1.1;
+  static const double expGainPerMinute = 20.0;
+  
+  static const int defaultPomodoroDuration = 25;
+  static const int defaultRelaxDuration = 5;
+  static const int defaultPomodoroLoops = 1;
 }
