@@ -45,7 +45,7 @@ class AppConstants {
   static final Color blackOverlayLightColor = Colors.black.withValues(alpha: 0.3);
   
   // Assets
-  static const String characterImagePath = 'assets/images/character.png';
+  static const String characterImagePath = 'assets/images/character_2.png';
 
   // EXP System
   static const int initialLevel = 1;
