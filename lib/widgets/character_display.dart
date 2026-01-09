@@ -6,10 +6,14 @@ class CharacterDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Image.asset(
-        AppConstants.characterImagePath,
-        fit: BoxFit.contain,
+    return Align(
+      alignment: const Alignment(0, 0),
+      child: Transform.scale(
+        scale: 1.2,
+        child: Image.asset(
+          AppConstants.characterImagePath,
+          fit: BoxFit.contain,
+        ),
       ),
     );
   }
