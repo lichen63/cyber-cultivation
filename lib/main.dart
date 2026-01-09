@@ -12,7 +12,10 @@ import 'package:path/path.dart' as p;
 
 import 'constants.dart';
 import 'models/game_data.dart';
+import 'package:intl/intl.dart';
+import 'models/daily_stats.dart';
 import 'services/game_data_service.dart';
+import 'widgets/stats_window.dart';
 import 'widgets/character_display.dart';
 import 'widgets/exp_display.dart';
 import 'widgets/keyboard_monitor.dart';
@@ -50,8 +53,10 @@ void main() async {
     await gameDataService.saveGameData(gameData);
   }
 
-  final double windowWidth = gameData.windowWidth ?? AppConstants.defaultWindowWidth;
-  final double windowHeight = gameData.windowHeight ?? AppConstants.defaultWindowHeight;
+  final double windowWidth =
+      gameData.windowWidth ?? AppConstants.defaultWindowWidth;
+  final double windowHeight =
+      gameData.windowHeight ?? AppConstants.defaultWindowHeight;
 
   WindowOptions windowOptions = WindowOptions(
     size: Size(windowWidth, windowHeight),
@@ -114,18 +119,12 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
       iconPath = await _extractAsset(iconPath);
     }
     await trayManager.setIcon(iconPath);
-    
+
     Menu menu = Menu(
       items: [
-        MenuItem(
-          key: 'show_window',
-          label: 'Show Window',
-        ),
+        MenuItem(key: 'show_window', label: 'Show Window'),
         MenuItem.separator(),
-        MenuItem(
-          key: 'exit_app',
-          label: 'Exit',
-        ),
+        MenuItem(key: 'exit_app', label: 'Exit'),
       ],
     );
     await trayManager.setContextMenu(menu);
@@ -135,7 +134,7 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
     final tempDir = await getTemporaryDirectory();
     final fileName = p.basename(assetPath);
     final file = File(p.join(tempDir.path, fileName));
-    
+
     if (!await file.exists()) {
       final byteData = await rootBundle.load(assetPath);
       await file.writeAsBytes(byteData.buffer.asUint8List());
@@ -187,7 +186,9 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
       theme: ThemeData(
         fontFamily: 'NotoSansSC',
         scaffoldBackgroundColor: AppConstants.transparentColor,
-        colorScheme: ColorScheme.fromSeed(seedColor: AppConstants.primarySeedColor),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppConstants.primarySeedColor,
+        ),
         canvasColor: AppConstants.transparentColor,
       ),
       color: AppConstants.transparentColor,
@@ -212,7 +213,8 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBindingObserver {
+class _MyHomePageState extends State<MyHomePage>
+    with WindowListener, WidgetsBindingObserver {
   String _currentKey = AppConstants.defaultKeyText;
   double _mouseX = 0;
   double _mouseY = 0;
@@ -232,6 +234,12 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
   double _windowHeight = AppConstants.defaultWindowHeight;
   String? _language;
 
+  // Stats
+  DailyStats _todayStats = DailyStats();
+  Map<String, DailyStats> _dailyStatsMap = {};
+  double? _lastAbsX;
+  double? _lastAbsY;
+
   final GameDataService _gameDataService = GameDataService();
   Timer? _saveDebounce;
 
@@ -249,9 +257,9 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
   Timer? _scheduledMoveTimer;
   DateTime _lastMouseMoveTime = DateTime.now();
   // Toggle for the anti-sleep feature
-  bool _enableAntiSleep = false; 
+  bool _enableAntiSleep = false;
   // Toggle moving direction to prevent cursor drift
-  bool _moveToggle = false; 
+  bool _moveToggle = false;
 
   // Pomodoro
   Timer? _pomodoroTimer;
@@ -269,13 +277,13 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     windowManager.addListener(this);
-    
+
     if (widget.initialGameData != null) {
       _applyGameData(widget.initialGameData!);
     } else {
       _loadGameData();
     }
-    
+
     _setupKeyboardListener();
     _setupMouseListener();
     _startIdleCheck();
@@ -294,7 +302,8 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.detached) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached) {
       _saveGameData(immediate: true);
     }
   }
@@ -307,7 +316,10 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
         _windowWidth = size.width;
         _windowHeight = size.height;
         if (_saveDebounce?.isActive ?? false) _saveDebounce!.cancel();
-        _saveDebounce = Timer(const Duration(seconds: 1), () => _saveGameData());
+        _saveDebounce = Timer(
+          const Duration(seconds: 1),
+          () => _saveGameData(),
+        );
       }
     });
   }
@@ -324,13 +336,24 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
       _windowWidth = data.windowWidth ?? AppConstants.defaultWindowWidth;
       _windowHeight = data.windowHeight ?? AppConstants.defaultWindowHeight;
 
+      _dailyStatsMap = Map.of(data.dailyStats);
+      final todayKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      if (_dailyStatsMap.containsKey(todayKey)) {
+        _todayStats = _dailyStatsMap[todayKey]!;
+      } else {
+        _todayStats = DailyStats();
+        _dailyStatsMap[todayKey] = _todayStats;
+      }
+
       if (_level >= AppConstants.maxLevel) {
         _currentExp = double.infinity;
         _maxExp = double.infinity;
       } else {
         _currentExp = data.currentExp;
         // Recalculate max exp based on level
-        _maxExp = AppConstants.initialMaxExp * pow(AppConstants.expGrowthFactor, _level - 1);
+        _maxExp =
+            AppConstants.initialMaxExp *
+            pow(AppConstants.expGrowthFactor, _level - 1);
       }
     });
     windowManager.setAlwaysOnTop(_isAlwaysOnTop);
@@ -348,22 +371,13 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
 
   void _saveGameData({bool immediate = false}) {
     if (_saveDebounce?.isActive ?? false) _saveDebounce!.cancel();
-    
-    if (immediate) {
-      _gameDataService.saveGameData(GameData(
-        level: _level,
-        currentExp: _currentExp,
-        isAlwaysOnTop: _isAlwaysOnTop,
-        isAntiSleepEnabled: _enableAntiSleep,
-        isAlwaysShowActionButtons: _isAlwaysShowActionButtons,
-        windowWidth: _windowWidth,
-        windowHeight: _windowHeight,
-        userId: _userId,
-        language: _language,
-      ));
-    } else {
-      _saveDebounce = Timer(const Duration(seconds: 1), () {
-        _gameDataService.saveGameData(GameData(
+
+    void save() {
+      final todayKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      _dailyStatsMap[todayKey] = _todayStats;
+
+      _gameDataService.saveGameData(
+        GameData(
           level: _level,
           currentExp: _currentExp,
           isAlwaysOnTop: _isAlwaysOnTop,
@@ -373,8 +387,15 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
           windowHeight: _windowHeight,
           userId: _userId,
           language: _language,
-        ));
-      });
+          dailyStats: _dailyStatsMap,
+        ),
+      );
+    }
+
+    if (immediate) {
+      save();
+    } else {
+      _saveDebounce = Timer(const Duration(seconds: 1), save);
     }
   }
 
@@ -388,7 +409,7 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
         _level++;
         _maxExp = _maxExp * AppConstants.expGrowthFactor;
       }
-      
+
       if (_level >= AppConstants.maxLevel) {
         _currentExp = double.infinity;
         _maxExp = double.infinity;
@@ -447,8 +468,10 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text(l10n.cancelButtonText,
-                  style: const TextStyle(color: AppConstants.greyColor)),
+              child: Text(
+                l10n.cancelButtonText,
+                style: const TextStyle(color: AppConstants.greyColor),
+              ),
             ),
             TextButton(
               onPressed: () {
@@ -498,15 +521,17 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
             _isPomodoroRelaxing = false;
             _pomodoroCurrentLoop++;
             if (_pomodoroCurrentLoop > _pomodoroTotalLoops) {
-                // Should not happen if logic is correct, but safety catch
-                 _cancelPomodoro();
+              // Should not happen if logic is correct, but safety catch
+              _cancelPomodoro();
             } else {
-                 _pomodoroSecondsRemaining = _pomodoroWorkDurationMinutes * 60;
+              _pomodoroSecondsRemaining = _pomodoroWorkDurationMinutes * 60;
             }
           } else {
             // Finished Working
-            _gainExp(AppConstants.expGainPerMinute * _pomodoroWorkDurationMinutes);
-            
+            _gainExp(
+              AppConstants.expGainPerMinute * _pomodoroWorkDurationMinutes,
+            );
+
             if (_pomodoroCurrentLoop >= _pomodoroTotalLoops) {
               // All work done
               _cancelPomodoro();
@@ -532,6 +557,35 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
     });
   }
 
+  void _showStatsWindow() {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black54,
+      builder: (context) {
+        final todayKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
+        final viewHistory = Map<String, DailyStats>.from(_dailyStatsMap);
+        viewHistory[todayKey] = _todayStats;
+
+        return StatsWindow(todayStats: _todayStats, historyStats: viewHistory);
+      },
+    );
+  }
+
+  void _updateStats({
+    int keyboardCount = 0,
+    int clickCount = 0,
+    double moveDistance = 0,
+  }) {
+    // Only update if we are mounted
+    if (!mounted) return;
+
+    setState(() {
+      _todayStats.keyboardCount += keyboardCount;
+      _todayStats.mouseClickCount += clickCount;
+      _todayStats.mouseMoveDistance += moveDistance;
+    });
+  }
+
   void _setupKeyboardListener() {
     _eventChannel.receiveBroadcastStream().listen(
       (dynamic event) {
@@ -540,6 +594,7 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
             _currentKey = event;
           });
           _gainExp(AppConstants.expGainPerKey);
+          _updateStats(keyboardCount: 1);
         }
       },
       onError: (dynamic error) {
@@ -553,7 +608,7 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
       (dynamic event) {
         _lastMouseMoveTime = DateTime.now();
         if (_scheduledMoveTimer?.isActive ?? false) {
-           _scheduledMoveTimer!.cancel();
+          _scheduledMoveTimer!.cancel();
         }
 
         if (event is Map) {
@@ -561,18 +616,34 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
           final absY = (event['y'] as num?)?.toDouble() ?? 0;
           final screenMinX = (event['screenMinX'] as num?)?.toDouble() ?? 0;
           final screenMinY = (event['screenMinY'] as num?)?.toDouble() ?? 0;
+          final type = event['type'] as String? ?? 'move';
 
-          if (mounted) {
-            setState(() {
-              // Calculate relative position in Dart
-              _mouseX = absX - screenMinX;
-              _mouseY = absY - screenMinY;
-
-              // Update current screen dimensions
-              _screenWidth = (event['screenWidth'] as num?)?.toDouble() ?? 1;
-              _screenHeight = (event['screenHeight'] as num?)?.toDouble() ?? 1;
-            });
+          if (type == 'click') {
             _gainExp(AppConstants.expGainPerMouse);
+            _updateStats(clickCount: 1);
+          } else {
+            if (_lastAbsX != null && _lastAbsY != null) {
+              final dx = absX - _lastAbsX!;
+              final dy = absY - _lastAbsY!;
+              final distance = sqrt(dx * dx + dy * dy);
+              _updateStats(moveDistance: distance);
+            }
+            _lastAbsX = absX;
+            _lastAbsY = absY;
+
+            if (mounted) {
+              setState(() {
+                // Calculate relative position in Dart
+                _mouseX = absX - screenMinX;
+                _mouseY = absY - screenMinY;
+
+                // Update current screen dimensions
+                _screenWidth = (event['screenWidth'] as num?)?.toDouble() ?? 1;
+                _screenHeight =
+                    (event['screenHeight'] as num?)?.toDouble() ?? 1;
+              });
+              _gainExp(AppConstants.expGainPerMouse);
+            }
           }
         }
       },
@@ -585,10 +656,10 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
   void _startIdleCheck() {
     _idleCheckTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!_enableAntiSleep) return;
-      
+
       // Calculate how long since the last mouse move
       final diff = DateTime.now().difference(_lastMouseMoveTime);
-      
+
       // If idle for more than 10 seconds
       if (diff.inSeconds >= 10) {
         _performMouseMove();
@@ -601,7 +672,7 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
       // Toggle move direction to prevent cursor from drifting off-screen over time
       _moveToggle = !_moveToggle;
       final double offset = _moveToggle ? 2.0 : -2.0;
-      
+
       await _mouseControlChannel.invokeMethod('moveMouse', {
         'dx': offset,
         'dy': offset,
@@ -636,10 +707,13 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
             children: [
               SizedBox(
                 width: 24,
-                child:
-                    _isAlwaysOnTop
-                        ? const Icon(Icons.check, color: AppConstants.whiteColor, size: 18)
-                        : null,
+                child: _isAlwaysOnTop
+                    ? const Icon(
+                        Icons.check,
+                        color: AppConstants.whiteColor,
+                        size: 18,
+                      )
+                    : null,
               ),
               const SizedBox(width: 8),
               Text(
@@ -659,7 +733,11 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
               SizedBox(
                 width: 24,
                 child: _enableAntiSleep
-                    ? const Icon(Icons.check, color: AppConstants.whiteColor, size: 18)
+                    ? const Icon(
+                        Icons.check,
+                        color: AppConstants.whiteColor,
+                        size: 18,
+                      )
                     : null,
               ),
               const SizedBox(width: 8),
@@ -682,7 +760,8 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
               Text(
                 l10n.exitGameText,
                 style: const TextStyle(
-                  color: AppConstants.redColor, // Use red for destructive action
+                  color:
+                      AppConstants.redColor, // Use red for destructive action
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -777,7 +856,8 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
           }
         },
         child: GestureDetector(
-          onSecondaryTapUp: (details) => _showContextMenu(details.globalPosition),
+          onSecondaryTapUp: (details) =>
+              _showContextMenu(details.globalPosition),
           child: LayoutBuilder(
             builder: (context, constraints) {
               final double windowScale =
@@ -829,12 +909,14 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
                                                 const CharacterDisplay(),
                                                 if (_isPomodoroActive)
                                                   CultivationFormation(
-                                                    progress: _pomodoroSecondsRemaining /
+                                                    progress:
+                                                        _pomodoroSecondsRemaining /
                                                         ((_isPomodoroRelaxing
                                                                 ? _pomodoroRelaxDurationMinutes
                                                                 : _pomodoroWorkDurationMinutes) *
                                                             60),
-                                                    isRelaxing: _isPomodoroRelaxing,
+                                                    isRelaxing:
+                                                        _isPomodoroRelaxing,
                                                     size: 240 * scale,
                                                   ),
                                               ],
@@ -882,8 +964,8 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
                           StyledButton(
                             text: _isPomodoroActive
                                 ? (_isPomodoroRelaxing
-                                    ? '${l10n.relaxState} ${(_pomodoroSecondsRemaining ~/ 60).toString().padLeft(2, '0')}:${(_pomodoroSecondsRemaining % 60).toString().padLeft(2, '0')}'
-                                    : '${l10n.focusState} $_pomodoroCurrentLoop/$_pomodoroTotalLoops  ${(_pomodoroSecondsRemaining ~/ 60).toString().padLeft(2, '0')}:${(_pomodoroSecondsRemaining % 60).toString().padLeft(2, '0')}')
+                                      ? '${l10n.relaxState} ${(_pomodoroSecondsRemaining ~/ 60).toString().padLeft(2, '0')}:${(_pomodoroSecondsRemaining % 60).toString().padLeft(2, '0')}'
+                                      : '${l10n.focusState} $_pomodoroCurrentLoop/$_pomodoroTotalLoops  ${(_pomodoroSecondsRemaining ~/ 60).toString().padLeft(2, '0')}:${(_pomodoroSecondsRemaining % 60).toString().padLeft(2, '0')}')
                                 : l10n.focusState,
                             onPressed: _isPomodoroActive
                                 ? _confirmStopPomodoro
@@ -892,8 +974,8 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
                           ),
                           SizedBox(width: 10 * windowScale),
                           StyledButton(
-                            text: 'T-2',
-                            onPressed: () {},
+                            text: 'Stats',
+                            onPressed: _showStatsWindow,
                             scale: windowScale,
                           ),
                           SizedBox(width: 10 * windowScale),

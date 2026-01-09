@@ -1,3 +1,5 @@
+import 'daily_stats.dart';
+
 class GameData {
   final int level;
   final double currentExp;
@@ -8,6 +10,7 @@ class GameData {
   final double? windowHeight;
   final String? userId;
   final String? language;
+  final Map<String, DailyStats> dailyStats;
 
   GameData({
     required this.level,
@@ -19,7 +22,8 @@ class GameData {
     this.windowHeight,
     this.userId,
     this.language,
-  });
+    Map<String, DailyStats>? dailyStats,
+  }) : dailyStats = dailyStats ?? {};
 
   // Convert a GameData object into a Map object
   Map<String, dynamic> toJson() {
@@ -33,6 +37,7 @@ class GameData {
       'windowHeight': windowHeight,
       'userId': userId,
       'language': language,
+      'dailyStats': dailyStats.map((k, v) => MapEntry(k, v.toJson())),
     };
   }
 
@@ -43,11 +48,17 @@ class GameData {
       currentExp: (json['currentExp'] as num).toDouble(),
       isAlwaysOnTop: json['isAlwaysOnTop'] as bool? ?? true,
       isAntiSleepEnabled: json['isAntiSleepEnabled'] as bool? ?? false,
-      isAlwaysShowActionButtons: json['isAlwaysShowActionButtons'] as bool? ?? false,
+      isAlwaysShowActionButtons:
+          json['isAlwaysShowActionButtons'] as bool? ?? false,
       windowWidth: (json['windowWidth'] as num?)?.toDouble(),
       windowHeight: (json['windowHeight'] as num?)?.toDouble(),
       userId: json['userId'] as String?,
       language: json['language'] as String?,
+      dailyStats:
+          (json['dailyStats'] as Map<String, dynamic>?)?.map(
+            (k, v) => MapEntry(k, DailyStats.fromJson(v)),
+          ) ??
+          {},
     );
   }
 
@@ -61,17 +72,20 @@ class GameData {
     double? windowHeight,
     String? userId,
     String? language,
+    Map<String, DailyStats>? dailyStats,
   }) {
     return GameData(
       level: level ?? this.level,
       currentExp: currentExp ?? this.currentExp,
       isAlwaysOnTop: isAlwaysOnTop ?? this.isAlwaysOnTop,
       isAntiSleepEnabled: isAntiSleepEnabled ?? this.isAntiSleepEnabled,
-      isAlwaysShowActionButtons: isAlwaysShowActionButtons ?? this.isAlwaysShowActionButtons,
+      isAlwaysShowActionButtons:
+          isAlwaysShowActionButtons ?? this.isAlwaysShowActionButtons,
       windowWidth: windowWidth ?? this.windowWidth,
       windowHeight: windowHeight ?? this.windowHeight,
       userId: userId ?? this.userId,
       language: language ?? this.language,
+      dailyStats: dailyStats ?? this.dailyStats,
     );
   }
 }
