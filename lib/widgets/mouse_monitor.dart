@@ -23,8 +23,8 @@ class MouseMonitor extends StatelessWidget {
       scale: scale,
       alignment: Alignment.topRight,
       child: Container(
-        width: AppConstants.mouseMonitorSize,
-        height: AppConstants.mouseMonitorSize,
+        width: AppConstants.monitorWidgetSize,
+        height: AppConstants.monitorWidgetSize,
         decoration: BoxDecoration(
           border: Border.all(
             color: AppConstants.whiteColor,
