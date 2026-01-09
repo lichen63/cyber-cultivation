@@ -90,5 +90,9 @@
     "alwaysShowActionsText": "Always Show Actions",
     "@alwaysShowActionsText": {
         "description": "Option to always show action buttons"
+    },
+    "statsTitle": "Stats",
+    "@statsTitle": {
+        "description": "Title for the stats button"
     }
 }

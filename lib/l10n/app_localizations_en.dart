@@ -76,4 +76,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get alwaysShowActionsText => 'Always Show Actions';
+
+  @override
+  String get statsTitle => 'Stats';
 }

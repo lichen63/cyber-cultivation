@@ -235,6 +235,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Always Show Actions'**
   String get alwaysShowActionsText;
+
+  /// Title for the stats button
+  ///
+  /// In en, this message translates to:
+  /// **'Stats'**
+  String get statsTitle;
 }
 
 class _AppLocalizationsDelegate

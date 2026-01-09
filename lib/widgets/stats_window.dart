@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
+import 'package:cyber_cultivation/l10n/app_localizations.dart';
 import '../constants.dart';
 import '../models/daily_stats.dart';
 import 'dart:math';
@@ -128,7 +129,7 @@ class _StatsWindowState extends State<StatsWindow> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            "Stats",
+            AppLocalizations.of(context)!.statsTitle,
             style: TextStyle(
               color: textColor,
               fontSize: 20,

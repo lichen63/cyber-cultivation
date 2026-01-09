@@ -21,5 +21,6 @@
     "systemLanguage": "系统默认",
     "focusState": "专注",
     "relaxState": "休息",
-    "alwaysShowActionsText": "总是显示操作按钮"
+    "alwaysShowActionsText": "总是显示操作按钮",
+    "statsTitle": "统计"
 }
