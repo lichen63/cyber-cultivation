@@ -1,5 +1,7 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
+import '../constants.dart';
+
+import 'dart:math';
 
 class CultivationFormation extends StatefulWidget {
   final double progress;
@@ -31,12 +33,6 @@ class _CultivationFormationState extends State<CultivationFormation>
   }
 
   @override
-  void disposal() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
   void dispose() {
     _controller.dispose();
     super.dispose();
@@ -44,7 +40,9 @@ class _CultivationFormationState extends State<CultivationFormation>
 
   @override
   Widget build(BuildContext context) {
-    final color = widget.isRelaxing ? Colors.greenAccent : Colors.cyanAccent;
+    final color = widget.isRelaxing
+        ? AppConstants.pomodoroRelaxColor
+        : AppConstants.pomodoroFocusColor;
 
     return SizedBox(
       width: widget.size,
