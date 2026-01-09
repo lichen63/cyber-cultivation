@@ -25,10 +25,7 @@ class CultivationFormation extends StatelessWidget {
       width: size,
       height: size,
       child: CustomPaint(
-        painter: _FormationPainter(
-          progress: progress,
-          color: color,
-        ),
+        painter: _FormationPainter(progress: progress, color: color),
       ),
     );
   }
@@ -38,10 +35,7 @@ class _FormationPainter extends CustomPainter {
   final double progress;
   final Color color;
 
-  _FormationPainter({
-    required this.progress,
-    required this.color,
-  });
+  _FormationPainter({required this.progress, required this.color});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -56,9 +50,9 @@ class _FormationPainter extends CustomPainter {
 
     // Draw fill inside the outer circle (matching progress)
     final fillPaint = Paint()
-      ..color = color.withOpacity(0.5)
+      ..color = color.withValues(alpha: 0.5)
       ..style = PaintingStyle.fill;
-    
+
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius - 2),
       startAngle,
@@ -76,12 +70,12 @@ class _FormationPainter extends CustomPainter {
 
     // Draw background ring for progress
     canvas.drawCircle(
-      center, 
-      radius - 2, 
+      center,
+      radius - 2,
       Paint()
-        ..color = color.withOpacity(0.1)
+        ..color = color.withValues(alpha: 0.1)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 4.0
+        ..strokeWidth = 4.0,
     );
 
     canvas.drawArc(
@@ -95,7 +89,6 @@ class _FormationPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _FormationPainter oldDelegate) {
-    return oldDelegate.progress != progress ||
-        oldDelegate.color != color;
+    return oldDelegate.progress != progress || oldDelegate.color != color;
   }
 }

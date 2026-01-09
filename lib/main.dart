@@ -883,7 +883,7 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
                             text: _isPomodoroActive
                                 ? (_isPomodoroRelaxing
                                     ? '${l10n.relaxState} ${(_pomodoroSecondsRemaining ~/ 60).toString().padLeft(2, '0')}:${(_pomodoroSecondsRemaining % 60).toString().padLeft(2, '0')}'
-                                    : '${l10n.focusState} ${_pomodoroCurrentLoop}/$_pomodoroTotalLoops  ${(_pomodoroSecondsRemaining ~/ 60).toString().padLeft(2, '0')}:${(_pomodoroSecondsRemaining % 60).toString().padLeft(2, '0')}')
+                                    : '${l10n.focusState} $_pomodoroCurrentLoop/$_pomodoroTotalLoops  ${(_pomodoroSecondsRemaining ~/ 60).toString().padLeft(2, '0')}:${(_pomodoroSecondsRemaining % 60).toString().padLeft(2, '0')}')
                                 : l10n.focusState,
                             onPressed: _isPomodoroActive
                                 ? _confirmStopPomodoro

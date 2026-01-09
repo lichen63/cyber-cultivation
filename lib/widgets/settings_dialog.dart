@@ -47,6 +47,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return AlertDialog(
+      scrollable: true,
       backgroundColor: AppConstants.dialogBackgroundColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppConstants.borderRadius),
@@ -109,33 +110,18 @@ class _SettingsDialogState extends State<SettingsDialog> {
       children: [
         Text(
           l10n.language,
-          style: const TextStyle(
-            color: AppConstants.whiteColor,
-            fontSize: 16,
-          ),
+          style: const TextStyle(color: AppConstants.whiteColor, fontSize: 16),
         ),
         DropdownButton<String?>(
           value: _currentLanguage,
           dropdownColor: AppConstants.dialogBackgroundColor,
           style: const TextStyle(color: AppConstants.whiteColor),
           iconEnabledColor: AppConstants.cyanAccentColor,
-          underline: Container(
-            height: 1,
-            color: AppConstants.cyanAccentColor,
-          ),
+          underline: Container(height: 1, color: AppConstants.cyanAccentColor),
           items: [
-            DropdownMenuItem(
-              value: null,
-              child: Text(l10n.systemLanguage),
-            ),
-            const DropdownMenuItem(
-              value: 'en',
-              child: Text('English'),
-            ),
-            const DropdownMenuItem(
-              value: 'zh',
-              child: Text('中文'),
-            ),
+            DropdownMenuItem(value: null, child: Text(l10n.systemLanguage)),
+            const DropdownMenuItem(value: 'en', child: Text('English')),
+            const DropdownMenuItem(value: 'zh', child: Text('中文')),
           ],
           onChanged: (value) {
             setState(() => _currentLanguage = value);
@@ -157,18 +143,15 @@ class _SettingsDialogState extends State<SettingsDialog> {
       children: [
         Text(
           title,
-          style: const TextStyle(
-            color: AppConstants.whiteColor,
-            fontSize: 16,
-          ),
+          style: const TextStyle(color: AppConstants.whiteColor, fontSize: 16),
         ),
         Switch(
           value: value,
           onChanged: onChanged,
-          activeColor: AppConstants.cyanAccentColor,
-          activeTrackColor: AppConstants.cyanAccentColor.withOpacity(0.5),
+          activeThumbColor: AppConstants.cyanAccentColor,
+          activeTrackColor: AppConstants.cyanAccentColor.withValues(alpha: 0.5),
           inactiveThumbColor: AppConstants.greyColor,
-          inactiveTrackColor: AppConstants.greyColor.withOpacity(0.5),
+          inactiveTrackColor: AppConstants.greyColor.withValues(alpha: 0.5),
         ),
       ],
     );
