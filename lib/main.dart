@@ -17,6 +17,7 @@ import 'widgets/keyboard_monitor.dart';
 import 'widgets/mouse_monitor.dart';
 import 'widgets/pomodoro_dialog.dart';
 import 'widgets/styled_button.dart';
+import 'widgets/settings_dialog.dart';
 import 'widgets/cultivation_formation.dart';
 
 void main() async {
@@ -676,6 +677,26 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
     }
   }
 
+  void _showSettingsDialog() {
+    showDialog(
+      context: context,
+      barrierColor: AppConstants.blackOverlayColor,
+      builder: (context) {
+        return SettingsDialog(
+          isAlwaysOnTop: _isAlwaysOnTop,
+          isAntiSleepEnabled: _enableAntiSleep,
+          onAlwaysOnTopChanged: _toggleAlwaysOnTop,
+          onAntiSleepChanged: (value) {
+            setState(() {
+              _enableAntiSleep = value;
+            });
+            _saveGameData();
+          },
+        );
+      },
+    );
+  }
+
   void _toggleAlwaysOnTop(bool value) async {
     setState(() {
       _isAlwaysOnTop = value;
@@ -855,8 +876,8 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
                           ),
                           SizedBox(width: 10 * windowScale),
                           StyledButton(
-                            text: 'B-3',
-                            onPressed: () {},
+                            text: 'Settings',
+                            onPressed: _showSettingsDialog,
                             scale: windowScale,
                           ),
                         ],
