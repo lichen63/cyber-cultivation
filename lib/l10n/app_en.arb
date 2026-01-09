@@ -1,0 +1,90 @@
+{
+    "appTitle": "Cyber Cultivation",
+    "@appTitle": {
+        "description": "The title of the application"
+    },
+    "defaultKeyText": "Key",
+    "@defaultKeyText": {
+        "description": "Label for the default key"
+    },
+    "forceForegroundText": "Force Foreground",
+    "@forceForegroundText": {
+        "description": "Option to force the window to the foreground"
+    },
+    "antiSleepText": "Anti-Sleep",
+    "@antiSleepText": {
+        "description": "Option to prevent the system from sleeping"
+    },
+    "exitGameText": "Exit Game",
+    "@exitGameText": {
+        "description": "Option to exit the game"
+    },
+    "pomodoroDialogTitle": "Pomodoro Clock",
+    "@pomodoroDialogTitle": {
+        "description": "Title of the Pomodoro dialog"
+    },
+    "pomodoroDurationLabel": "Focus (min):",
+    "@pomodoroDurationLabel": {
+        "description": "Label for the focus duration input"
+    },
+    "pomodoroRelaxLabel": "Relax (min):",
+    "@pomodoroRelaxLabel": {
+        "description": "Label for the relax duration input"
+    },
+    "pomodoroLoopsLabel": "Loops:",
+    "@pomodoroLoopsLabel": {
+        "description": "Label for the loops input"
+    },
+    "pomodoroExpectedExpLabel": "Expected Exp: ",
+    "@pomodoroExpectedExpLabel": {
+        "description": "Label for expected experience points"
+    },
+    "pomodoroStartButtonText": "Start",
+    "@pomodoroStartButtonText": {
+        "description": "Text for the start button"
+    },
+    "cancelButtonText": "Cancel",
+    "@cancelButtonText": {
+        "description": "Text for the cancel button"
+    },
+    "confirmStopTitle": "Stop Focus?",
+    "@confirmStopTitle": {
+        "description": "Title for the stop confirmation dialog"
+    },
+    "confirmStopContent": "Current focus progress will be lost.",
+    "@confirmStopContent": {
+        "description": "Content for the stop confirmation dialog"
+    },
+    "stopButtonText": "Stop",
+    "@stopButtonText": {
+        "description": "Text for the stop button"
+    },
+    "invalidInputErrorText": "Invalid",
+    "@invalidInputErrorText": {
+        "description": "Error text for invalid input"
+    },
+    "settingsTitle": "Settings",
+    "@settingsTitle": {
+        "description": "Title for the settings dialog"
+    },
+    "closeButtonText": "Close",
+    "@closeButtonText": {
+        "description": "Text for the close button"
+    },
+    "language": "Language",
+    "@language": {
+        "description": "Label for language selection"
+    },
+    "systemLanguage": "System",
+    "@systemLanguage": {
+        "description": "Label for system language option"
+    },
+    "focusState": "Focus",
+    "@focusState": {
+        "description": "Label for focus state"
+    },
+    "relaxState": "Relax",
+    "@relaxState": {
+        "description": "Label for relax state"
+    }
+}

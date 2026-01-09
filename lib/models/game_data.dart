@@ -6,6 +6,7 @@ class GameData {
   final double? windowWidth;
   final double? windowHeight;
   final String? userId;
+  final String? language;
 
   GameData({
     required this.level,
@@ -15,6 +16,7 @@ class GameData {
     this.windowWidth,
     this.windowHeight,
     this.userId,
+    this.language,
   });
 
   // Convert a GameData object into a Map object
@@ -27,6 +29,7 @@ class GameData {
       'windowWidth': windowWidth,
       'windowHeight': windowHeight,
       'userId': userId,
+      'language': language,
     };
   }
 
@@ -40,6 +43,7 @@ class GameData {
       windowWidth: (json['windowWidth'] as num?)?.toDouble(),
       windowHeight: (json['windowHeight'] as num?)?.toDouble(),
       userId: json['userId'] as String?,
+      language: json['language'] as String?,
     );
   }
 
@@ -51,6 +55,7 @@ class GameData {
     double? windowWidth,
     double? windowHeight,
     String? userId,
+    String? language,
   }) {
     return GameData(
       level: level ?? this.level,
@@ -60,6 +65,7 @@ class GameData {
       windowWidth: windowWidth ?? this.windowWidth,
       windowHeight: windowHeight ?? this.windowHeight,
       userId: userId ?? this.userId,
+      language: language ?? this.language,
     );
   }
 }

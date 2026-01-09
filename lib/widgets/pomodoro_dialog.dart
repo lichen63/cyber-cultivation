@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:cyber_cultivation/l10n/app_localizations.dart';
 import '../constants.dart';
 
 class PomodoroDialog extends StatefulWidget {
@@ -49,14 +50,15 @@ class _PomodoroDialogState extends State<PomodoroDialog> {
   }
 
   void _validateAndStart() {
+    final l10n = AppLocalizations.of(context)!;
     final duration = int.tryParse(_durationController.text);
     final relax = int.tryParse(_relaxController.text);
     final loops = int.tryParse(_loopsController.text);
 
     setState(() {
-      _durationError = (duration == null || duration <= 0) ? AppConstants.invalidInputErrorText : null;
-      _relaxError = (relax == null || relax <= 0) ? AppConstants.invalidInputErrorText : null;
-      _loopsError = (loops == null || loops <= 0) ? AppConstants.invalidInputErrorText : null;
+      _durationError = (duration == null || duration <= 0) ? l10n.invalidInputErrorText : null;
+      _relaxError = (relax == null || relax <= 0) ? l10n.invalidInputErrorText : null;
+      _loopsError = (loops == null || loops <= 0) ? l10n.invalidInputErrorText : null;
     });
 
     if (_durationError == null && _relaxError == null && _loopsError == null) {
@@ -72,6 +74,7 @@ class _PomodoroDialogState extends State<PomodoroDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return AlertDialog(
       actionsAlignment: MainAxisAlignment.spaceEvenly,
       backgroundColor: AppConstants.dialogBackgroundColor,
@@ -79,10 +82,10 @@ class _PomodoroDialogState extends State<PomodoroDialog> {
         borderRadius: BorderRadius.circular(AppConstants.borderRadius),
         side: const BorderSide(color: AppConstants.whiteColor, width: 2),
       ),
-      title: const Center(
+      title: Center(
         child: Text(
-          AppConstants.pomodoroDialogTitle,
-          style: TextStyle(color: AppConstants.cyanAccentColor),
+          l10n.pomodoroDialogTitle,
+          style: const TextStyle(color: AppConstants.cyanAccentColor),
         ),
       ),
       content: SingleChildScrollView(
@@ -90,19 +93,19 @@ class _PomodoroDialogState extends State<PomodoroDialog> {
           mainAxisSize: MainAxisSize.min,
           children: [
             _buildSettingInput(
-              AppConstants.pomodoroDurationLabel,
+              l10n.pomodoroDurationLabel,
               _durationController,
               _durationError,
             ),
             const SizedBox(height: 10),
             _buildSettingInput(
-              AppConstants.pomodoroRelaxLabel,
+              l10n.pomodoroRelaxLabel,
               _relaxController,
               _relaxError,
             ),
             const SizedBox(height: 10),
             _buildSettingInput(
-              AppConstants.pomodoroLoopsLabel,
+              l10n.pomodoroLoopsLabel,
               _loopsController,
               _loopsError,
             ),
@@ -114,7 +117,7 @@ class _PomodoroDialogState extends State<PomodoroDialog> {
                   valueListenable: _loopsController,
                   builder: (context, loopsValue, child) {
                     return Text(
-                      '${AppConstants.pomodoroExpectedExpLabel}${_calculateExpectedExp()}',
+                      '${l10n.pomodoroExpectedExpLabel}${_calculateExpectedExp()}',
                       style: const TextStyle(
                         color: AppConstants.purpleAccentColor,
                         fontWeight: FontWeight.bold,
@@ -146,7 +149,7 @@ class _PomodoroDialogState extends State<PomodoroDialog> {
                 MaterialStateProperty.all<Color>(AppConstants.greyColor),
           ),
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text(AppConstants.cancelButtonText),
+          child: Text(l10n.cancelButtonText),
         ),
         TextButton(
           style: ButtonStyle(
@@ -167,8 +170,8 @@ class _PomodoroDialogState extends State<PomodoroDialog> {
           onPressed: () {
             _validateAndStart();
           },
-          child: const Text(
-            AppConstants.pomodoroStartButtonText,
+          child: Text(
+            l10n.pomodoroStartButtonText,
           ),
         ),
       ],
