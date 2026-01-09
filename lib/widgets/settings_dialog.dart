@@ -5,18 +5,22 @@ import '../constants.dart';
 class SettingsDialog extends StatefulWidget {
   final bool isAlwaysOnTop;
   final bool isAntiSleepEnabled;
+  final bool isAlwaysShowActionButtons;
   final String? currentLanguage;
   final ValueChanged<bool> onAlwaysOnTopChanged;
   final ValueChanged<bool> onAntiSleepChanged;
+  final ValueChanged<bool> onAlwaysShowActionButtonsChanged;
   final ValueChanged<String?> onLanguageChanged;
 
   const SettingsDialog({
     super.key,
     required this.isAlwaysOnTop,
     required this.isAntiSleepEnabled,
+    required this.isAlwaysShowActionButtons,
     this.currentLanguage,
     required this.onAlwaysOnTopChanged,
     required this.onAntiSleepChanged,
+    required this.onAlwaysShowActionButtonsChanged,
     required this.onLanguageChanged,
   });
 
@@ -27,6 +31,7 @@ class SettingsDialog extends StatefulWidget {
 class _SettingsDialogState extends State<SettingsDialog> {
   late bool _isAlwaysOnTop;
   late bool _isAntiSleepEnabled;
+  late bool _isAlwaysShowActionButtons;
   late String? _currentLanguage;
 
   @override
@@ -34,6 +39,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
     super.initState();
     _isAlwaysOnTop = widget.isAlwaysOnTop;
     _isAntiSleepEnabled = widget.isAntiSleepEnabled;
+    _isAlwaysShowActionButtons = widget.isAlwaysShowActionButtons;
     _currentLanguage = widget.currentLanguage;
   }
 
@@ -70,6 +76,15 @@ class _SettingsDialogState extends State<SettingsDialog> {
             onChanged: (value) {
               setState(() => _isAntiSleepEnabled = value);
               widget.onAntiSleepChanged(value);
+            },
+          ),
+          const SizedBox(height: 16),
+          _buildSwitchTile(
+            title: l10n.alwaysShowActionsText,
+            value: _isAlwaysShowActionButtons,
+            onChanged: (value) {
+              setState(() => _isAlwaysShowActionButtons = value);
+              widget.onAlwaysShowActionButtonsChanged(value);
             },
           ),
           const SizedBox(height: 16),

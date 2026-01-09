@@ -3,6 +3,7 @@ class GameData {
   final double currentExp;
   final bool isAlwaysOnTop;
   final bool isAntiSleepEnabled;
+  final bool isAlwaysShowActionButtons;
   final double? windowWidth;
   final double? windowHeight;
   final String? userId;
@@ -13,6 +14,7 @@ class GameData {
     required this.currentExp,
     this.isAlwaysOnTop = true,
     this.isAntiSleepEnabled = false,
+    this.isAlwaysShowActionButtons = false,
     this.windowWidth,
     this.windowHeight,
     this.userId,
@@ -26,6 +28,7 @@ class GameData {
       'currentExp': currentExp.isInfinite ? 0 : currentExp.toInt(),
       'isAlwaysOnTop': isAlwaysOnTop,
       'isAntiSleepEnabled': isAntiSleepEnabled,
+      'isAlwaysShowActionButtons': isAlwaysShowActionButtons,
       'windowWidth': windowWidth,
       'windowHeight': windowHeight,
       'userId': userId,
@@ -40,6 +43,7 @@ class GameData {
       currentExp: (json['currentExp'] as num).toDouble(),
       isAlwaysOnTop: json['isAlwaysOnTop'] as bool? ?? true,
       isAntiSleepEnabled: json['isAntiSleepEnabled'] as bool? ?? false,
+      isAlwaysShowActionButtons: json['isAlwaysShowActionButtons'] as bool? ?? false,
       windowWidth: (json['windowWidth'] as num?)?.toDouble(),
       windowHeight: (json['windowHeight'] as num?)?.toDouble(),
       userId: json['userId'] as String?,
@@ -52,6 +56,7 @@ class GameData {
     double? currentExp,
     bool? isAlwaysOnTop,
     bool? isAntiSleepEnabled,
+    bool? isAlwaysShowActionButtons,
     double? windowWidth,
     double? windowHeight,
     String? userId,
@@ -62,6 +67,7 @@ class GameData {
       currentExp: currentExp ?? this.currentExp,
       isAlwaysOnTop: isAlwaysOnTop ?? this.isAlwaysOnTop,
       isAntiSleepEnabled: isAntiSleepEnabled ?? this.isAntiSleepEnabled,
+      isAlwaysShowActionButtons: isAlwaysShowActionButtons ?? this.isAlwaysShowActionButtons,
       windowWidth: windowWidth ?? this.windowWidth,
       windowHeight: windowHeight ?? this.windowHeight,
       userId: userId ?? this.userId,
