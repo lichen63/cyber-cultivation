@@ -974,7 +974,7 @@ class _MyHomePageState extends State<MyHomePage>
                           ),
                           SizedBox(width: 10 * windowScale),
                           StyledButton(
-                            text: 'Stats',
+                            text: l10n.statsTitle,
                             onPressed: _showStatsWindow,
                             scale: windowScale,
                           ),

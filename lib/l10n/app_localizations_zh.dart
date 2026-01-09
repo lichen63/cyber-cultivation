@@ -76,4 +76,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get alwaysShowActionsText => '总是显示操作按钮';
+
+  @override
+  String get statsTitle => '统计';
 }
