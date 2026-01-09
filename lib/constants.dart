@@ -27,6 +27,19 @@ class AppConstants {
   static const String exitGameText = 'Exit Game';
   static const String exitGameValue = 'exit_game';
   
+  // Pomodoro Strings
+  static const String pomodoroDialogTitle = 'Pomodoro Clock';
+  static const String pomodoroDurationLabel = 'Duration (min):';
+  static const String pomodoroRelaxLabel = 'Relax (min):';
+  static const String pomodoroLoopsLabel = 'Loops:';
+  static const String pomodoroExpectedExpLabel = 'Expected Exp: ';
+  static const String pomodoroStartButtonText = 'Start';
+  static const String cancelButtonText = 'Cancel';
+  static const String confirmStopTitle = 'Stop Cultivation?';
+  static const String confirmStopContent = 'Current cultivation progress will be lost.';
+  static const String stopButtonText = 'Stop';
+  static const String invalidInputErrorText = 'Invalid';
+  
   // UI Dimensions
   static const double borderWidth = 6.0;
   static const double thinBorderWidth = 2.0;
@@ -45,6 +58,11 @@ class AppConstants {
   static const Color redColor = Colors.red;
   static final Color blackOverlayColor = Colors.black.withValues(alpha: 0.7);
   static final Color blackOverlayLightColor = Colors.black.withValues(alpha: 0.3);
+  static final Color dialogBackgroundColor = Colors.black.withValues(alpha: 0.9);
+  static const Color cyanAccentColor = Colors.cyanAccent;
+  static const Color purpleAccentColor = Colors.purpleAccent;
+  static const Color greyColor = Colors.grey;
+  static const Color white54Color = Colors.white54;
   
   // Assets
   static const String characterImagePath = 'assets/images/character_2.png';
