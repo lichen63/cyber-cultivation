@@ -134,38 +134,38 @@ class _PomodoroDialogState extends State<PomodoroDialog> {
       actions: [
         TextButton(
           style: ButtonStyle(
-            overlayColor: MaterialStateProperty.resolveWith<Color?>(
-              (Set<MaterialState> states) {
-                if (states.contains(MaterialState.hovered)) {
-                  return AppConstants.greyColor.withOpacity(0.2);
+            overlayColor: WidgetStateProperty.resolveWith<Color?>(
+              (Set<WidgetState> states) {
+                if (states.contains(WidgetState.hovered)) {
+                  return AppConstants.greyColor.withValues(alpha: 0.2);
                 }
-                if (states.contains(MaterialState.pressed)) {
-                  return AppConstants.greyColor.withOpacity(0.4);
+                if (states.contains(WidgetState.pressed)) {
+                  return AppConstants.greyColor.withValues(alpha: 0.4);
                 }
                 return null;
               },
             ),
             foregroundColor:
-                MaterialStateProperty.all<Color>(AppConstants.greyColor),
+                WidgetStateProperty.all<Color>(AppConstants.greyColor),
           ),
           onPressed: () => Navigator.of(context).pop(),
           child: Text(l10n.cancelButtonText),
         ),
         TextButton(
           style: ButtonStyle(
-            overlayColor: MaterialStateProperty.resolveWith<Color?>(
-              (Set<MaterialState> states) {
-                if (states.contains(MaterialState.hovered)) {
-                  return AppConstants.cyanAccentColor.withOpacity(0.2);
+            overlayColor: WidgetStateProperty.resolveWith<Color?>(
+              (Set<WidgetState> states) {
+                if (states.contains(WidgetState.hovered)) {
+                  return AppConstants.cyanAccentColor.withValues(alpha: 0.2);
                 }
-                if (states.contains(MaterialState.pressed)) {
-                  return AppConstants.cyanAccentColor.withOpacity(0.4);
+                if (states.contains(WidgetState.pressed)) {
+                  return AppConstants.cyanAccentColor.withValues(alpha: 0.4);
                 }
                 return null;
               },
             ),
             foregroundColor:
-                MaterialStateProperty.all<Color>(AppConstants.cyanAccentColor),
+                WidgetStateProperty.all<Color>(AppConstants.cyanAccentColor),
           ),
           onPressed: () {
             _validateAndStart();
