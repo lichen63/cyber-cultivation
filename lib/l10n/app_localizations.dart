@@ -229,6 +229,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Relax'**
   String get relaxState;
+
+  /// Option to always show action buttons
+  ///
+  /// In en, this message translates to:
+  /// **'Always Show Actions'**
+  String get alwaysShowActionsText;
 }
 
 class _AppLocalizationsDelegate

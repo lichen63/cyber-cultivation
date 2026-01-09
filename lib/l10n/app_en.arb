@@ -86,5 +86,9 @@
     "relaxState": "Relax",
     "@relaxState": {
         "description": "Label for relax state"
+    },
+    "alwaysShowActionsText": "Always Show Actions",
+    "@alwaysShowActionsText": {
+        "description": "Option to always show action buttons"
     }
 }

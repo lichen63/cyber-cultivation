@@ -73,4 +73,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get relaxState => 'Relax';
+
+  @override
+  String get alwaysShowActionsText => 'Always Show Actions';
 }

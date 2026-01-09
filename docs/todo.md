@@ -30,6 +30,7 @@
 - [x] Make tray icon larger
 - [x] Add settings window
 - [x] Localization
+- [x] Add switch for every ui in the game window, let player can customize which ui to show/hide
 - [ ] Add summary of keyboard/mouse events per day?
 - [ ] Add upgrade effect when level up
 - [ ] Change level to cultivation realm
@@ -51,7 +52,6 @@
 - [ ] Add pet system
 - [ ] Add friends system
 - [ ] Let player customize the character image
-- [ ] Add switch for every ui in the game window, let player can customize which ui to show/hide
 - [ ] Investigate how to implement character operate virtual keyboard, refer to: https://juejin.cn/post/7497785507788488723
   - https://github.com/ayangweb/BongoCat
   - https://www.live2d.com/en/

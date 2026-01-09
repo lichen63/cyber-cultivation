@@ -221,6 +221,7 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
   bool _isHovering = false;
   bool _isAlwaysOnTop = true;
   bool _isMenuOpen = false;
+  bool _isAlwaysShowActionButtons = false;
 
   // EXP System
   int _level = AppConstants.initialLevel;
@@ -317,6 +318,7 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
       _level = data.level;
       _isAlwaysOnTop = data.isAlwaysOnTop;
       _enableAntiSleep = data.isAntiSleepEnabled;
+      _isAlwaysShowActionButtons = data.isAlwaysShowActionButtons;
       _userId = data.userId;
       _language = data.language;
       _windowWidth = data.windowWidth ?? AppConstants.defaultWindowWidth;
@@ -353,6 +355,7 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
         currentExp: _currentExp,
         isAlwaysOnTop: _isAlwaysOnTop,
         isAntiSleepEnabled: _enableAntiSleep,
+        isAlwaysShowActionButtons: _isAlwaysShowActionButtons,
         windowWidth: _windowWidth,
         windowHeight: _windowHeight,
         userId: _userId,
@@ -365,6 +368,7 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
           currentExp: _currentExp,
           isAlwaysOnTop: _isAlwaysOnTop,
           isAntiSleepEnabled: _enableAntiSleep,
+          isAlwaysShowActionButtons: _isAlwaysShowActionButtons,
           windowWidth: _windowWidth,
           windowHeight: _windowHeight,
           userId: _userId,
@@ -714,11 +718,18 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
         return SettingsDialog(
           isAlwaysOnTop: _isAlwaysOnTop,
           isAntiSleepEnabled: _enableAntiSleep,
+          isAlwaysShowActionButtons: _isAlwaysShowActionButtons,
           currentLanguage: _language,
           onAlwaysOnTopChanged: _toggleAlwaysOnTop,
           onAntiSleepChanged: (value) {
             setState(() {
               _enableAntiSleep = value;
+            });
+            _saveGameData();
+          },
+          onAlwaysShowActionButtonsChanged: (value) {
+            setState(() {
+              _isAlwaysShowActionButtons = value;
             });
             _saveGameData();
           },
@@ -860,7 +871,7 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
                       ),
                     ),
                   ),
-                  if (_isHovering) ...[
+                  if (_isHovering || _isAlwaysShowActionButtons) ...[
                     Positioned(
                       top: 10 * windowScale,
                       left: 0,

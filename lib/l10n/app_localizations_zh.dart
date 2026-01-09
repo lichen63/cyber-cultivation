@@ -73,4 +73,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get relaxState => '休息';
+
+  @override
+  String get alwaysShowActionsText => '总是显示操作按钮';
 }
