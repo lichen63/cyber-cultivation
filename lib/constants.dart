@@ -63,6 +63,8 @@ class AppConstants {
   static const Color purpleAccentColor = Colors.purpleAccent;
   static const Color greyColor = Colors.grey;
   static const Color white54Color = Colors.white54;
+  static const Color pomodoroFocusColor = Colors.redAccent;
+  static const Color pomodoroRelaxColor = Colors.greenAccent;
   
   // Assets
   static const String characterImagePath = 'assets/images/character_2.png';
