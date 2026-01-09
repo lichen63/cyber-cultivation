@@ -32,6 +32,7 @@
 - [x] Localization
 - [x] Add switch for every ui in the game window, let player can customize which ui to show/hide
 - [ ] Add summary of keyboard/mouse events per day?
+- [ ] Launch at login
 - [ ] Add upgrade effect when level up
 - [ ] Change level to cultivation realm
 - [ ] Use different pictures for different levels -> change to only one image, but show different effect in different realm
