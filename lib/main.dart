@@ -689,6 +689,22 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
             ],
           ),
         ),
+        PopupMenuItem(
+          value: AppConstants.exitGameValue,
+          child: Row(
+            children: [
+              const SizedBox(width: 24), // No checkmark for exit
+              const SizedBox(width: 8),
+              const Text(
+                AppConstants.exitGameText,
+                style: TextStyle(
+                  color: AppConstants.redColor, // Use red for destructive action
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     );
 
@@ -705,6 +721,8 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
         _enableAntiSleep = !_enableAntiSleep;
       });
       _saveGameData();
+    } else if (result == AppConstants.exitGameValue) {
+      windowManager.close();
     }
   }
 
