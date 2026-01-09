@@ -17,10 +17,9 @@ class KeyboardMonitor extends StatelessWidget {
       scale: scale,
       alignment: Alignment.topLeft,
       child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 8,
-        ),
+        width: AppConstants.monitorWidgetSize,
+        height: AppConstants.monitorWidgetSize,
+        alignment: Alignment.center,
         decoration: BoxDecoration(
           color: AppConstants.blackOverlayColor,
           borderRadius: BorderRadius.circular(AppConstants.smallBorderRadius),
@@ -36,6 +35,7 @@ class KeyboardMonitor extends StatelessWidget {
             fontSize: 14,
             fontWeight: FontWeight.bold,
           ),
+          textAlign: TextAlign.center,
         ),
       ),
     );
