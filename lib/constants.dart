@@ -29,7 +29,7 @@ class AppConstants {
   
   // Pomodoro Strings
   static const String pomodoroDialogTitle = 'Pomodoro Clock';
-  static const String pomodoroDurationLabel = 'Duration (min):';
+  static const String pomodoroDurationLabel = 'Focus (min):';
   static const String pomodoroRelaxLabel = 'Relax (min):';
   static const String pomodoroLoopsLabel = 'Loops:';
   static const String pomodoroExpectedExpLabel = 'Expected Exp: ';
