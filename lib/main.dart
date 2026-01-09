@@ -15,7 +15,9 @@ import 'widgets/character_display.dart';
 import 'widgets/exp_display.dart';
 import 'widgets/keyboard_monitor.dart';
 import 'widgets/mouse_monitor.dart';
+import 'widgets/pomodoro_dialog.dart';
 import 'widgets/styled_button.dart';
+import 'widgets/cultivation_formation.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -365,84 +367,24 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
 
   void _showPomodoroDialog() {
     if (_isPomodoroActive) {
-      _cancelPomodoro();
+      _confirmStopPomodoro();
       return;
     }
-
-    int duration = AppConstants.defaultPomodoroDuration;
-    int relax = AppConstants.defaultRelaxDuration;
-    int loops = AppConstants.defaultPomodoroLoops;
 
     showDialog(
       context: context,
       barrierColor: AppConstants.blackOverlayColor,
       builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            final double expectedExp =
-                duration * loops * AppConstants.expGainPerMinute;
-
-            return AlertDialog(
-              backgroundColor: Colors.black.withOpacity(0.9),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppConstants.borderRadius),
-                side: const BorderSide(color: AppConstants.whiteColor, width: 2),
-              ),
-              title: const Text(
-                'Spirit Gathering Array',
-                style: TextStyle(color: Colors.cyanAccent),
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _buildSettingRow(
-                    'Duration (min):',
-                    duration,
-                    (val) => setState(() => duration = val),
-                  ),
-                  const SizedBox(height: 10),
-                  _buildSettingRow(
-                    'Relax (min):',
-                    relax,
-                    (val) => setState(() => relax = val),
-                  ),
-                  const SizedBox(height: 10),
-                  _buildSettingRow(
-                    'Loops:',
-                    loops,
-                    (val) => setState(() => loops = val),
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    'Expected Qi: ${expectedExp.toInt()}',
-                    style: const TextStyle(
-                      color: Colors.purpleAccent,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    _startPomodoro(
-                      workMinutes: duration,
-                      relaxMinutes: relax,
-                      loops: loops,
-                    );
-                  },
-                  child: const Text(
-                    'Start Cultivation',
-                    style: TextStyle(color: Colors.cyanAccent),
-                  ),
-                ),
-              ],
+        return PomodoroDialog(
+          initialDuration: AppConstants.defaultPomodoroDuration,
+          initialRelax: AppConstants.defaultRelaxDuration,
+          initialLoops: AppConstants.defaultPomodoroLoops,
+          onStart: (duration, relax, loops) {
+            Navigator.of(context).pop();
+            _startPomodoro(
+              workMinutes: duration,
+              relaxMinutes: relax,
+              loops: loops,
             );
           },
         );
@@ -450,36 +392,44 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
     );
   }
 
-  Widget _buildSettingRow(String label, int value, Function(int) onChanged) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(label, style: const TextStyle(color: Colors.white)),
-        Row(
-          children: [
-            IconButton(
-              icon: const Icon(Icons.remove_circle_outline, color: Colors.white),
-              onPressed: () {
-                if (value > 1) onChanged(value - 1);
-              },
+  void _confirmStopPomodoro() {
+    showDialog(
+      context: context,
+      barrierColor: AppConstants.blackOverlayColor,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: AppConstants.dialogBackgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+            side: const BorderSide(color: AppConstants.whiteColor, width: 2),
+          ),
+          title: const Text(
+            AppConstants.confirmStopTitle,
+            style: TextStyle(color: AppConstants.redColor),
+          ),
+          content: const Text(
+            AppConstants.confirmStopContent,
+            style: TextStyle(color: AppConstants.whiteColor),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text(AppConstants.cancelButtonText,
+                  style: TextStyle(color: AppConstants.greyColor)),
             ),
-            SizedBox(
-              width: 30,
-              child: Text(
-                value.toString(),
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.white),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _cancelPomodoro();
+              },
+              child: const Text(
+                AppConstants.stopButtonText,
+                style: TextStyle(color: AppConstants.redColor),
               ),
             ),
-            IconButton(
-              icon: const Icon(Icons.add_circle_outline, color: Colors.white),
-              onPressed: () {
-                if (value < 60) onChanged(value + 1); // Cap at 60 for simplicity
-              },
-            ),
           ],
-        ),
-      ],
+        );
+      },
     );
   }
 
@@ -808,22 +758,14 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
                                               children: [
                                                 const CharacterDisplay(),
                                                 if (_isPomodoroActive)
-                                                  SizedBox(
-                                                    width: 140 * scale,
-                                                    height: 140 * scale,
-                                                    child: CircularProgressIndicator(
-                                                      value: _pomodoroSecondsRemaining /
-                                                          ((_isPomodoroRelaxing
-                                                                  ? _pomodoroRelaxDurationMinutes
-                                                                  : _pomodoroWorkDurationMinutes) *
-                                                              60),
-                                                      strokeWidth: 4 * scale,
-                                                      color: _isPomodoroRelaxing
-                                                          ? Colors.greenAccent
-                                                          : Colors.cyanAccent,
-                                                      backgroundColor:
-                                                          Colors.white24,
-                                                    ),
+                                                  CultivationFormation(
+                                                    progress: _pomodoroSecondsRemaining /
+                                                        ((_isPomodoroRelaxing
+                                                                ? _pomodoroRelaxDurationMinutes
+                                                                : _pomodoroWorkDurationMinutes) *
+                                                            60),
+                                                    isRelaxing: _isPomodoroRelaxing,
+                                                    size: 240 * scale,
                                                   ),
                                               ],
                                             ),
@@ -871,10 +813,10 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
                             text: _isPomodoroActive
                                 ? (_isPomodoroRelaxing
                                     ? 'Relax ${(_pomodoroSecondsRemaining ~/ 60).toString().padLeft(2, '0')}:${(_pomodoroSecondsRemaining % 60).toString().padLeft(2, '0')}'
-                                    : 'W ${_pomodoroCurrentLoop}/$_pomodoroTotalLoops ${(_pomodoroSecondsRemaining ~/ 60).toString().padLeft(2, '0')}:${(_pomodoroSecondsRemaining % 60).toString().padLeft(2, '0')}')
+                                    : 'Focus ${_pomodoroCurrentLoop}/$_pomodoroTotalLoops  ${(_pomodoroSecondsRemaining ~/ 60).toString().padLeft(2, '0')}:${(_pomodoroSecondsRemaining % 60).toString().padLeft(2, '0')}')
                                 : 'Focus',
                             onPressed: _isPomodoroActive
-                                ? _cancelPomodoro
+                                ? _confirmStopPomodoro
                                 : _showPomodoroDialog,
                             scale: windowScale,
                           ),
