@@ -29,7 +29,7 @@
 - [x] Replace character image
 - [x] Make tray icon larger
 - [x] Add settings window
-- [ ] Localization
+- [x] Localization
 - [ ] Add summary of keyboard/mouse events per day?
 - [ ] Add upgrade effect when level up
 - [ ] Change level to cultivation realm
