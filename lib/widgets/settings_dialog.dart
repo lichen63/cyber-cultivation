@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:cyber_cultivation/l10n/app_localizations.dart';
 import '../constants.dart';
 
 class SettingsDialog extends StatefulWidget {
   final bool isAlwaysOnTop;
   final bool isAntiSleepEnabled;
+  final String? currentLanguage;
   final ValueChanged<bool> onAlwaysOnTopChanged;
   final ValueChanged<bool> onAntiSleepChanged;
+  final ValueChanged<String?> onLanguageChanged;
 
   const SettingsDialog({
     super.key,
     required this.isAlwaysOnTop,
     required this.isAntiSleepEnabled,
+    this.currentLanguage,
     required this.onAlwaysOnTopChanged,
     required this.onAntiSleepChanged,
+    required this.onLanguageChanged,
   });
 
   @override
@@ -22,33 +27,36 @@ class SettingsDialog extends StatefulWidget {
 class _SettingsDialogState extends State<SettingsDialog> {
   late bool _isAlwaysOnTop;
   late bool _isAntiSleepEnabled;
+  late String? _currentLanguage;
 
   @override
   void initState() {
     super.initState();
     _isAlwaysOnTop = widget.isAlwaysOnTop;
     _isAntiSleepEnabled = widget.isAntiSleepEnabled;
+    _currentLanguage = widget.currentLanguage;
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return AlertDialog(
       backgroundColor: AppConstants.dialogBackgroundColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppConstants.borderRadius),
         side: const BorderSide(color: AppConstants.whiteColor, width: 2),
       ),
-      title: const Center(
+      title: Center(
         child: Text(
-          'Settings',
-          style: TextStyle(color: AppConstants.cyanAccentColor),
+          l10n.settingsTitle,
+          style: const TextStyle(color: AppConstants.cyanAccentColor),
         ),
       ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           _buildSwitchTile(
-            title: AppConstants.forceForegroundText,
+            title: l10n.forceForegroundText,
             value: _isAlwaysOnTop,
             onChanged: (value) {
               setState(() => _isAlwaysOnTop = value);
@@ -57,22 +65,68 @@ class _SettingsDialogState extends State<SettingsDialog> {
           ),
           const SizedBox(height: 16),
           _buildSwitchTile(
-            title: AppConstants.antiSleepText,
+            title: l10n.antiSleepText,
             value: _isAntiSleepEnabled,
             onChanged: (value) {
               setState(() => _isAntiSleepEnabled = value);
               widget.onAntiSleepChanged(value);
             },
           ),
+          const SizedBox(height: 16),
+          _buildLanguageSelector(l10n),
         ],
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text(
-            'Close',
-            style: TextStyle(color: AppConstants.cyanAccentColor),
+          child: Text(
+            l10n.closeButtonText,
+            style: const TextStyle(color: AppConstants.cyanAccentColor),
           ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLanguageSelector(AppLocalizations l10n) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          l10n.language,
+          style: const TextStyle(
+            color: AppConstants.whiteColor,
+            fontSize: 16,
+          ),
+        ),
+        DropdownButton<String?>(
+          value: _currentLanguage,
+          dropdownColor: AppConstants.dialogBackgroundColor,
+          style: const TextStyle(color: AppConstants.whiteColor),
+          iconEnabledColor: AppConstants.cyanAccentColor,
+          underline: Container(
+            height: 1,
+            color: AppConstants.cyanAccentColor,
+          ),
+          items: [
+            DropdownMenuItem(
+              value: null,
+              child: Text(l10n.systemLanguage),
+            ),
+            const DropdownMenuItem(
+              value: 'en',
+              child: Text('English'),
+            ),
+            const DropdownMenuItem(
+              value: 'zh',
+              child: Text('中文'),
+            ),
+          ],
+          onChanged: (value) {
+            setState(() => _currentLanguage = value);
+            widget.onLanguageChanged(value);
+            // Rebuild happens due to parent setState usually, but here we update local state too.
+          },
         ),
       ],
     );

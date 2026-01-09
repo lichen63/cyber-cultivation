@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:cyber_cultivation/l10n/app_localizations.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 
@@ -86,11 +88,16 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
+  Locale? _locale;
+
   @override
   void initState() {
     super.initState();
     windowManager.addListener(this);
     trayManager.addListener(this);
+    if (widget.initialGameData?.language != null) {
+      _locale = Locale(widget.initialGameData!.language!);
+    }
     _initTray();
   }
 
@@ -169,6 +176,14 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: AppConstants.appTitle,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: _locale,
       theme: ThemeData(
         fontFamily: 'NotoSansSC',
         scaffoldBackgroundColor: AppConstants.transparentColor,
@@ -176,14 +191,22 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
         canvasColor: AppConstants.transparentColor,
       ),
       color: AppConstants.transparentColor,
-      home: MyHomePage(initialGameData: widget.initialGameData),
+      home: MyHomePage(
+        initialGameData: widget.initialGameData,
+        onLanguageChanged: (lang) {
+          setState(() {
+            _locale = lang != null ? Locale(lang) : null;
+          });
+        },
+      ),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
   final GameData? initialGameData;
-  const MyHomePage({super.key, this.initialGameData});
+  final ValueChanged<String?>? onLanguageChanged;
+  const MyHomePage({super.key, this.initialGameData, this.onLanguageChanged});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -206,6 +229,7 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
   String? _userId;
   double _windowWidth = AppConstants.defaultWindowWidth;
   double _windowHeight = AppConstants.defaultWindowHeight;
+  String? _language;
 
   final GameDataService _gameDataService = GameDataService();
   Timer? _saveDebounce;
@@ -294,6 +318,7 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
       _isAlwaysOnTop = data.isAlwaysOnTop;
       _enableAntiSleep = data.isAntiSleepEnabled;
       _userId = data.userId;
+      _language = data.language;
       _windowWidth = data.windowWidth ?? AppConstants.defaultWindowWidth;
       _windowHeight = data.windowHeight ?? AppConstants.defaultWindowHeight;
 
@@ -331,6 +356,7 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
         windowWidth: _windowWidth,
         windowHeight: _windowHeight,
         userId: _userId,
+        language: _language,
       ));
     } else {
       _saveDebounce = Timer(const Duration(seconds: 1), () {
@@ -342,6 +368,7 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
           windowWidth: _windowWidth,
           windowHeight: _windowHeight,
           userId: _userId,
+          language: _language,
         ));
       });
     }
@@ -394,6 +421,7 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
   }
 
   void _confirmStopPomodoro() {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       barrierColor: AppConstants.blackOverlayColor,
@@ -404,28 +432,28 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
             borderRadius: BorderRadius.circular(AppConstants.borderRadius),
             side: const BorderSide(color: AppConstants.whiteColor, width: 2),
           ),
-          title: const Text(
-            AppConstants.confirmStopTitle,
-            style: TextStyle(color: AppConstants.redColor),
+          title: Text(
+            l10n.confirmStopTitle,
+            style: const TextStyle(color: AppConstants.redColor),
           ),
-          content: const Text(
-            AppConstants.confirmStopContent,
-            style: TextStyle(color: AppConstants.whiteColor),
+          content: Text(
+            l10n.confirmStopContent,
+            style: const TextStyle(color: AppConstants.whiteColor),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text(AppConstants.cancelButtonText,
-                  style: TextStyle(color: AppConstants.greyColor)),
+              child: Text(l10n.cancelButtonText,
+                  style: const TextStyle(color: AppConstants.greyColor)),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
                 _cancelPomodoro();
               },
-              child: const Text(
-                AppConstants.stopButtonText,
-                style: TextStyle(color: AppConstants.redColor),
+              child: Text(
+                l10n.stopButtonText,
+                style: const TextStyle(color: AppConstants.redColor),
               ),
             ),
           ],
@@ -583,6 +611,7 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
     setState(() {
       _isMenuOpen = true;
     });
+    final l10n = AppLocalizations.of(context)!;
     final result = await showMenu(
       context: context,
       color: AppConstants.blackOverlayColor,
@@ -609,9 +638,9 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
                         : null,
               ),
               const SizedBox(width: 8),
-              const Text(
-                AppConstants.forceForegroundText,
-                style: TextStyle(
+              Text(
+                l10n.forceForegroundText,
+                style: const TextStyle(
                   color: AppConstants.whiteColor,
                   fontWeight: FontWeight.bold,
                 ),
@@ -630,9 +659,9 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
                     : null,
               ),
               const SizedBox(width: 8),
-              const Text(
-                AppConstants.antiSleepText,
-                style: TextStyle(
+              Text(
+                l10n.antiSleepText,
+                style: const TextStyle(
                   color: AppConstants.whiteColor,
                   fontWeight: FontWeight.bold,
                 ),
@@ -646,9 +675,9 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
             children: [
               const SizedBox(width: 24), // No checkmark for exit
               const SizedBox(width: 8),
-              const Text(
-                AppConstants.exitGameText,
-                style: TextStyle(
+              Text(
+                l10n.exitGameText,
+                style: const TextStyle(
                   color: AppConstants.redColor, // Use red for destructive action
                   fontWeight: FontWeight.bold,
                 ),
@@ -685,11 +714,19 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
         return SettingsDialog(
           isAlwaysOnTop: _isAlwaysOnTop,
           isAntiSleepEnabled: _enableAntiSleep,
+          currentLanguage: _language,
           onAlwaysOnTopChanged: _toggleAlwaysOnTop,
           onAntiSleepChanged: (value) {
             setState(() {
               _enableAntiSleep = value;
             });
+            _saveGameData();
+          },
+          onLanguageChanged: (value) {
+            setState(() {
+              _language = value;
+            });
+            widget.onLanguageChanged?.call(value);
             _saveGameData();
           },
         );
@@ -707,6 +744,7 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppConstants.transparentColor,
       body: MouseRegion(
@@ -833,9 +871,9 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
                           StyledButton(
                             text: _isPomodoroActive
                                 ? (_isPomodoroRelaxing
-                                    ? 'Relax ${(_pomodoroSecondsRemaining ~/ 60).toString().padLeft(2, '0')}:${(_pomodoroSecondsRemaining % 60).toString().padLeft(2, '0')}'
-                                    : 'Focus ${_pomodoroCurrentLoop}/$_pomodoroTotalLoops  ${(_pomodoroSecondsRemaining ~/ 60).toString().padLeft(2, '0')}:${(_pomodoroSecondsRemaining % 60).toString().padLeft(2, '0')}')
-                                : 'Focus',
+                                    ? '${l10n.relaxState} ${(_pomodoroSecondsRemaining ~/ 60).toString().padLeft(2, '0')}:${(_pomodoroSecondsRemaining % 60).toString().padLeft(2, '0')}'
+                                    : '${l10n.focusState} ${_pomodoroCurrentLoop}/$_pomodoroTotalLoops  ${(_pomodoroSecondsRemaining ~/ 60).toString().padLeft(2, '0')}:${(_pomodoroSecondsRemaining % 60).toString().padLeft(2, '0')}')
+                                : l10n.focusState,
                             onPressed: _isPomodoroActive
                                 ? _confirmStopPomodoro
                                 : _showPomodoroDialog,
@@ -876,7 +914,7 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener, WidgetsBin
                           ),
                           SizedBox(width: 10 * windowScale),
                           StyledButton(
-                            text: 'Settings',
+                            text: l10n.settingsTitle,
                             onPressed: _showSettingsDialog,
                             scale: windowScale,
                           ),
