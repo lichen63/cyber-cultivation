@@ -1,12 +1,12 @@
 class DailyStats {
   int keyboardCount;
   int mouseClickCount;
-  double mouseMoveDistance;
+  int mouseMoveDistance;
 
   DailyStats({
     this.keyboardCount = 0,
     this.mouseClickCount = 0,
-    this.mouseMoveDistance = 0.0,
+    this.mouseMoveDistance = 0,
   });
 
   Map<String, dynamic> toJson() => {
@@ -19,7 +19,7 @@ class DailyStats {
     return DailyStats(
       keyboardCount: json['keyboardCount'] as int? ?? 0,
       mouseClickCount: json['mouseClickCount'] as int? ?? 0,
-      mouseMoveDistance: (json['mouseMoveDistance'] as num?)?.toDouble() ?? 0.0,
+      mouseMoveDistance: (json['mouseMoveDistance'] as num?)?.toInt() ?? 0,
     );
   }
 }

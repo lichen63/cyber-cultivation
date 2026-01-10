@@ -582,7 +582,7 @@ class _MyHomePageState extends State<MyHomePage>
     setState(() {
       _todayStats.keyboardCount += keyboardCount;
       _todayStats.mouseClickCount += clickCount;
-      _todayStats.mouseMoveDistance += moveDistance;
+      _todayStats.mouseMoveDistance += moveDistance.toInt();
     });
   }
 
