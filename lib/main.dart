@@ -94,6 +94,9 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
   Locale? _locale;
+  AppThemeMode _themeMode = AppThemeMode.dark;
+
+  AppThemeColors get _themeColors => AppThemeColors.fromMode(_themeMode);
 
   @override
   void initState() {
@@ -102,6 +105,9 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
     trayManager.addListener(this);
     if (widget.initialGameData?.language != null) {
       _locale = Locale(widget.initialGameData!.language!);
+    }
+    if (widget.initialGameData != null) {
+      _themeMode = widget.initialGameData!.themeMode;
     }
     _initTray();
   }
@@ -187,16 +193,24 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
         fontFamily: 'NotoSansSC',
         scaffoldBackgroundColor: AppConstants.transparentColor,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: AppConstants.primarySeedColor,
+          seedColor: _themeColors.progressBarFill,
+          brightness: _themeColors.brightness,
         ),
         canvasColor: AppConstants.transparentColor,
       ),
       color: AppConstants.transparentColor,
       home: MyHomePage(
         initialGameData: widget.initialGameData,
+        themeMode: _themeMode,
+        themeColors: _themeColors,
         onLanguageChanged: (lang) {
           setState(() {
             _locale = lang != null ? Locale(lang) : null;
+          });
+        },
+        onThemeModeChanged: (mode) {
+          setState(() {
+            _themeMode = mode;
           });
         },
       ),
@@ -206,8 +220,18 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
 
 class MyHomePage extends StatefulWidget {
   final GameData? initialGameData;
+  final AppThemeMode themeMode;
+  final AppThemeColors themeColors;
   final ValueChanged<String?>? onLanguageChanged;
-  const MyHomePage({super.key, this.initialGameData, this.onLanguageChanged});
+  final ValueChanged<AppThemeMode>? onThemeModeChanged;
+  const MyHomePage({
+    super.key,
+    this.initialGameData,
+    required this.themeMode,
+    required this.themeColors,
+    this.onLanguageChanged,
+    this.onThemeModeChanged,
+  });
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -224,6 +248,9 @@ class _MyHomePageState extends State<MyHomePage>
   bool _isAlwaysOnTop = true;
   bool _isMenuOpen = false;
   bool _isAlwaysShowActionButtons = false;
+  late AppThemeMode _themeMode;
+
+  AppThemeColors get _themeColors => widget.themeColors;
 
   // EXP System
   int _level = AppConstants.initialLevel;
@@ -277,6 +304,7 @@ class _MyHomePageState extends State<MyHomePage>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     windowManager.addListener(this);
+    _themeMode = widget.themeMode;
 
     if (widget.initialGameData != null) {
       _applyGameData(widget.initialGameData!);
@@ -333,6 +361,7 @@ class _MyHomePageState extends State<MyHomePage>
       _isAlwaysShowActionButtons = data.isAlwaysShowActionButtons;
       _userId = data.userId;
       _language = data.language;
+      _themeMode = data.themeMode;
       _windowWidth = data.windowWidth ?? AppConstants.defaultWindowWidth;
       _windowHeight = data.windowHeight ?? AppConstants.defaultWindowHeight;
 
@@ -387,6 +416,7 @@ class _MyHomePageState extends State<MyHomePage>
           windowHeight: _windowHeight,
           userId: _userId,
           language: _language,
+          themeMode: _themeMode,
           dailyStats: _dailyStatsMap,
         ),
       );
@@ -426,12 +456,13 @@ class _MyHomePageState extends State<MyHomePage>
 
     showDialog(
       context: context,
-      barrierColor: AppConstants.blackOverlayColor,
+      barrierColor: _themeColors.overlay,
       builder: (BuildContext context) {
         return PomodoroDialog(
           initialDuration: AppConstants.defaultPomodoroDuration,
           initialRelax: AppConstants.defaultRelaxDuration,
           initialLoops: AppConstants.defaultPomodoroLoops,
+          themeColors: _themeColors,
           onStart: (duration, relax, loops) {
             Navigator.of(context).pop();
             _startPomodoro(
@@ -449,28 +480,28 @@ class _MyHomePageState extends State<MyHomePage>
     final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
-      barrierColor: AppConstants.blackOverlayColor,
+      barrierColor: _themeColors.overlay,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: AppConstants.dialogBackgroundColor,
+          backgroundColor: _themeColors.dialogBackground,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppConstants.borderRadius),
-            side: const BorderSide(color: AppConstants.whiteColor, width: 2),
+            side: BorderSide(color: _themeColors.border, width: 2),
           ),
           title: Text(
             l10n.confirmStopTitle,
-            style: const TextStyle(color: AppConstants.redColor),
+            style: TextStyle(color: _themeColors.error),
           ),
           content: Text(
             l10n.confirmStopContent,
-            style: const TextStyle(color: AppConstants.whiteColor),
+            style: TextStyle(color: _themeColors.primaryText),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
               child: Text(
                 l10n.cancelButtonText,
-                style: const TextStyle(color: AppConstants.greyColor),
+                style: TextStyle(color: _themeColors.inactive),
               ),
             ),
             TextButton(
@@ -480,7 +511,7 @@ class _MyHomePageState extends State<MyHomePage>
               },
               child: Text(
                 l10n.stopButtonText,
-                style: const TextStyle(color: AppConstants.redColor),
+                style: TextStyle(color: _themeColors.error),
               ),
             ),
           ],
@@ -560,13 +591,17 @@ class _MyHomePageState extends State<MyHomePage>
   void _showStatsWindow() {
     showDialog(
       context: context,
-      barrierColor: Colors.black54,
+      barrierColor: _themeColors.overlay,
       builder: (context) {
         final todayKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
         final viewHistory = Map<String, DailyStats>.from(_dailyStatsMap);
         viewHistory[todayKey] = _todayStats;
 
-        return StatsWindow(todayStats: _todayStats, historyStats: viewHistory);
+        return StatsWindow(
+          todayStats: _todayStats,
+          historyStats: viewHistory,
+          themeColors: _themeColors,
+        );
       },
     );
   }
@@ -689,10 +724,10 @@ class _MyHomePageState extends State<MyHomePage>
     final l10n = AppLocalizations.of(context)!;
     final result = await showMenu(
       context: context,
-      color: AppConstants.blackOverlayColor,
+      color: _themeColors.overlay,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppConstants.smallBorderRadius),
-        side: const BorderSide(color: AppConstants.whiteColor, width: 2),
+        side: BorderSide(color: _themeColors.border, width: 2),
       ),
       position: RelativeRect.fromLTRB(
         position.dx,
@@ -708,9 +743,9 @@ class _MyHomePageState extends State<MyHomePage>
               SizedBox(
                 width: 24,
                 child: _isAlwaysOnTop
-                    ? const Icon(
+                    ? Icon(
                         Icons.check,
-                        color: AppConstants.whiteColor,
+                        color: _themeColors.primaryText,
                         size: 18,
                       )
                     : null,
@@ -718,8 +753,8 @@ class _MyHomePageState extends State<MyHomePage>
               const SizedBox(width: 8),
               Text(
                 l10n.forceForegroundText,
-                style: const TextStyle(
-                  color: AppConstants.whiteColor,
+                style: TextStyle(
+                  color: _themeColors.primaryText,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -733,9 +768,9 @@ class _MyHomePageState extends State<MyHomePage>
               SizedBox(
                 width: 24,
                 child: _enableAntiSleep
-                    ? const Icon(
+                    ? Icon(
                         Icons.check,
-                        color: AppConstants.whiteColor,
+                        color: _themeColors.primaryText,
                         size: 18,
                       )
                     : null,
@@ -743,8 +778,8 @@ class _MyHomePageState extends State<MyHomePage>
               const SizedBox(width: 8),
               Text(
                 l10n.antiSleepText,
-                style: const TextStyle(
-                  color: AppConstants.whiteColor,
+                style: TextStyle(
+                  color: _themeColors.primaryText,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -759,9 +794,8 @@ class _MyHomePageState extends State<MyHomePage>
               const SizedBox(width: 8),
               Text(
                 l10n.exitGameText,
-                style: const TextStyle(
-                  color:
-                      AppConstants.redColor, // Use red for destructive action
+                style: TextStyle(
+                  color: _themeColors.error, // Use error for destructive action
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -792,13 +826,15 @@ class _MyHomePageState extends State<MyHomePage>
   void _showSettingsDialog() {
     showDialog(
       context: context,
-      barrierColor: AppConstants.blackOverlayColor,
+      barrierColor: _themeColors.overlay,
       builder: (context) {
         return SettingsDialog(
           isAlwaysOnTop: _isAlwaysOnTop,
           isAntiSleepEnabled: _enableAntiSleep,
           isAlwaysShowActionButtons: _isAlwaysShowActionButtons,
           currentLanguage: _language,
+          themeMode: _themeMode,
+          themeColors: _themeColors,
           onAlwaysOnTopChanged: _toggleAlwaysOnTop,
           onAntiSleepChanged: (value) {
             setState(() {
@@ -817,6 +853,13 @@ class _MyHomePageState extends State<MyHomePage>
               _language = value;
             });
             widget.onLanguageChanged?.call(value);
+            _saveGameData();
+          },
+          onThemeModeChanged: (value) {
+            setState(() {
+              _themeMode = value;
+            });
+            widget.onThemeModeChanged?.call(value);
             _saveGameData();
           },
         );
@@ -868,7 +911,7 @@ class _MyHomePageState extends State<MyHomePage>
                     child: Container(
                       decoration: BoxDecoration(
                         border: Border.all(
-                          color: AppConstants.whiteColor,
+                          color: _themeColors.border,
                           width: AppConstants.borderWidth * windowScale,
                         ),
                         borderRadius: BorderRadius.circular(
@@ -900,6 +943,7 @@ class _MyHomePageState extends State<MyHomePage>
                                             currentExp: _currentExp,
                                             maxExp: _maxExp,
                                             scale: scale,
+                                            themeColors: _themeColors,
                                           ),
                                           SizedBox(height: 10 * scale),
                                           Expanded(
@@ -930,6 +974,7 @@ class _MyHomePageState extends State<MyHomePage>
                                         child: KeyboardMonitor(
                                           currentKey: _currentKey,
                                           scale: scale,
+                                          themeColors: _themeColors,
                                         ),
                                       ),
                                       Positioned(
@@ -941,6 +986,7 @@ class _MyHomePageState extends State<MyHomePage>
                                           screenWidth: _screenWidth,
                                           screenHeight: _screenHeight,
                                           scale: scale,
+                                          themeColors: _themeColors,
                                         ),
                                       ),
                                     ],
@@ -971,18 +1017,21 @@ class _MyHomePageState extends State<MyHomePage>
                                 ? _confirmStopPomodoro
                                 : _showPomodoroDialog,
                             scale: windowScale,
+                            themeColors: _themeColors,
                           ),
                           SizedBox(width: 10 * windowScale),
                           StyledButton(
                             text: l10n.statsTitle,
                             onPressed: _showStatsWindow,
                             scale: windowScale,
+                            themeColors: _themeColors,
                           ),
                           SizedBox(width: 10 * windowScale),
                           StyledButton(
                             text: 'T-3',
                             onPressed: () {},
                             scale: windowScale,
+                            themeColors: _themeColors,
                           ),
                         ],
                       ),
@@ -998,18 +1047,21 @@ class _MyHomePageState extends State<MyHomePage>
                             text: 'B-1',
                             onPressed: () {},
                             scale: windowScale,
+                            themeColors: _themeColors,
                           ),
                           SizedBox(width: 10 * windowScale),
                           StyledButton(
                             text: 'B-2',
                             onPressed: () {},
                             scale: windowScale,
+                            themeColors: _themeColors,
                           ),
                           SizedBox(width: 10 * windowScale),
                           StyledButton(
                             text: l10n.settingsTitle,
                             onPressed: _showSettingsDialog,
                             scale: windowScale,
+                            themeColors: _themeColors,
                           ),
                         ],
                       ),

@@ -289,6 +289,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No data available'**
   String get noDataAvailable;
+
+  /// Label for theme mode selection
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get themeMode;
+
+  /// Label for dark theme mode
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get darkMode;
+
+  /// Label for light theme mode
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get lightMode;
 }
 
 class _AppLocalizationsDelegate

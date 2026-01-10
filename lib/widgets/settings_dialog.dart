@@ -7,10 +7,13 @@ class SettingsDialog extends StatefulWidget {
   final bool isAntiSleepEnabled;
   final bool isAlwaysShowActionButtons;
   final String? currentLanguage;
+  final AppThemeMode themeMode;
+  final AppThemeColors themeColors;
   final ValueChanged<bool> onAlwaysOnTopChanged;
   final ValueChanged<bool> onAntiSleepChanged;
   final ValueChanged<bool> onAlwaysShowActionButtonsChanged;
   final ValueChanged<String?> onLanguageChanged;
+  final ValueChanged<AppThemeMode> onThemeModeChanged;
 
   const SettingsDialog({
     super.key,
@@ -18,10 +21,13 @@ class SettingsDialog extends StatefulWidget {
     required this.isAntiSleepEnabled,
     required this.isAlwaysShowActionButtons,
     this.currentLanguage,
+    required this.themeMode,
+    required this.themeColors,
     required this.onAlwaysOnTopChanged,
     required this.onAntiSleepChanged,
     required this.onAlwaysShowActionButtonsChanged,
     required this.onLanguageChanged,
+    required this.onThemeModeChanged,
   });
 
   @override
@@ -33,6 +39,9 @@ class _SettingsDialogState extends State<SettingsDialog> {
   late bool _isAntiSleepEnabled;
   late bool _isAlwaysShowActionButtons;
   late String? _currentLanguage;
+  late AppThemeMode _themeMode;
+
+  AppThemeColors get _colors => widget.themeColors;
 
   @override
   void initState() {
@@ -41,6 +50,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
     _isAntiSleepEnabled = widget.isAntiSleepEnabled;
     _isAlwaysShowActionButtons = widget.isAlwaysShowActionButtons;
     _currentLanguage = widget.currentLanguage;
+    _themeMode = widget.themeMode;
   }
 
   @override
@@ -48,15 +58,15 @@ class _SettingsDialogState extends State<SettingsDialog> {
     final l10n = AppLocalizations.of(context)!;
     return AlertDialog(
       scrollable: true,
-      backgroundColor: AppConstants.dialogBackgroundColor,
+      backgroundColor: _colors.dialogBackground,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppConstants.borderRadius),
-        side: const BorderSide(color: AppConstants.whiteColor, width: 2),
+        side: BorderSide(color: _colors.border, width: 2),
       ),
       title: Center(
         child: Text(
           l10n.settingsTitle,
-          style: const TextStyle(color: AppConstants.cyanAccentColor),
+          style: TextStyle(color: _colors.accent),
         ),
       ),
       content: Column(
@@ -89,6 +99,8 @@ class _SettingsDialogState extends State<SettingsDialog> {
             },
           ),
           const SizedBox(height: 16),
+          _buildThemeModeSelector(l10n),
+          const SizedBox(height: 16),
           _buildLanguageSelector(l10n),
         ],
       ),
@@ -97,8 +109,42 @@ class _SettingsDialogState extends State<SettingsDialog> {
           onPressed: () => Navigator.of(context).pop(),
           child: Text(
             l10n.closeButtonText,
-            style: const TextStyle(color: AppConstants.cyanAccentColor),
+            style: TextStyle(color: _colors.accent),
           ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildThemeModeSelector(AppLocalizations l10n) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          l10n.themeMode,
+          style: TextStyle(color: _colors.primaryText, fontSize: 16),
+        ),
+        ToggleButtons(
+          isSelected: [
+            _themeMode == AppThemeMode.light,
+            _themeMode == AppThemeMode.dark,
+          ],
+          onPressed: (index) {
+            final newMode = index == 0 ? AppThemeMode.light : AppThemeMode.dark;
+            setState(() => _themeMode = newMode);
+            widget.onThemeModeChanged(newMode);
+          },
+          borderRadius: BorderRadius.circular(8),
+          selectedColor: _colors.primaryText,
+          fillColor: _colors.accent.withValues(alpha: 0.3),
+          color: _colors.secondaryText,
+          borderColor: _colors.inactive,
+          selectedBorderColor: _colors.accent,
+          constraints: const BoxConstraints(minWidth: 60, minHeight: 32),
+          children: [
+            Text(l10n.lightMode),
+            Text(l10n.darkMode),
+          ],
         ),
       ],
     );
@@ -110,14 +156,14 @@ class _SettingsDialogState extends State<SettingsDialog> {
       children: [
         Text(
           l10n.language,
-          style: const TextStyle(color: AppConstants.whiteColor, fontSize: 16),
+          style: TextStyle(color: _colors.primaryText, fontSize: 16),
         ),
         DropdownButton<String?>(
           value: _currentLanguage,
-          dropdownColor: AppConstants.dialogBackgroundColor,
-          style: const TextStyle(color: AppConstants.whiteColor),
-          iconEnabledColor: AppConstants.cyanAccentColor,
-          underline: Container(height: 1, color: AppConstants.cyanAccentColor),
+          dropdownColor: _colors.dialogBackground,
+          style: TextStyle(color: _colors.primaryText),
+          iconEnabledColor: _colors.accent,
+          underline: Container(height: 1, color: _colors.accent),
           items: [
             DropdownMenuItem(value: null, child: Text(l10n.systemLanguage)),
             const DropdownMenuItem(value: 'en', child: Text('English')),
@@ -143,15 +189,15 @@ class _SettingsDialogState extends State<SettingsDialog> {
       children: [
         Text(
           title,
-          style: const TextStyle(color: AppConstants.whiteColor, fontSize: 16),
+          style: TextStyle(color: _colors.primaryText, fontSize: 16),
         ),
         Switch(
           value: value,
           onChanged: onChanged,
-          activeThumbColor: AppConstants.cyanAccentColor,
-          activeTrackColor: AppConstants.cyanAccentColor.withValues(alpha: 0.5),
-          inactiveThumbColor: AppConstants.greyColor,
-          inactiveTrackColor: AppConstants.greyColor.withValues(alpha: 0.5),
+          activeThumbColor: _colors.accent,
+          activeTrackColor: _colors.accent.withValues(alpha: 0.5),
+          inactiveThumbColor: _colors.inactive,
+          inactiveTrackColor: _colors.inactive.withValues(alpha: 0.5),
         ),
       ],
     );
