@@ -1,4 +1,5 @@
 {
+    "@@locale": "en",
     "appTitle": "Cyber Cultivation",
     "@appTitle": {
         "description": "The title of the application"
@@ -94,5 +95,37 @@
     "statsTitle": "Stats",
     "@statsTitle": {
         "description": "Title for the stats button"
+    },
+    "statsHistoryTrends": "History Trends",
+    "@statsHistoryTrends": {
+        "description": "Section title for history trends"
+    },
+    "statsLast7Days": "Last 7 Days",
+    "@statsLast7Days": {
+        "description": "Button label for last 7 days stats"
+    },
+    "statsLast30Days": "Last 30 Days",
+    "@statsLast30Days": {
+        "description": "Button label for last 30 days stats"
+    },
+    "statsKeyboard": "Keyboard",
+    "@statsKeyboard": {
+        "description": "Label for keyboard stats"
+    },
+    "statsClicks": "Clicks",
+    "@statsClicks": {
+        "description": "Label for click stats"
+    },
+    "statsDistance": "Distance",
+    "@statsDistance": {
+        "description": "Label for mouse distance stats"
+    },
+    "statsTodaysActivity": "Today's Activity",
+    "@statsTodaysActivity": {
+        "description": "Section title for today's activity"
+    },
+    "noDataAvailable": "No data available",
+    "@noDataAvailable": {
+        "description": "Text shown when there is no data"
     }
 }

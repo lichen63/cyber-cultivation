@@ -79,4 +79,28 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get statsTitle => '统计';
+
+  @override
+  String get statsHistoryTrends => '历史趋势';
+
+  @override
+  String get statsLast7Days => '最近 7 天';
+
+  @override
+  String get statsLast30Days => '最近 30 天';
+
+  @override
+  String get statsKeyboard => '按键';
+
+  @override
+  String get statsClicks => '点击';
+
+  @override
+  String get statsDistance => '距离';
+
+  @override
+  String get statsTodaysActivity => '今日活动';
+
+  @override
+  String get noDataAvailable => '暂无数据';
 }
