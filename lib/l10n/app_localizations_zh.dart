@@ -112,4 +112,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get lightMode => '浅色';
+
+  @override
+  String get autoStartText => '登录时自动启动';
 }

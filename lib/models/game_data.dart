@@ -7,6 +7,7 @@ class GameData {
   final bool isAlwaysOnTop;
   final bool isAntiSleepEnabled;
   final bool isAlwaysShowActionButtons;
+  final bool isAutoStartEnabled;
   final double? windowWidth;
   final double? windowHeight;
   final String? userId;
@@ -20,6 +21,7 @@ class GameData {
     this.isAlwaysOnTop = true,
     this.isAntiSleepEnabled = false,
     this.isAlwaysShowActionButtons = false,
+    this.isAutoStartEnabled = false,
     this.windowWidth,
     this.windowHeight,
     this.userId,
@@ -36,6 +38,7 @@ class GameData {
       'isAlwaysOnTop': isAlwaysOnTop,
       'isAntiSleepEnabled': isAntiSleepEnabled,
       'isAlwaysShowActionButtons': isAlwaysShowActionButtons,
+      'isAutoStartEnabled': isAutoStartEnabled,
       'windowWidth': windowWidth,
       'windowHeight': windowHeight,
       'userId': userId,
@@ -54,6 +57,7 @@ class GameData {
       isAntiSleepEnabled: json['isAntiSleepEnabled'] as bool? ?? false,
       isAlwaysShowActionButtons:
           json['isAlwaysShowActionButtons'] as bool? ?? false,
+      isAutoStartEnabled: json['isAutoStartEnabled'] as bool? ?? false,
       windowWidth: (json['windowWidth'] as num?)?.toDouble(),
       windowHeight: (json['windowHeight'] as num?)?.toDouble(),
       userId: json['userId'] as String?,
@@ -78,6 +82,7 @@ class GameData {
     bool? isAlwaysOnTop,
     bool? isAntiSleepEnabled,
     bool? isAlwaysShowActionButtons,
+    bool? isAutoStartEnabled,
     double? windowWidth,
     double? windowHeight,
     String? userId,
@@ -92,6 +97,7 @@ class GameData {
       isAntiSleepEnabled: isAntiSleepEnabled ?? this.isAntiSleepEnabled,
       isAlwaysShowActionButtons:
           isAlwaysShowActionButtons ?? this.isAlwaysShowActionButtons,
+      isAutoStartEnabled: isAutoStartEnabled ?? this.isAutoStartEnabled,
       windowWidth: windowWidth ?? this.windowWidth,
       windowHeight: windowHeight ?? this.windowHeight,
       userId: userId ?? this.userId,

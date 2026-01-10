@@ -2,6 +2,7 @@ import Cocoa
 import FlutterMacOS
 import QuartzCore
 import ApplicationServices
+import ServiceManagement
 
 class MainFlutterWindow: NSWindow {
   private var layerObserver: NSKeyValueObservation?
@@ -42,6 +43,49 @@ class MainFlutterWindow: NSWindow {
                 result(FlutterError(code: "INVALID_ARGUMENTS", message: "dx and dy are required", details: nil))
             }
         } else {
+            result(FlutterMethodNotImplemented)
+        }
+    }
+
+    // Launch at startup method channel
+    let launchAtStartupChannel = FlutterMethodChannel(name: "launch_at_startup", binaryMessenger: flutterViewController.engine.binaryMessenger)
+    launchAtStartupChannel.setMethodCallHandler { (call, result) in
+        switch call.method {
+        case "launchAtStartupIsEnabled":
+            if #available(macOS 13.0, *) {
+                result(SMAppService.mainApp.status == .enabled)
+            } else {
+                // For older macOS versions, we can't easily check, return false
+                result(false)
+            }
+        case "launchAtStartupSetEnabled":
+            if let arguments = call.arguments as? [String: Any],
+               let setEnabled = arguments["setEnabledValue"] as? Bool {
+                if #available(macOS 13.0, *) {
+                    do {
+                        if setEnabled {
+                            try SMAppService.mainApp.register()
+                        } else {
+                            try SMAppService.mainApp.unregister()
+                        }
+                        result(nil)
+                    } catch {
+                        result(FlutterError(code: "LAUNCH_AT_STARTUP_ERROR", message: error.localizedDescription, details: nil))
+                    }
+                } else {
+                    // For older macOS, use deprecated SMLoginItemSetEnabled
+                    let bundleId = Bundle.main.bundleIdentifier ?? ""
+                    let success = SMLoginItemSetEnabled(bundleId as CFString, setEnabled)
+                    if success {
+                        result(nil)
+                    } else {
+                        result(FlutterError(code: "LAUNCH_AT_STARTUP_ERROR", message: "Failed to set launch at startup", details: nil))
+                    }
+                }
+            } else {
+                result(FlutterError(code: "INVALID_ARGUMENTS", message: "setEnabledValue is required", details: nil))
+            }
+        default:
             result(FlutterMethodNotImplemented)
         }
     }

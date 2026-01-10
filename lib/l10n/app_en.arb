@@ -139,5 +139,9 @@
     "lightMode": "Light",
     "@lightMode": {
         "description": "Label for light theme mode"
+    },
+    "autoStartText": "Auto Start at Login",
+    "@autoStartText": {
+        "description": "Option to auto start the app at login"
     }
 }

@@ -307,6 +307,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Light'**
   String get lightMode;
+
+  /// Option to auto start the app at login
+  ///
+  /// In en, this message translates to:
+  /// **'Auto Start at Login'**
+  String get autoStartText;
 }
 
 class _AppLocalizationsDelegate

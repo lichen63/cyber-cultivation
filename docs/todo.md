@@ -33,8 +33,8 @@
 - [x] Add switch for every ui in the game window, let player can customize which ui to show/hide
 - [x] Add summary of keyboard/mouse events per day
 - [x] For all numbers, use k/m/b if they are large
-- [ ] Dark/Light mode
-- [ ] Launch at login
+- [x] Dark/Light mode
+- [x] Launch at login
 - [ ] Add upgrade effect when level up
 - [ ] Change level to cultivation realm
 - [ ] Use different pictures for different levels -> change to only one image, but show different effect in different realm
