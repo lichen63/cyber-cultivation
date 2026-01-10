@@ -4,16 +4,17 @@ import 'package:intl/intl.dart';
 import 'package:cyber_cultivation/l10n/app_localizations.dart';
 import '../constants.dart';
 import '../models/daily_stats.dart';
-import 'dart:math';
 
 class StatsWindow extends StatefulWidget {
   final DailyStats todayStats;
   final Map<String, DailyStats> historyStats;
+  final AppThemeColors themeColors;
 
   const StatsWindow({
     super.key,
     required this.todayStats,
     required this.historyStats,
+    required this.themeColors,
   });
 
   @override
@@ -24,10 +25,7 @@ class _StatsWindowState extends State<StatsWindow> {
   bool isLast7Days = true;
   String metric = 'keyboard'; // keyboard, click, move
 
-  // Colors
-  final Color primaryColor = const Color(0xFF66BB6A); // Greenish
-  final Color secondaryColor = const Color(0xFF424242);
-  final Color textColor = Colors.white;
+  AppThemeColors get _colors => widget.themeColors;
 
   String _formatNumber(num value) {
     // Round to avoid floating point precision issues (e.g., 495.00000001)
@@ -66,12 +64,14 @@ class _StatsWindowState extends State<StatsWindow> {
         width: size.width > 700 ? 700 : size.width * 0.95,
         height: size.height > 600 ? 600 : size.height * 0.9,
         decoration: BoxDecoration(
-          color: const Color(0xFF2C2C2E).withOpacity(0.95),
+          color: _colors.dialogBackground,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white24),
+          border: Border.all(color: _colors.border.withValues(alpha: 0.3)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.5),
+              color: _colors.brightness == Brightness.dark
+                  ? Colors.black.withValues(alpha: 0.5)
+                  : Colors.black.withValues(alpha: 0.2),
               blurRadius: 20,
               spreadRadius: 5,
             ),
@@ -89,7 +89,7 @@ class _StatsWindowState extends State<StatsWindow> {
                     Text(
                       AppLocalizations.of(context)!.statsTodaysActivity,
                       style: TextStyle(
-                        color: textColor,
+                        color: _colors.primaryText,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
@@ -100,7 +100,7 @@ class _StatsWindowState extends State<StatsWindow> {
                     Text(
                       AppLocalizations.of(context)!.statsHistoryTrends,
                       style: TextStyle(
-                        color: textColor,
+                        color: _colors.primaryText,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
@@ -122,9 +122,9 @@ class _StatsWindowState extends State<StatsWindow> {
   Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: const BoxDecoration(
-        color: Colors.white10,
-        borderRadius: BorderRadius.only(
+      decoration: BoxDecoration(
+        color: _colors.overlayLight,
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(16),
           topRight: Radius.circular(16),
         ),
@@ -135,13 +135,13 @@ class _StatsWindowState extends State<StatsWindow> {
           Text(
             AppLocalizations.of(context)!.statsTitle,
             style: TextStyle(
-              color: textColor,
+              color: _colors.primaryText,
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.close, color: Colors.white70),
+            icon: Icon(Icons.close, color: _colors.secondaryText),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ],
@@ -186,12 +186,12 @@ class _StatsWindowState extends State<StatsWindow> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
       decoration: BoxDecoration(
-        color: Colors.white10,
+        color: _colors.overlayLight,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         children: [
-          Icon(icon, color: primaryColor, size: 28),
+          Icon(icon, color: _colors.chartAccent, size: 28),
           const SizedBox(height: 8),
           SizedBox(
             height: 30,
@@ -201,7 +201,7 @@ class _StatsWindowState extends State<StatsWindow> {
                 child: Text(
                   value,
                   style: TextStyle(
-                    color: textColor,
+                    color: _colors.primaryText,
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
@@ -213,7 +213,7 @@ class _StatsWindowState extends State<StatsWindow> {
             fit: BoxFit.scaleDown,
             child: Text(
               title,
-              style: const TextStyle(color: Colors.white54, fontSize: 13),
+              style: TextStyle(color: _colors.secondaryText, fontSize: 13),
             ),
           ),
         ],
@@ -284,13 +284,15 @@ class _StatsWindowState extends State<StatsWindow> {
         height: 40,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: isActive ? primaryColor : Colors.white10,
+          color: isActive ? _colors.chartAccent : _colors.overlayLight,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Text(
           text,
           style: TextStyle(
-            color: isActive ? Colors.white : Colors.white70,
+            color: isActive
+                ? Colors.white
+                : _colors.primaryText,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -304,7 +306,10 @@ class _StatsWindowState extends State<StatsWindow> {
       return SizedBox(
         height: 250,
         child: Center(
-          child: Text(AppLocalizations.of(context)!.noDataAvailable, style: TextStyle(color: textColor)),
+          child: Text(
+            AppLocalizations.of(context)!.noDataAvailable,
+            style: TextStyle(color: _colors.primaryText),
+          ),
         ),
       );
     }
@@ -330,9 +335,9 @@ class _StatsWindowState extends State<StatsWindow> {
               drawVerticalLine: true,
               horizontalInterval: interval,
               getDrawingHorizontalLine: (value) =>
-                  FlLine(color: Colors.white10, strokeWidth: 1),
+                  FlLine(color: _colors.border.withValues(alpha: 0.1), strokeWidth: 1),
               getDrawingVerticalLine: (value) =>
-                  FlLine(color: Colors.white10, strokeWidth: 1),
+                  FlLine(color: _colors.border.withValues(alpha: 0.1), strokeWidth: 1),
             ),
             titlesData: FlTitlesData(
               show: true,
@@ -361,8 +366,8 @@ class _StatsWindowState extends State<StatsWindow> {
                         meta: meta,
                         child: Text(
                           DateFormat('MM/dd').format(date),
-                          style: const TextStyle(
-                            color: Colors.white54,
+                          style: TextStyle(
+                            color: _colors.secondaryText,
                             fontSize: 10,
                           ),
                         ),
@@ -382,8 +387,8 @@ class _StatsWindowState extends State<StatsWindow> {
                       meta: meta,
                       child: Text(
                         '${_formatNumber(value)}$suffix',
-                        style: const TextStyle(
-                          color: Colors.white54,
+                        style: TextStyle(
+                          color: _colors.secondaryText,
                           fontSize: 10,
                         ),
                       ),
@@ -405,8 +410,8 @@ class _StatsWindowState extends State<StatsWindow> {
                     final suffix = metric == 'move' ? ' m' : '';
                     return LineTooltipItem(
                       '${spot.y.round()}$suffix',
-                      const TextStyle(
-                        color: Colors.white,
+                      TextStyle(
+                        color: _colors.primaryText,
                         fontWeight: FontWeight.bold,
                       ),
                     );
@@ -419,13 +424,13 @@ class _StatsWindowState extends State<StatsWindow> {
                 spots: dataPoints,
                 isCurved: true,
                 preventCurveOverShooting: true,
-                color: primaryColor,
+                color: _colors.chartAccent,
                 barWidth: 3,
                 isStrokeCapRound: true,
                 dotData: const FlDotData(show: true),
                 belowBarData: BarAreaData(
                   show: true,
-                  color: primaryColor.withOpacity(0.2),
+                  color: _colors.chartAccent.withValues(alpha: 0.2),
                 ),
               ),
             ],

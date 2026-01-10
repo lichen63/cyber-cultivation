@@ -103,4 +103,13 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get noDataAvailable => '暂无数据';
+
+  @override
+  String get themeMode => '主题';
+
+  @override
+  String get darkMode => '深色';
+
+  @override
+  String get lightMode => '浅色';
 }

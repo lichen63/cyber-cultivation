@@ -1,5 +1,88 @@
 import 'package:flutter/material.dart';
 
+/// Theme mode for the application
+enum AppThemeMode { light, dark }
+
+/// Theme colors for different modes
+class AppThemeColors {
+  final Color primaryText;
+  final Color secondaryText;
+  final Color background;
+  final Color dialogBackground;
+  final Color overlay;
+  final Color overlayLight;
+  final Color border;
+  final Color accent;
+  final Color accentSecondary;
+  final Color inactive;
+  final Color error;
+  final Color expBarBackground;
+  final Color progressBarFill;
+  final Color chartAccent;
+  final Brightness brightness;
+
+  const AppThemeColors({
+    required this.primaryText,
+    required this.secondaryText,
+    required this.background,
+    required this.dialogBackground,
+    required this.overlay,
+    required this.overlayLight,
+    required this.border,
+    required this.accent,
+    required this.accentSecondary,
+    required this.inactive,
+    required this.error,
+    required this.expBarBackground,
+    required this.progressBarFill,
+    required this.chartAccent,
+    required this.brightness,
+  });
+
+  /// Dark theme colors (default)
+  static final dark = AppThemeColors(
+    primaryText: Colors.white,
+    secondaryText: Colors.white54,
+    background: Colors.transparent,
+    dialogBackground: Colors.black.withValues(alpha: 0.9),
+    overlay: Colors.black.withValues(alpha: 0.7),
+    overlayLight: Colors.black.withValues(alpha: 0.3),
+    border: Colors.white,
+    accent: Colors.cyanAccent,
+    accentSecondary: Colors.purpleAccent,
+    inactive: Colors.grey,
+    error: Colors.red,
+    expBarBackground: Colors.black.withValues(alpha: 0.5),
+    progressBarFill: Colors.deepPurple,
+    chartAccent: const Color(0xFF66BB6A),
+    brightness: Brightness.dark,
+  );
+
+  /// Light theme colors
+  static final light = AppThemeColors(
+    primaryText: const Color(0xFF1A1A2E),
+    secondaryText: const Color(0xFF4A4A6A),
+    background: Colors.transparent,
+    dialogBackground: const Color(0xFFF5F5F7).withValues(alpha: 0.95),
+    overlay: const Color(0xFFE8E8EC).withValues(alpha: 0.85),
+    overlayLight: const Color(0xFFE8E8EC).withValues(alpha: 0.5),
+    border: const Color(0xFF3A3A5C),
+    accent: const Color(0xFF0097A7),
+    accentSecondary: const Color(0xFF7B1FA2),
+    inactive: const Color(0xFF9E9E9E),
+    error: const Color(0xFFD32F2F),
+    expBarBackground: const Color(0xFFE0E0E0).withValues(alpha: 0.7),
+    progressBarFill: const Color(0xFF673AB7),
+    chartAccent: const Color(0xFF43A047),
+    brightness: Brightness.light,
+  );
+
+  /// Get theme colors by mode
+  static AppThemeColors fromMode(AppThemeMode mode) {
+    return mode == AppThemeMode.light ? light : dark;
+  }
+}
+
 class AppConstants {
   // App Info
   static const String appTitle = 'Cyber Cultivation';
@@ -50,22 +133,12 @@ class AppConstants {
   static const double buttonPaddingVertical = 4.0;
   static const double monitorWidgetSize = 80.0;
   static const double mouseDotSize = 10.0;
-  
-  // Colors
-  static const Color primarySeedColor = Colors.deepPurple;
+
+  // Colors (non-themed)
   static const Color transparentColor = Colors.transparent;
-  static const Color whiteColor = Colors.white;
-  static const Color redColor = Colors.red;
-  static final Color blackOverlayColor = Colors.black.withValues(alpha: 0.7);
-  static final Color blackOverlayLightColor = Colors.black.withValues(alpha: 0.3);
-  static final Color dialogBackgroundColor = Colors.black.withValues(alpha: 0.9);
-  static const Color cyanAccentColor = Colors.cyanAccent;
-  static const Color purpleAccentColor = Colors.purpleAccent;
-  static const Color greyColor = Colors.grey;
-  static const Color white54Color = Colors.white54;
   static const Color pomodoroFocusColor = Colors.redAccent;
   static const Color pomodoroRelaxColor = Colors.greenAccent;
-  
+
   // Assets
   static const String characterImagePath = 'assets/images/character_2.png';
 

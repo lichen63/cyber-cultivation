@@ -4,11 +4,13 @@ import '../constants.dart';
 class KeyboardMonitor extends StatelessWidget {
   final String currentKey;
   final double scale;
+  final AppThemeColors themeColors;
 
   const KeyboardMonitor({
     super.key,
     required this.currentKey,
     required this.scale,
+    required this.themeColors,
   });
 
   @override
@@ -21,17 +23,17 @@ class KeyboardMonitor extends StatelessWidget {
         height: AppConstants.monitorWidgetSize,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: AppConstants.blackOverlayColor,
+          color: themeColors.overlay,
           borderRadius: BorderRadius.circular(AppConstants.smallBorderRadius),
           border: Border.all(
-            color: AppConstants.whiteColor,
+            color: themeColors.border,
             width: AppConstants.thinBorderWidth,
           ),
         ),
         child: Text(
           currentKey,
-          style: const TextStyle(
-            color: AppConstants.whiteColor,
+          style: TextStyle(
+            color: themeColors.primaryText,
             fontSize: 14,
             fontWeight: FontWeight.bold,
           ),

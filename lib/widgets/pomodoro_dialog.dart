@@ -7,6 +7,7 @@ class PomodoroDialog extends StatefulWidget {
   final int initialDuration;
   final int initialRelax;
   final int initialLoops;
+  final AppThemeColors themeColors;
   final Function(int, int, int) onStart;
 
   const PomodoroDialog({
@@ -14,6 +15,7 @@ class PomodoroDialog extends StatefulWidget {
     required this.initialDuration,
     required this.initialRelax,
     required this.initialLoops,
+    required this.themeColors,
     required this.onStart,
   });
 
@@ -29,6 +31,8 @@ class _PomodoroDialogState extends State<PomodoroDialog> {
   String? _durationError;
   String? _relaxError;
   String? _loopsError;
+
+  AppThemeColors get _colors => widget.themeColors;
 
   @override
   void initState() {
@@ -77,15 +81,15 @@ class _PomodoroDialogState extends State<PomodoroDialog> {
     final l10n = AppLocalizations.of(context)!;
     return AlertDialog(
       actionsAlignment: MainAxisAlignment.spaceEvenly,
-      backgroundColor: AppConstants.dialogBackgroundColor,
+      backgroundColor: _colors.dialogBackground,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppConstants.borderRadius),
-        side: const BorderSide(color: AppConstants.whiteColor, width: 2),
+        side: BorderSide(color: _colors.border, width: 2),
       ),
       title: Center(
         child: Text(
           l10n.pomodoroDialogTitle,
-          style: const TextStyle(color: AppConstants.cyanAccentColor),
+          style: TextStyle(color: _colors.accent),
         ),
       ),
       content: SingleChildScrollView(
@@ -118,8 +122,8 @@ class _PomodoroDialogState extends State<PomodoroDialog> {
                   builder: (context, loopsValue, child) {
                     return Text(
                       '${l10n.pomodoroExpectedExpLabel}${_calculateExpectedExp()}',
-                      style: const TextStyle(
-                        color: AppConstants.purpleAccentColor,
+                      style: TextStyle(
+                        color: _colors.accentSecondary,
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
@@ -137,16 +141,16 @@ class _PomodoroDialogState extends State<PomodoroDialog> {
             overlayColor: WidgetStateProperty.resolveWith<Color?>(
               (Set<WidgetState> states) {
                 if (states.contains(WidgetState.hovered)) {
-                  return AppConstants.greyColor.withValues(alpha: 0.2);
+                  return _colors.inactive.withValues(alpha: 0.2);
                 }
                 if (states.contains(WidgetState.pressed)) {
-                  return AppConstants.greyColor.withValues(alpha: 0.4);
+                  return _colors.inactive.withValues(alpha: 0.4);
                 }
                 return null;
               },
             ),
             foregroundColor:
-                WidgetStateProperty.all<Color>(AppConstants.greyColor),
+                WidgetStateProperty.all<Color>(_colors.inactive),
           ),
           onPressed: () => Navigator.of(context).pop(),
           child: Text(l10n.cancelButtonText),
@@ -156,16 +160,16 @@ class _PomodoroDialogState extends State<PomodoroDialog> {
             overlayColor: WidgetStateProperty.resolveWith<Color?>(
               (Set<WidgetState> states) {
                 if (states.contains(WidgetState.hovered)) {
-                  return AppConstants.cyanAccentColor.withValues(alpha: 0.2);
+                  return _colors.accent.withValues(alpha: 0.2);
                 }
                 if (states.contains(WidgetState.pressed)) {
-                  return AppConstants.cyanAccentColor.withValues(alpha: 0.4);
+                  return _colors.accent.withValues(alpha: 0.4);
                 }
                 return null;
               },
             ),
             foregroundColor:
-                WidgetStateProperty.all<Color>(AppConstants.cyanAccentColor),
+                WidgetStateProperty.all<Color>(_colors.accent),
           ),
           onPressed: () {
             _validateAndStart();
@@ -189,7 +193,7 @@ class _PomodoroDialogState extends State<PomodoroDialog> {
       children: [
         Padding(
           padding: const EdgeInsets.only(top: 12.0),
-          child: Text(label, style: const TextStyle(color: AppConstants.whiteColor)),
+          child: Text(label, style: TextStyle(color: _colors.primaryText)),
         ),
         const SizedBox(width: 20),
         SizedBox(
@@ -197,8 +201,8 @@ class _PomodoroDialogState extends State<PomodoroDialog> {
           child: Row(
             children: [
               IconButton(
-                icon: const Icon(Icons.remove_circle_outline,
-                    color: AppConstants.whiteColor),
+                icon: Icon(Icons.remove_circle_outline,
+                    color: _colors.primaryText),
                 onPressed: () {
                   final currentValue = int.tryParse(controller.text) ?? 0;
                   if (currentValue > 1) {
@@ -223,20 +227,20 @@ class _PomodoroDialogState extends State<PomodoroDialog> {
                   child: TextField(
                     controller: controller,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(color: AppConstants.whiteColor),
+                    style: TextStyle(color: _colors.primaryText),
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     decoration: InputDecoration(
                       isDense: true,
                       contentPadding: const EdgeInsets.symmetric(
                           vertical: 8.0, horizontal: 4.0),
-                      enabledBorder: const UnderlineInputBorder(
+                      enabledBorder: UnderlineInputBorder(
                         borderSide:
-                            BorderSide(color: AppConstants.white54Color),
+                            BorderSide(color: _colors.secondaryText),
                       ),
-                      focusedBorder: const UnderlineInputBorder(
+                      focusedBorder: UnderlineInputBorder(
                         borderSide:
-                            BorderSide(color: AppConstants.cyanAccentColor),
+                            BorderSide(color: _colors.accent),
                       ),
                       errorText: errorText,
                     ),
@@ -245,7 +249,7 @@ class _PomodoroDialogState extends State<PomodoroDialog> {
               ),
               IconButton(
                 icon:
-                    const Icon(Icons.add_circle_outline, color: AppConstants.whiteColor),
+                    Icon(Icons.add_circle_outline, color: _colors.primaryText),
                 onPressed: () {
                   final currentValue = int.tryParse(controller.text) ?? 0;
                   controller.text = (currentValue + 1).toString();

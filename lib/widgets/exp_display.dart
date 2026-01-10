@@ -6,6 +6,7 @@ class ExpDisplay extends StatelessWidget {
   final double currentExp;
   final double maxExp;
   final double scale;
+  final AppThemeColors themeColors;
 
   const ExpDisplay({
     super.key,
@@ -13,6 +14,7 @@ class ExpDisplay extends StatelessWidget {
     required this.currentExp,
     required this.maxExp,
     this.scale = 1.0,
+    required this.themeColors,
   });
 
   /// Formats a large number with K/M/B/T suffixes for readability.
@@ -44,14 +46,16 @@ class ExpDisplay extends StatelessWidget {
         Text(
           'Lv. $level',
           style: TextStyle(
-            color: AppConstants.whiteColor,
+            color: themeColors.primaryText,
             fontSize: 16 * scale,
             fontWeight: FontWeight.bold,
             shadows: [
               Shadow(
                 blurRadius: 2,
-                color: Colors.black,
-                offset: Offset(1, 1),
+                color: themeColors.brightness == Brightness.dark 
+                    ? Colors.black 
+                    : Colors.white,
+                offset: const Offset(1, 1),
               ),
             ],
           ),
@@ -61,9 +65,9 @@ class ExpDisplay extends StatelessWidget {
           width: 200 * scale,
           height: 20 * scale,
           decoration: BoxDecoration(
-            border: Border.all(color: AppConstants.whiteColor, width: 1),
+            border: Border.all(color: themeColors.border, width: 1),
             borderRadius: BorderRadius.circular(10 * scale),
-            color: Colors.black.withValues(alpha: 0.5),
+            color: themeColors.expBarBackground,
           ),
           child: Stack(
             children: [
@@ -73,7 +77,7 @@ class ExpDisplay extends StatelessWidget {
                   value: progress,
                   backgroundColor: Colors.transparent,
                   valueColor: AlwaysStoppedAnimation<Color>(
-                    AppConstants.primarySeedColor,
+                    themeColors.progressBarFill,
                   ),
                   minHeight: 20 * scale,
                 ),
@@ -82,14 +86,16 @@ class ExpDisplay extends StatelessWidget {
                 child: Text(
                   expText,
                   style: TextStyle(
-                    color: AppConstants.whiteColor,
+                    color: themeColors.primaryText,
                     fontSize: 12 * scale,
                     fontWeight: FontWeight.bold,
                     shadows: [
                       Shadow(
                         blurRadius: 2,
-                        color: Colors.black,
-                        offset: Offset(1, 1),
+                        color: themeColors.brightness == Brightness.dark 
+                            ? Colors.black 
+                            : Colors.white,
+                        offset: const Offset(1, 1),
                       ),
                     ],
                   ),

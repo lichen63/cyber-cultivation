@@ -1,4 +1,5 @@
 import 'daily_stats.dart';
+import '../constants.dart';
 
 class GameData {
   final int level;
@@ -10,6 +11,7 @@ class GameData {
   final double? windowHeight;
   final String? userId;
   final String? language;
+  final AppThemeMode themeMode;
   final Map<String, DailyStats> dailyStats;
 
   GameData({
@@ -22,6 +24,7 @@ class GameData {
     this.windowHeight,
     this.userId,
     this.language,
+    this.themeMode = AppThemeMode.dark,
     Map<String, DailyStats>? dailyStats,
   }) : dailyStats = dailyStats ?? {};
 
@@ -37,6 +40,7 @@ class GameData {
       'windowHeight': windowHeight,
       'userId': userId,
       'language': language,
+      'themeMode': themeMode.name,
       'dailyStats': dailyStats.map((k, v) => MapEntry(k, v.toJson())),
     };
   }
@@ -54,12 +58,18 @@ class GameData {
       windowHeight: (json['windowHeight'] as num?)?.toDouble(),
       userId: json['userId'] as String?,
       language: json['language'] as String?,
+      themeMode: _parseThemeMode(json['themeMode'] as String?),
       dailyStats:
           (json['dailyStats'] as Map<String, dynamic>?)?.map(
             (k, v) => MapEntry(k, DailyStats.fromJson(v)),
           ) ??
           {},
     );
+  }
+
+  static AppThemeMode _parseThemeMode(String? value) {
+    if (value == 'light') return AppThemeMode.light;
+    return AppThemeMode.dark;
   }
 
   GameData copyWith({
@@ -72,6 +82,7 @@ class GameData {
     double? windowHeight,
     String? userId,
     String? language,
+    AppThemeMode? themeMode,
     Map<String, DailyStats>? dailyStats,
   }) {
     return GameData(
@@ -85,6 +96,7 @@ class GameData {
       windowHeight: windowHeight ?? this.windowHeight,
       userId: userId ?? this.userId,
       language: language ?? this.language,
+      themeMode: themeMode ?? this.themeMode,
       dailyStats: dailyStats ?? this.dailyStats,
     );
   }

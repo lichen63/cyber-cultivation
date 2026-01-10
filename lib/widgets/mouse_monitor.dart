@@ -7,6 +7,7 @@ class MouseMonitor extends StatelessWidget {
   final double screenWidth;
   final double screenHeight;
   final double scale;
+  final AppThemeColors themeColors;
 
   const MouseMonitor({
     super.key,
@@ -15,6 +16,7 @@ class MouseMonitor extends StatelessWidget {
     required this.screenWidth,
     required this.screenHeight,
     required this.scale,
+    required this.themeColors,
   });
 
   @override
@@ -27,11 +29,11 @@ class MouseMonitor extends StatelessWidget {
         height: AppConstants.monitorWidgetSize,
         decoration: BoxDecoration(
           border: Border.all(
-            color: AppConstants.whiteColor,
+            color: themeColors.border,
             width: AppConstants.thinBorderWidth,
           ),
           borderRadius: BorderRadius.circular(AppConstants.smallBorderRadius),
-          color: AppConstants.blackOverlayLightColor,
+          color: themeColors.overlayLight,
         ),
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -49,8 +51,8 @@ class MouseMonitor extends StatelessWidget {
                   child: Container(
                     width: AppConstants.mouseDotSize,
                     height: AppConstants.mouseDotSize,
-                    decoration: const BoxDecoration(
-                      color: AppConstants.redColor,
+                    decoration: BoxDecoration(
+                      color: themeColors.error,
                       shape: BoxShape.circle,
                     ),
                   ),

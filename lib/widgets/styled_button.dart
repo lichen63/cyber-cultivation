@@ -5,12 +5,14 @@ class StyledButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
   final double scale;
+  final AppThemeColors themeColors;
 
   const StyledButton({
     super.key,
     required this.text,
     required this.onPressed,
     this.scale = 1.0,
+    required this.themeColors,
   });
 
   @override
@@ -23,17 +25,17 @@ class StyledButton extends StatelessWidget {
           vertical: AppConstants.buttonPaddingVertical * scale,
         ),
         decoration: BoxDecoration(
-          color: AppConstants.blackOverlayColor,
+          color: themeColors.overlay,
           borderRadius: BorderRadius.circular(AppConstants.smallBorderRadius * scale),
           border: Border.all(
-            color: AppConstants.whiteColor,
+            color: themeColors.border,
             width: AppConstants.thinBorderWidth * scale,
           ),
         ),
         child: Text(
           text,
           style: TextStyle(
-            color: AppConstants.whiteColor,
+            color: themeColors.primaryText,
             fontSize: 14 * scale,
             fontWeight: FontWeight.bold,
           ),

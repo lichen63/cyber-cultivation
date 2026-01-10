@@ -127,5 +127,17 @@
     "noDataAvailable": "No data available",
     "@noDataAvailable": {
         "description": "Text shown when there is no data"
+    },
+    "themeMode": "Theme",
+    "@themeMode": {
+        "description": "Label for theme mode selection"
+    },
+    "darkMode": "Dark",
+    "@darkMode": {
+        "description": "Label for dark theme mode"
+    },
+    "lightMode": "Light",
+    "@lightMode": {
+        "description": "Label for light theme mode"
     }
 }
