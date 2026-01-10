@@ -79,4 +79,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get statsTitle => 'Stats';
+
+  @override
+  String get statsHistoryTrends => 'History Trends';
+
+  @override
+  String get statsLast7Days => 'Last 7 Days';
+
+  @override
+  String get statsLast30Days => 'Last 30 Days';
+
+  @override
+  String get statsKeyboard => 'Keyboard';
+
+  @override
+  String get statsClicks => 'Clicks';
+
+  @override
+  String get statsDistance => 'Distance';
+
+  @override
+  String get statsTodaysActivity => 'Today\'s Activity';
+
+  @override
+  String get noDataAvailable => 'No data available';
 }

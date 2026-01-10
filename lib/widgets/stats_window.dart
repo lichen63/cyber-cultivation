@@ -83,7 +83,7 @@ class _StatsWindowState extends State<StatsWindow> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Today's Activity",
+                      AppLocalizations.of(context)!.statsTodaysActivity,
                       style: TextStyle(
                         color: textColor,
                         fontSize: 18,
@@ -94,7 +94,7 @@ class _StatsWindowState extends State<StatsWindow> {
                     _buildTodaySummary(),
                     const SizedBox(height: 32),
                     Text(
-                      "History Trends",
+                      AppLocalizations.of(context)!.statsHistoryTrends,
                       style: TextStyle(
                         color: textColor,
                         fontSize: 18,
@@ -152,7 +152,7 @@ class _StatsWindowState extends State<StatsWindow> {
         children: [
           Expanded(
             child: _buildStatCard(
-              "Keyboard",
+              AppLocalizations.of(context)!.statsKeyboard,
               _formatNumber(widget.todayStats.keyboardCount),
               Icons.keyboard,
             ),
@@ -160,7 +160,7 @@ class _StatsWindowState extends State<StatsWindow> {
           const SizedBox(width: 8),
           Expanded(
             child: _buildStatCard(
-              "Clicks",
+              AppLocalizations.of(context)!.statsClicks,
               _formatNumber(widget.todayStats.mouseClickCount),
               Icons.mouse,
             ),
@@ -168,7 +168,7 @@ class _StatsWindowState extends State<StatsWindow> {
           const SizedBox(width: 8),
           Expanded(
             child: _buildStatCard(
-              "Distance",
+              AppLocalizations.of(context)!.statsDistance,
               "${_formatNumber(_pixelsToMeters(widget.todayStats.mouseMoveDistance))} m",
               Icons.show_chart,
             ),
@@ -225,7 +225,7 @@ class _StatsWindowState extends State<StatsWindow> {
           children: [
             Expanded(
               child: _buildToggleBtn(
-                "Last 7 Days",
+                AppLocalizations.of(context)!.statsLast7Days,
                 isLast7Days,
                 () => setState(() => isLast7Days = true),
               ),
@@ -233,7 +233,7 @@ class _StatsWindowState extends State<StatsWindow> {
             const SizedBox(width: 10),
             Expanded(
               child: _buildToggleBtn(
-                "Last 30 Days",
+                AppLocalizations.of(context)!.statsLast30Days,
                 !isLast7Days,
                 () => setState(() => isLast7Days = false),
               ),
@@ -246,7 +246,7 @@ class _StatsWindowState extends State<StatsWindow> {
           children: [
             Expanded(
               child: _buildToggleBtn(
-                "Keyboard",
+                AppLocalizations.of(context)!.statsKeyboard,
                 metric == 'keyboard',
                 () => setState(() => metric = 'keyboard'),
               ),
@@ -254,7 +254,7 @@ class _StatsWindowState extends State<StatsWindow> {
             const SizedBox(width: 10),
             Expanded(
               child: _buildToggleBtn(
-                "Clicks",
+                AppLocalizations.of(context)!.statsClicks,
                 metric == 'click',
                 () => setState(() => metric = 'click'),
               ),
@@ -262,7 +262,7 @@ class _StatsWindowState extends State<StatsWindow> {
             const SizedBox(width: 10),
             Expanded(
               child: _buildToggleBtn(
-                "Distance",
+                AppLocalizations.of(context)!.statsDistance,
                 metric == 'move',
                 () => setState(() => metric = 'move'),
               ),
@@ -300,7 +300,7 @@ class _StatsWindowState extends State<StatsWindow> {
       return SizedBox(
         height: 250,
         child: Center(
-          child: Text("No data available", style: TextStyle(color: textColor)),
+          child: Text(AppLocalizations.of(context)!.noDataAvailable, style: TextStyle(color: textColor)),
         ),
       );
     }
@@ -397,6 +397,7 @@ class _StatsWindowState extends State<StatsWindow> {
               LineChartBarData(
                 spots: dataPoints,
                 isCurved: true,
+                preventCurveOverShooting: true,
                 color: primaryColor,
                 barWidth: 3,
                 isStrokeCapRound: true,

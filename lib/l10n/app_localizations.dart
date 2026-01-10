@@ -241,6 +241,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Stats'**
   String get statsTitle;
+
+  /// Section title for history trends
+  ///
+  /// In en, this message translates to:
+  /// **'History Trends'**
+  String get statsHistoryTrends;
+
+  /// Button label for last 7 days stats
+  ///
+  /// In en, this message translates to:
+  /// **'Last 7 Days'**
+  String get statsLast7Days;
+
+  /// Button label for last 30 days stats
+  ///
+  /// In en, this message translates to:
+  /// **'Last 30 Days'**
+  String get statsLast30Days;
+
+  /// Label for keyboard stats
+  ///
+  /// In en, this message translates to:
+  /// **'Keyboard'**
+  String get statsKeyboard;
+
+  /// Label for click stats
+  ///
+  /// In en, this message translates to:
+  /// **'Clicks'**
+  String get statsClicks;
+
+  /// Label for mouse distance stats
+  ///
+  /// In en, this message translates to:
+  /// **'Distance'**
+  String get statsDistance;
+
+  /// Section title for today's activity
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Activity'**
+  String get statsTodaysActivity;
+
+  /// Text shown when there is no data
+  ///
+  /// In en, this message translates to:
+  /// **'No data available'**
+  String get noDataAvailable;
 }
 
 class _AppLocalizationsDelegate
