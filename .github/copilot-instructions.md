@@ -36,3 +36,7 @@ Please follow these rules in every interaction:
 
 9.  **Documentation**:
     - Add clear comments (`///`) for business logic and complex algorithms.
+
+10. **Avoid Hardcoding**:
+    - Do not hardcode values such as numbers, strings, or logic directly in code.
+    - All constants (e.g., dimensions, durations, thresholds, configuration values) should be placed in `constants.dart`.
