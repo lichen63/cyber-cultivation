@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:launch_at_startup/launch_at_startup.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -28,6 +29,12 @@ import 'widgets/cultivation_formation.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await windowManager.ensureInitialized();
+
+  // Initialize launch at startup
+  launchAtStartup.setup(
+    appName: AppConstants.appTitle,
+    appPath: Platform.resolvedExecutable,
+  );
 
   final gameDataService = GameDataService();
   var gameData = await gameDataService.loadGameData();
@@ -248,6 +255,7 @@ class _MyHomePageState extends State<MyHomePage>
   bool _isAlwaysOnTop = true;
   bool _isMenuOpen = false;
   bool _isAlwaysShowActionButtons = false;
+  bool _isAutoStartEnabled = false;
   late AppThemeMode _themeMode;
 
   AppThemeColors get _themeColors => widget.themeColors;
@@ -359,6 +367,7 @@ class _MyHomePageState extends State<MyHomePage>
       _isAlwaysOnTop = data.isAlwaysOnTop;
       _enableAntiSleep = data.isAntiSleepEnabled;
       _isAlwaysShowActionButtons = data.isAlwaysShowActionButtons;
+      _isAutoStartEnabled = data.isAutoStartEnabled;
       _userId = data.userId;
       _language = data.language;
       _themeMode = data.themeMode;
@@ -412,6 +421,7 @@ class _MyHomePageState extends State<MyHomePage>
           isAlwaysOnTop: _isAlwaysOnTop,
           isAntiSleepEnabled: _enableAntiSleep,
           isAlwaysShowActionButtons: _isAlwaysShowActionButtons,
+          isAutoStartEnabled: _isAutoStartEnabled,
           windowWidth: _windowWidth,
           windowHeight: _windowHeight,
           userId: _userId,
@@ -832,6 +842,7 @@ class _MyHomePageState extends State<MyHomePage>
           isAlwaysOnTop: _isAlwaysOnTop,
           isAntiSleepEnabled: _enableAntiSleep,
           isAlwaysShowActionButtons: _isAlwaysShowActionButtons,
+          isAutoStartEnabled: _isAutoStartEnabled,
           currentLanguage: _language,
           themeMode: _themeMode,
           themeColors: _themeColors,
@@ -848,6 +859,7 @@ class _MyHomePageState extends State<MyHomePage>
             });
             _saveGameData();
           },
+          onAutoStartChanged: _toggleAutoStart,
           onLanguageChanged: (value) {
             setState(() {
               _language = value;
@@ -865,6 +877,18 @@ class _MyHomePageState extends State<MyHomePage>
         );
       },
     );
+  }
+
+  void _toggleAutoStart(bool value) async {
+    setState(() {
+      _isAutoStartEnabled = value;
+    });
+    if (value) {
+      await launchAtStartup.enable();
+    } else {
+      await launchAtStartup.disable();
+    }
+    _saveGameData();
   }
 
   void _toggleAlwaysOnTop(bool value) async {

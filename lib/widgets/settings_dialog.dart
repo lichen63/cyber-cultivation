@@ -6,12 +6,14 @@ class SettingsDialog extends StatefulWidget {
   final bool isAlwaysOnTop;
   final bool isAntiSleepEnabled;
   final bool isAlwaysShowActionButtons;
+  final bool isAutoStartEnabled;
   final String? currentLanguage;
   final AppThemeMode themeMode;
   final AppThemeColors themeColors;
   final ValueChanged<bool> onAlwaysOnTopChanged;
   final ValueChanged<bool> onAntiSleepChanged;
   final ValueChanged<bool> onAlwaysShowActionButtonsChanged;
+  final ValueChanged<bool> onAutoStartChanged;
   final ValueChanged<String?> onLanguageChanged;
   final ValueChanged<AppThemeMode> onThemeModeChanged;
 
@@ -20,12 +22,14 @@ class SettingsDialog extends StatefulWidget {
     required this.isAlwaysOnTop,
     required this.isAntiSleepEnabled,
     required this.isAlwaysShowActionButtons,
+    required this.isAutoStartEnabled,
     this.currentLanguage,
     required this.themeMode,
     required this.themeColors,
     required this.onAlwaysOnTopChanged,
     required this.onAntiSleepChanged,
     required this.onAlwaysShowActionButtonsChanged,
+    required this.onAutoStartChanged,
     required this.onLanguageChanged,
     required this.onThemeModeChanged,
   });
@@ -38,6 +42,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
   late bool _isAlwaysOnTop;
   late bool _isAntiSleepEnabled;
   late bool _isAlwaysShowActionButtons;
+  late bool _isAutoStartEnabled;
   late String? _currentLanguage;
   late AppThemeMode _themeMode;
 
@@ -49,6 +54,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
     _isAlwaysOnTop = widget.isAlwaysOnTop;
     _isAntiSleepEnabled = widget.isAntiSleepEnabled;
     _isAlwaysShowActionButtons = widget.isAlwaysShowActionButtons;
+    _isAutoStartEnabled = widget.isAutoStartEnabled;
     _currentLanguage = widget.currentLanguage;
     _themeMode = widget.themeMode;
   }
@@ -96,6 +102,15 @@ class _SettingsDialogState extends State<SettingsDialog> {
             onChanged: (value) {
               setState(() => _isAlwaysShowActionButtons = value);
               widget.onAlwaysShowActionButtonsChanged(value);
+            },
+          ),
+          const SizedBox(height: 16),
+          _buildSwitchTile(
+            title: l10n.autoStartText,
+            value: _isAutoStartEnabled,
+            onChanged: (value) {
+              setState(() => _isAutoStartEnabled = value);
+              widget.onAutoStartChanged(value);
             },
           ),
           const SizedBox(height: 16),
