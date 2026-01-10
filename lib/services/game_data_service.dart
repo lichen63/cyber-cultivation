@@ -59,7 +59,7 @@ class GameDataService {
     try {
       final path = await _getFilePath();
       final file = File(path);
-      
+
       if (await file.exists()) {
         final jsonString = await file.readAsString();
         final jsonMap = jsonDecode(jsonString);

@@ -30,19 +30,23 @@ class _StatsWindowState extends State<StatsWindow> {
   final Color textColor = Colors.white;
 
   String _formatNumber(num value) {
-    if (value >= 1000000000000) {
-      return '${(value / 1000000000000).toStringAsFixed(1)}T';
-    } else if (value >= 1000000000) {
-      return '${(value / 1000000000).toStringAsFixed(1)}B';
-    } else if (value >= 1000000) {
-      return '${(value / 1000000).toStringAsFixed(1)}M';
-    } else if (value >= 1000) {
-      return '${(value / 1000).toStringAsFixed(1)}K';
+    // Round to avoid floating point precision issues (e.g., 495.00000001)
+    final roundedValue = (value * 100).round() / 100;
+    
+    if (roundedValue >= 1000000000000) {
+      return '${(roundedValue / 1000000000000).toStringAsFixed(1)}T';
+    } else if (roundedValue >= 1000000000) {
+      return '${(roundedValue / 1000000000).toStringAsFixed(1)}B';
+    } else if (roundedValue >= 1000000) {
+      return '${(roundedValue / 1000000).toStringAsFixed(1)}M';
+    } else if (roundedValue >= 1000) {
+      return '${(roundedValue / 1000).toStringAsFixed(1)}K';
     } else {
-      if (value is int || value == value.roundToDouble()) {
-        return value.toInt().toString();
+      // Check if value is effectively an integer (no fractional part)
+      if (roundedValue % 1 == 0) {
+        return roundedValue.toInt().toString();
       }
-      return value.toStringAsFixed(2);
+      return roundedValue.toStringAsFixed(2);
     }
   }
 
@@ -169,7 +173,7 @@ class _StatsWindowState extends State<StatsWindow> {
           Expanded(
             child: _buildStatCard(
               AppLocalizations.of(context)!.statsDistance,
-              "${_formatNumber(_pixelsToMeters(widget.todayStats.mouseMoveDistance))} m",
+              "${_formatNumber(_pixelsToMeters(widget.todayStats.mouseMoveDistance.toDouble()))} m",
               Icons.show_chart,
             ),
           ),
@@ -373,10 +377,11 @@ class _StatsWindowState extends State<StatsWindow> {
                   showTitles: true,
                   interval: interval,
                   getTitlesWidget: (value, meta) {
+                    final suffix = metric == 'move' ? ' m' : '';
                     return SideTitleWidget(
                       meta: meta,
                       child: Text(
-                        _formatNumber(value),
+                        '${_formatNumber(value)}$suffix',
                         style: const TextStyle(
                           color: Colors.white54,
                           fontSize: 10,
@@ -384,7 +389,7 @@ class _StatsWindowState extends State<StatsWindow> {
                       ),
                     );
                   },
-                  reservedSize: 40,
+                  reservedSize: 50,
                 ),
               ),
             ),
@@ -393,6 +398,22 @@ class _StatsWindowState extends State<StatsWindow> {
             maxX: (dataPoints.length - 1).toDouble(),
             minY: 0,
             maxY: maxY * 1.1,
+            lineTouchData: LineTouchData(
+              touchTooltipData: LineTouchTooltipData(
+                getTooltipItems: (touchedSpots) {
+                  return touchedSpots.map((spot) {
+                    final suffix = metric == 'move' ? ' m' : '';
+                    return LineTooltipItem(
+                      '${spot.y.round()}$suffix',
+                      const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    );
+                  }).toList();
+                },
+              ),
+            ),
             lineBarsData: [
               LineChartBarData(
                 spots: dataPoints,
@@ -431,7 +452,7 @@ class _StatsWindowState extends State<StatsWindow> {
         } else if (metric == 'click') {
           value = stats.mouseClickCount.toDouble();
         } else if (metric == 'move') {
-          value = _pixelsToMeters(stats.mouseMoveDistance);
+          value = _pixelsToMeters(stats.mouseMoveDistance.toDouble());
         }
       }
 
