@@ -128,7 +128,7 @@ class SystemStatBox extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                color: themeColors.secondaryText,
+                color: themeColors.primaryText,
                 fontSize: 12 * scale,
                 fontWeight: FontWeight.bold,
               ),
@@ -212,7 +212,7 @@ class _NetworkStatBox extends StatelessWidget {
             Text(
               'NET',
               style: TextStyle(
-                color: themeColors.secondaryText,
+                color: themeColors.primaryText,
                 fontSize: 12 * scale,
                 fontWeight: FontWeight.bold,
               ),
