@@ -26,6 +26,7 @@ import 'widgets/styled_button.dart';
 import 'widgets/settings_dialog.dart';
 import 'widgets/cultivation_formation.dart';
 import 'widgets/accessibility_dialog.dart';
+import 'widgets/system_stats_panel.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -334,10 +335,7 @@ class _MyHomePageState extends State<MyHomePage>
       // Wait for the widget to be fully built before showing dialog
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          AccessibilityDialog.show(
-            context: context,
-            themeColors: _themeColors,
-          );
+          AccessibilityDialog.show(context: context, themeColors: _themeColors);
         }
       });
     }
@@ -1005,13 +1003,23 @@ class _MyHomePageState extends State<MyHomePage>
                                                         _isPomodoroRelaxing,
                                                     size: 240 * scale,
                                                   ),
+                                                // System stats positioned around the character
+                                                Positioned(
+                                                  top: 0,
+                                                  left: 0,
+                                                  right: 0,
+                                                  child: SystemStatsPanel(
+                                                    scale: scale,
+                                                    themeColors: _themeColors,
+                                                  ),
+                                                ),
                                               ],
                                             ),
                                           ),
                                         ],
                                       ),
                                       Positioned(
-                                        top: 80 * scale,
+                                        bottom: 50 * scale,
                                         left: 0,
                                         child: KeyboardMonitor(
                                           currentKey: _currentKey,
@@ -1020,7 +1028,7 @@ class _MyHomePageState extends State<MyHomePage>
                                         ),
                                       ),
                                       Positioned(
-                                        top: 80 * scale,
+                                        bottom: 50 * scale,
                                         right: 0,
                                         child: MouseMonitor(
                                           mouseX: _mouseX,

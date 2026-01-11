@@ -9,7 +9,7 @@ class CharacterDisplay extends StatelessWidget {
     return Align(
       alignment: const Alignment(0, 0),
       child: Transform.scale(
-        scale: 1.2,
+        scale: 1.0,
         child: Image.asset(
           AppConstants.characterImagePath,
           fit: BoxFit.contain,

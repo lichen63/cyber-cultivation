@@ -1,0 +1,443 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import '../constants.dart';
+
+/// Service for getting system information via native platform channel
+class SystemInfoService {
+  static const MethodChannel _channel = MethodChannel(
+    AppConstants.systemInfoChannel,
+  );
+
+  /// Get CPU usage percentage (0-100)
+  static Future<double> getCpuUsage() async {
+    try {
+      final result = await _channel.invokeMethod<double>('getCpuUsage');
+      return result ?? 0.0;
+    } catch (e) {
+      debugPrint('Failed to get CPU usage: $e');
+      return 0.0;
+    }
+  }
+
+  /// Get GPU usage percentage (0-100)
+  static Future<double> getGpuUsage() async {
+    try {
+      final result = await _channel.invokeMethod<double>('getGpuUsage');
+      return result ?? 0.0;
+    } catch (e) {
+      debugPrint('Failed to get GPU usage: $e');
+      return 0.0;
+    }
+  }
+
+  /// Get RAM usage percentage (0-100)
+  static Future<double> getRamUsage() async {
+    try {
+      final result = await _channel.invokeMethod<double>('getRamUsage');
+      return result ?? 0.0;
+    } catch (e) {
+      debugPrint('Failed to get RAM usage: $e');
+      return 0.0;
+    }
+  }
+
+  /// Get Disk usage percentage (0-100)
+  static Future<double> getDiskUsage() async {
+    try {
+      final result = await _channel.invokeMethod<double>('getDiskUsage');
+      return result ?? 0.0;
+    } catch (e) {
+      debugPrint('Failed to get Disk usage: $e');
+      return 0.0;
+    }
+  }
+
+  /// Get Network upload speed in bytes per second
+  static Future<int> getNetworkUpload() async {
+    try {
+      final result = await _channel.invokeMethod<int>('getNetworkUpload');
+      return result ?? 0;
+    } catch (e) {
+      debugPrint('Failed to get Network upload: $e');
+      return 0;
+    }
+  }
+
+  /// Get Network download speed in bytes per second
+  static Future<int> getNetworkDownload() async {
+    try {
+      final result = await _channel.invokeMethod<int>('getNetworkDownload');
+      return result ?? 0;
+    } catch (e) {
+      debugPrint('Failed to get Network download: $e');
+      return 0;
+    }
+  }
+
+  /// Get all system stats at once
+  static Future<Map<String, dynamic>> getAllStats() async {
+    try {
+      final result = await _channel.invokeMethod<Map>('getAllStats');
+      if (result != null) {
+        return Map<String, dynamic>.from(result);
+      }
+      return {};
+    } catch (e) {
+      debugPrint('Failed to get all stats: $e');
+      return {};
+    }
+  }
+}
+
+/// Widget that displays a single system stat
+class SystemStatBox extends StatelessWidget {
+  final String label;
+  final String value;
+  final double scale;
+  final AppThemeColors themeColors;
+  final double? progress;
+
+  const SystemStatBox({
+    super.key,
+    required this.label,
+    required this.value,
+    required this.scale,
+    required this.themeColors,
+    this.progress,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: themeColors.overlay,
+        borderRadius: BorderRadius.circular(AppConstants.smallBorderRadius),
+        border: Border.all(
+          color: themeColors.border,
+          width: AppConstants.thinBorderWidth,
+        ),
+      ),
+      padding: EdgeInsets.symmetric(horizontal: 4 * scale, vertical: 2 * scale),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              color: themeColors.secondaryText,
+              fontSize: 8 * scale,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          if (progress != null)
+            SizedBox(
+              width: double.infinity,
+              height: 3 * scale,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(2 * scale),
+                child: LinearProgressIndicator(
+                  value: progress!.clamp(0.0, 1.0),
+                  backgroundColor: themeColors.expBarBackground,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    _getProgressColor(progress!),
+                  ),
+                ),
+              ),
+            ),
+          Text(
+            value,
+            style: TextStyle(
+              color: themeColors.primaryText,
+              fontSize: 9 * scale,
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color _getProgressColor(double progress) {
+    if (progress >= 0.9) {
+      return themeColors.error;
+    } else if (progress >= 0.7) {
+      return Colors.orange;
+    } else {
+      return themeColors.accent;
+    }
+  }
+}
+
+/// Specialized widget for network stats with compact layout
+class _NetworkStatBox extends StatelessWidget {
+  final int upload;
+  final int download;
+  final String Function(int) formatBytes;
+  final double scale;
+  final AppThemeColors themeColors;
+
+  const _NetworkStatBox({
+    required this.upload,
+    required this.download,
+    required this.formatBytes,
+    required this.scale,
+    required this.themeColors,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: themeColors.overlay,
+        borderRadius: BorderRadius.circular(AppConstants.smallBorderRadius),
+        border: Border.all(
+          color: themeColors.border,
+          width: AppConstants.thinBorderWidth,
+        ),
+      ),
+      padding: EdgeInsets.symmetric(horizontal: 2 * scale, vertical: 2 * scale),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Text(
+            'NET',
+            style: TextStyle(
+              color: themeColors.secondaryText,
+              fontSize: 8 * scale,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '↑',
+                style: TextStyle(
+                  color: themeColors.accent,
+                  fontSize: 7 * scale,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                formatBytes(upload),
+                style: TextStyle(
+                  color: themeColors.primaryText,
+                  fontSize: 7 * scale,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '↓',
+                style: TextStyle(
+                  color: Colors.green,
+                  fontSize: 7 * scale,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                formatBytes(download),
+                style: TextStyle(
+                  color: themeColors.primaryText,
+                  fontSize: 7 * scale,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Panel containing all system stats arranged in a grid
+class SystemStatsPanel extends StatefulWidget {
+  final double scale;
+  final AppThemeColors themeColors;
+
+  const SystemStatsPanel({
+    super.key,
+    required this.scale,
+    required this.themeColors,
+  });
+
+  @override
+  State<SystemStatsPanel> createState() => _SystemStatsPanelState();
+}
+
+class _SystemStatsPanelState extends State<SystemStatsPanel> {
+  Timer? _updateTimer;
+
+  double _cpuUsage = 0.0;
+  double _gpuUsage = 0.0;
+  double _ramUsage = 0.0;
+  double _diskUsage = 0.0;
+  int _networkUpload = 0;
+  int _networkDownload = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchStats();
+    _updateTimer = Timer.periodic(
+      const Duration(seconds: 2),
+      (_) => _fetchStats(),
+    );
+  }
+
+  @override
+  void dispose() {
+    _updateTimer?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _fetchStats() async {
+    try {
+      final stats = await SystemInfoService.getAllStats();
+      if (mounted) {
+        setState(() {
+          _cpuUsage = (stats['cpu'] as num?)?.toDouble() ?? 0.0;
+          _gpuUsage = (stats['gpu'] as num?)?.toDouble() ?? 0.0;
+          _ramUsage = (stats['ram'] as num?)?.toDouble() ?? 0.0;
+          _diskUsage = (stats['disk'] as num?)?.toDouble() ?? 0.0;
+          _networkUpload = (stats['networkUp'] as num?)?.toInt() ?? 0;
+          _networkDownload = (stats['networkDown'] as num?)?.toInt() ?? 0;
+        });
+      }
+    } catch (e) {
+      debugPrint('Failed to fetch system stats: $e');
+    }
+  }
+
+  String _formatBytes(int bytes) {
+    if (bytes < 1024) {
+      return '${bytes}B';
+    } else if (bytes < 1024 * 1024) {
+      return '${(bytes / 1024).toStringAsFixed(1)}K';
+    } else if (bytes < 1024 * 1024 * 1024) {
+      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)}M';
+    } else {
+      return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)}G';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final boxSize = AppConstants.systemStatBoxSize * widget.scale;
+    final spacing = AppConstants.systemStatSpacing * widget.scale;
+
+    // Calculate positions for the 5 stat boxes around the character
+    // Top row: 3 boxes (left, center, right) - positioned near top of character area
+    // Bottom row: 2 boxes (left, right) - positioned at the sides
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final centerX = constraints.maxWidth / 2;
+        final topRowY = 0.0;
+        final bottomRowY = boxSize + spacing;
+
+        // Horizontal spacing for top row (3 items) - larger separation
+        final topRowSpacing = boxSize + spacing * 6;
+
+        return SizedBox(
+          width: constraints.maxWidth,
+          height: boxSize * 2 + spacing,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              // Top Left - CPU
+              Positioned(
+                left: centerX - topRowSpacing - boxSize / 2,
+                top: topRowY,
+                child: SizedBox(
+                  width: boxSize,
+                  height: boxSize,
+                  child: SystemStatBox(
+                    label: 'CPU',
+                    value: '${_cpuUsage.toStringAsFixed(0)}%',
+                    scale: widget.scale,
+                    themeColors: widget.themeColors,
+                    progress: _cpuUsage / 100,
+                  ),
+                ),
+              ),
+              // Top Center - GPU
+              Positioned(
+                left: centerX - boxSize / 2,
+                top: topRowY,
+                child: SizedBox(
+                  width: boxSize,
+                  height: boxSize,
+                  child: SystemStatBox(
+                    label: 'GPU',
+                    value: '${_gpuUsage.toStringAsFixed(0)}%',
+                    scale: widget.scale,
+                    themeColors: widget.themeColors,
+                    progress: _gpuUsage / 100,
+                  ),
+                ),
+              ),
+              // Top Right - RAM
+              Positioned(
+                left: centerX + topRowSpacing - boxSize / 2,
+                top: topRowY,
+                child: SizedBox(
+                  width: boxSize,
+                  height: boxSize,
+                  child: SystemStatBox(
+                    label: 'RAM',
+                    value: '${_ramUsage.toStringAsFixed(0)}%',
+                    scale: widget.scale,
+                    themeColors: widget.themeColors,
+                    progress: _ramUsage / 100,
+                  ),
+                ),
+              ),
+              // Bottom Left - DISK (positioned at left edge)
+              Positioned(
+                left: spacing,
+                top: bottomRowY,
+                child: SizedBox(
+                  width: boxSize,
+                  height: boxSize,
+                  child: SystemStatBox(
+                    label: 'DISK',
+                    value: '${_diskUsage.toStringAsFixed(0)}%',
+                    scale: widget.scale,
+                    themeColors: widget.themeColors,
+                    progress: _diskUsage / 100,
+                  ),
+                ),
+              ),
+              // Bottom Right - NET (positioned at right edge)
+              Positioned(
+                right: spacing,
+                top: bottomRowY,
+                child: SizedBox(
+                  width: boxSize,
+                  height: boxSize,
+                  child: _NetworkStatBox(
+                    upload: _networkUpload,
+                    download: _networkDownload,
+                    formatBytes: _formatBytes,
+                    scale: widget.scale,
+                    themeColors: widget.themeColors,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}

@@ -86,7 +86,7 @@ class AppThemeColors {
 class AppConstants {
   // App Info
   static const String appTitle = 'Cyber Cultivation';
-  
+
   // Window Configuration
   static const double defaultWindowWidth = 400.0;
   static const double defaultWindowHeight = 400.0;
@@ -95,13 +95,19 @@ class AppConstants {
   static const double maxWindowWidth = 800.0;
   static const double maxWindowHeight = 800.0;
   static const double windowAspectRatio = 1.0;
-  
+
   // Event Channels
-  static const String keyEventsChannel = 'com.lichen63.cyber_cultivation/key_events';
-  static const String mouseEventsChannel = 'com.lichen63.cyber_cultivation/mouse_events';
-  static const String mouseControlChannel = 'com.lichen63.cyber_cultivation/mouse_control';
-  static const String accessibilityChannel = 'com.lichen63.cyber_cultivation/accessibility';
-  
+  static const String keyEventsChannel =
+      'com.lichen63.cyber_cultivation/key_events';
+  static const String mouseEventsChannel =
+      'com.lichen63.cyber_cultivation/mouse_events';
+  static const String mouseControlChannel =
+      'com.lichen63.cyber_cultivation/mouse_control';
+  static const String accessibilityChannel =
+      'com.lichen63.cyber_cultivation/accessibility';
+  static const String systemInfoChannel =
+      'com.lichen63.cyber_cultivation/system_info';
+
   // UI Strings
   static const String defaultKeyText = 'Key';
   static const String forceForegroundText = 'Force Foreground';
@@ -110,7 +116,7 @@ class AppConstants {
   static const String toggleAntiSleepValue = 'toggle_anti_sleep';
   static const String exitGameText = 'Exit Game';
   static const String exitGameValue = 'exit_game';
-  
+
   // Pomodoro Strings
   static const String pomodoroDialogTitle = 'Pomodoro Clock';
   static const String pomodoroDurationLabel = 'Focus (min):';
@@ -120,10 +126,11 @@ class AppConstants {
   static const String pomodoroStartButtonText = 'Start';
   static const String cancelButtonText = 'Cancel';
   static const String confirmStopTitle = 'Stop Cultivation?';
-  static const String confirmStopContent = 'Current cultivation progress will be lost.';
+  static const String confirmStopContent =
+      'Current cultivation progress will be lost.';
   static const String stopButtonText = 'Stop';
   static const String invalidInputErrorText = 'Invalid';
-  
+
   // UI Dimensions
   static const double borderWidth = 6.0;
   static const double thinBorderWidth = 2.0;
@@ -134,6 +141,8 @@ class AppConstants {
   static const double buttonPaddingVertical = 4.0;
   static const double monitorWidgetSize = 80.0;
   static const double mouseDotSize = 10.0;
+  static const double systemStatBoxSize = 50.0;
+  static const double systemStatSpacing = 6.0;
 
   // Colors (non-themed)
   static const Color transparentColor = Colors.transparent;
@@ -151,7 +160,7 @@ class AppConstants {
   static const double expGainPerMouse = 1.0;
   static const double expGrowthFactor = 1.1;
   static const double expGainPerMinute = 20.0;
-  
+
   static const int defaultPomodoroDuration = 25;
   static const int defaultRelaxDuration = 5;
   static const int defaultPomodoroLoops = 1;
