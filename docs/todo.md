@@ -35,25 +35,13 @@
 - [x] For all numbers, use k/m/b if they are large
 - [x] Dark/Light mode
 - [x] Launch at login
-- [ ] Add upgrade effect when level up
-- [ ] Change level to cultivation realm
-- [ ] Use different pictures for different levels -> change to only one image, but show different effect in different realm
-- [ ] Replace the default character image -> change to make the character sprite image horizontal symmetric
-- [ ] Add a stop game script
+- [ ] Show cpu/gpu/memory/disk/network infos
+- [ ] Replace B-1 with game list, first game is greedy snake
+- [ ] Show todo list in one action button
 - [ ] Add version control
-- [ ] Add equipment system
-  - [ ] Replace B-1 with equipment button, and click to show the equipment ui
-  - [ ] Equip UI contains weapon, armor, tool, accessory, each has 11 levels (same as character realm)
-  - [ ] Each equip has a background square box and shows different colors for different levels which is same as character realm
-  - [ ] show tooltip when mouse hover on the equip
-  - [ ] Save equip items to local storage
-  - [ ] Can consume exp to upgrade equip? -> need to save all before exp, and consume it to upgrade, also need to record the consumed exp
-  - [ ] Weapon is responsible for increasing exp from keyboard events
-  - [ ] Armor is responsible for increasing exp from mouse events
-  - [ ] Cultivatil tool is reponsible for increasing exp from pomodoro clock(focus time)
-  - [ ] Accessory is reponsible for reducing the needed exp for current level
-- [ ] Add pet system
-- [ ] Add friends system
+- [ ] Add windows platform support
+- [ ] Add unix-like platform support
+- [ ] Add workflow/pipeline to build dmg of the app
 - [ ] Let player customize the character image
 - [ ] Investigate how to implement character operate virtual keyboard, refer to: https://juejin.cn/post/7497785507788488723
   - https://github.com/ayangweb/BongoCat
