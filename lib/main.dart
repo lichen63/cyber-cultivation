@@ -25,6 +25,7 @@ import 'widgets/pomodoro_dialog.dart';
 import 'widgets/styled_button.dart';
 import 'widgets/settings_dialog.dart';
 import 'widgets/cultivation_formation.dart';
+import 'widgets/accessibility_dialog.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -323,6 +324,23 @@ class _MyHomePageState extends State<MyHomePage>
     _setupKeyboardListener();
     _setupMouseListener();
     _startIdleCheck();
+    _checkAccessibilityPermission();
+  }
+
+  /// Checks accessibility permission and shows dialog if not granted.
+  Future<void> _checkAccessibilityPermission() async {
+    final isGranted = await AccessibilityService.checkAccessibility();
+    if (!isGranted && mounted) {
+      // Wait for the widget to be fully built before showing dialog
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          AccessibilityDialog.show(
+            context: context,
+            themeColors: _themeColors,
+          );
+        }
+      });
+    }
   }
 
   @override

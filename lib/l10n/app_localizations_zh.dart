@@ -115,4 +115,20 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get autoStartText => '登录时自动启动';
+
+  @override
+  String get accessibilityDialogTitle => '需要辅助功能权限';
+
+  @override
+  String get accessibilityDialogContent => '此应用需要辅助功能权限来监控键盘和鼠标活动，以获得修仙体验。';
+
+  @override
+  String get accessibilityDialogInstructions =>
+      '请在系统设置 → 隐私与安全性 → 辅助功能中启用此应用的权限。';
+
+  @override
+  String get accessibilityDialogOpenSettings => '打开设置';
+
+  @override
+  String get accessibilityDialogLater => '稍后';
 }

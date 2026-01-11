@@ -47,6 +47,30 @@ class MainFlutterWindow: NSWindow {
         }
     }
 
+    // Accessibility permission method channel
+    let accessibilityChannel = FlutterMethodChannel(name: "com.lichen63.cyber_cultivation/accessibility", binaryMessenger: flutterViewController.engine.binaryMessenger)
+    accessibilityChannel.setMethodCallHandler { (call, result) in
+        switch call.method {
+        case "checkAccessibility":
+            // Check without prompting
+            let trusted = AXIsProcessTrusted()
+            result(trusted)
+        case "requestAccessibility":
+            // Check with prompt - opens System Preferences
+            let options: NSDictionary = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true]
+            let trusted = AXIsProcessTrustedWithOptions(options)
+            result(trusted)
+        case "openAccessibilitySettings":
+            // Open System Preferences directly to Accessibility settings
+            if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
+                NSWorkspace.shared.open(url)
+            }
+            result(nil)
+        default:
+            result(FlutterMethodNotImplemented)
+        }
+    }
+
     // Launch at startup method channel
     let launchAtStartupChannel = FlutterMethodChannel(name: "launch_at_startup", binaryMessenger: flutterViewController.engine.binaryMessenger)
     launchAtStartupChannel.setMethodCallHandler { (call, result) in

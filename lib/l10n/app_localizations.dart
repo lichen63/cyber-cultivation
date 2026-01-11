@@ -313,6 +313,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Auto Start at Login'**
   String get autoStartText;
+
+  /// Title for the accessibility permission dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Accessibility Permission Required'**
+  String get accessibilityDialogTitle;
+
+  /// Content explaining why accessibility is needed
+  ///
+  /// In en, this message translates to:
+  /// **'This app needs accessibility permission to monitor keyboard and mouse activity for the cultivation experience.'**
+  String get accessibilityDialogContent;
+
+  /// Instructions for granting accessibility permission
+  ///
+  /// In en, this message translates to:
+  /// **'Please enable accessibility for this app in System Settings → Privacy & Security → Accessibility.'**
+  String get accessibilityDialogInstructions;
+
+  /// Button to open system settings
+  ///
+  /// In en, this message translates to:
+  /// **'Open Settings'**
+  String get accessibilityDialogOpenSettings;
+
+  /// Button to dismiss and do later
+  ///
+  /// In en, this message translates to:
+  /// **'Later'**
+  String get accessibilityDialogLater;
 }
 
 class _AppLocalizationsDelegate
