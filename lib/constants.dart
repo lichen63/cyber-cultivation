@@ -22,6 +22,8 @@ class AppThemeColors {
   final Color levelTextShadow;
   final Color progressBarFill;
   final Color chartAccent;
+  final Color networkUpload;
+  final Color networkDownload;
   final Brightness brightness;
 
   const AppThemeColors({
@@ -42,6 +44,8 @@ class AppThemeColors {
     required this.levelTextShadow,
     required this.progressBarFill,
     required this.chartAccent,
+    required this.networkUpload,
+    required this.networkDownload,
     required this.brightness,
   });
 
@@ -64,6 +68,8 @@ class AppThemeColors {
     levelTextShadow: Colors.black,
     progressBarFill: Colors.deepPurple,
     chartAccent: const Color(0xFF66BB6A),
+    networkUpload: Colors.red,
+    networkDownload: Colors.blue,
     brightness: Brightness.dark,
   );
 
@@ -86,6 +92,8 @@ class AppThemeColors {
     levelTextShadow: Colors.black45,
     progressBarFill: const Color(0xFF673AB7),
     chartAccent: const Color(0xFF43A047),
+    networkUpload: const Color(0xFFD32F2F),
+    networkDownload: const Color(0xFF1976D2),
     brightness: Brightness.light,
   );
 
@@ -153,7 +161,7 @@ class AppConstants {
   static const double buttonPaddingVertical = 4.0;
   static const double monitorWidgetSize = 80.0;
   static const double mouseDotSize = 10.0;
-  static const double systemStatBoxSize = 50.0;
+  static const double systemStatBoxSize = 70.0;
   static const double systemStatSpacing = 6.0;
 
   // Colors (non-themed)
