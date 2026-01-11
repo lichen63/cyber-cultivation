@@ -8,6 +8,10 @@
 .buildlog/
 .history
 
+# Release artifacts
+dist/
+*.dmg
+
 
 
 # Flutter repo-specific
