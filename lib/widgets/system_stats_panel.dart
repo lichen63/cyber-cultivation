@@ -112,51 +112,54 @@ class SystemStatBox extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: themeColors.overlay,
-        borderRadius: BorderRadius.circular(AppConstants.smallBorderRadius),
+        shape: BoxShape.circle,
         border: Border.all(
           color: themeColors.border,
           width: AppConstants.thinBorderWidth,
         ),
       ),
-      padding: EdgeInsets.symmetric(horizontal: 4 * scale, vertical: 2 * scale),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              color: themeColors.secondaryText,
-              fontSize: 8 * scale,
-              fontWeight: FontWeight.bold,
+      padding: EdgeInsets.all(4 * scale),
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                color: themeColors.secondaryText,
+                fontSize: 12 * scale,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          if (progress != null)
-            SizedBox(
-              width: double.infinity,
-              height: 3 * scale,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(2 * scale),
-                child: LinearProgressIndicator(
-                  value: progress!.clamp(0.0, 1.0),
-                  backgroundColor: themeColors.expBarBackground,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    _getProgressColor(progress!),
+            if (progress != null)
+              SizedBox(
+                width: 40 * scale,
+                height: 4 * scale,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(2 * scale),
+                  child: LinearProgressIndicator(
+                    value: progress!.clamp(0.0, 1.0),
+                    backgroundColor: themeColors.expBarBackground,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      _getProgressColor(progress!),
+                    ),
                   ),
                 ),
               ),
+            Text(
+              value,
+              style: TextStyle(
+                color: themeColors.primaryText,
+                fontSize: 14 * scale,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
             ),
-          Text(
-            value,
-            style: TextStyle(
-              color: themeColors.primaryText,
-              fontSize: 9 * scale,
-              fontWeight: FontWeight.bold,
-            ),
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -193,67 +196,73 @@ class _NetworkStatBox extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: themeColors.overlay,
-        borderRadius: BorderRadius.circular(AppConstants.smallBorderRadius),
+        shape: BoxShape.circle,
         border: Border.all(
           color: themeColors.border,
           width: AppConstants.thinBorderWidth,
         ),
       ),
-      padding: EdgeInsets.symmetric(horizontal: 2 * scale, vertical: 2 * scale),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Text(
-            'NET',
-            style: TextStyle(
-              color: themeColors.secondaryText,
-              fontSize: 8 * scale,
-              fontWeight: FontWeight.bold,
+      padding: EdgeInsets.all(4 * scale),
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'NET',
+              style: TextStyle(
+                color: themeColors.secondaryText,
+                fontSize: 12 * scale,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                '↑',
-                style: TextStyle(
-                  color: themeColors.accent,
-                  fontSize: 7 * scale,
-                  fontWeight: FontWeight.bold,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '↑',
+                  style: TextStyle(
+                    color: themeColors.networkUpload,
+                    fontSize: 11 * scale,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              Text(
-                formatBytes(upload),
-                style: TextStyle(
-                  color: themeColors.primaryText,
-                  fontSize: 7 * scale,
-                  fontWeight: FontWeight.bold,
+                Text(
+                  formatBytes(upload),
+                  style: TextStyle(
+                    color: themeColors.primaryText,
+                    fontSize: 11 * scale,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                '↓',
-                style: TextStyle(
-                  color: Colors.green,
-                  fontSize: 7 * scale,
-                  fontWeight: FontWeight.bold,
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '↓',
+                  style: TextStyle(
+                    color: themeColors.networkDownload,
+                    fontSize: 11 * scale,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              Text(
-                formatBytes(download),
-                style: TextStyle(
-                  color: themeColors.primaryText,
-                  fontSize: 7 * scale,
-                  fontWeight: FontWeight.bold,
+                Text(
+                  formatBytes(download),
+                  style: TextStyle(
+                    color: themeColors.primaryText,
+                    fontSize: 11 * scale,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

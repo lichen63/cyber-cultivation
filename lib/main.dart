@@ -1019,7 +1019,7 @@ class _MyHomePageState extends State<MyHomePage>
                                         ],
                                       ),
                                       Positioned(
-                                        bottom: 50 * scale,
+                                        top: 260 * scale,
                                         left: 0,
                                         child: KeyboardMonitor(
                                           currentKey: _currentKey,
@@ -1028,7 +1028,7 @@ class _MyHomePageState extends State<MyHomePage>
                                         ),
                                       ),
                                       Positioned(
-                                        bottom: 50 * scale,
+                                        top: 260 * scale,
                                         right: 0,
                                         child: MouseMonitor(
                                           mouseX: _mouseX,

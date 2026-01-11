@@ -36,7 +36,7 @@
 - [x] Dark/Light mode
 - [x] Launch at login
 - [x] Prompt for accessibility permission at launch
-- [ ] Show cpu/gpu/memory/disk/network infos
+- [x] Show cpu/gpu/memory/disk/network infos
 - [ ] Replace B-1 with game list, first game is greedy snake
 - [ ] Show todo list in one action button
 - [ ] Add version control
