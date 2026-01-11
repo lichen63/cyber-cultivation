@@ -115,4 +115,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get autoStartText => 'Auto Start at Login';
+
+  @override
+  String get accessibilityDialogTitle => 'Accessibility Permission Required';
+
+  @override
+  String get accessibilityDialogContent =>
+      'This app needs accessibility permission to monitor keyboard and mouse activity for the cultivation experience.';
+
+  @override
+  String get accessibilityDialogInstructions =>
+      'Please enable accessibility for this app in System Settings → Privacy & Security → Accessibility.';
+
+  @override
+  String get accessibilityDialogOpenSettings => 'Open Settings';
+
+  @override
+  String get accessibilityDialogLater => 'Later';
 }

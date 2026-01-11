@@ -100,6 +100,7 @@ class AppConstants {
   static const String keyEventsChannel = 'com.lichen63.cyber_cultivation/key_events';
   static const String mouseEventsChannel = 'com.lichen63.cyber_cultivation/mouse_events';
   static const String mouseControlChannel = 'com.lichen63.cyber_cultivation/mouse_control';
+  static const String accessibilityChannel = 'com.lichen63.cyber_cultivation/accessibility';
   
   // UI Strings
   static const String defaultKeyText = 'Key';

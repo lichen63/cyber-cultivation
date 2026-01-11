@@ -35,6 +35,7 @@
 - [x] For all numbers, use k/m/b if they are large
 - [x] Dark/Light mode
 - [x] Launch at login
+- [x] Prompt for accessibility permission at launch
 - [ ] Show cpu/gpu/memory/disk/network infos
 - [ ] Replace B-1 with game list, first game is greedy snake
 - [ ] Show todo list in one action button
@@ -43,6 +44,7 @@
 - [ ] Add unix-like platform support
 - [ ] Add workflow/pipeline to build dmg of the app
 - [ ] Let player customize the character image
+- [ ] Add to FAQ: using `tccutil` to manually reset the accessibility permission in some case
 - [ ] Investigate how to implement character operate virtual keyboard, refer to: https://juejin.cn/post/7497785507788488723
   - https://github.com/ayangweb/BongoCat
   - https://www.live2d.com/en/

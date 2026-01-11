@@ -143,5 +143,25 @@
     "autoStartText": "Auto Start at Login",
     "@autoStartText": {
         "description": "Option to auto start the app at login"
+    },
+    "accessibilityDialogTitle": "Accessibility Permission Required",
+    "@accessibilityDialogTitle": {
+        "description": "Title for the accessibility permission dialog"
+    },
+    "accessibilityDialogContent": "This app needs accessibility permission to monitor keyboard and mouse activity for the cultivation experience.",
+    "@accessibilityDialogContent": {
+        "description": "Content explaining why accessibility is needed"
+    },
+    "accessibilityDialogInstructions": "Please enable accessibility for this app in System Settings → Privacy & Security → Accessibility.",
+    "@accessibilityDialogInstructions": {
+        "description": "Instructions for granting accessibility permission"
+    },
+    "accessibilityDialogOpenSettings": "Open Settings",
+    "@accessibilityDialogOpenSettings": {
+        "description": "Button to open system settings"
+    },
+    "accessibilityDialogLater": "Later",
+    "@accessibilityDialogLater": {
+        "description": "Button to dismiss and do later"
     }
 }
