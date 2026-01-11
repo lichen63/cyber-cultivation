@@ -45,10 +45,6 @@
 - [ ] Add workflow/pipeline to build dmg of the app
 - [ ] Let player customize the character image
 - [ ] Add to FAQ: using `tccutil` to manually reset the accessibility permission in some case
-- [ ] Investigate how to implement character operate virtual keyboard, refer to: https://juejin.cn/post/7497785507788488723
-  - https://github.com/ayangweb/BongoCat
-  - https://www.live2d.com/en/
-  - https://github.com/guansss/pixi-live2d-display
 - [ ] Check and show multiple screens if there are more than one screen(dependency: could we get the arrangement of the screens?)
 
 ## Bugs
