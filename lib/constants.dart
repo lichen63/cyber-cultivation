@@ -17,6 +17,9 @@ class AppThemeColors {
   final Color inactive;
   final Color error;
   final Color expBarBackground;
+  final Color expBarText;
+  final Color expBarTextShadow;
+  final Color levelTextShadow;
   final Color progressBarFill;
   final Color chartAccent;
   final Brightness brightness;
@@ -34,6 +37,9 @@ class AppThemeColors {
     required this.inactive,
     required this.error,
     required this.expBarBackground,
+    required this.expBarText,
+    required this.expBarTextShadow,
+    required this.levelTextShadow,
     required this.progressBarFill,
     required this.chartAccent,
     required this.brightness,
@@ -53,6 +59,9 @@ class AppThemeColors {
     inactive: Colors.grey,
     error: Colors.red,
     expBarBackground: Colors.black.withValues(alpha: 0.5),
+    expBarText: Colors.white,
+    expBarTextShadow: Colors.black,
+    levelTextShadow: Colors.black,
     progressBarFill: Colors.deepPurple,
     chartAccent: const Color(0xFF66BB6A),
     brightness: Brightness.dark,
@@ -72,6 +81,9 @@ class AppThemeColors {
     inactive: const Color(0xFF9E9E9E),
     error: const Color(0xFFD32F2F),
     expBarBackground: const Color(0xFFE0E0E0).withValues(alpha: 0.7),
+    expBarText: Colors.white,
+    expBarTextShadow: Colors.black54,
+    levelTextShadow: Colors.black45,
     progressBarFill: const Color(0xFF673AB7),
     chartAccent: const Color(0xFF43A047),
     brightness: Brightness.light,
