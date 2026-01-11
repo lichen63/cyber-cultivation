@@ -176,9 +176,9 @@ class AppConstants {
   static const int initialLevel = 1;
   static const double initialMaxExp = 100.0;
   static const int maxLevel = 100;
-  static const double expGainPerKey = 10.0;
+  static const double expGainPerKey = 1.0;
   static const double expGainPerMouse = 1.0;
-  static const double expGrowthFactor = 1.1;
+  static const double expGrowthFactor = 1.3;
   static const double expGainPerMinute = 20.0;
 
   static const int defaultPomodoroDuration = 25;
