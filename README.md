@@ -1,31 +1,81 @@
 # Cyber Cultivation
 
-A flutter game with global input monitoring capabilities that work even when the game window loses focus.
+[中文](README_ZH.md)
 
-## Todo List
+A gamified desktop companion that turns your keyboard and mouse activity into a cultivation journey. Level up your character while you work!
 
-See [TODO.md](docs/TODO.md) for the complete list of planned features and known bugs.
+![Flutter](https://img.shields.io/badge/Flutter-3.10+-blue?logo=flutter)
+![Platform](https://img.shields.io/badge/Platform-macOS-lightgrey?logo=apple)
+![License](https://img.shields.io/badge/License-PolyForm%20NC-green)
 
-## Quick Start
+## Features
 
-### Prerequisites
+- **Cultivation System** - Gain experience from keyboard/mouse activity and level up
+- **Pomodoro Timer** - Built-in focus timer that also rewards experience
+- **Activity Stats** - Daily keyboard/mouse usage statistics with charts
+- **System Monitor** - CPU, memory, disk, and network usage display
+- **Anti-Sleep** - Prevent screen sleep with periodic mouse movement
+- **Bilingual** - English and Chinese support
+- **Dark/Light Mode** - Comfortable viewing in any environment
+- **Launch at Login** - Start automatically with your system
+- **Always on Top** - Stay visible while you work
 
-- **macOS**: Xcode Command Line Tools
-- **Windows**: Visual Studio Build Tools (not yet implemented)
-- **Linux**: GCC and X11 development libraries (not yet implemented)
-- **All Platforms**: Git
+## Installation
+
+### macOS
+
+Download the latest `.dmg` from [Releases](../../releases) and drag to Applications.
+
+> **Note**: On first launch, grant Accessibility permission when prompted (System Settings → Privacy & Security → Accessibility).
+
+### Build from Source
+
+```bash
+git clone https://github.com/user/cyber-cultivation.git
+cd cyber-cultivation
+flutter pub get
+flutter run -d macos
+```
+
+**Prerequisites**: Flutter SDK 3.10+, Xcode Command Line Tools
+
+## Usage
+
+- **Drag** anywhere to move the window
+- **Right-click** for context menu
+- **System tray** icon for quick access
+
+## FAQ
+
+### App won't open / "damaged" warning
+
+If macOS blocks the app with a security warning (Gatekeeper), run:
+
+```bash
+xattr -d com.apple.quarantine /Applications/CyberCultivation.app
+```
+
+### Accessibility permission not working
+
+After granting Accessibility permission, **quit and relaunch** the app for it to take effect.
+
+### Need to reset Accessibility permission
+
+If the app was updated/reinstalled and keyboard/mouse monitoring stops working, reset the permission:
+
+```bash
+tccutil reset Accessibility com.lichen.cyberCultivation
+```
+
+Then relaunch the app and grant permission again.
 
 ## Contributing
 
-We welcome contributions! Please read our [Contributing Guidelines](docs/CONTRIBUTING.md) before submitting pull requests.
+Contributions welcome! See [Contributing Guidelines](docs/CONTRIBUTING.md).
 
 ## License
 
-This project is licensed under the **PolyForm Noncommercial License 1.0.0**.
+[PolyForm Noncommercial License 1.0.0](LICENSE)
 
-- **Non-Commercial Use**: You are free to use, modify, and distribute this software for personal, educational, or non-profit purposes.
-- **Commercial Use**: Commercial use is **strictly prohibited** without a separate commercial license from the author.
-
-If you wish to use this software commercially, please contact the author for approval.
-
-See the [LICENSE](LICENSE) file for the full license text.
+- ✅ Free for personal, educational, non-profit use
+- ❌ Commercial use requires separate license

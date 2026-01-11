@@ -37,14 +37,13 @@
 - [x] Launch at login
 - [x] Prompt for accessibility permission at launch
 - [x] Show cpu/gpu/memory/disk/network infos
-- [ ] Replace B-1 with game list, first game is greedy snake
+- [x] Add to FAQ: using `tccutil` to manually reset the accessibility permission in some case
+- [x] Add workflow/pipeline to build dmg of the app
 - [ ] Show todo list in one action button
-- [ ] Add version control
+- [ ] Replace B-1 with game list, first game is greedy snake
 - [ ] Add windows platform support
 - [ ] Add unix-like platform support
-- [ ] Add workflow/pipeline to build dmg of the app
 - [ ] Let player customize the character image
-- [ ] Add to FAQ: using `tccutil` to manually reset the accessibility permission in some case
 - [ ] Check and show multiple screens if there are more than one screen(dependency: could we get the arrangement of the screens?)
 
 ## Bugs

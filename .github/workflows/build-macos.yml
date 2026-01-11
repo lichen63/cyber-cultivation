@@ -188,11 +188,8 @@ jobs:
                - Right-click on the app and select "Open"
                - Click "Open" in the dialog that appears
                - You only need to do this once
-
-            ### Note
-            This is an unsigned build. macOS Gatekeeper will show a warning when you first run it.
-            The app is safe to use - it's just not signed with a paid Apple Developer certificate.
+               - If the above doesn't work, run in Terminal: `xattr -d com.apple.quarantine /Applications/CyberCultivation.app`
           files: ${{ needs.build-macos.outputs.dmg_name }}
           draft: false
           prerelease: false
-          generate_release_notes: true
+          generate_release_notes: false
