@@ -33,7 +33,7 @@ class MouseMonitor extends StatelessWidget {
             width: AppConstants.thinBorderWidth,
           ),
           borderRadius: BorderRadius.circular(AppConstants.smallBorderRadius),
-          color: themeColors.overlayLight,
+          color: themeColors.overlay,
         ),
         child: LayoutBuilder(
           builder: (context, constraints) {

@@ -43,21 +43,25 @@ class ExpDisplay extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text(
-          'Lv. $level',
-          style: TextStyle(
-            color: themeColors.primaryText,
-            fontSize: 16 * scale,
-            fontWeight: FontWeight.bold,
-            shadows: [
-              Shadow(
-                blurRadius: 2,
-                color: themeColors.brightness == Brightness.dark 
-                    ? Colors.black 
-                    : Colors.white,
-                offset: const Offset(1, 1),
-              ),
-            ],
+        Container(
+          height: 23 * scale,
+          padding: EdgeInsets.symmetric(horizontal: 8 * scale),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: themeColors.expBarBackground,
+            borderRadius: BorderRadius.circular(10 * scale),
+            border: Border.all(
+              color: themeColors.border,
+              width: AppConstants.thinBorderWidth,
+            ),
+          ),
+          child: Text(
+            'Lv. $level',
+            style: TextStyle(
+              color: themeColors.primaryText,
+              fontSize: 14 * scale,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
         SizedBox(width: 8 * scale),
@@ -86,16 +90,19 @@ class ExpDisplay extends StatelessWidget {
                 child: Text(
                   expText,
                   style: TextStyle(
-                    color: themeColors.primaryText,
+                    color: themeColors.expBarText,
                     fontSize: 12 * scale,
                     fontWeight: FontWeight.bold,
                     shadows: [
                       Shadow(
-                        blurRadius: 2,
-                        color: themeColors.brightness == Brightness.dark 
-                            ? Colors.black 
-                            : Colors.white,
+                        blurRadius: 3,
+                        color: themeColors.expBarTextShadow,
                         offset: const Offset(1, 1),
+                      ),
+                      Shadow(
+                        blurRadius: 2,
+                        color: themeColors.expBarTextShadow,
+                        offset: const Offset(-1, -1),
                       ),
                     ],
                   ),
