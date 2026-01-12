@@ -41,7 +41,8 @@ void main() async {
 
   if (gameData == null || gameData.userId == null) {
     final userId = await gameDataService.generateUserId();
-    gameData = gameData?.copyWith(userId: userId) ??
+    gameData =
+        gameData?.copyWith(userId: userId) ??
         GameData(
           level: AppConstants.initialLevel,
           currentExp: 0,
@@ -299,6 +300,7 @@ class _MyHomePageState extends State<MyHomePage>
       onExpGain: _gainExp,
       onStatsUpdate: _updateStats,
     );
+    _inputMonitorService.addListener(_onInputMonitorChanged);
     _inputMonitorService.initialize();
   }
 
@@ -306,10 +308,15 @@ class _MyHomePageState extends State<MyHomePage>
     if (mounted) setState(() {});
   }
 
+  void _onInputMonitorChanged() {
+    if (mounted) setState(() {});
+  }
+
   @override
   void dispose() {
     _pomodoroService.removeListener(_onPomodoroStateChanged);
     _pomodoroService.dispose();
+    _inputMonitorService.removeListener(_onInputMonitorChanged);
     _inputMonitorService.dispose();
     _saveGameData(immediate: true);
     WidgetsBinding.instance.removeObserver(this);
@@ -672,8 +679,9 @@ class _MyHomePageState extends State<MyHomePage>
           Text(
             label,
             style: TextStyle(
-              color:
-                  isDestructive ? _themeColors.error : _themeColors.primaryText,
+              color: isDestructive
+                  ? _themeColors.error
+                  : _themeColors.primaryText,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -735,7 +743,12 @@ class _MyHomePageState extends State<MyHomePage>
     setState(() => _isHovering = false);
     if (_isMenuOpen) {
       final windowSize = MediaQuery.of(context).size;
-      final windowRect = Rect.fromLTWH(0, 0, windowSize.width, windowSize.height);
+      final windowRect = Rect.fromLTWH(
+        0,
+        0,
+        windowSize.width,
+        windowSize.height,
+      );
       final safeRect = windowRect.inflate(10.0);
       if (!safeRect.contains(event.position)) {
         Navigator.of(context).pop();

@@ -165,7 +165,7 @@ class AppConstants {
   static const double systemStatSpacing = 6.0;
 
   // Animation Durations
-  static const int mouseClickBlinkDurationMs = 150;
+  static const int mouseClickBlinkDurationMs = 100;
 
   // Colors (non-themed)
   static const Color transparentColor = Colors.transparent;
