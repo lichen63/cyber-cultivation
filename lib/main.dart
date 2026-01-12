@@ -1105,7 +1105,9 @@ class _MyHomePageState extends State<MyHomePage>
                           ),
                           SizedBox(width: 10 * windowScale),
                           StyledButton(
-                            text: l10n.todoTitle,
+                            text: _todos.isEmpty
+                                ? l10n.todoTitle
+                                : '${l10n.todoTitle} ${_todos.where((t) => t.status == TodoStatus.done).length}/${_todos.length}',
                             onPressed: _showTodoDialog,
                             scale: windowScale,
                             themeColors: _themeColors,
