@@ -8,9 +8,19 @@
 ![Platform](https://img.shields.io/badge/Platform-macOS-lightgrey?logo=apple)
 ![License](https://img.shields.io/badge/License-PolyForm%20NC-green)
 
+## 游戏截图
+
+<p align="center">
+  <img src="docs/images/image-3.png" width="45%" alt="浅色模式">
+  &nbsp;
+  <img src="docs/images/image-4.png" width="45%" alt="深色模式">
+</p>
+
 ## 功能特性
 
 - **修仙系统** - 通过键盘/鼠标活动获取经验值并升级
+- **待办清单** - 高效管理每日任务
+- **小游戏** - 内置休闲小游戏，赚取额外经验
 - **番茄钟** - 内置专注计时器，完成后获得经验奖励
 - **活动统计** - 每日键盘/鼠标使用统计图表
 - **系统监控** - CPU、内存、磁盘和网络使用情况显示
