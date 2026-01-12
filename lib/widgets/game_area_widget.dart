@@ -79,6 +79,7 @@ class GameAreaWidget extends StatelessWidget {
             progress: pomodoroState.progress,
             isRelaxing: pomodoroState.isRelaxing,
             size: 240 * scale,
+            timeText: pomodoroState.formattedTime,
           ),
         Positioned(
           top: 0,

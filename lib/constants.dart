@@ -87,8 +87,8 @@ class AppThemeColors {
     inactive: const Color(0xFF9E9E9E),
     error: const Color(0xFFD32F2F),
     expBarBackground: const Color(0xFFE0E0E0).withValues(alpha: 0.7),
-    expBarText: Colors.white,
-    expBarTextShadow: Colors.black54,
+    expBarText: const Color(0xFF1A1A2E),
+    expBarTextShadow: Colors.white54,
     levelTextShadow: Colors.black45,
     progressBarFill: const Color(0xFF673AB7),
     chartAccent: const Color(0xFF43A047),
@@ -171,6 +171,7 @@ class AppConstants {
   static const Color transparentColor = Colors.transparent;
   static const Color pomodoroFocusColor = Colors.redAccent;
   static const Color pomodoroRelaxColor = Colors.greenAccent;
+  static const double pomodoroTimeFontSizeRatio = 0.22;
 
   // Assets
   static const String characterImagePath = 'assets/images/character_2.png';
