@@ -152,10 +152,9 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
     final fileName = p.basename(assetPath);
     final file = File(p.join(tempDir.path, fileName));
 
-    if (!await file.exists()) {
-      final byteData = await rootBundle.load(assetPath);
-      await file.writeAsBytes(byteData.buffer.asUint8List());
-    }
+    // Always overwrite to ensure updates take effect
+    final byteData = await rootBundle.load(assetPath);
+    await file.writeAsBytes(byteData.buffer.asUint8List());
     return file.path;
   }
 
