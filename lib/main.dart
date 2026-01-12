@@ -27,6 +27,8 @@ import 'widgets/settings_dialog.dart';
 import 'widgets/cultivation_formation.dart';
 import 'widgets/accessibility_dialog.dart';
 import 'widgets/system_stats_panel.dart';
+import 'widgets/todo_dialog.dart';
+import 'models/todo_item.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -271,6 +273,9 @@ class _MyHomePageState extends State<MyHomePage>
   double _windowHeight = AppConstants.defaultWindowHeight;
   String? _language;
 
+  // Todos
+  List<TodoItem> _todos = [];
+
   // Stats
   DailyStats _todayStats = DailyStats();
   Map<String, DailyStats> _dailyStatsMap = {};
@@ -390,6 +395,8 @@ class _MyHomePageState extends State<MyHomePage>
       _windowWidth = data.windowWidth ?? AppConstants.defaultWindowWidth;
       _windowHeight = data.windowHeight ?? AppConstants.defaultWindowHeight;
 
+      _todos = List.from(data.todos);
+
       _dailyStatsMap = Map.of(data.dailyStats);
       final todayKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
       if (_dailyStatsMap.containsKey(todayKey)) {
@@ -426,11 +433,11 @@ class _MyHomePageState extends State<MyHomePage>
   void _saveGameData({bool immediate = false}) {
     if (_saveDebounce?.isActive ?? false) _saveDebounce!.cancel();
 
-    void save() {
+    Future<void> save() async {
       final todayKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
       _dailyStatsMap[todayKey] = _todayStats;
 
-      _gameDataService.saveGameData(
+      await _gameDataService.saveGameData(
         GameData(
           level: _level,
           currentExp: _currentExp,
@@ -444,6 +451,7 @@ class _MyHomePageState extends State<MyHomePage>
           language: _language,
           themeMode: _themeMode,
           dailyStats: _dailyStatsMap,
+          todos: _todos,
         ),
       );
     }
@@ -627,6 +635,25 @@ class _MyHomePageState extends State<MyHomePage>
           todayStats: _todayStats,
           historyStats: viewHistory,
           themeColors: _themeColors,
+        );
+      },
+    );
+  }
+
+  void _showTodoDialog() {
+    showDialog(
+      context: context,
+      barrierColor: _themeColors.overlay,
+      builder: (context) {
+        return TodoDialog(
+          todos: _todos,
+          themeColors: _themeColors,
+          onTodosChanged: (updatedTodos) {
+            setState(() {
+              _todos = updatedTodos;
+            });
+            _saveGameData(immediate: true);
+          },
         );
       },
     );
@@ -1078,8 +1105,8 @@ class _MyHomePageState extends State<MyHomePage>
                           ),
                           SizedBox(width: 10 * windowScale),
                           StyledButton(
-                            text: 'T-3',
-                            onPressed: () {},
+                            text: l10n.todoTitle,
+                            onPressed: _showTodoDialog,
                             scale: windowScale,
                             themeColors: _themeColors,
                           ),

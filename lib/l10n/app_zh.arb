@@ -40,5 +40,15 @@
     "accessibilityDialogContent": "此应用需要辅助功能权限来监控键盘和鼠标活动，以获得修仙体验。",
     "accessibilityDialogInstructions": "请在系统设置 → 隐私与安全性 → 辅助功能中启用此应用的权限。",
     "accessibilityDialogOpenSettings": "打开设置",
-    "accessibilityDialogLater": "稍后"
+    "accessibilityDialogLater": "稍后",
+    "todoTitle": "待办",
+    "todoStatusTodo": "待办",
+    "todoStatusDoing": "进行中",
+    "todoStatusDone": "已完成",
+    "todoAddNew": "添加待办",
+    "todoNewPlaceholder": "输入新待办...",
+    "todoEmpty": "暂无待办事项",
+    "todoDeleteConfirmTitle": "删除待办?",
+    "todoDeleteConfirmContent": "该待办事项将被永久删除。",
+    "deleteButtonText": "删除"
 }

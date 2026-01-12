@@ -343,6 +343,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Later'**
   String get accessibilityDialogLater;
+
+  /// Title for todo button and dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Todo'**
+  String get todoTitle;
+
+  /// Status label for todo items
+  ///
+  /// In en, this message translates to:
+  /// **'Todo'**
+  String get todoStatusTodo;
+
+  /// Status label for in-progress items
+  ///
+  /// In en, this message translates to:
+  /// **'Doing'**
+  String get todoStatusDoing;
+
+  /// Status label for completed items
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get todoStatusDone;
+
+  /// Button to add new todo
+  ///
+  /// In en, this message translates to:
+  /// **'Add Todo'**
+  String get todoAddNew;
+
+  /// Placeholder for new todo input
+  ///
+  /// In en, this message translates to:
+  /// **'Enter new todo...'**
+  String get todoNewPlaceholder;
+
+  /// Message when todo list is empty
+  ///
+  /// In en, this message translates to:
+  /// **'No todos yet'**
+  String get todoEmpty;
+
+  /// Title for delete confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Todo?'**
+  String get todoDeleteConfirmTitle;
+
+  /// Content for delete confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'This todo will be permanently removed.'**
+  String get todoDeleteConfirmContent;
+
+  /// Delete button text
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get deleteButtonText;
 }
 
 class _AppLocalizationsDelegate

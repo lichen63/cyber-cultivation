@@ -131,4 +131,34 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get accessibilityDialogLater => '稍后';
+
+  @override
+  String get todoTitle => '待办';
+
+  @override
+  String get todoStatusTodo => '待办';
+
+  @override
+  String get todoStatusDoing => '进行中';
+
+  @override
+  String get todoStatusDone => '已完成';
+
+  @override
+  String get todoAddNew => '添加待办';
+
+  @override
+  String get todoNewPlaceholder => '输入新待办...';
+
+  @override
+  String get todoEmpty => '暂无待办事项';
+
+  @override
+  String get todoDeleteConfirmTitle => '删除待办?';
+
+  @override
+  String get todoDeleteConfirmContent => '该待办事项将被永久删除。';
+
+  @override
+  String get deleteButtonText => '删除';
 }
