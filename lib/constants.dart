@@ -87,8 +87,8 @@ class AppThemeColors {
     inactive: const Color(0xFF9E9E9E),
     error: const Color(0xFFD32F2F),
     expBarBackground: const Color(0xFFE0E0E0).withValues(alpha: 0.7),
-    expBarText: Colors.white,
-    expBarTextShadow: Colors.black54,
+    expBarText: const Color(0xFF1A1A2E),
+    expBarTextShadow: Colors.white54,
     levelTextShadow: Colors.black45,
     progressBarFill: const Color(0xFF673AB7),
     chartAccent: const Color(0xFF43A047),
@@ -108,12 +108,12 @@ class AppConstants {
   static const String appTitle = 'Cyber Cultivation';
 
   // Window Configuration
-  static const double defaultWindowWidth = 400.0;
-  static const double defaultWindowHeight = 400.0;
-  static const double minWindowWidth = 200.0;
-  static const double minWindowHeight = 200.0;
-  static const double maxWindowWidth = 800.0;
-  static const double maxWindowHeight = 800.0;
+  static const double defaultWindowWidth = 600.0;
+  static const double defaultWindowHeight = 600.0;
+  static const double minWindowWidth = 400.0;
+  static const double minWindowHeight = 400.0;
+  static const double maxWindowWidth = 1600.0;
+  static const double maxWindowHeight = 1600.0;
   static const double windowAspectRatio = 1.0;
 
   // Event Channels
@@ -164,10 +164,14 @@ class AppConstants {
   static const double systemStatBoxSize = 70.0;
   static const double systemStatSpacing = 6.0;
 
+  // Animation Durations
+  static const int mouseClickBlinkDurationMs = 100;
+
   // Colors (non-themed)
   static const Color transparentColor = Colors.transparent;
   static const Color pomodoroFocusColor = Colors.redAccent;
   static const Color pomodoroRelaxColor = Colors.greenAccent;
+  static const double pomodoroTimeFontSizeRatio = 0.22;
 
   // Assets
   static const String characterImagePath = 'assets/images/character_2.png';

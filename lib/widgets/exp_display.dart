@@ -34,9 +34,11 @@ class ExpDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double progress = maxExp.isInfinite ? 1.0 : (currentExp / maxExp).clamp(0.0, 1.0);
-    final String expText = maxExp.isInfinite 
-        ? '∞ / ∞' 
+    final double progress = maxExp.isInfinite
+        ? 1.0
+        : (currentExp / maxExp).clamp(0.0, 1.0);
+    final String expText = maxExp.isInfinite
+        ? '∞ / ∞'
         : '${_formatNumber(currentExp)} / ${_formatNumber(maxExp)}';
 
     return Row(
@@ -50,16 +52,13 @@ class ExpDisplay extends StatelessWidget {
           decoration: BoxDecoration(
             color: themeColors.expBarBackground,
             borderRadius: BorderRadius.circular(10 * scale),
-            border: Border.all(
-              color: themeColors.border,
-              width: AppConstants.thinBorderWidth,
-            ),
+            border: Border.all(color: themeColors.border, width: 1),
           ),
           child: Text(
             'Lv. $level',
             style: TextStyle(
               color: themeColors.primaryText,
-              fontSize: 14 * scale,
+              fontSize: 12 * scale,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -67,7 +66,7 @@ class ExpDisplay extends StatelessWidget {
         SizedBox(width: 8 * scale),
         Container(
           width: 200 * scale,
-          height: 20 * scale,
+          height: 23 * scale,
           decoration: BoxDecoration(
             border: Border.all(color: themeColors.border, width: 1),
             borderRadius: BorderRadius.circular(10 * scale),
@@ -83,7 +82,7 @@ class ExpDisplay extends StatelessWidget {
                   valueColor: AlwaysStoppedAnimation<Color>(
                     themeColors.progressBarFill,
                   ),
-                  minHeight: 20 * scale,
+                  minHeight: 23 * scale,
                 ),
               ),
               Center(

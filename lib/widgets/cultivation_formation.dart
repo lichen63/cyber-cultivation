@@ -7,12 +7,14 @@ class CultivationFormation extends StatelessWidget {
   final double progress;
   final bool isRelaxing;
   final double size;
+  final String? timeText;
 
   const CultivationFormation({
     super.key,
     required this.progress,
     required this.isRelaxing,
     required this.size,
+    this.timeText,
   });
 
   @override
@@ -24,8 +26,24 @@ class CultivationFormation extends StatelessWidget {
     return SizedBox(
       width: size,
       height: size,
-      child: CustomPaint(
-        painter: _FormationPainter(progress: progress, color: color),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          CustomPaint(
+            size: Size(size, size),
+            painter: _FormationPainter(progress: progress, color: color),
+          ),
+          if (timeText != null)
+            Text(
+              timeText!,
+              style: TextStyle(
+                color: color,
+                fontSize: size * AppConstants.pomodoroTimeFontSizeRatio,
+                fontWeight: FontWeight.bold,
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
+            ),
+        ],
       ),
     );
   }
