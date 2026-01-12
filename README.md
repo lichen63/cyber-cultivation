@@ -8,17 +8,28 @@ A gamified desktop companion that turns your keyboard and mouse activity into a 
 ![Platform](https://img.shields.io/badge/Platform-macOS-lightgrey?logo=apple)
 ![License](https://img.shields.io/badge/License-PolyForm%20NC-green)
 
+## Screenshots
+
+<p align="center">
+  <img src="docs/images/image-1.png" width="45%" alt="Light Mode">
+  &nbsp;
+  <img src="docs/images/image-2.png" width="45%" alt="Dark Mode">
+</p>
+
 ## Features
 
-- **Cultivation System** - Gain experience from keyboard/mouse activity and level up
+- **Cultivation System** - Gain experience from keyboard/mouse activity, focus sessions, and games to level up
+- **Activity Tracking** - Monitor keyboard and mouse usage in real-time
+- **System Monitor** - CPU, GPU, memory, disk, and network usage display
+- **Always on Top** - Stay visible while you work
+- **Anti-Sleep** - Prevent screen sleep with periodic mouse movement
 - **Pomodoro Timer** - Built-in focus timer that also rewards experience
 - **Activity Stats** - Daily keyboard/mouse usage statistics with charts
-- **System Monitor** - CPU, memory, disk, and network usage display
-- **Anti-Sleep** - Prevent screen sleep with periodic mouse movement
-- **Bilingual** - English and Chinese support
+- **Todo List** - Manage daily tasks efficiently
+- **Mini Games** - Relax with built-in mini-games to earn extra experience
 - **Dark/Light Mode** - Comfortable viewing in any environment
+- **Bilingual** - English and Chinese support
 - **Launch at Login** - Start automatically with your system
-- **Always on Top** - Stay visible while you work
 
 ## Installation
 

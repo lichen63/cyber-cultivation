@@ -28,6 +28,7 @@ class HomePageContent extends StatelessWidget {
   final VoidCallback onStatsPressed;
   final VoidCallback onTodoPressed;
   final VoidCallback onSettingsPressed;
+  final VoidCallback onGamesPressed;
   final void Function(Offset) onContextMenu;
 
   const HomePageContent({
@@ -50,6 +51,7 @@ class HomePageContent extends StatelessWidget {
     required this.onStatsPressed,
     required this.onTodoPressed,
     required this.onSettingsPressed,
+    required this.onGamesPressed,
     required this.onContextMenu,
   });
 
@@ -149,7 +151,7 @@ class HomePageContent extends StatelessWidget {
         scale: windowScale,
         themeColors: themeColors,
         buttons: [
-          ActionButtonConfig(text: 'B-1', onPressed: () {}),
+          ActionButtonConfig(text: l10n.gamesTitle, onPressed: onGamesPressed),
           ActionButtonConfig(text: 'B-2', onPressed: () {}),
           ActionButtonConfig(
             text: l10n.settingsTitle,

@@ -161,4 +161,33 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get deleteButtonText => '删除';
+
+  @override
+  String get gamesTitle => '游戏';
+
+  @override
+  String get snakeGameTitle => '贪吃蛇';
+
+  @override
+  String get snakeGameDescription => '经典贪吃蛇游戏。吃食物来成长并获得经验值！';
+
+  @override
+  String get gameScore => '分数';
+
+  @override
+  String get gameOver => '游戏结束';
+
+  @override
+  String gameExpGained(int exp) {
+    return '获得经验: $exp';
+  }
+
+  @override
+  String get gamePlayAgain => '再玩一次';
+
+  @override
+  String get gamePressToStart => '按空格键或点击开始';
+
+  @override
+  String get gameUseArrowKeys => '使用方向键或滑动来移动';
 }

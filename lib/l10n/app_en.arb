@@ -203,5 +203,46 @@
     "deleteButtonText": "Delete",
     "@deleteButtonText": {
         "description": "Delete button text"
+    },
+    "gamesTitle": "Games",
+    "@gamesTitle": {
+        "description": "Title for games list"
+    },
+    "snakeGameTitle": "Snake",
+    "@snakeGameTitle": {
+        "description": "Title for snake game"
+    },
+    "snakeGameDescription": "Classic snake game. Eat food to grow and earn EXP!",
+    "@snakeGameDescription": {
+        "description": "Description for snake game"
+    },
+    "gameScore": "Score",
+    "@gameScore": {
+        "description": "Score label in games"
+    },
+    "gameOver": "Game Over",
+    "@gameOver": {
+        "description": "Game over text"
+    },
+    "gameExpGained": "EXP Gained: {exp}",
+    "@gameExpGained": {
+        "description": "EXP gained text",
+        "placeholders": {
+            "exp": {
+                "type": "int"
+            }
+        }
+    },
+    "gamePlayAgain": "Play Again",
+    "@gamePlayAgain": {
+        "description": "Play again button text"
+    },
+    "gamePressToStart": "Press SPACE or tap to start",
+    "@gamePressToStart": {
+        "description": "Press to start instruction"
+    },
+    "gameUseArrowKeys": "Use arrow keys or swipe to move",
+    "@gameUseArrowKeys": {
+        "description": "Control instructions"
     }
 }
