@@ -351,7 +351,7 @@ class _StatsWindowState extends State<StatsWindow> {
                 sideTitles: SideTitles(
                   showTitles: true,
                   reservedSize: 30,
-                  interval: 1,
+                  interval: isLast7Days ? 1 : 5,
                   getTitlesWidget: (value, meta) {
                     int index = value.toInt();
                     if (index >= 0 && index < dataPoints.length) {
