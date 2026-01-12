@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import '../constants.dart';
 
+/// Widget that displays mouse position and click feedback.
 class MouseMonitor extends StatelessWidget {
   final double mouseX;
   final double mouseY;
   final double screenWidth;
   final double screenHeight;
+  final bool isClicking;
   final double scale;
   final AppThemeColors themeColors;
 
@@ -15,6 +17,7 @@ class MouseMonitor extends StatelessWidget {
     required this.mouseY,
     required this.screenWidth,
     required this.screenHeight,
+    required this.isClicking,
     required this.scale,
     required this.themeColors,
   });
@@ -54,17 +57,26 @@ class MouseMonitor extends StatelessWidget {
             );
 
             return Stack(
+              clipBehavior: Clip.none,
               children: [
-                // Red dot representing mouse position
+                // Red dot representing mouse position with blink on click
                 Positioned(
                   left: clampedLeft,
                   top: clampedTop,
-                  child: Container(
-                    width: AppConstants.mouseDotSize,
-                    height: AppConstants.mouseDotSize,
-                    decoration: BoxDecoration(
-                      color: themeColors.error,
-                      shape: BoxShape.circle,
+                  child: AnimatedScale(
+                    duration: const Duration(
+                      milliseconds: AppConstants.mouseClickBlinkDurationMs,
+                    ),
+                    scale: isClicking ? 1.8 : 1.0,
+                    child: Container(
+                      width: AppConstants.mouseDotSize,
+                      height: AppConstants.mouseDotSize,
+                      decoration: BoxDecoration(
+                        color: isClicking
+                            ? themeColors.accent
+                            : themeColors.error,
+                        shape: BoxShape.circle,
+                      ),
                     ),
                   ),
                 ),

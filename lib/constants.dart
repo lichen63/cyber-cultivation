@@ -164,6 +164,9 @@ class AppConstants {
   static const double systemStatBoxSize = 70.0;
   static const double systemStatSpacing = 6.0;
 
+  // Animation Durations
+  static const int mouseClickBlinkDurationMs = 150;
+
   // Colors (non-themed)
   static const Color transparentColor = Colors.transparent;
   static const Color pomodoroFocusColor = Colors.redAccent;

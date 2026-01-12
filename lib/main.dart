@@ -254,6 +254,7 @@ class _MyHomePageState extends State<MyHomePage>
   double _mouseY = 0;
   double _screenWidth = 1;
   double _screenHeight = 1;
+  bool _isMouseClicking = false;
   bool _isHovering = false;
   bool _isAlwaysOnTop = true;
   bool _isMenuOpen = false;
@@ -708,6 +709,21 @@ class _MyHomePageState extends State<MyHomePage>
           if (type == 'click') {
             _gainExp(AppConstants.expGainPerMouse);
             _updateStats(clickCount: 1);
+            setState(() {
+              _isMouseClicking = true;
+            });
+            Future.delayed(
+              const Duration(
+                milliseconds: AppConstants.mouseClickBlinkDurationMs,
+              ),
+              () {
+                if (mounted) {
+                  setState(() {
+                    _isMouseClicking = false;
+                  });
+                }
+              },
+            );
           } else {
             if (_lastAbsX != null && _lastAbsY != null) {
               final dx = absX - _lastAbsX!;
@@ -1061,6 +1077,7 @@ class _MyHomePageState extends State<MyHomePage>
                                           mouseY: _mouseY,
                                           screenWidth: _screenWidth,
                                           screenHeight: _screenHeight,
+                                          isClicking: _isMouseClicking,
                                           scale: scale,
                                           themeColors: _themeColors,
                                         ),
