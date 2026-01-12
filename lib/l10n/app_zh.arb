@@ -50,5 +50,14 @@
     "todoEmpty": "暂无待办事项",
     "todoDeleteConfirmTitle": "删除待办?",
     "todoDeleteConfirmContent": "该待办事项将被永久删除。",
-    "deleteButtonText": "删除"
+    "deleteButtonText": "删除",
+    "gamesTitle": "游戏",
+    "snakeGameTitle": "贪吃蛇",
+    "snakeGameDescription": "经典贪吃蛇游戏。吃食物来成长并获得经验值！",
+    "gameScore": "分数",
+    "gameOver": "游戏结束",
+    "gameExpGained": "获得经验: {exp}",
+    "gamePlayAgain": "再玩一次",
+    "gamePressToStart": "按空格键或点击开始",
+    "gameUseArrowKeys": "使用方向键或滑动来移动"
 }

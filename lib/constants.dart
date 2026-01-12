@@ -189,3 +189,109 @@ class AppConstants {
   static const int defaultRelaxDuration = 5;
   static const int defaultPomodoroLoops = 1;
 }
+
+/// Constants for games list dialog
+class GameConstants {
+  // Dialog dimensions
+  static const double gamesDialogMaxWidth = 500.0;
+  static const double gamesDialogMaxHeight = 400.0;
+  static const double gamesDialogWidthRatio = 0.9;
+  static const double gamesDialogHeightRatio = 0.7;
+  static const double gamesDialogInsetPadding = 20.0;
+  static const double gamesDialogBorderRadius = 16.0;
+  static const double gamesDialogShadowBlur = 20.0;
+  static const double gamesDialogShadowSpread = 5.0;
+
+  // Header
+  static const double gamesDialogHeaderPaddingH = 16.0;
+  static const double gamesDialogHeaderPaddingV = 12.0;
+  static const double gamesHeaderIconSize = 24.0;
+  static const double gamesHeaderIconSpacing = 8.0;
+  static const double gamesHeaderFontSize = 20.0;
+
+  // Games list
+  static const double gamesListPadding = 16.0;
+  static const double gameCardBorderRadius = 12.0;
+  static const double gameCardPadding = 16.0;
+  static const double gameIconContainerSize = 48.0;
+  static const double gameIconContainerRadius = 12.0;
+  static const double gameIconSize = 28.0;
+  static const double gameCardContentSpacing = 16.0;
+  static const double gameTitleFontSize = 16.0;
+  static const double gameTitleSpacing = 4.0;
+  static const double gameDescFontSize = 13.0;
+}
+
+/// Constants for snake game
+class SnakeGameConstants {
+  // Grid
+  static const int gridSize = 15;
+  static const double gridBorderRadius = 8.0;
+  static const double gridBorderWidth = 2.0;
+
+  // Game mechanics
+  static const int gameTickMs = 200;
+  static const int scorePerFood = 10;
+  static const int expPerFood = 5;
+  static const double swipeThreshold = 20.0;
+
+  // Dialog dimensions
+  static const double gameDialogMaxWidth = 500.0;
+  static const double gameDialogMaxHeight = 600.0;
+  static const double gameDialogWidthRatio = 0.95;
+  static const double gameDialogHeightRatio = 0.85;
+  static const double gameDialogInsetPadding = 20.0;
+  static const double gameDialogBorderRadius = 16.0;
+  static const double gameDialogShadowBlur = 20.0;
+  static const double gameDialogShadowSpread = 5.0;
+
+  // Header
+  static const double gameHeaderPaddingH = 16.0;
+  static const double gameHeaderPaddingV = 12.0;
+  static const double gameHeaderIconSize = 24.0;
+  static const double gameHeaderIconSpacing = 8.0;
+  static const double gameHeaderFontSize = 20.0;
+  static const double headerButtonSpacing = 8.0;
+
+  // Score display
+  static const double scorePaddingH = 12.0;
+  static const double scorePaddingV = 6.0;
+  static const double scoreBorderRadius = 20.0;
+  static const double scoreIconSize = 16.0;
+  static const double scoreIconSpacing = 4.0;
+  static const double scoreFontSize = 14.0;
+
+  // Game area
+  static const double gameAreaPadding = 16.0;
+  static const double gameAreaMargin = 32.0;
+  static const double cellPadding = 2.0;
+
+  // Cell rendering
+  static const double snakeHeadBorderRadius = 6.0;
+  static const double snakeBodyBorderRadius = 4.0;
+  static const double foodBorderRadius = 50.0;
+
+  // Colors
+  static const Color snakeColor = Color(0xFF4CAF50);
+  static const Color snakeHeadColor = Color(0xFF2E7D32);
+  static const Color foodColor = Color(0xFFFF5722);
+
+  // Overlay UI
+  static const double overlayIconSize = 64.0;
+  static const double overlaySpacing = 16.0;
+  static const double overlaySmallSpacing = 8.0;
+  static const double overlayLargeSpacing = 24.0;
+  static const double overlayTitleFontSize = 28.0;
+  static const double overlaySubtitleFontSize = 16.0;
+  static const double overlayHintFontSize = 14.0;
+
+  // Game over
+  static const double gameOverTitleFontSize = 32.0;
+  static const double gameOverScoreFontSize = 20.0;
+  static const double gameOverExpFontSize = 18.0;
+
+  // Button
+  static const double buttonPaddingH = 24.0;
+  static const double buttonPaddingV = 12.0;
+  static const double buttonBorderRadius = 25.0;
+}

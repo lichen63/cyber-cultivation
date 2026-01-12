@@ -20,6 +20,7 @@ import 'services/game_data_service.dart';
 import 'services/input_monitor_service.dart';
 import 'services/pomodoro_service.dart';
 import 'widgets/accessibility_dialog.dart';
+import 'widgets/games_list_dialog.dart';
 import 'widgets/home_page_content.dart';
 import 'widgets/pomodoro_dialog.dart';
 import 'widgets/settings_dialog.dart';
@@ -551,6 +552,19 @@ class _MyHomePageState extends State<MyHomePage>
     );
   }
 
+  void _showGamesDialog() {
+    showDialog(
+      context: context,
+      barrierColor: _themeColors.overlay,
+      builder: (context) => GamesListDialog(
+        themeColors: _themeColors,
+        onExpGained: (expGained) {
+          _gainExp(expGained.toDouble());
+        },
+      ),
+    );
+  }
+
   void _showTodoDialog() {
     showDialog(
       context: context,
@@ -733,6 +747,7 @@ class _MyHomePageState extends State<MyHomePage>
           onStatsPressed: _showStatsWindow,
           onTodoPressed: _showTodoDialog,
           onSettingsPressed: _showSettingsDialog,
+          onGamesPressed: _showGamesDialog,
           onContextMenu: _showContextMenu,
         ),
       ),
