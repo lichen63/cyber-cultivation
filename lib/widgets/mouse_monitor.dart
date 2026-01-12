@@ -41,13 +41,24 @@ class MouseMonitor extends StatelessWidget {
             // Use actual screen dimensions from native side
             final dotX = (mouseX / screenWidth) * constraints.maxWidth;
             final dotY = (mouseY / screenHeight) * constraints.maxHeight;
-            
+
+            // Clamp the dot position to keep it fully within bounds
+            final halfDot = AppConstants.mouseDotSize / 2;
+            final clampedLeft = (dotX - halfDot).clamp(
+              0.0,
+              constraints.maxWidth - AppConstants.mouseDotSize,
+            );
+            final clampedTop = (dotY - halfDot).clamp(
+              0.0,
+              constraints.maxHeight - AppConstants.mouseDotSize,
+            );
+
             return Stack(
               children: [
                 // Red dot representing mouse position
                 Positioned(
-                  left: dotX.clamp(0, constraints.maxWidth) - (AppConstants.mouseDotSize / 2),
-                  top: dotY.clamp(0, constraints.maxHeight) - (AppConstants.mouseDotSize / 2),
+                  left: clampedLeft,
+                  top: clampedTop,
                   child: Container(
                     width: AppConstants.mouseDotSize,
                     height: AppConstants.mouseDotSize,
