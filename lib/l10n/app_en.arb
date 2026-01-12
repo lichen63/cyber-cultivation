@@ -163,5 +163,45 @@
     "accessibilityDialogLater": "Later",
     "@accessibilityDialogLater": {
         "description": "Button to dismiss and do later"
+    },
+    "todoTitle": "Todo",
+    "@todoTitle": {
+        "description": "Title for todo button and dialog"
+    },
+    "todoStatusTodo": "Todo",
+    "@todoStatusTodo": {
+        "description": "Status label for todo items"
+    },
+    "todoStatusDoing": "Doing",
+    "@todoStatusDoing": {
+        "description": "Status label for in-progress items"
+    },
+    "todoStatusDone": "Done",
+    "@todoStatusDone": {
+        "description": "Status label for completed items"
+    },
+    "todoAddNew": "Add Todo",
+    "@todoAddNew": {
+        "description": "Button to add new todo"
+    },
+    "todoNewPlaceholder": "Enter new todo...",
+    "@todoNewPlaceholder": {
+        "description": "Placeholder for new todo input"
+    },
+    "todoEmpty": "No todos yet",
+    "@todoEmpty": {
+        "description": "Message when todo list is empty"
+    },
+    "todoDeleteConfirmTitle": "Delete Todo?",
+    "@todoDeleteConfirmTitle": {
+        "description": "Title for delete confirmation dialog"
+    },
+    "todoDeleteConfirmContent": "This todo will be permanently removed.",
+    "@todoDeleteConfirmContent": {
+        "description": "Content for delete confirmation dialog"
+    },
+    "deleteButtonText": "Delete",
+    "@deleteButtonText": {
+        "description": "Delete button text"
     }
 }

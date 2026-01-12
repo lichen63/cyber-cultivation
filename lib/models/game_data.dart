@@ -1,4 +1,5 @@
 import 'daily_stats.dart';
+import 'todo_item.dart';
 import '../constants.dart';
 
 class GameData {
@@ -14,6 +15,7 @@ class GameData {
   final String? language;
   final AppThemeMode themeMode;
   final Map<String, DailyStats> dailyStats;
+  final List<TodoItem> todos;
 
   GameData({
     required this.level,
@@ -28,7 +30,9 @@ class GameData {
     this.language,
     this.themeMode = AppThemeMode.dark,
     Map<String, DailyStats>? dailyStats,
-  }) : dailyStats = dailyStats ?? {};
+    List<TodoItem>? todos,
+  })  : dailyStats = dailyStats ?? {},
+        todos = todos ?? [];
 
   // Convert a GameData object into a Map object
   Map<String, dynamic> toJson() {
@@ -45,6 +49,7 @@ class GameData {
       'language': language,
       'themeMode': themeMode.name,
       'dailyStats': dailyStats.map((k, v) => MapEntry(k, v.toJson())),
+      'todos': todos.map((t) => t.toJson()).toList(),
     };
   }
 
@@ -68,6 +73,10 @@ class GameData {
             (k, v) => MapEntry(k, DailyStats.fromJson(v)),
           ) ??
           {},
+      todos: (json['todos'] as List<dynamic>?)
+              ?.map((t) => TodoItem.fromJson(t as Map<String, dynamic>))
+              .toList() ??
+          [],
     );
   }
 
@@ -89,6 +98,7 @@ class GameData {
     String? language,
     AppThemeMode? themeMode,
     Map<String, DailyStats>? dailyStats,
+    List<TodoItem>? todos,
   }) {
     return GameData(
       level: level ?? this.level,
@@ -104,6 +114,7 @@ class GameData {
       language: language ?? this.language,
       themeMode: themeMode ?? this.themeMode,
       dailyStats: dailyStats ?? this.dailyStats,
+      todos: todos ?? this.todos,
     );
   }
 }
