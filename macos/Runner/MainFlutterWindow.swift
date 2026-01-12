@@ -319,8 +319,12 @@ class KeyMonitorStreamHandler: NSObject, FlutterStreamHandler {
     private func formatCGEvent(keyCode: Int, flags: CGEventFlags) -> String? {
         var parts = getModifierParts(flags)
         
-        // Remove "Fn" if it's Keypad Clear (71) as it often reports Fn automatically
-        if keyCode == 71 {
+        // Remove "Fn" for keys that macOS reports Fn automatically:
+        // - Arrow keys (123=←, 124=→, 125=↓, 126=↑)
+        // - Navigation keys (115=Home, 116=PageUp, 117=Delete, 119=End, 121=PageDown)
+        // - Keypad Clear (71)
+        let fnAutoKeys: Set<Int> = [71, 115, 116, 117, 119, 121, 123, 124, 125, 126]
+        if fnAutoKeys.contains(keyCode) {
             parts.removeAll { $0 == "Fn" }
         }
         

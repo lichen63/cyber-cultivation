@@ -163,4 +163,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteButtonText => 'Delete';
+
+  @override
+  String get gamesTitle => 'Games';
+
+  @override
+  String get snakeGameTitle => 'Snake';
+
+  @override
+  String get snakeGameDescription =>
+      'Classic snake game. Eat food to grow and earn EXP!';
+
+  @override
+  String get gameScore => 'Score';
+
+  @override
+  String get gameOver => 'Game Over';
+
+  @override
+  String gameExpGained(int exp) {
+    return 'EXP Gained: $exp';
+  }
+
+  @override
+  String get gamePlayAgain => 'Play Again';
+
+  @override
+  String get gamePressToStart => 'Press SPACE or tap to start';
+
+  @override
+  String get gameUseArrowKeys => 'Use arrow keys or swipe to move';
 }

@@ -403,6 +403,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete'**
   String get deleteButtonText;
+
+  /// Title for games list
+  ///
+  /// In en, this message translates to:
+  /// **'Games'**
+  String get gamesTitle;
+
+  /// Title for snake game
+  ///
+  /// In en, this message translates to:
+  /// **'Snake'**
+  String get snakeGameTitle;
+
+  /// Description for snake game
+  ///
+  /// In en, this message translates to:
+  /// **'Classic snake game. Eat food to grow and earn EXP!'**
+  String get snakeGameDescription;
+
+  /// Score label in games
+  ///
+  /// In en, this message translates to:
+  /// **'Score'**
+  String get gameScore;
+
+  /// Game over text
+  ///
+  /// In en, this message translates to:
+  /// **'Game Over'**
+  String get gameOver;
+
+  /// EXP gained text
+  ///
+  /// In en, this message translates to:
+  /// **'EXP Gained: {exp}'**
+  String gameExpGained(int exp);
+
+  /// Play again button text
+  ///
+  /// In en, this message translates to:
+  /// **'Play Again'**
+  String get gamePlayAgain;
+
+  /// Press to start instruction
+  ///
+  /// In en, this message translates to:
+  /// **'Press SPACE or tap to start'**
+  String get gamePressToStart;
+
+  /// Control instructions
+  ///
+  /// In en, this message translates to:
+  /// **'Use arrow keys or swipe to move'**
+  String get gameUseArrowKeys;
 }
 
 class _AppLocalizationsDelegate
