@@ -39,8 +39,9 @@
 - [x] Show cpu/gpu/memory/disk/network infos
 - [x] Add to FAQ: using `tccutil` to manually reset the accessibility permission in some case
 - [x] Add workflow/pipeline to build dmg of the app
-- [ ] Show todo list in one action button
+- [x] Show todo list in one action button
 - [ ] Replace B-1 with game list, first game is greedy snake
+- [ ] Add unit/widget/integration tests
 - [ ] Add windows platform support
 - [ ] Add unix-like platform support
 - [ ] Let player customize the character image

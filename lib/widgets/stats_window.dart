@@ -30,7 +30,7 @@ class _StatsWindowState extends State<StatsWindow> {
   String _formatNumber(num value) {
     // Round to avoid floating point precision issues (e.g., 495.00000001)
     final roundedValue = (value * 100).round() / 100;
-    
+
     if (roundedValue >= 1000000000000) {
       return '${(roundedValue / 1000000000000).toStringAsFixed(1)}T';
     } else if (roundedValue >= 1000000000) {
@@ -290,9 +290,7 @@ class _StatsWindowState extends State<StatsWindow> {
         child: Text(
           text,
           style: TextStyle(
-            color: isActive
-                ? Colors.white
-                : _colors.primaryText,
+            color: isActive ? Colors.white : _colors.primaryText,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -334,10 +332,14 @@ class _StatsWindowState extends State<StatsWindow> {
               show: true,
               drawVerticalLine: true,
               horizontalInterval: interval,
-              getDrawingHorizontalLine: (value) =>
-                  FlLine(color: _colors.border.withValues(alpha: 0.1), strokeWidth: 1),
-              getDrawingVerticalLine: (value) =>
-                  FlLine(color: _colors.border.withValues(alpha: 0.1), strokeWidth: 1),
+              getDrawingHorizontalLine: (value) => FlLine(
+                color: _colors.border.withValues(alpha: 0.1),
+                strokeWidth: 1,
+              ),
+              getDrawingVerticalLine: (value) => FlLine(
+                color: _colors.border.withValues(alpha: 0.1),
+                strokeWidth: 1,
+              ),
             ),
             titlesData: FlTitlesData(
               show: true,
@@ -351,7 +353,7 @@ class _StatsWindowState extends State<StatsWindow> {
                 sideTitles: SideTitles(
                   showTitles: true,
                   reservedSize: 30,
-                  interval: 1,
+                  interval: isLast7Days ? 1 : 5,
                   getTitlesWidget: (value, meta) {
                     int index = value.toInt();
                     if (index >= 0 && index < dataPoints.length) {
