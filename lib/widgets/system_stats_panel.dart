@@ -352,10 +352,11 @@ class _SystemStatsPanelState extends State<SystemStatsPanel> {
       builder: (context, constraints) {
         final centerX = constraints.maxWidth / 2;
         final topRowY = 0.0;
+        final sideOffset = spacing * 4; // CPU and RAM are lower than GPU
         final bottomRowY = boxSize + spacing;
 
         // Horizontal spacing for top row (3 items) - larger separation
-        final topRowSpacing = boxSize + spacing * 6;
+        final topRowSpacing = boxSize + spacing * 11;
 
         return SizedBox(
           width: constraints.maxWidth,
@@ -366,7 +367,7 @@ class _SystemStatsPanelState extends State<SystemStatsPanel> {
               // Top Left - CPU
               Positioned(
                 left: centerX - topRowSpacing - boxSize / 2,
-                top: topRowY,
+                top: topRowY + sideOffset,
                 child: SizedBox(
                   width: boxSize,
                   height: boxSize,
@@ -398,7 +399,7 @@ class _SystemStatsPanelState extends State<SystemStatsPanel> {
               // Top Right - RAM
               Positioned(
                 left: centerX + topRowSpacing - boxSize / 2,
-                top: topRowY,
+                top: topRowY + sideOffset,
                 child: SizedBox(
                   width: boxSize,
                   height: boxSize,
