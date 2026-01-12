@@ -141,58 +141,85 @@ class _AccessibilityDialogState extends State<AccessibilityDialog> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return AlertDialog(
+    return Dialog(
       backgroundColor: _colors.dialogBackground,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppConstants.borderRadius),
         side: BorderSide(color: _colors.border, width: 2),
       ),
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.accessibility_new, color: _colors.accent, size: 28),
-          const SizedBox(width: 8),
-          Text(
-            l10n.accessibilityDialogTitle,
-            style: TextStyle(color: _colors.accent),
-          ),
-        ],
-      ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            l10n.accessibilityDialogContent,
-            style: TextStyle(color: _colors.primaryText),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            l10n.accessibilityDialogInstructions,
-            style: TextStyle(color: _colors.secondaryText, fontSize: 12),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-      actionsAlignment: MainAxisAlignment.center,
-      actions: [
-        TextButton(
-          onPressed: _onLaterPressed,
-          child: Text(
-            l10n.accessibilityDialogLater,
-            style: TextStyle(color: _colors.secondaryText),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 400),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Title
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.accessibility_new,
+                      color: _colors.accent,
+                      size: 28,
+                    ),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        l10n.accessibilityDialogTitle,
+                        style: TextStyle(
+                          color: _colors.accent,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                // Content
+                Text(
+                  l10n.accessibilityDialogContent,
+                  style: TextStyle(color: _colors.primaryText),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  l10n.accessibilityDialogInstructions,
+                  style: TextStyle(color: _colors.secondaryText, fontSize: 12),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                // Actions
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    TextButton(
+                      onPressed: _onLaterPressed,
+                      child: Text(
+                        l10n.accessibilityDialogLater,
+                        style: TextStyle(color: _colors.secondaryText),
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: _onOpenSettingsPressed,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _colors.accent,
+                        foregroundColor: _colors.dialogBackground,
+                      ),
+                      child: Text(l10n.accessibilityDialogOpenSettings),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
-        const SizedBox(width: 8),
-        ElevatedButton(
-          onPressed: _onOpenSettingsPressed,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: _colors.accent,
-            foregroundColor: _colors.dialogBackground,
-          ),
-          child: Text(l10n.accessibilityDialogOpenSettings),
-        ),
-      ],
+      ),
     );
   }
 }

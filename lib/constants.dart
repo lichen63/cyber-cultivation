@@ -108,12 +108,12 @@ class AppConstants {
   static const String appTitle = 'Cyber Cultivation';
 
   // Window Configuration
-  static const double defaultWindowWidth = 400.0;
-  static const double defaultWindowHeight = 400.0;
-  static const double minWindowWidth = 200.0;
-  static const double minWindowHeight = 200.0;
-  static const double maxWindowWidth = 800.0;
-  static const double maxWindowHeight = 800.0;
+  static const double defaultWindowWidth = 600.0;
+  static const double defaultWindowHeight = 600.0;
+  static const double minWindowWidth = 400.0;
+  static const double minWindowHeight = 400.0;
+  static const double maxWindowWidth = 1600.0;
+  static const double maxWindowHeight = 1600.0;
   static const double windowAspectRatio = 1.0;
 
   // Event Channels
