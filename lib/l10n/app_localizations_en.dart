@@ -132,4 +132,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get accessibilityDialogLater => 'Later';
+
+  @override
+  String get todoTitle => 'Todo';
+
+  @override
+  String get todoStatusTodo => 'Todo';
+
+  @override
+  String get todoStatusDoing => 'Doing';
+
+  @override
+  String get todoStatusDone => 'Done';
+
+  @override
+  String get todoAddNew => 'Add Todo';
+
+  @override
+  String get todoNewPlaceholder => 'Enter new todo...';
+
+  @override
+  String get todoEmpty => 'No todos yet';
+
+  @override
+  String get todoDeleteConfirmTitle => 'Delete Todo?';
+
+  @override
+  String get todoDeleteConfirmContent =>
+      'This todo will be permanently removed.';
+
+  @override
+  String get deleteButtonText => 'Delete';
 }
