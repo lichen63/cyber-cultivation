@@ -62,7 +62,7 @@ class AppThemeColors {
     accentSecondary: Colors.purpleAccent,
     inactive: Colors.grey,
     error: Colors.red,
-    expBarBackground: Colors.black.withValues(alpha: 0.5),
+    expBarBackground: Colors.black.withValues(alpha: 0.7),
     expBarText: Colors.white,
     expBarTextShadow: Colors.black,
     levelTextShadow: Colors.black,
@@ -86,7 +86,7 @@ class AppThemeColors {
     accentSecondary: const Color(0xFF7B1FA2),
     inactive: const Color(0xFF9E9E9E),
     error: const Color(0xFFD32F2F),
-    expBarBackground: const Color(0xFFE0E0E0).withValues(alpha: 0.7),
+    expBarBackground: const Color(0xFFE8E8EC).withValues(alpha: 0.85),
     expBarText: const Color(0xFF1A1A2E),
     expBarTextShadow: Colors.white54,
     levelTextShadow: Colors.black45,
@@ -158,18 +158,18 @@ class AppConstants {
   static const double smallBorderRadius = 10.0;
   static const double defaultPadding = 30.0;
   static const double buttonPaddingHorizontal = 24.0;
-  static const double buttonPaddingVertical = 10.0;
+  static const double buttonPaddingVertical = 0.0;
   static const double monitorWidgetSize = 120.0;
   static const double mouseDotSize = 16.0;
   static const double systemStatBoxSize = 110.0;
   static const double systemStatSpacing = 10.0;
 
   // EXP Bar Dimensions
-  static const double expBarHeight = 34.0;
-  static const double expBarWidth = 280.0;
-  static const double expBarBorderRadius = 14.0;
-  static const double expBarPaddingHorizontal = 12.0;
-  static const double expBarSpacing = 12.0;
+  static const double expBarHeight = 40.0;
+  static const double expBarWidth = 320.0;
+  static const double expBarBorderRadius = 16.0;
+  static const double expBarPaddingHorizontal = 16.0;
+  static const double expBarSpacing = 14.0;
 
   // Animation Durations
   static const int mouseClickBlinkDurationMs = 100;
@@ -182,8 +182,8 @@ class AppConstants {
   static const double fontSizeDialogTitle = 38.0;
   static const double fontSizeDialogContent = 28.0;
   static const double fontSizeDialogHint = 26.0;
-  static const double fontSizeLevel = 26.0;
-  static const double fontSizeExpProgress = 26.0;
+  static const double fontSizeLevel = 30.0;
+  static const double fontSizeExpProgress = 28.0;
   static const double fontSizeStatLabel = 26.0;
   static const double fontSizeStatValue = 28.0;
   static const double fontSizeNetworkStat = 24.0;

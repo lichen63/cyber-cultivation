@@ -49,7 +49,7 @@ class GameAreaWidget extends StatelessWidget {
           children: [
             Column(
               children: [
-                SizedBox(height: 50 * scale),
+                SizedBox(height: 30 * scale),
                 ExpDisplay(
                   level: level,
                   currentExp: currentExp,

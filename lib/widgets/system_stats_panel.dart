@@ -356,7 +356,7 @@ class _SystemStatsPanelState extends State<SystemStatsPanel> {
         final bottomRowY = boxSize + spacing;
 
         // Horizontal spacing for top row (3 items) - larger separation
-        final topRowSpacing = boxSize + spacing * 4;
+        final topRowSpacing = boxSize + spacing * 2;
 
         return SizedBox(
           width: constraints.maxWidth,
