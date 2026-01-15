@@ -170,7 +170,7 @@ class _AccessibilityDialogState extends State<AccessibilityDialog> {
                         l10n.accessibilityDialogTitle,
                         style: TextStyle(
                           color: _colors.accent,
-                          fontSize: 20,
+                          fontSize: AppConstants.fontSizeDialogTitle,
                           fontWeight: FontWeight.w500,
                         ),
                         overflow: TextOverflow.ellipsis,
@@ -188,7 +188,7 @@ class _AccessibilityDialogState extends State<AccessibilityDialog> {
                 const SizedBox(height: 16),
                 Text(
                   l10n.accessibilityDialogInstructions,
-                  style: TextStyle(color: _colors.secondaryText, fontSize: 12),
+                  style: TextStyle(color: _colors.secondaryText, fontSize: AppConstants.fontSizeDialogHint),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 24),

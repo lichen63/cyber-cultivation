@@ -58,7 +58,7 @@ class ExpDisplay extends StatelessWidget {
             'Lv. $level',
             style: TextStyle(
               color: themeColors.primaryText,
-              fontSize: 12 * scale,
+              fontSize: AppConstants.fontSizeLevel * scale,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -90,7 +90,7 @@ class ExpDisplay extends StatelessWidget {
                   expText,
                   style: TextStyle(
                     color: themeColors.expBarText,
-                    fontSize: 12 * scale,
+                    fontSize: AppConstants.fontSizeExpProgress * scale,
                     fontWeight: FontWeight.bold,
                     shadows: [
                       Shadow(

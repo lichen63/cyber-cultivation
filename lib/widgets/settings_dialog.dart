@@ -137,7 +137,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
       children: [
         Text(
           l10n.themeMode,
-          style: TextStyle(color: _colors.primaryText, fontSize: 16),
+          style: TextStyle(color: _colors.primaryText, fontSize: AppConstants.fontSizeLarge),
         ),
         ToggleButtons(
           isSelected: [
@@ -171,7 +171,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
       children: [
         Text(
           l10n.language,
-          style: TextStyle(color: _colors.primaryText, fontSize: 16),
+          style: TextStyle(color: _colors.primaryText, fontSize: AppConstants.fontSizeLarge),
         ),
         DropdownButton<String?>(
           value: _currentLanguage,
@@ -204,7 +204,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
       children: [
         Text(
           title,
-          style: TextStyle(color: _colors.primaryText, fontSize: 16),
+          style: TextStyle(color: _colors.primaryText, fontSize: AppConstants.fontSizeLarge),
         ),
         Switch(
           value: value,

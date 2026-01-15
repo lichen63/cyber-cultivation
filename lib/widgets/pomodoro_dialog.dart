@@ -125,7 +125,7 @@ class _PomodoroDialogState extends State<PomodoroDialog> {
                       style: TextStyle(
                         color: _colors.accentSecondary,
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontSize: AppConstants.fontSizeLarge,
                       ),
                     );
                   },

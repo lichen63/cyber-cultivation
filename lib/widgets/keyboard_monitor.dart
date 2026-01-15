@@ -34,7 +34,7 @@ class KeyboardMonitor extends StatelessWidget {
           currentKey,
           style: TextStyle(
             color: themeColors.primaryText,
-            fontSize: 14,
+            fontSize: AppConstants.fontSizeMedium,
             fontWeight: FontWeight.bold,
           ),
           textAlign: TextAlign.center,

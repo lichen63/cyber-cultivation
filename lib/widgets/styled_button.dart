@@ -36,7 +36,7 @@ class StyledButton extends StatelessWidget {
           text,
           style: TextStyle(
             color: themeColors.primaryText,
-            fontSize: 14 * scale,
+            fontSize: AppConstants.fontSizeButton * scale,
             fontWeight: FontWeight.bold,
           ),
         ),

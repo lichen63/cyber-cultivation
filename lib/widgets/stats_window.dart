@@ -90,7 +90,7 @@ class _StatsWindowState extends State<StatsWindow> {
                       AppLocalizations.of(context)!.statsTodaysActivity,
                       style: TextStyle(
                         color: _colors.primaryText,
-                        fontSize: 18,
+                        fontSize: AppConstants.fontSizeXLarge,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -101,7 +101,7 @@ class _StatsWindowState extends State<StatsWindow> {
                       AppLocalizations.of(context)!.statsHistoryTrends,
                       style: TextStyle(
                         color: _colors.primaryText,
-                        fontSize: 18,
+                        fontSize: AppConstants.fontSizeXLarge,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -136,7 +136,7 @@ class _StatsWindowState extends State<StatsWindow> {
             AppLocalizations.of(context)!.statsTitle,
             style: TextStyle(
               color: _colors.primaryText,
-              fontSize: 20,
+              fontSize: AppConstants.fontSizeDialogTitle,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -202,7 +202,7 @@ class _StatsWindowState extends State<StatsWindow> {
                   value,
                   style: TextStyle(
                     color: _colors.primaryText,
-                    fontSize: 24,
+                    fontSize: 28,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -213,7 +213,7 @@ class _StatsWindowState extends State<StatsWindow> {
             fit: BoxFit.scaleDown,
             child: Text(
               title,
-              style: TextStyle(color: _colors.secondaryText, fontSize: 13),
+              style: TextStyle(color: _colors.secondaryText, fontSize: AppConstants.fontSizeSmall),
             ),
           ),
         ],
@@ -370,7 +370,7 @@ class _StatsWindowState extends State<StatsWindow> {
                           DateFormat('MM/dd').format(date),
                           style: TextStyle(
                             color: _colors.secondaryText,
-                            fontSize: 10,
+                            fontSize: 12,
                           ),
                         ),
                       );
@@ -391,7 +391,7 @@ class _StatsWindowState extends State<StatsWindow> {
                         '${_formatNumber(value)}$suffix',
                         style: TextStyle(
                           color: _colors.secondaryText,
-                          fontSize: 10,
+                          fontSize: 12,
                         ),
                       ),
                     );
