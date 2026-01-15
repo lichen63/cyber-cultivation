@@ -157,43 +157,43 @@ class AppConstants {
   static const double borderRadius = 20.0;
   static const double smallBorderRadius = 10.0;
   static const double defaultPadding = 30.0;
-  static const double buttonPaddingHorizontal = 20.0;
-  static const double buttonPaddingVertical = 8.0;
-  static const double monitorWidgetSize = 100.0;
-  static const double mouseDotSize = 14.0;
-  static const double systemStatBoxSize = 90.0;
-  static const double systemStatSpacing = 8.0;
+  static const double buttonPaddingHorizontal = 24.0;
+  static const double buttonPaddingVertical = 10.0;
+  static const double monitorWidgetSize = 120.0;
+  static const double mouseDotSize = 16.0;
+  static const double systemStatBoxSize = 110.0;
+  static const double systemStatSpacing = 10.0;
 
   // EXP Bar Dimensions
-  static const double expBarHeight = 28.0;
-  static const double expBarWidth = 240.0;
-  static const double expBarBorderRadius = 12.0;
-  static const double expBarPaddingHorizontal = 10.0;
-  static const double expBarSpacing = 10.0;
+  static const double expBarHeight = 34.0;
+  static const double expBarWidth = 280.0;
+  static const double expBarBorderRadius = 14.0;
+  static const double expBarPaddingHorizontal = 12.0;
+  static const double expBarSpacing = 12.0;
 
   // Animation Durations
   static const int mouseClickBlinkDurationMs = 100;
 
   // Font Sizes (base values before scaling)
-  static const double fontSizeSmall = 14.0;
-  static const double fontSizeMedium = 17.0;
-  static const double fontSizeLarge = 20.0;
-  static const double fontSizeXLarge = 24.0;
-  static const double fontSizeDialogTitle = 24.0;
-  static const double fontSizeDialogContent = 17.0;
-  static const double fontSizeDialogHint = 15.0;
-  static const double fontSizeLevel = 15.0;
-  static const double fontSizeExpProgress = 15.0;
-  static const double fontSizeStatLabel = 15.0;
-  static const double fontSizeStatValue = 17.0;
-  static const double fontSizeNetworkStat = 14.0;
-  static const double fontSizeButton = 17.0;
+  static const double fontSizeSmall = 24.0;
+  static const double fontSizeMedium = 28.0;
+  static const double fontSizeLarge = 32.0;
+  static const double fontSizeXLarge = 38.0;
+  static const double fontSizeDialogTitle = 38.0;
+  static const double fontSizeDialogContent = 28.0;
+  static const double fontSizeDialogHint = 26.0;
+  static const double fontSizeLevel = 26.0;
+  static const double fontSizeExpProgress = 26.0;
+  static const double fontSizeStatLabel = 26.0;
+  static const double fontSizeStatValue = 28.0;
+  static const double fontSizeNetworkStat = 24.0;
+  static const double fontSizeButton = 28.0;
 
   // Colors (non-themed)
   static const Color transparentColor = Colors.transparent;
   static const Color pomodoroFocusColor = Colors.redAccent;
   static const Color pomodoroRelaxColor = Colors.greenAccent;
-  static const double pomodoroTimeFontSizeRatio = 0.26;
+  static const double pomodoroTimeFontSizeRatio = 0.38;
 
   // Assets
   static const String characterImagePath = 'assets/images/character_2.png';
@@ -227,21 +227,21 @@ class GameConstants {
   // Header
   static const double gamesDialogHeaderPaddingH = 16.0;
   static const double gamesDialogHeaderPaddingV = 12.0;
-  static const double gamesHeaderIconSize = 24.0;
-  static const double gamesHeaderIconSpacing = 8.0;
-  static const double gamesHeaderFontSize = 24.0;
+  static const double gamesHeaderIconSize = 38.0;
+  static const double gamesHeaderIconSpacing = 14.0;
+  static const double gamesHeaderFontSize = 38.0;
 
   // Games list
   static const double gamesListPadding = 16.0;
   static const double gameCardBorderRadius = 12.0;
   static const double gameCardPadding = 16.0;
-  static const double gameIconContainerSize = 48.0;
-  static const double gameIconContainerRadius = 12.0;
-  static const double gameIconSize = 28.0;
+  static const double gameIconContainerSize = 68.0;
+  static const double gameIconContainerRadius = 18.0;
+  static const double gameIconSize = 40.0;
   static const double gameCardContentSpacing = 16.0;
-  static const double gameTitleFontSize = 20.0;
+  static const double gameTitleFontSize = 32.0;
   static const double gameTitleSpacing = 4.0;
-  static const double gameDescFontSize = 16.0;
+  static const double gameDescFontSize = 26.0;
 }
 
 /// Constants for snake game
@@ -270,18 +270,18 @@ class SnakeGameConstants {
   // Header
   static const double gameHeaderPaddingH = 16.0;
   static const double gameHeaderPaddingV = 12.0;
-  static const double gameHeaderIconSize = 24.0;
-  static const double gameHeaderIconSpacing = 8.0;
-  static const double gameHeaderFontSize = 24.0;
-  static const double headerButtonSpacing = 8.0;
+  static const double gameHeaderIconSize = 38.0;
+  static const double gameHeaderIconSpacing = 14.0;
+  static const double gameHeaderFontSize = 38.0;
+  static const double headerButtonSpacing = 14.0;
 
   // Score display
-  static const double scorePaddingH = 12.0;
-  static const double scorePaddingV = 6.0;
-  static const double scoreBorderRadius = 20.0;
-  static const double scoreIconSize = 16.0;
-  static const double scoreIconSpacing = 4.0;
-  static const double scoreFontSize = 17.0;
+  static const double scorePaddingH = 18.0;
+  static const double scorePaddingV = 12.0;
+  static const double scoreBorderRadius = 26.0;
+  static const double scoreIconSize = 28.0;
+  static const double scoreIconSpacing = 10.0;
+  static const double scoreFontSize = 28.0;
 
   // Game area
   static const double gameAreaPadding = 16.0;
@@ -299,21 +299,21 @@ class SnakeGameConstants {
   static const Color foodColor = Color(0xFFFF5722);
 
   // Overlay UI
-  static const double overlayIconSize = 64.0;
-  static const double overlaySpacing = 16.0;
-  static const double overlaySmallSpacing = 8.0;
-  static const double overlayLargeSpacing = 24.0;
-  static const double overlayTitleFontSize = 34.0;
-  static const double overlaySubtitleFontSize = 20.0;
-  static const double overlayHintFontSize = 17.0;
+  static const double overlayIconSize = 88.0;
+  static const double overlaySpacing = 22.0;
+  static const double overlaySmallSpacing = 14.0;
+  static const double overlayLargeSpacing = 36.0;
+  static const double overlayTitleFontSize = 56.0;
+  static const double overlaySubtitleFontSize = 32.0;
+  static const double overlayHintFontSize = 28.0;
 
   // Game over
-  static const double gameOverTitleFontSize = 38.0;
-  static const double gameOverScoreFontSize = 24.0;
-  static const double gameOverExpFontSize = 22.0;
+  static const double gameOverTitleFontSize = 60.0;
+  static const double gameOverScoreFontSize = 38.0;
+  static const double gameOverExpFontSize = 36.0;
 
   // Button
-  static const double buttonPaddingH = 24.0;
-  static const double buttonPaddingV = 12.0;
-  static const double buttonBorderRadius = 25.0;
+  static const double buttonPaddingH = 36.0;
+  static const double buttonPaddingV = 18.0;
+  static const double buttonBorderRadius = 32.0;
 }

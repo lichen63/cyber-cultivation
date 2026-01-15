@@ -202,7 +202,7 @@ class _StatsWindowState extends State<StatsWindow> {
                   value,
                   style: TextStyle(
                     color: _colors.primaryText,
-                    fontSize: 28,
+                    fontSize: 48,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -370,7 +370,7 @@ class _StatsWindowState extends State<StatsWindow> {
                           DateFormat('MM/dd').format(date),
                           style: TextStyle(
                             color: _colors.secondaryText,
-                            fontSize: 12,
+                            fontSize: 18,
                           ),
                         ),
                       );
@@ -391,7 +391,7 @@ class _StatsWindowState extends State<StatsWindow> {
                         '${_formatNumber(value)}$suffix',
                         style: TextStyle(
                           color: _colors.secondaryText,
-                          fontSize: 12,
+                          fontSize: 18,
                         ),
                       ),
                     );

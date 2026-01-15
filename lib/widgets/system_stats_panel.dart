@@ -141,7 +141,7 @@ class SystemStatBox extends StatelessWidget {
                   borderRadius: BorderRadius.circular(2 * scale),
                   child: LinearProgressIndicator(
                     value: progress!.clamp(0.0, 1.0),
-                    backgroundColor: themeColors.expBarBackground,
+                    backgroundColor: themeColors.border.withValues(alpha: 0.9),
                     valueColor: AlwaysStoppedAnimation<Color>(
                       _getProgressColor(progress!),
                     ),
@@ -356,7 +356,7 @@ class _SystemStatsPanelState extends State<SystemStatsPanel> {
         final bottomRowY = boxSize + spacing;
 
         // Horizontal spacing for top row (3 items) - larger separation
-        final topRowSpacing = boxSize + spacing * 11;
+        final topRowSpacing = boxSize + spacing * 4;
 
         return SizedBox(
           width: constraints.maxWidth,

@@ -93,7 +93,7 @@ class GameAreaWidget extends StatelessWidget {
 
   Widget _buildKeyboardMonitor(double scale) {
     return Positioned(
-      top: 320 * scale,
+      top: 360 * scale,
       left: 0,
       child: KeyboardMonitor(
         currentKey: currentKey,
@@ -105,7 +105,7 @@ class GameAreaWidget extends StatelessWidget {
 
   Widget _buildMouseMonitor(double scale) {
     return Positioned(
-      top: 320 * scale,
+      top: 360 * scale,
       right: 0,
       child: MouseMonitor(
         mouseX: mouseX,

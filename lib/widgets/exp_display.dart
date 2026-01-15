@@ -60,6 +60,7 @@ class ExpDisplay extends StatelessWidget {
               color: themeColors.primaryText,
               fontSize: AppConstants.fontSizeLevel * scale,
               fontWeight: FontWeight.bold,
+              height: 1.0,
             ),
           ),
         ),
@@ -92,6 +93,7 @@ class ExpDisplay extends StatelessWidget {
                     color: themeColors.expBarText,
                     fontSize: AppConstants.fontSizeExpProgress * scale,
                     fontWeight: FontWeight.bold,
+                    height: 1.0,
                     shadows: [
                       Shadow(
                         blurRadius: 3,
