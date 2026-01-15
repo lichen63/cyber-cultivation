@@ -46,12 +46,12 @@ class ExpDisplay extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
-          height: 23 * scale,
-          padding: EdgeInsets.symmetric(horizontal: 8 * scale),
+          height: AppConstants.expBarHeight * scale,
+          padding: EdgeInsets.symmetric(horizontal: AppConstants.expBarPaddingHorizontal * scale),
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: themeColors.expBarBackground,
-            borderRadius: BorderRadius.circular(10 * scale),
+            borderRadius: BorderRadius.circular(AppConstants.expBarBorderRadius * scale),
             border: Border.all(color: themeColors.border, width: 1),
           ),
           child: Text(
@@ -63,26 +63,26 @@ class ExpDisplay extends StatelessWidget {
             ),
           ),
         ),
-        SizedBox(width: 8 * scale),
+        SizedBox(width: AppConstants.expBarSpacing * scale),
         Container(
-          width: 200 * scale,
-          height: 23 * scale,
+          width: AppConstants.expBarWidth * scale,
+          height: AppConstants.expBarHeight * scale,
           decoration: BoxDecoration(
             border: Border.all(color: themeColors.border, width: 1),
-            borderRadius: BorderRadius.circular(10 * scale),
+            borderRadius: BorderRadius.circular(AppConstants.expBarBorderRadius * scale),
             color: themeColors.expBarBackground,
           ),
           child: Stack(
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.circular(9 * scale),
+                borderRadius: BorderRadius.circular((AppConstants.expBarBorderRadius - 1) * scale),
                 child: LinearProgressIndicator(
                   value: progress,
                   backgroundColor: Colors.transparent,
                   valueColor: AlwaysStoppedAnimation<Color>(
                     themeColors.progressBarFill,
                   ),
-                  minHeight: 23 * scale,
+                  minHeight: AppConstants.expBarHeight * scale,
                 ),
               ),
               Center(

@@ -49,7 +49,7 @@ class GameAreaWidget extends StatelessWidget {
           children: [
             Column(
               children: [
-                SizedBox(height: 10 * scale),
+                SizedBox(height: 50 * scale),
                 ExpDisplay(
                   level: level,
                   currentExp: currentExp,
@@ -93,7 +93,7 @@ class GameAreaWidget extends StatelessWidget {
 
   Widget _buildKeyboardMonitor(double scale) {
     return Positioned(
-      top: 260 * scale,
+      top: 320 * scale,
       left: 0,
       child: KeyboardMonitor(
         currentKey: currentKey,
@@ -105,7 +105,7 @@ class GameAreaWidget extends StatelessWidget {
 
   Widget _buildMouseMonitor(double scale) {
     return Positioned(
-      top: 260 * scale,
+      top: 320 * scale,
       right: 0,
       child: MouseMonitor(
         mouseX: mouseX,

@@ -157,12 +157,19 @@ class AppConstants {
   static const double borderRadius = 20.0;
   static const double smallBorderRadius = 10.0;
   static const double defaultPadding = 30.0;
-  static const double buttonPaddingHorizontal = 16.0;
-  static const double buttonPaddingVertical = 4.0;
-  static const double monitorWidgetSize = 80.0;
-  static const double mouseDotSize = 10.0;
-  static const double systemStatBoxSize = 70.0;
-  static const double systemStatSpacing = 6.0;
+  static const double buttonPaddingHorizontal = 20.0;
+  static const double buttonPaddingVertical = 8.0;
+  static const double monitorWidgetSize = 100.0;
+  static const double mouseDotSize = 14.0;
+  static const double systemStatBoxSize = 90.0;
+  static const double systemStatSpacing = 8.0;
+
+  // EXP Bar Dimensions
+  static const double expBarHeight = 28.0;
+  static const double expBarWidth = 240.0;
+  static const double expBarBorderRadius = 12.0;
+  static const double expBarPaddingHorizontal = 10.0;
+  static const double expBarSpacing = 10.0;
 
   // Animation Durations
   static const int mouseClickBlinkDurationMs = 100;
