@@ -220,11 +220,11 @@ class AppConstants {
 /// Constants for games list dialog
 class GameConstants {
   // Dialog dimensions
-  static const double gamesDialogMaxWidth = 500.0;
-  static const double gamesDialogMaxHeight = 400.0;
-  static const double gamesDialogWidthRatio = 0.9;
-  static const double gamesDialogHeightRatio = 0.7;
-  static const double gamesDialogInsetPadding = 20.0;
+  static const double gamesDialogMaxWidth = 800.0;
+  static const double gamesDialogMaxHeight = 700.0;
+  static const double gamesDialogWidthRatio = 0.98;
+  static const double gamesDialogHeightRatio = 0.9;
+  static const double gamesDialogInsetPadding = 8.0;
   static const double gamesDialogBorderRadius = 16.0;
   static const double gamesDialogShadowBlur = 20.0;
   static const double gamesDialogShadowSpread = 5.0;
@@ -263,11 +263,11 @@ class SnakeGameConstants {
   static const double swipeThreshold = 20.0;
 
   // Dialog dimensions
-  static const double gameDialogMaxWidth = 500.0;
-  static const double gameDialogMaxHeight = 600.0;
-  static const double gameDialogWidthRatio = 0.95;
-  static const double gameDialogHeightRatio = 0.85;
-  static const double gameDialogInsetPadding = 20.0;
+  static const double gameDialogMaxWidth = 800.0;
+  static const double gameDialogMaxHeight = 900.0;
+  static const double gameDialogWidthRatio = 0.98;
+  static const double gameDialogHeightRatio = 0.98;
+  static const double gameDialogInsetPadding = 8.0;
   static const double gameDialogBorderRadius = 16.0;
   static const double gameDialogShadowBlur = 20.0;
   static const double gameDialogShadowSpread = 5.0;
