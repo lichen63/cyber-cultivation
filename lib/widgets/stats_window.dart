@@ -90,7 +90,7 @@ class _StatsWindowState extends State<StatsWindow> {
                       AppLocalizations.of(context)!.statsTodaysActivity,
                       style: TextStyle(
                         color: _colors.primaryText,
-                        fontSize: AppConstants.fontSizeXLarge,
+                        fontSize: AppConstants.fontSizeDialogTitle,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -101,7 +101,7 @@ class _StatsWindowState extends State<StatsWindow> {
                       AppLocalizations.of(context)!.statsHistoryTrends,
                       style: TextStyle(
                         color: _colors.primaryText,
-                        fontSize: AppConstants.fontSizeXLarge,
+                        fontSize: AppConstants.fontSizeDialogTitle,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -202,7 +202,7 @@ class _StatsWindowState extends State<StatsWindow> {
                   value,
                   style: TextStyle(
                     color: _colors.primaryText,
-                    fontSize: 48,
+                    fontSize: AppConstants.fontSizeDialogStatValue,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -213,7 +213,7 @@ class _StatsWindowState extends State<StatsWindow> {
             fit: BoxFit.scaleDown,
             child: Text(
               title,
-              style: TextStyle(color: _colors.secondaryText, fontSize: AppConstants.fontSizeSmall),
+              style: TextStyle(color: _colors.secondaryText, fontSize: AppConstants.fontSizeDialogStatLabel),
             ),
           ),
         ],
@@ -370,7 +370,7 @@ class _StatsWindowState extends State<StatsWindow> {
                           DateFormat('MM/dd').format(date),
                           style: TextStyle(
                             color: _colors.secondaryText,
-                            fontSize: 18,
+                            fontSize: AppConstants.fontSizeDialogHint,
                           ),
                         ),
                       );
@@ -391,7 +391,7 @@ class _StatsWindowState extends State<StatsWindow> {
                         '${_formatNumber(value)}$suffix',
                         style: TextStyle(
                           color: _colors.secondaryText,
-                          fontSize: 18,
+                          fontSize: AppConstants.fontSizeDialogHint,
                         ),
                       ),
                     );

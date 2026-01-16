@@ -262,6 +262,7 @@ class _MyHomePageState extends State<MyHomePage>
   // Stats
   DailyStats _todayStats = DailyStats();
   Map<String, DailyStats> _dailyStatsMap = {};
+  String _currentDateKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
   // Services
   final GameDataService _gameDataService = GameDataService();
@@ -378,6 +379,7 @@ class _MyHomePageState extends State<MyHomePage>
 
       _dailyStatsMap = Map.of(data.dailyStats);
       final todayKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      _currentDateKey = todayKey;
       _todayStats = _dailyStatsMap[todayKey] ?? DailyStats();
       _dailyStatsMap[todayKey] = _todayStats;
 
@@ -461,6 +463,18 @@ class _MyHomePageState extends State<MyHomePage>
     double moveDistance = 0,
   }) {
     if (!mounted) return;
+    
+    // Check if date has changed (midnight crossed)
+    final todayKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    if (todayKey != _currentDateKey) {
+      // Save yesterday's stats and start fresh for today
+      _dailyStatsMap[_currentDateKey] = _todayStats;
+      _currentDateKey = todayKey;
+      _todayStats = _dailyStatsMap[todayKey] ?? DailyStats();
+      _dailyStatsMap[todayKey] = _todayStats;
+      _saveGameData(immediate: true);
+    }
+    
     setState(() {
       _todayStats.keyboardCount += keyboardCount;
       _todayStats.mouseClickCount += clickCount;
