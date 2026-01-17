@@ -30,7 +30,7 @@ class SnakeGameWindow extends StatefulWidget {
 }
 
 class _SnakeGameWindowState extends State<SnakeGameWindow>
-    with GameKeyboardMixin {
+    with GameKeyboardMixin, GameRestartCooldownMixin {
   // Game state
   SnakeGameState _gameState = SnakeGameState.waiting;
   List<Point<int>> _snake = [];
@@ -165,6 +165,9 @@ class _SnakeGameWindowState extends State<SnakeGameWindow>
     _gameTimer?.cancel();
     _gameState = SnakeGameState.gameOver;
 
+    // Prevent accidental restart by adding cooldown
+    startRestartCooldown();
+
     // Notify parent about exp gained
     if (_expGained > 0) {
       widget.onExpGained(_expGained);
@@ -195,12 +198,18 @@ class _SnakeGameWindowState extends State<SnakeGameWindow>
     if (handleCommonKeyEvent(event)) return;
     if (event is! KeyDownEvent) return;
 
-    if (_gameState == SnakeGameState.waiting ||
-        _gameState == SnakeGameState.gameOver) {
+    if (_gameState == SnakeGameState.waiting) {
       if (event.logicalKey == LogicalKeyboardKey.space) {
         _startGame();
         return;
       }
+    }
+
+    if (_gameState == SnakeGameState.gameOver) {
+      if (event.logicalKey == LogicalKeyboardKey.space) {
+        tryRestart(_startGame);
+      }
+      return;
     }
 
     switch (event.logicalKey) {

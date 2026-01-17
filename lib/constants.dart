@@ -325,13 +325,13 @@ class SnakeGameConstants {
 
 /// Constants for Flappy Bird game
 class FlappyBirdConstants {
-  // Game area
-  static const double gameWidth = 500.0;
+  // Game area (square)
+  static const double gameWidth = 700.0;
   static const double gameHeight = 700.0;
 
   // Bird
   static const double birdSize = 30.0;
-  static const double birdX = 100.0;
+  static const double birdX = 120.0;
   static const double birdStartY = 350.0;
   static const double birdJumpVelocity = -7.0;
   static const double gravity = 0.35;
@@ -349,9 +349,9 @@ class FlappyBirdConstants {
   static const int scorePerPipe = 1;
   static const int expPerScore = 2;
 
-  // Dialog dimensions
-  static const double gameDialogMaxWidth = 500.0;
-  static const double gameDialogMaxHeight = 750.0;
+  // Dialog dimensions (square)
+  static const double gameDialogMaxWidth = 750.0;
+  static const double gameDialogMaxHeight = 800.0;
   static const double gameDialogWidthRatio = 0.95;
   static const double gameDialogHeightRatio = 0.95;
   static const double gameDialogInsetPadding = 8.0;

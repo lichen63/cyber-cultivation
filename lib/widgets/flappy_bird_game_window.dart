@@ -36,7 +36,7 @@ class FlappyBirdGameWindow extends StatefulWidget {
 }
 
 class _FlappyBirdGameWindowState extends State<FlappyBirdGameWindow>
-    with GameKeyboardMixin {
+    with GameKeyboardMixin, GameRestartCooldownMixin {
   // Game state
   FlappyBirdGameState _gameState = FlappyBirdGameState.waiting;
   double _birdY = FlappyBirdConstants.birdStartY;
@@ -194,6 +194,9 @@ class _FlappyBirdGameWindowState extends State<FlappyBirdGameWindow>
     _pipeSpawnTimer?.cancel();
     _gameState = FlappyBirdGameState.gameOver;
 
+    // Prevent accidental restart by adding cooldown
+    startRestartCooldown();
+
     // Notify parent about exp gained
     if (_expGained > 0) {
       widget.onExpGained(_expGained);
@@ -201,9 +204,13 @@ class _FlappyBirdGameWindowState extends State<FlappyBirdGameWindow>
   }
 
   void _flap() {
-    if (_gameState == FlappyBirdGameState.waiting ||
-        _gameState == FlappyBirdGameState.gameOver) {
+    if (_gameState == FlappyBirdGameState.waiting) {
       _startGame();
+      return;
+    }
+
+    if (_gameState == FlappyBirdGameState.gameOver) {
+      tryRestart(_startGame);
       return;
     }
 

@@ -18,6 +18,46 @@ mixin GameKeyboardMixin<T extends StatefulWidget> on State<T> {
   }
 }
 
+/// Mixin for restart cooldown logic to prevent accidental restart
+/// Add this to any game window state to get restart cooldown support
+mixin GameRestartCooldownMixin<T extends StatefulWidget> on State<T> {
+  /// Cooldown duration in milliseconds
+  static const int restartCooldownMs = 1000;
+
+  /// Whether restart is currently allowed
+  bool _canRestart = true;
+
+  /// Check if restart is allowed
+  bool get canRestart => _canRestart;
+
+  /// Start the cooldown timer (call this when game ends)
+  void startRestartCooldown() {
+    _canRestart = false;
+    Future.delayed(const Duration(milliseconds: restartCooldownMs), () {
+      if (mounted) {
+        setState(() {
+          _canRestart = true;
+        });
+      }
+    });
+  }
+
+  /// Reset the cooldown (call this when initializing game)
+  void resetRestartCooldown() {
+    _canRestart = true;
+  }
+
+  /// Try to restart the game if cooldown has passed
+  /// Returns true if restart was allowed, false otherwise
+  bool tryRestart(VoidCallback startGame) {
+    if (_canRestart) {
+      startGame();
+      return true;
+    }
+    return false;
+  }
+}
+
 /// Common overlay constants for all games
 class GameOverlayConstants {
   static const double iconSize = 40.0;
