@@ -326,23 +326,23 @@ class SnakeGameConstants {
 /// Constants for Flappy Bird game
 class FlappyBirdConstants {
   // Game area
-  static const double gameWidth = 400.0;
-  static const double gameHeight = 600.0;
+  static const double gameWidth = 500.0;
+  static const double gameHeight = 700.0;
 
   // Bird
   static const double birdSize = 30.0;
-  static const double birdX = 80.0;
-  static const double birdStartY = 250.0;
-  static const double birdJumpVelocity = -8.0;
-  static const double gravity = 0.5;
-  static const double maxFallVelocity = 12.0;
+  static const double birdX = 100.0;
+  static const double birdStartY = 350.0;
+  static const double birdJumpVelocity = -7.0;
+  static const double gravity = 0.35;
+  static const double maxFallVelocity = 10.0;
 
   // Pipes
   static const double pipeWidth = 50.0;
-  static const double pipeGap = 150.0;
-  static const double pipeSpeed = 3.0;
-  static const double pipeSpawnInterval = 1500.0; // ms
-  static const double minPipeHeight = 50.0;
+  static const double pipeGap = 180.0;
+  static const double pipeSpeed = 2.5;
+  static const double pipeSpawnInterval = 2000.0; // ms
+  static const double minPipeHeight = 60.0;
 
   // Game mechanics
   static const int gameTickMs = 16; // ~60 FPS

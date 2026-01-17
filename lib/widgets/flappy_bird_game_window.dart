@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 
 import '../constants.dart';
 import '../l10n/app_localizations.dart';
+import 'base_game_window.dart';
 
 /// State of the flappy bird game
 enum FlappyBirdGameState { waiting, playing, gameOver }
@@ -34,7 +35,8 @@ class FlappyBirdGameWindow extends StatefulWidget {
   State<FlappyBirdGameWindow> createState() => _FlappyBirdGameWindowState();
 }
 
-class _FlappyBirdGameWindowState extends State<FlappyBirdGameWindow> {
+class _FlappyBirdGameWindowState extends State<FlappyBirdGameWindow>
+    with GameKeyboardMixin {
   // Game state
   FlappyBirdGameState _gameState = FlappyBirdGameState.waiting;
   double _birdY = FlappyBirdConstants.birdStartY;
@@ -213,6 +215,8 @@ class _FlappyBirdGameWindowState extends State<FlappyBirdGameWindow> {
   }
 
   void _handleKeyEvent(KeyEvent event) {
+    // Handle common keys (ESC to close)
+    if (handleCommonKeyEvent(event)) return;
     if (event is! KeyDownEvent) return;
 
     if (event.logicalKey == LogicalKeyboardKey.space) {
@@ -416,126 +420,28 @@ class _FlappyBirdGameWindowState extends State<FlappyBirdGameWindow> {
   }
 
   Widget _buildStartOverlay(AppLocalizations l10n) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(
-          FlappyBirdConstants.gameBorderRadius,
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.flutter_dash,
-                  color: FlappyBirdConstants.birdColor,
-                  size: FlappyBirdConstants.overlayIconSize,
-                ),
-                const SizedBox(height: FlappyBirdConstants.overlaySpacing),
-                Text(
-                  l10n.flappyBirdTitle,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: FlappyBirdConstants.overlayTitleFontSize,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: FlappyBirdConstants.overlaySpacing),
-                Text(
-                  l10n.gamePressToStart,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.8),
-                    fontSize: FlappyBirdConstants.overlaySubtitleFontSize,
-                  ),
-                ),
-                const SizedBox(height: FlappyBirdConstants.overlaySmallSpacing),
-                Text(
-                  l10n.flappyBirdTapToFlap,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.6),
-                    fontSize: FlappyBirdConstants.overlayHintFontSize,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+    return GameOverlayBuilder.buildStartOverlay(
+      title: l10n.flappyBirdTitle,
+      pressToStartText: l10n.gamePressToStart,
+      controlHintText: l10n.flappyBirdTapToFlap,
+      icon: Icons.flutter_dash,
+      iconColor: FlappyBirdConstants.birdColor,
+      borderRadius: FlappyBirdConstants.gameBorderRadius,
     );
   }
 
   Widget _buildGameOverOverlay(AppLocalizations l10n) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.7),
-        borderRadius: BorderRadius.circular(
-          FlappyBirdConstants.gameBorderRadius,
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  l10n.gameOver,
-                  style: TextStyle(
-                    color: _colors.error,
-                    fontSize: FlappyBirdConstants.gameOverTitleFontSize,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: FlappyBirdConstants.overlaySpacing),
-                Text(
-                  '${l10n.gameScore}: $_score',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: FlappyBirdConstants.gameOverScoreFontSize,
-                  ),
-                ),
-                const SizedBox(height: FlappyBirdConstants.overlaySmallSpacing),
-                Text(
-                  l10n.gameExpGained(_expGained),
-                  style: TextStyle(
-                    color: _colors.accent,
-                    fontSize: FlappyBirdConstants.gameOverExpFontSize,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: FlappyBirdConstants.overlayLargeSpacing),
-                ElevatedButton.icon(
-                  onPressed: _startGame,
-                  icon: const Icon(Icons.replay),
-                  label: Text(l10n.gamePlayAgain),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: FlappyBirdConstants.birdColor,
-                    foregroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: FlappyBirdConstants.buttonPaddingH,
-                      vertical: FlappyBirdConstants.buttonPaddingV,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                        FlappyBirdConstants.buttonBorderRadius,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+    return GameOverlayBuilder.buildGameOverOverlay(
+      gameOverText: l10n.gameOver,
+      scoreText: '${l10n.gameScore}: $_score',
+      expGainedText: l10n.gameExpGained(_expGained),
+      playAgainText: l10n.gamePlayAgain,
+      onPlayAgain: _startGame,
+      errorColor: _colors.error,
+      accentColor: _colors.accent,
+      buttonColor: FlappyBirdConstants.birdColor,
+      buttonTextColor: Colors.black,
+      borderRadius: FlappyBirdConstants.gameBorderRadius,
     );
   }
 }
