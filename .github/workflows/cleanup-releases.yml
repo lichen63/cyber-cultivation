@@ -4,6 +4,11 @@ on:
   # Run after a new release is published
   release:
     types: [published]
+  # Run after Build macOS DMG workflow completes
+  workflow_run:
+    workflows: ["Build macOS DMG"]
+    types:
+      - completed
   # Also allow manual trigger
   workflow_dispatch:
 
