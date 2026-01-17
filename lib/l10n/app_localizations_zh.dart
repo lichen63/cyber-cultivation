@@ -199,4 +199,41 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get flappyBirdTapToFlap => '点击或按空格键来拍打翅膀';
+
+  @override
+  String get sudokuTitle => '数独';
+
+  @override
+  String get sudokuDescription => '经典数字谜题。填满格子来获得经验值！';
+
+  @override
+  String get sudokuSelectNumber => '点击下方数字或使用按键 1-9';
+
+  @override
+  String get sudokuNewGame => '新游戏';
+
+  @override
+  String get sudokuEasy => '简单';
+
+  @override
+  String get sudokuMedium => '中等';
+
+  @override
+  String get sudokuHard => '困难';
+
+  @override
+  String sudokuMistakes(int count, int max) {
+    return '错误: $count/$max';
+  }
+
+  @override
+  String get sudokuCompleted => '恭喜完成！';
+
+  @override
+  String get sudokuTooManyMistakes => '错误次数过多！';
+
+  @override
+  String sudokuTime(String time) {
+    return '用时: $time';
+  }
 }

@@ -203,4 +203,42 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get flappyBirdTapToFlap => 'Tap or press SPACE to flap';
+
+  @override
+  String get sudokuTitle => 'Sudoku';
+
+  @override
+  String get sudokuDescription =>
+      'Classic number puzzle. Fill the grid and earn EXP!';
+
+  @override
+  String get sudokuSelectNumber => 'Select a number below or use keys 1-9';
+
+  @override
+  String get sudokuNewGame => 'New Game';
+
+  @override
+  String get sudokuEasy => 'Easy';
+
+  @override
+  String get sudokuMedium => 'Medium';
+
+  @override
+  String get sudokuHard => 'Hard';
+
+  @override
+  String sudokuMistakes(int count, int max) {
+    return 'Mistakes: $count/$max';
+  }
+
+  @override
+  String get sudokuCompleted => 'Puzzle Completed!';
+
+  @override
+  String get sudokuTooManyMistakes => 'Too Many Mistakes!';
+
+  @override
+  String sudokuTime(String time) {
+    return 'Time: $time';
+  }
 }

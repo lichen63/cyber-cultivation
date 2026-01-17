@@ -408,3 +408,69 @@ class FlappyBirdConstants {
   static const double buttonPaddingV = 8.0;
   static const double buttonBorderRadius = 12.0;
 }
+
+/// Constants for Sudoku game
+class SudokuConstants {
+  // Grid
+  static const int gridSize = 9;
+  static const int boxSize = 3;
+
+  // Game mechanics
+  static const int maxMistakes = 3;
+  static const int expPerCompletion = 50;
+  static const int expBonusEasy = 0;
+  static const int expBonusMedium = 25;
+  static const int expBonusHard = 50;
+
+  // Difficulty (cells to remove)
+  static const int easyCellsToRemove = 35;
+  static const int mediumCellsToRemove = 45;
+  static const int hardCellsToRemove = 55;
+
+  // Dialog dimensions
+  static const double gameDialogMaxWidth = 600.0;
+  static const double gameDialogMaxHeight = 800.0;
+  static const double gameDialogWidthRatio = 0.95;
+  static const double gameDialogHeightRatio = 0.95;
+  static const double gameDialogInsetPadding = 8.0;
+  static const double gameDialogBorderRadius = 16.0;
+  static const double gameDialogShadowBlur = 20.0;
+  static const double gameDialogShadowSpread = 5.0;
+
+  // Header
+  static const double gameHeaderPaddingH = 12.0;
+  static const double gameHeaderPaddingV = 8.0;
+  static const double gameHeaderIconSize = 16.0;
+  static const double gameHeaderIconSpacing = 6.0;
+  static const double gameHeaderFontSize = 16.0;
+  static const double headerButtonSpacing = 6.0;
+
+  // Grid styling
+  static const double cellSize = 40.0;
+  static const double gridPadding = 8.0;
+  static const double gridBorderWidth = 2.0;
+  static const double cellBorderWidth = 0.5;
+  static const double boxBorderWidth = 2.0;
+
+  // Number pad
+  static const double numberPadPadding = 12.0;
+  static const double numberButtonSize = 40.0;
+  static const double numberButtonSpacing = 8.0;
+  static const double numberFontSize = 20.0;
+
+  // Info display
+  static const double infoPaddingH = 8.0;
+  static const double infoPaddingV = 4.0;
+  static const double infoBorderRadius = 10.0;
+  static const double infoFontSize = 12.0;
+
+  // Colors
+  static const Color gridLineColor = Color(0xFF9E9E9E);
+  static const Color boxLineColor = Color(0xFF424242);
+  static const Color selectedCellColor = Color(0x4081D4FA);
+  static const Color sameNumberColor = Color(0x2081D4FA);
+  static const Color fixedNumberColor = Color(0xFF212121);
+  static const Color userNumberColor = Color(0xFF1976D2);
+  static const Color errorNumberColor = Color(0xFFD32F2F);
+  static const Color highlightColor = Color(0x20FFD700);
+}
