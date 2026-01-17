@@ -11,9 +11,7 @@ A gamified desktop companion that turns your keyboard and mouse activity into a 
 ## Screenshots
 
 <p align="center">
-  <img src="docs/images/image-1.png" width="45%" alt="Light Mode">
-  &nbsp;
-  <img src="docs/images/image-2.png" width="45%" alt="Dark Mode">
+  <img src="docs/images/image-1.png" width="45%">
 </p>
 
 ## Features

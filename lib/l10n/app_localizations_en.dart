@@ -193,4 +193,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get gameUseArrowKeys => 'Use arrow keys or swipe to move';
+
+  @override
+  String get flappyBirdTitle => 'Flappy Bird';
+
+  @override
+  String get flappyBirdDescription =>
+      'Tap to fly through the pipes and earn EXP!';
+
+  @override
+  String get flappyBirdTapToFlap => 'Tap or press SPACE to flap';
 }

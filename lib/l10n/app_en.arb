@@ -244,5 +244,17 @@
     "gameUseArrowKeys": "Use arrow keys or swipe to move",
     "@gameUseArrowKeys": {
         "description": "Control instructions"
+    },
+    "flappyBirdTitle": "Flappy Bird",
+    "@flappyBirdTitle": {
+        "description": "Title for flappy bird game"
+    },
+    "flappyBirdDescription": "Tap to fly through the pipes and earn EXP!",
+    "@flappyBirdDescription": {
+        "description": "Description for flappy bird game"
+    },
+    "flappyBirdTapToFlap": "Tap or press SPACE to flap",
+    "@flappyBirdTapToFlap": {
+        "description": "Control instructions for flappy bird"
     }
 }

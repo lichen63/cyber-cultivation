@@ -190,4 +190,13 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get gameUseArrowKeys => '使用方向键或滑动来移动';
+
+  @override
+  String get flappyBirdTitle => '飞翔小鸟';
+
+  @override
+  String get flappyBirdDescription => '点击飞过管道来获得经验值！';
+
+  @override
+  String get flappyBirdTapToFlap => '点击或按空格键来拍打翅膀';
 }

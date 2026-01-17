@@ -322,3 +322,89 @@ class SnakeGameConstants {
   static const double buttonPaddingV = 8.0;
   static const double buttonBorderRadius = 12.0;
 }
+
+/// Constants for Flappy Bird game
+class FlappyBirdConstants {
+  // Game area
+  static const double gameWidth = 400.0;
+  static const double gameHeight = 600.0;
+
+  // Bird
+  static const double birdSize = 30.0;
+  static const double birdX = 80.0;
+  static const double birdStartY = 250.0;
+  static const double birdJumpVelocity = -8.0;
+  static const double gravity = 0.5;
+  static const double maxFallVelocity = 12.0;
+
+  // Pipes
+  static const double pipeWidth = 50.0;
+  static const double pipeGap = 150.0;
+  static const double pipeSpeed = 3.0;
+  static const double pipeSpawnInterval = 1500.0; // ms
+  static const double minPipeHeight = 50.0;
+
+  // Game mechanics
+  static const int gameTickMs = 16; // ~60 FPS
+  static const int scorePerPipe = 1;
+  static const int expPerScore = 2;
+
+  // Dialog dimensions
+  static const double gameDialogMaxWidth = 500.0;
+  static const double gameDialogMaxHeight = 750.0;
+  static const double gameDialogWidthRatio = 0.95;
+  static const double gameDialogHeightRatio = 0.95;
+  static const double gameDialogInsetPadding = 8.0;
+  static const double gameDialogBorderRadius = 16.0;
+  static const double gameDialogShadowBlur = 20.0;
+  static const double gameDialogShadowSpread = 5.0;
+
+  // Header
+  static const double gameHeaderPaddingH = 12.0;
+  static const double gameHeaderPaddingV = 8.0;
+  static const double gameHeaderIconSize = 16.0;
+  static const double gameHeaderIconSpacing = 6.0;
+  static const double gameHeaderFontSize = 16.0;
+  static const double headerButtonSpacing = 6.0;
+
+  // Score display
+  static const double scorePaddingH = 8.0;
+  static const double scorePaddingV = 4.0;
+  static const double scoreBorderRadius = 10.0;
+  static const double scoreIconSize = 12.0;
+  static const double scoreIconSpacing = 4.0;
+  static const double scoreFontSize = 12.0;
+
+  // Game area styling
+  static const double gameAreaPadding = 16.0;
+  static const double gameBorderRadius = 8.0;
+  static const double gameBorderWidth = 2.0;
+
+  // Colors
+  static const Color skyColorTop = Color(0xFF87CEEB);
+  static const Color skyColorBottom = Color(0xFF4CA6E8);
+  static const Color birdColor = Color(0xFFFFD700);
+  static const Color birdOutlineColor = Color(0xFFE6A800);
+  static const Color pipeColor = Color(0xFF228B22);
+  static const Color pipeOutlineColor = Color(0xFF006400);
+  static const Color groundColor = Color(0xFF8B4513);
+
+  // Overlay UI
+  static const double overlayIconSize = 40.0;
+  static const double overlaySpacing = 12.0;
+  static const double overlaySmallSpacing = 6.0;
+  static const double overlayLargeSpacing = 16.0;
+  static const double overlayTitleFontSize = 22.0;
+  static const double overlaySubtitleFontSize = 12.0;
+  static const double overlayHintFontSize = 10.0;
+
+  // Game over
+  static const double gameOverTitleFontSize = 24.0;
+  static const double gameOverScoreFontSize = 14.0;
+  static const double gameOverExpFontSize = 12.0;
+
+  // Button
+  static const double buttonPaddingH = 16.0;
+  static const double buttonPaddingV = 8.0;
+  static const double buttonBorderRadius = 12.0;
+}

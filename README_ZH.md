@@ -11,9 +11,7 @@
 ## 游戏截图
 
 <p align="center">
-  <img src="docs/images/image-3.png" width="45%" alt="浅色模式">
-  &nbsp;
-  <img src="docs/images/image-4.png" width="45%" alt="深色模式">
+  <img src="docs/images/image-2.png" width="45%">
 </p>
 
 ## 功能特性

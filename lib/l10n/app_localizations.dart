@@ -457,6 +457,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Use arrow keys or swipe to move'**
   String get gameUseArrowKeys;
+
+  /// Title for flappy bird game
+  ///
+  /// In en, this message translates to:
+  /// **'Flappy Bird'**
+  String get flappyBirdTitle;
+
+  /// Description for flappy bird game
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to fly through the pipes and earn EXP!'**
+  String get flappyBirdDescription;
+
+  /// Control instructions for flappy bird
+  ///
+  /// In en, this message translates to:
+  /// **'Tap or press SPACE to flap'**
+  String get flappyBirdTapToFlap;
 }
 
 class _AppLocalizationsDelegate
