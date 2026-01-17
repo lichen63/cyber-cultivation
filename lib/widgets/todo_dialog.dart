@@ -165,7 +165,7 @@ class _TodoDialogState extends State<TodoDialog> {
                   Text(
                     l10n.todoTitle,
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: AppConstants.fontSizeDialogTitle,
                       fontWeight: FontWeight.bold,
                       color: themeColors.primaryText,
                     ),
@@ -315,7 +315,7 @@ class _TodoDialogState extends State<TodoDialog> {
                                   _getStatusText(todo.status, l10n),
                                   style: TextStyle(
                                     color: statusColor,
-                                    fontSize: 12,
+                                    fontSize: AppConstants.fontSizeDialogHint,
                                   ),
                                 ),
                                 trailing: IconButton(

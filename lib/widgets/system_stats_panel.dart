@@ -129,7 +129,7 @@ class SystemStatBox extends StatelessWidget {
               label,
               style: TextStyle(
                 color: themeColors.primaryText,
-                fontSize: 12 * scale,
+                fontSize: AppConstants.fontSizeStatLabel * scale,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -141,7 +141,7 @@ class SystemStatBox extends StatelessWidget {
                   borderRadius: BorderRadius.circular(2 * scale),
                   child: LinearProgressIndicator(
                     value: progress!.clamp(0.0, 1.0),
-                    backgroundColor: themeColors.expBarBackground,
+                    backgroundColor: themeColors.border.withValues(alpha: 0.9),
                     valueColor: AlwaysStoppedAnimation<Color>(
                       _getProgressColor(progress!),
                     ),
@@ -152,7 +152,7 @@ class SystemStatBox extends StatelessWidget {
               value,
               style: TextStyle(
                 color: themeColors.primaryText,
-                fontSize: 14 * scale,
+                fontSize: AppConstants.fontSizeStatValue * scale,
                 fontWeight: FontWeight.bold,
               ),
               textAlign: TextAlign.center,
@@ -213,7 +213,7 @@ class _NetworkStatBox extends StatelessWidget {
               'NET',
               style: TextStyle(
                 color: themeColors.primaryText,
-                fontSize: 12 * scale,
+                fontSize: AppConstants.fontSizeStatLabel * scale,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -225,7 +225,7 @@ class _NetworkStatBox extends StatelessWidget {
                   '↑',
                   style: TextStyle(
                     color: themeColors.networkUpload,
-                    fontSize: 11 * scale,
+                    fontSize: AppConstants.fontSizeNetworkStat * scale,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -233,7 +233,7 @@ class _NetworkStatBox extends StatelessWidget {
                   formatBytes(upload),
                   style: TextStyle(
                     color: themeColors.primaryText,
-                    fontSize: 11 * scale,
+                    fontSize: AppConstants.fontSizeNetworkStat * scale,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -247,7 +247,7 @@ class _NetworkStatBox extends StatelessWidget {
                   '↓',
                   style: TextStyle(
                     color: themeColors.networkDownload,
-                    fontSize: 11 * scale,
+                    fontSize: AppConstants.fontSizeNetworkStat * scale,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -255,7 +255,7 @@ class _NetworkStatBox extends StatelessWidget {
                   formatBytes(download),
                   style: TextStyle(
                     color: themeColors.primaryText,
-                    fontSize: 11 * scale,
+                    fontSize: AppConstants.fontSizeNetworkStat * scale,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -356,7 +356,7 @@ class _SystemStatsPanelState extends State<SystemStatsPanel> {
         final bottomRowY = boxSize + spacing;
 
         // Horizontal spacing for top row (3 items) - larger separation
-        final topRowSpacing = boxSize + spacing * 11;
+        final topRowSpacing = boxSize + spacing * 2;
 
         return SizedBox(
           width: constraints.maxWidth,
