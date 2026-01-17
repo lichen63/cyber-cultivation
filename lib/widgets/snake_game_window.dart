@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 
 import '../constants.dart';
 import '../l10n/app_localizations.dart';
+import 'base_game_window.dart';
 
 /// Direction the snake is moving
 enum SnakeDirection { up, down, left, right }
@@ -28,7 +29,8 @@ class SnakeGameWindow extends StatefulWidget {
   State<SnakeGameWindow> createState() => _SnakeGameWindowState();
 }
 
-class _SnakeGameWindowState extends State<SnakeGameWindow> {
+class _SnakeGameWindowState extends State<SnakeGameWindow>
+    with GameKeyboardMixin, GameRestartCooldownMixin {
   // Game state
   SnakeGameState _gameState = SnakeGameState.waiting;
   List<Point<int>> _snake = [];
@@ -163,6 +165,9 @@ class _SnakeGameWindowState extends State<SnakeGameWindow> {
     _gameTimer?.cancel();
     _gameState = SnakeGameState.gameOver;
 
+    // Prevent accidental restart by adding cooldown
+    startRestartCooldown();
+
     // Notify parent about exp gained
     if (_expGained > 0) {
       widget.onExpGained(_expGained);
@@ -189,14 +194,22 @@ class _SnakeGameWindowState extends State<SnakeGameWindow> {
   }
 
   void _handleKeyEvent(KeyEvent event) {
+    // Handle common keys (ESC to close)
+    if (handleCommonKeyEvent(event)) return;
     if (event is! KeyDownEvent) return;
 
-    if (_gameState == SnakeGameState.waiting ||
-        _gameState == SnakeGameState.gameOver) {
+    if (_gameState == SnakeGameState.waiting) {
       if (event.logicalKey == LogicalKeyboardKey.space) {
         _startGame();
         return;
       }
+    }
+
+    if (_gameState == SnakeGameState.gameOver) {
+      if (event.logicalKey == LogicalKeyboardKey.space) {
+        tryRestart(_startGame);
+      }
+      return;
     }
 
     switch (event.logicalKey) {
@@ -425,15 +438,21 @@ class _SnakeGameWindowState extends State<SnakeGameWindow> {
         borderRadius: BorderRadius.circular(
           SnakeGameConstants.gridBorderRadius - 1,
         ),
-        child: CustomPaint(
-          painter: SnakeGamePainter(
-            snake: _snake,
-            food: _food,
-            cellSize: cellSize,
-            snakeColor: SnakeGameConstants.snakeColor,
-            snakeHeadColor: SnakeGameConstants.snakeHeadColor,
-            foodColor: SnakeGameConstants.foodColor,
-            gridColor: _colors.border.withValues(alpha: 0.1),
+        child: SizedBox(
+          width: gameSize,
+          height: gameSize,
+          child: CustomPaint(
+            size: Size(gameSize, gameSize),
+            painter: SnakeGamePainter(
+              snake: _snake,
+              food: _food,
+              cellSize: cellSize,
+              gridSize: SnakeGameConstants.gridSize,
+              snakeColor: SnakeGameConstants.snakeColor,
+              snakeHeadColor: SnakeGameConstants.snakeHeadColor,
+              foodColor: SnakeGameConstants.foodColor,
+              gridColor: _colors.border.withValues(alpha: 0.7),
+            ),
           ),
         ),
       ),
@@ -444,55 +463,13 @@ class _SnakeGameWindowState extends State<SnakeGameWindow> {
     return SizedBox(
       width: gameSize,
       height: gameSize,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.black.withValues(alpha: 0.7),
-          borderRadius: BorderRadius.circular(
-            SnakeGameConstants.gridBorderRadius,
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.pest_control_outlined,
-                  color: SnakeGameConstants.snakeColor,
-                  size: SnakeGameConstants.overlayIconSize,
-                ),
-                const SizedBox(height: SnakeGameConstants.overlaySpacing),
-                Text(
-                  l10n.snakeGameTitle,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: SnakeGameConstants.overlayTitleFontSize,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: SnakeGameConstants.overlaySpacing),
-                Text(
-                  l10n.gamePressToStart,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.8),
-                    fontSize: SnakeGameConstants.overlaySubtitleFontSize,
-                  ),
-                ),
-                const SizedBox(height: SnakeGameConstants.overlaySmallSpacing),
-                Text(
-                  l10n.gameUseArrowKeys,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.6),
-                    fontSize: SnakeGameConstants.overlayHintFontSize,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+      child: GameOverlayBuilder.buildStartOverlay(
+        title: l10n.snakeGameTitle,
+        pressToStartText: l10n.gamePressToStart,
+        controlHintText: l10n.gameUseArrowKeys,
+        icon: Icons.pest_control_outlined,
+        iconColor: SnakeGameConstants.snakeColor,
+        borderRadius: SnakeGameConstants.gridBorderRadius,
       ),
     );
   }
@@ -501,69 +478,17 @@ class _SnakeGameWindowState extends State<SnakeGameWindow> {
     return SizedBox(
       width: gameSize,
       height: gameSize,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.black.withValues(alpha: 0.8),
-          borderRadius: BorderRadius.circular(
-            SnakeGameConstants.gridBorderRadius,
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  l10n.gameOver,
-                  style: TextStyle(
-                    color: _colors.error,
-                    fontSize: SnakeGameConstants.gameOverTitleFontSize,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: SnakeGameConstants.overlaySpacing),
-                Text(
-                  '${l10n.gameScore}: $_score',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: SnakeGameConstants.gameOverScoreFontSize,
-                  ),
-                ),
-                const SizedBox(height: SnakeGameConstants.overlaySmallSpacing),
-                Text(
-                  l10n.gameExpGained(_expGained),
-                  style: TextStyle(
-                    color: _colors.accent,
-                    fontSize: SnakeGameConstants.gameOverExpFontSize,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: SnakeGameConstants.overlayLargeSpacing),
-                ElevatedButton.icon(
-                  onPressed: _startGame,
-                  icon: const Icon(Icons.replay),
-                  label: Text(l10n.gamePlayAgain),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: SnakeGameConstants.snakeColor,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: SnakeGameConstants.buttonPaddingH,
-                      vertical: SnakeGameConstants.buttonPaddingV,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                        SnakeGameConstants.buttonBorderRadius,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+      child: GameOverlayBuilder.buildGameOverOverlay(
+        gameOverText: l10n.gameOver,
+        scoreText: '${l10n.gameScore}: $_score',
+        expGainedText: l10n.gameExpGained(_expGained),
+        playAgainText: l10n.gamePlayAgain,
+        onPlayAgain: _startGame,
+        errorColor: _colors.error,
+        accentColor: _colors.accent,
+        buttonColor: SnakeGameConstants.snakeColor,
+        buttonTextColor: Colors.white,
+        borderRadius: SnakeGameConstants.gridBorderRadius,
       ),
     );
   }
@@ -574,6 +499,7 @@ class SnakeGamePainter extends CustomPainter {
   final List<Point<int>> snake;
   final Point<int> food;
   final double cellSize;
+  final int gridSize;
   final Color snakeColor;
   final Color snakeHeadColor;
   final Color foodColor;
@@ -583,6 +509,7 @@ class SnakeGamePainter extends CustomPainter {
     required this.snake,
     required this.food,
     required this.cellSize,
+    required this.gridSize,
     required this.snakeColor,
     required this.snakeHeadColor,
     required this.foodColor,
@@ -596,7 +523,7 @@ class SnakeGamePainter extends CustomPainter {
       ..color = gridColor
       ..strokeWidth = 1;
 
-    for (int i = 0; i <= SnakeGameConstants.gridSize; i++) {
+    for (int i = 0; i <= gridSize; i++) {
       final pos = i * cellSize;
       canvas.drawLine(Offset(pos, 0), Offset(pos, size.height), gridPaint);
       canvas.drawLine(Offset(0, pos), Offset(size.width, pos), gridPaint);

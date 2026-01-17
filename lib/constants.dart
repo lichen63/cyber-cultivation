@@ -322,3 +322,155 @@ class SnakeGameConstants {
   static const double buttonPaddingV = 8.0;
   static const double buttonBorderRadius = 12.0;
 }
+
+/// Constants for Flappy Bird game
+class FlappyBirdConstants {
+  // Game area (square)
+  static const double gameWidth = 700.0;
+  static const double gameHeight = 700.0;
+
+  // Bird
+  static const double birdSize = 30.0;
+  static const double birdX = 120.0;
+  static const double birdStartY = 350.0;
+  static const double birdJumpVelocity = -7.0;
+  static const double gravity = 0.35;
+  static const double maxFallVelocity = 10.0;
+
+  // Pipes
+  static const double pipeWidth = 50.0;
+  static const double pipeGap = 180.0;
+  static const double pipeSpeed = 2.5;
+  static const double pipeSpawnInterval = 2000.0; // ms
+  static const double minPipeHeight = 60.0;
+
+  // Game mechanics
+  static const int gameTickMs = 16; // ~60 FPS
+  static const int scorePerPipe = 1;
+  static const int expPerScore = 2;
+
+  // Dialog dimensions (square)
+  static const double gameDialogMaxWidth = 750.0;
+  static const double gameDialogMaxHeight = 800.0;
+  static const double gameDialogWidthRatio = 0.95;
+  static const double gameDialogHeightRatio = 0.95;
+  static const double gameDialogInsetPadding = 8.0;
+  static const double gameDialogBorderRadius = 16.0;
+  static const double gameDialogShadowBlur = 20.0;
+  static const double gameDialogShadowSpread = 5.0;
+
+  // Header
+  static const double gameHeaderPaddingH = 12.0;
+  static const double gameHeaderPaddingV = 8.0;
+  static const double gameHeaderIconSize = 16.0;
+  static const double gameHeaderIconSpacing = 6.0;
+  static const double gameHeaderFontSize = 16.0;
+  static const double headerButtonSpacing = 6.0;
+
+  // Score display
+  static const double scorePaddingH = 8.0;
+  static const double scorePaddingV = 4.0;
+  static const double scoreBorderRadius = 10.0;
+  static const double scoreIconSize = 12.0;
+  static const double scoreIconSpacing = 4.0;
+  static const double scoreFontSize = 12.0;
+
+  // Game area styling
+  static const double gameAreaPadding = 16.0;
+  static const double gameBorderRadius = 8.0;
+  static const double gameBorderWidth = 2.0;
+
+  // Colors
+  static const Color skyColorTop = Color(0xFF87CEEB);
+  static const Color skyColorBottom = Color(0xFF4CA6E8);
+  static const Color birdColor = Color(0xFFFFD700);
+  static const Color birdOutlineColor = Color(0xFFE6A800);
+  static const Color pipeColor = Color(0xFF228B22);
+  static const Color pipeOutlineColor = Color(0xFF006400);
+  static const Color groundColor = Color(0xFF8B4513);
+
+  // Overlay UI
+  static const double overlayIconSize = 40.0;
+  static const double overlaySpacing = 12.0;
+  static const double overlaySmallSpacing = 6.0;
+  static const double overlayLargeSpacing = 16.0;
+  static const double overlayTitleFontSize = 22.0;
+  static const double overlaySubtitleFontSize = 12.0;
+  static const double overlayHintFontSize = 10.0;
+
+  // Game over
+  static const double gameOverTitleFontSize = 24.0;
+  static const double gameOverScoreFontSize = 14.0;
+  static const double gameOverExpFontSize = 12.0;
+
+  // Button
+  static const double buttonPaddingH = 16.0;
+  static const double buttonPaddingV = 8.0;
+  static const double buttonBorderRadius = 12.0;
+}
+
+/// Constants for Sudoku game
+class SudokuConstants {
+  // Grid
+  static const int gridSize = 9;
+  static const int boxSize = 3;
+
+  // Game mechanics
+  static const int maxMistakes = 3;
+  static const int expPerCompletion = 50;
+  static const int expBonusEasy = 0;
+  static const int expBonusMedium = 25;
+  static const int expBonusHard = 50;
+
+  // Difficulty (cells to remove)
+  static const int easyCellsToRemove = 35;
+  static const int mediumCellsToRemove = 45;
+  static const int hardCellsToRemove = 55;
+
+  // Dialog dimensions
+  static const double gameDialogMaxWidth = 600.0;
+  static const double gameDialogMaxHeight = 800.0;
+  static const double gameDialogWidthRatio = 0.95;
+  static const double gameDialogHeightRatio = 0.95;
+  static const double gameDialogInsetPadding = 8.0;
+  static const double gameDialogBorderRadius = 16.0;
+  static const double gameDialogShadowBlur = 20.0;
+  static const double gameDialogShadowSpread = 5.0;
+
+  // Header
+  static const double gameHeaderPaddingH = 12.0;
+  static const double gameHeaderPaddingV = 8.0;
+  static const double gameHeaderIconSize = 16.0;
+  static const double gameHeaderIconSpacing = 6.0;
+  static const double gameHeaderFontSize = 16.0;
+  static const double headerButtonSpacing = 6.0;
+
+  // Grid styling
+  static const double cellSize = 40.0;
+  static const double gridPadding = 8.0;
+  static const double gridBorderWidth = 2.0;
+  static const double cellBorderWidth = 0.5;
+  static const double boxBorderWidth = 2.0;
+
+  // Number pad
+  static const double numberPadPadding = 12.0;
+  static const double numberButtonSize = 40.0;
+  static const double numberButtonSpacing = 8.0;
+  static const double numberFontSize = 20.0;
+
+  // Info display
+  static const double infoPaddingH = 8.0;
+  static const double infoPaddingV = 4.0;
+  static const double infoBorderRadius = 10.0;
+  static const double infoFontSize = 12.0;
+
+  // Colors
+  static const Color gridLineColor = Color(0xFF9E9E9E);
+  static const Color boxLineColor = Color(0xFF424242);
+  static const Color selectedCellColor = Color(0x4081D4FA);
+  static const Color sameNumberColor = Color(0x2081D4FA);
+  static const Color fixedNumberColor = Color(0xFF212121);
+  static const Color userNumberColor = Color(0xFF1976D2);
+  static const Color errorNumberColor = Color(0xFFD32F2F);
+  static const Color highlightColor = Color(0x20FFD700);
+}

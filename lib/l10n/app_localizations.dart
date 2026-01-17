@@ -457,6 +457,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Use arrow keys or swipe to move'**
   String get gameUseArrowKeys;
+
+  /// Title for flappy bird game
+  ///
+  /// In en, this message translates to:
+  /// **'Flappy Bird'**
+  String get flappyBirdTitle;
+
+  /// Description for flappy bird game
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to fly through the pipes and earn EXP!'**
+  String get flappyBirdDescription;
+
+  /// Control instructions for flappy bird
+  ///
+  /// In en, this message translates to:
+  /// **'Tap or press SPACE to flap'**
+  String get flappyBirdTapToFlap;
+
+  /// Title for sudoku game
+  ///
+  /// In en, this message translates to:
+  /// **'Sudoku'**
+  String get sudokuTitle;
+
+  /// Description for sudoku game
+  ///
+  /// In en, this message translates to:
+  /// **'Classic number puzzle. Fill the grid and earn EXP!'**
+  String get sudokuDescription;
+
+  /// Control instructions for sudoku
+  ///
+  /// In en, this message translates to:
+  /// **'Select a number below or use keys 1-9'**
+  String get sudokuSelectNumber;
+
+  /// New game button text
+  ///
+  /// In en, this message translates to:
+  /// **'New Game'**
+  String get sudokuNewGame;
+
+  /// Easy difficulty
+  ///
+  /// In en, this message translates to:
+  /// **'Easy'**
+  String get sudokuEasy;
+
+  /// Medium difficulty
+  ///
+  /// In en, this message translates to:
+  /// **'Medium'**
+  String get sudokuMedium;
+
+  /// Hard difficulty
+  ///
+  /// In en, this message translates to:
+  /// **'Hard'**
+  String get sudokuHard;
+
+  /// Mistakes counter
+  ///
+  /// In en, this message translates to:
+  /// **'Mistakes: {count}/{max}'**
+  String sudokuMistakes(int count, int max);
+
+  /// Puzzle completed text
+  ///
+  /// In en, this message translates to:
+  /// **'Puzzle Completed!'**
+  String get sudokuCompleted;
+
+  /// Too many mistakes text
+  ///
+  /// In en, this message translates to:
+  /// **'Too Many Mistakes!'**
+  String get sudokuTooManyMistakes;
+
+  /// Time display
+  ///
+  /// In en, this message translates to:
+  /// **'Time: {time}'**
+  String sudokuTime(String time);
 }
 
 class _AppLocalizationsDelegate
