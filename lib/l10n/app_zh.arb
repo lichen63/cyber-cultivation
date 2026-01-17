@@ -59,5 +59,19 @@
     "gameExpGained": "获得经验: {exp}",
     "gamePlayAgain": "再玩一次",
     "gamePressToStart": "按空格键或点击开始",
-    "gameUseArrowKeys": "使用方向键或滑动来移动"
+    "gameUseArrowKeys": "使用方向键或滑动来移动",
+    "flappyBirdTitle": "飞翔小鸟",
+    "flappyBirdDescription": "点击飞过管道来获得经验值！",
+    "flappyBirdTapToFlap": "点击或按空格键来拍打翅膀",
+    "sudokuTitle": "数独",
+    "sudokuDescription": "经典数字谜题。填满格子来获得经验值！",
+    "sudokuSelectNumber": "点击下方数字或使用按键 1-9",
+    "sudokuNewGame": "新游戏",
+    "sudokuEasy": "简单",
+    "sudokuMedium": "中等",
+    "sudokuHard": "困难",
+    "sudokuMistakes": "错误: {count}/{max}",
+    "sudokuCompleted": "恭喜完成！",
+    "sudokuTooManyMistakes": "错误次数过多！",
+    "sudokuTime": "用时: {time}"
 }

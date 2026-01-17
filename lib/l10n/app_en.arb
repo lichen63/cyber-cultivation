@@ -244,5 +244,74 @@
     "gameUseArrowKeys": "Use arrow keys or swipe to move",
     "@gameUseArrowKeys": {
         "description": "Control instructions"
+    },
+    "flappyBirdTitle": "Flappy Bird",
+    "@flappyBirdTitle": {
+        "description": "Title for flappy bird game"
+    },
+    "flappyBirdDescription": "Tap to fly through the pipes and earn EXP!",
+    "@flappyBirdDescription": {
+        "description": "Description for flappy bird game"
+    },
+    "flappyBirdTapToFlap": "Tap or press SPACE to flap",
+    "@flappyBirdTapToFlap": {
+        "description": "Control instructions for flappy bird"
+    },
+    "sudokuTitle": "Sudoku",
+    "@sudokuTitle": {
+        "description": "Title for sudoku game"
+    },
+    "sudokuDescription": "Classic number puzzle. Fill the grid and earn EXP!",
+    "@sudokuDescription": {
+        "description": "Description for sudoku game"
+    },
+    "sudokuSelectNumber": "Select a number below or use keys 1-9",
+    "@sudokuSelectNumber": {
+        "description": "Control instructions for sudoku"
+    },
+    "sudokuNewGame": "New Game",
+    "@sudokuNewGame": {
+        "description": "New game button text"
+    },
+    "sudokuEasy": "Easy",
+    "@sudokuEasy": {
+        "description": "Easy difficulty"
+    },
+    "sudokuMedium": "Medium",
+    "@sudokuMedium": {
+        "description": "Medium difficulty"
+    },
+    "sudokuHard": "Hard",
+    "@sudokuHard": {
+        "description": "Hard difficulty"
+    },
+    "sudokuMistakes": "Mistakes: {count}/{max}",
+    "@sudokuMistakes": {
+        "description": "Mistakes counter",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            },
+            "max": {
+                "type": "int"
+            }
+        }
+    },
+    "sudokuCompleted": "Puzzle Completed!",
+    "@sudokuCompleted": {
+        "description": "Puzzle completed text"
+    },
+    "sudokuTooManyMistakes": "Too Many Mistakes!",
+    "@sudokuTooManyMistakes": {
+        "description": "Too many mistakes text"
+    },
+    "sudokuTime": "Time: {time}",
+    "@sudokuTime": {
+        "description": "Time display",
+        "placeholders": {
+            "time": {
+                "type": "String"
+            }
+        }
     }
 }

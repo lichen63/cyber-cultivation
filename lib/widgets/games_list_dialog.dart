@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../constants.dart';
 import '../l10n/app_localizations.dart';
+import 'flappy_bird_game_window.dart';
 import 'snake_game_window.dart';
+import 'sudoku_game_window.dart';
 
 /// Model for a game entry in the games list
 class GameEntry {
@@ -41,6 +43,22 @@ class GamesListDialog extends StatelessWidget {
         iconColor: Colors.green,
         buildGame: (colors, onExp) =>
             SnakeGameWindow(themeColors: colors, onExpGained: onExp),
+      ),
+      GameEntry(
+        getTitle: (l10n) => l10n.flappyBirdTitle,
+        getDescription: (l10n) => l10n.flappyBirdDescription,
+        icon: Icons.flutter_dash,
+        iconColor: const Color(0xFFFFD700),
+        buildGame: (colors, onExp) =>
+            FlappyBirdGameWindow(themeColors: colors, onExpGained: onExp),
+      ),
+      GameEntry(
+        getTitle: (l10n) => l10n.sudokuTitle,
+        getDescription: (l10n) => l10n.sudokuDescription,
+        icon: Icons.grid_3x3,
+        iconColor: const Color(0xFF1976D2),
+        buildGame: (colors, onExp) =>
+            SudokuGameWindow(themeColors: colors, onExpGained: onExp),
       ),
       // Add more games here in the future
     ];
