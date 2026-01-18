@@ -40,3 +40,8 @@ Please follow these rules in every interaction:
 10. **Avoid Hardcoding**:
     - Do not hardcode values such as numbers, strings, or logic directly in code.
     - All constants (e.g., dimensions, durations, thresholds, configuration values) should be placed in `constants.dart`.
+
+11. **Testing**:
+    - Add tests for new features in the appropriate directory (`test/models/`, `test/services/`, `test/widgets/`, `test/integration/`).
+    - Follow existing test patterns and ensure all tests pass (`flutter test`).
+    - Test edge cases and error handling; avoid unused variables in tests.
