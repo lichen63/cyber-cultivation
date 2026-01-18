@@ -1,30 +1,53 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
+/// Test index file that exports all test groups
+///
+/// Run all tests with: flutter test
+/// Run specific test file: flutter test test/models/game_data_test.dart
+///
+/// Test structure:
+/// - test/models/ - Unit tests for data models
+/// - test/services/ - Unit tests for services
+/// - test/widgets/ - Widget tests for UI components
+/// - test/integration/ - Integration tests for feature flows
+/// - test/constants_test.dart - Tests for app constants
+library;
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:cyber_cultivation/main.dart';
+// Import all test files to ensure they're discoverable
+import 'models/daily_stats_test.dart' as daily_stats_test;
+import 'models/todo_item_test.dart' as todo_item_test;
+import 'models/game_data_test.dart' as game_data_test;
+import 'services/pomodoro_service_test.dart' as pomodoro_service_test;
+import 'widgets/styled_button_test.dart' as styled_button_test;
+import 'widgets/exp_display_test.dart' as exp_display_test;
+import 'widgets/todo_dialog_test.dart' as todo_dialog_test;
+import 'integration/game_flow_test.dart' as game_flow_test;
+import 'constants_test.dart' as constants_test;
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  group('All Tests', () {
+    group('Models', () {
+      daily_stats_test.main();
+      todo_item_test.main();
+      game_data_test.main();
+    });
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    group('Services', () {
+      pomodoro_service_test.main();
+    });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    group('Widgets', () {
+      styled_button_test.main();
+      exp_display_test.main();
+      todo_dialog_test.main();
+    });
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    group('Integration', () {
+      game_flow_test.main();
+    });
+
+    group('Constants', () {
+      constants_test.main();
+    });
   });
 }
