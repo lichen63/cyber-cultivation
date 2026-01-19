@@ -128,6 +128,18 @@
     "@noDataAvailable": {
         "description": "Text shown when there is no data"
     },
+    "statsClearData": "Clear Stats",
+    "@statsClearData": {
+        "description": "Tooltip for clear stats button"
+    },
+    "statsClearConfirmTitle": "Clear All Stats?",
+    "@statsClearConfirmTitle": {
+        "description": "Title for clear stats confirmation dialog"
+    },
+    "statsClearConfirmContent": "All saved activity data will be permanently deleted. This action cannot be undone.",
+    "@statsClearConfirmContent": {
+        "description": "Content for clear stats confirmation dialog"
+    },
     "themeMode": "Theme",
     "@themeMode": {
         "description": "Label for theme mode selection"

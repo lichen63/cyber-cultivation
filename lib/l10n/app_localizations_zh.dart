@@ -105,6 +105,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noDataAvailable => '暂无数据';
 
   @override
+  String get statsClearData => '清除统计';
+
+  @override
+  String get statsClearConfirmTitle => '清除所有统计数据?';
+
+  @override
+  String get statsClearConfirmContent => '所有保存的活动数据将被永久删除，此操作无法撤销。';
+
+  @override
   String get themeMode => '主题';
 
   @override

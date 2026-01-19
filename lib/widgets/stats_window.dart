@@ -9,12 +9,14 @@ class StatsWindow extends StatefulWidget {
   final DailyStats todayStats;
   final Map<String, DailyStats> historyStats;
   final AppThemeColors themeColors;
+  final VoidCallback? onClearStats;
 
   const StatsWindow({
     super.key,
     required this.todayStats,
     required this.historyStats,
     required this.themeColors,
+    this.onClearStats,
   });
 
   @override
@@ -140,9 +142,63 @@ class _StatsWindowState extends State<StatsWindow> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          IconButton(
-            icon: Icon(Icons.close, color: _colors.secondaryText),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (widget.onClearStats != null)
+                IconButton(
+                  icon: Icon(Icons.delete_outline, color: _colors.secondaryText),
+                  tooltip: AppLocalizations.of(context)!.statsClearData,
+                  onPressed: _showClearConfirmation,
+                ),
+              IconButton(
+                icon: Icon(Icons.close, color: _colors.secondaryText),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showClearConfirmation() {
+    final l10n = AppLocalizations.of(context)!;
+    showDialog(
+      context: context,
+      barrierColor: _colors.overlay,
+      builder: (context) => AlertDialog(
+        backgroundColor: _colors.dialogBackground,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+          side: BorderSide(color: _colors.border, width: 2),
+        ),
+        title: Text(
+          l10n.statsClearConfirmTitle,
+          style: TextStyle(color: _colors.error),
+        ),
+        content: Text(
+          l10n.statsClearConfirmContent,
+          style: TextStyle(color: _colors.primaryText),
+        ),
+        actions: [
+          TextButton(
             onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              l10n.cancelButtonText,
+              style: TextStyle(color: _colors.inactive),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).pop();
+              widget.onClearStats?.call();
+            },
+            child: Text(
+              l10n.deleteButtonText,
+              style: TextStyle(color: _colors.error),
+            ),
           ),
         ],
       ),

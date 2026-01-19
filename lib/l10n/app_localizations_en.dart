@@ -105,6 +105,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noDataAvailable => 'No data available';
 
   @override
+  String get statsClearData => 'Clear Stats';
+
+  @override
+  String get statsClearConfirmTitle => 'Clear All Stats?';
+
+  @override
+  String get statsClearConfirmContent =>
+      'All saved activity data will be permanently deleted. This action cannot be undone.';
+
+  @override
   String get themeMode => 'Theme';
 
   @override

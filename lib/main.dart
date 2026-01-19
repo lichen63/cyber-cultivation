@@ -562,8 +562,19 @@ class _MyHomePageState extends State<MyHomePage>
         todayStats: _todayStats,
         historyStats: viewHistory,
         themeColors: _themeColors,
+        onClearStats: _clearAllStats,
       ),
     );
+  }
+
+  void _clearAllStats() {
+    setState(() {
+      _dailyStatsMap.clear();
+      _todayStats = DailyStats();
+      final todayKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      _dailyStatsMap[todayKey] = _todayStats;
+    });
+    _saveGameData(immediate: true);
   }
 
   void _showGamesDialog() {

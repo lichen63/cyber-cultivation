@@ -290,6 +290,24 @@ abstract class AppLocalizations {
   /// **'No data available'**
   String get noDataAvailable;
 
+  /// Tooltip for clear stats button
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Stats'**
+  String get statsClearData;
+
+  /// Title for clear stats confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Clear All Stats?'**
+  String get statsClearConfirmTitle;
+
+  /// Content for clear stats confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'All saved activity data will be permanently deleted. This action cannot be undone.'**
+  String get statsClearConfirmContent;
+
   /// Label for theme mode selection
   ///
   /// In en, this message translates to:
