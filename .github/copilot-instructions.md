@@ -45,3 +45,7 @@ Please follow these rules in every interaction:
     - Add tests for new features in the appropriate directory (`test/models/`, `test/services/`, `test/widgets/`, `test/integration/`).
     - Follow existing test patterns and ensure all tests pass (`flutter test`).
     - Test edge cases and error handling; avoid unused variables in tests.
+
+12. **Formatting**:
+    - After editing Dart files, use the `dart_format` tool to format the code.
+    - Never manually fix formatting issues; always use the formatter.
