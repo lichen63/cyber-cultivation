@@ -68,6 +68,8 @@ class MenuBarItem {
   final String bottom;
   final String alignment; // 'center', 'left', or 'right'
   final double? fixedWidth; // Fixed width in pixels (null = variable)
+  final double? topFontSize; // Font size for top row (null = use default)
+  final double? bottomFontSize; // Font size for bottom row (null = use default)
 
   const MenuBarItem({
     required this.id,
@@ -75,6 +77,8 @@ class MenuBarItem {
     required this.bottom,
     this.alignment = 'center',
     this.fixedWidth,
+    this.topFontSize,
+    this.bottomFontSize,
   });
 
   Map<String, dynamic> toMap() => {
@@ -83,5 +87,7 @@ class MenuBarItem {
         'bottom': bottom,
         'alignment': alignment,
         'fixedWidth': fixedWidth ?? -1,
+        'topFontSize': topFontSize ?? -1,
+        'bottomFontSize': bottomFontSize ?? -1,
       };
 }

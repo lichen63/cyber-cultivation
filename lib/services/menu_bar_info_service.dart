@@ -221,10 +221,9 @@ class MenuBarInfoService extends ChangeNotifier {
     for (final type in _getEnabledTypesInOrder()) {
       final (top, bottom) = _buildInfoPart(type);
       if (top.isNotEmpty) {
-        // Only network info should be left aligned
-        final alignment = type == MenuBarInfoType.network ? 'left' : 'center';
-        // Fixed widths to prevent layout shifts when values change
+        final alignment = _getAlignmentForType(type);
         final fixedWidth = _getFixedWidthForType(type);
+        final (topFontSize, bottomFontSize) = _getFontSizesForType(type);
         items.add(
           MenuBarItem(
             id: type.name,
@@ -232,12 +231,54 @@ class MenuBarInfoService extends ChangeNotifier {
             bottom: bottom,
             alignment: alignment,
             fixedWidth: fixedWidth,
+            topFontSize: topFontSize,
+            bottomFontSize: bottomFontSize,
           ),
         );
       }
     }
 
     return items;
+  }
+
+  /// Get alignment for each info type
+  String _getAlignmentForType(MenuBarInfoType type) {
+    switch (type) {
+      case MenuBarInfoType.network:
+        return 'left';
+      case MenuBarInfoType.trayIcon:
+      case MenuBarInfoType.focus:
+      case MenuBarInfoType.todo:
+      case MenuBarInfoType.levelExp:
+      case MenuBarInfoType.cpu:
+      case MenuBarInfoType.gpu:
+      case MenuBarInfoType.ram:
+      case MenuBarInfoType.disk:
+      case MenuBarInfoType.keyboard:
+      case MenuBarInfoType.mouse:
+      case MenuBarInfoType.systemTime:
+        return 'center';
+    }
+  }
+
+  /// Get font sizes (top, bottom) for each info type
+  (double, double) _getFontSizesForType(MenuBarInfoType type) {
+    switch (type) {
+      case MenuBarInfoType.levelExp:
+      case MenuBarInfoType.network:
+        return (10.0, 10.0); // Same size for both rows
+      case MenuBarInfoType.trayIcon:
+      case MenuBarInfoType.focus:
+      case MenuBarInfoType.todo:
+      case MenuBarInfoType.cpu:
+      case MenuBarInfoType.gpu:
+      case MenuBarInfoType.ram:
+      case MenuBarInfoType.disk:
+      case MenuBarInfoType.keyboard:
+      case MenuBarInfoType.mouse:
+      case MenuBarInfoType.systemTime:
+        return (8.0, 12.0); // Smaller top, larger bottom
+    }
   }
 
   /// Get fixed width in pixels for each info type
@@ -250,7 +291,7 @@ class MenuBarInfoService extends ChangeNotifier {
       case MenuBarInfoType.todo:
         return 35; // "✅" + "99/99"
       case MenuBarInfoType.levelExp:
-        return 55; // "Lv99" + "999K/999K"
+        return 80; // "Lv99" + "999K/999K"
       case MenuBarInfoType.cpu:
       case MenuBarInfoType.gpu:
       case MenuBarInfoType.ram:
@@ -259,9 +300,9 @@ class MenuBarInfoService extends ChangeNotifier {
       case MenuBarInfoType.network:
         return 55; // "↑ 999M/s"
       case MenuBarInfoType.keyboard:
-        return 38; // "⌨️" + "999.9K"
+        return 50; // "⌨️" + "999.9K"
       case MenuBarInfoType.mouse:
-        return 38; // "🖱" + "99.9km"
+        return 50; // "🖱" + "99.9km"
       case MenuBarInfoType.systemTime:
         return 120; // "2026-01-19 12:34" single row
     }

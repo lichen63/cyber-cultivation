@@ -136,19 +136,43 @@ class AppDelegate: FlutterAppDelegate {
           ]
           attributedString = NSAttributedString(string: timeText, attributes: timeAttributes)
         } else {
-          style.lineSpacing = -2  // Tighter line spacing
-          style.paragraphSpacing = 0
-          style.maximumLineHeight = CGFloat(fontSize) + 1
+          // Get per-item font sizes, fallback to global fontSize if not specified (-1 means use default)
+          let itemTopFontSize = itemData["topFontSize"] as? Double ?? -1
+          let itemBottomFontSize = itemData["bottomFontSize"] as? Double ?? -1
+          let topFontSize: CGFloat = itemTopFontSize > 0 ? CGFloat(itemTopFontSize) : CGFloat(fontSize)
+          let bottomFontSize: CGFloat = itemBottomFontSize > 0 ? CGFloat(itemBottomFontSize) : CGFloat(fontSize)
           
-          let attributes: [NSAttributedString.Key: Any] = [
-            .font: NSFont.systemFont(ofSize: CGFloat(fontSize), weight: fontWeight),
+          let topStyle = NSMutableParagraphStyle()
+          topStyle.alignment = style.alignment
+          topStyle.lineSpacing = -2
+          topStyle.paragraphSpacing = 0
+          topStyle.maximumLineHeight = topFontSize + 1
+          
+          let bottomStyle = NSMutableParagraphStyle()
+          bottomStyle.alignment = style.alignment
+          bottomStyle.lineSpacing = 0
+          bottomStyle.paragraphSpacing = 0
+          bottomStyle.maximumLineHeight = bottomFontSize + 1
+          
+          let topAttributes: [NSAttributedString.Key: Any] = [
+            .font: NSFont.systemFont(ofSize: topFontSize, weight: .regular),
             .foregroundColor: NSColor.textColor,
-            .paragraphStyle: style,
-            .baselineOffset: -5  // Lower the text more
+            .paragraphStyle: topStyle,
+            .baselineOffset: -4
           ]
           
-          let fullText = "\(topText)\n\(bottomText)"
-          attributedString = NSAttributedString(string: fullText, attributes: attributes)
+          let bottomAttributes: [NSAttributedString.Key: Any] = [
+            .font: NSFont.systemFont(ofSize: bottomFontSize, weight: fontWeight),
+            .foregroundColor: NSColor.textColor,
+            .paragraphStyle: bottomStyle,
+            .baselineOffset: -5
+          ]
+          
+          let mutableString = NSMutableAttributedString()
+          mutableString.append(NSAttributedString(string: topText, attributes: topAttributes))
+          mutableString.append(NSAttributedString(string: "\n", attributes: topAttributes))
+          mutableString.append(NSAttributedString(string: bottomText, attributes: bottomAttributes))
+          attributedString = mutableString
         }
         
         if let button = statusItem.button {
