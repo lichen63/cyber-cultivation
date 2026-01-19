@@ -291,7 +291,7 @@ class MenuBarInfoService extends ChangeNotifier {
       case MenuBarInfoType.todo:
         return 35; // "✅" + "99/99"
       case MenuBarInfoType.levelExp:
-        return 80; // "Lv99" + "999K/999K"
+        return 70; // "Lv99" + "999K/999K"
       case MenuBarInfoType.cpu:
       case MenuBarInfoType.gpu:
       case MenuBarInfoType.ram:
@@ -300,9 +300,9 @@ class MenuBarInfoService extends ChangeNotifier {
       case MenuBarInfoType.network:
         return 55; // "↑ 999M/s"
       case MenuBarInfoType.keyboard:
-        return 50; // "⌨️" + "999.9K"
+        return 40; // "⌨️" + "999.9K"
       case MenuBarInfoType.mouse:
-        return 50; // "🖱" + "99.9km"
+        return 40; // "🖱" + "99.9km"
       case MenuBarInfoType.systemTime:
         return 120; // "2026-01-19 12:34" single row
     }
