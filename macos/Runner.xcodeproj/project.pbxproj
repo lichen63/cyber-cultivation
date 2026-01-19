@@ -29,6 +29,11 @@
 		33CC10F62044A3C60003C045 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 33CC10F42044A3C60003C045 /* MainMenu.xib */; };
 		33CC11132044BFA00003C045 /* MainFlutterWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CC11122044BFA00003C045 /* MainFlutterWindow.swift */; };
 		7B67459AC2CC6B98D4CCD02E /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3CE32B0750CF28ACD4808F61 /* Pods_RunnerTests.framework */; };
+		A1B2C3D401000001 /* CalendarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000001 /* CalendarViewController.swift */; };
+		A1B2C3D401000002 /* KeyMonitorStreamHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000002 /* KeyMonitorStreamHandler.swift */; };
+		A1B2C3D401000003 /* MouseMonitorStreamHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000003 /* MouseMonitorStreamHandler.swift */; };
+		A1B2C3D401000004 /* SystemInfoHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000004 /* SystemInfoHandler.swift */; };
+		A1B2C3D401000005 /* IOServiceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000005 /* IOServiceHelper.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -74,6 +79,11 @@
 		33CC10F52044A3C60003C045 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		33CC10F72044A3C60003C045 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = Runner/Info.plist; sourceTree = "<group>"; };
 		33CC11122044BFA00003C045 /* MainFlutterWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainFlutterWindow.swift; sourceTree = "<group>"; };
+		A1B2C3D400000001 /* CalendarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewController.swift; sourceTree = "<group>"; };
+		A1B2C3D400000002 /* KeyMonitorStreamHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyMonitorStreamHandler.swift; sourceTree = "<group>"; };
+		A1B2C3D400000003 /* MouseMonitorStreamHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MouseMonitorStreamHandler.swift; sourceTree = "<group>"; };
+		A1B2C3D400000004 /* SystemInfoHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemInfoHandler.swift; sourceTree = "<group>"; };
+		A1B2C3D400000005 /* IOServiceHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IOServiceHelper.swift; sourceTree = "<group>"; };
 		33CEB47222A05771004F2AC0 /* Flutter-Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Flutter-Debug.xcconfig"; sourceTree = "<group>"; };
 		33CEB47422A05771004F2AC0 /* Flutter-Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Flutter-Release.xcconfig"; sourceTree = "<group>"; };
 		33CEB47722A0578A004F2AC0 /* Flutter-Generated.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = "Flutter-Generated.xcconfig"; path = "ephemeral/Flutter-Generated.xcconfig"; sourceTree = "<group>"; };
@@ -177,6 +187,11 @@
 			children = (
 				33CC10F02044A3C60003C045 /* AppDelegate.swift */,
 				33CC11122044BFA00003C045 /* MainFlutterWindow.swift */,
+				A1B2C3D400000001 /* CalendarViewController.swift */,
+				A1B2C3D400000002 /* KeyMonitorStreamHandler.swift */,
+				A1B2C3D400000003 /* MouseMonitorStreamHandler.swift */,
+				A1B2C3D400000004 /* SystemInfoHandler.swift */,
+				A1B2C3D400000005 /* IOServiceHelper.swift */,
 				33E51913231747F40026EE4D /* DebugProfile.entitlements */,
 				33E51914231749380026EE4D /* Release.entitlements */,
 				33CC11242044D66E0003C045 /* Resources */,
@@ -440,6 +455,11 @@
 				33CC11132044BFA00003C045 /* MainFlutterWindow.swift in Sources */,
 				33CC10F12044A3C60003C045 /* AppDelegate.swift in Sources */,
 				335BBD1B22A9A15E00E9071D /* GeneratedPluginRegistrant.swift in Sources */,
+				A1B2C3D401000001 /* CalendarViewController.swift in Sources */,
+				A1B2C3D401000002 /* KeyMonitorStreamHandler.swift in Sources */,
+				A1B2C3D401000003 /* MouseMonitorStreamHandler.swift in Sources */,
+				A1B2C3D401000004 /* SystemInfoHandler.swift in Sources */,
+				A1B2C3D401000005 /* IOServiceHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
