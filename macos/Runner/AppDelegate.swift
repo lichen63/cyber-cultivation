@@ -395,7 +395,7 @@ class CalendarViewController: NSViewController {
     timeLabel = NSTextField(labelWithString: "")
     timeLabel.font = NSFont.monospacedDigitSystemFont(ofSize: 18, weight: .light)
     timeLabel.alignment = .center
-    timeLabel.textColor = NSColor.labelColor
+    timeLabel.textColor = .white
     timeLabel.translatesAutoresizingMaskIntoConstraints = false
     timeContainer.addSubview(timeLabel)
     
@@ -427,6 +427,7 @@ class CalendarViewController: NSViewController {
     monthLabel = NSTextField(labelWithString: "")
     monthLabel.font = NSFont.systemFont(ofSize: 16, weight: .medium)
     monthLabel.alignment = .left
+    monthLabel.textColor = .white
     
     // Buttons container
     let buttons = NSStackView()
@@ -475,13 +476,13 @@ class CalendarViewController: NSViewController {
     } else {
       calendarButton.title = "📅"
     }
-    calendarButton.contentTintColor = .secondaryLabelColor
+    calendarButton.contentTintColor = NSColor(white: 0.6, alpha: 1.0)
     
     // Centered title
     let titleLabel = NSTextField(labelWithString: "Clock")
     titleLabel.font = NSFont.systemFont(ofSize: 18, weight: .semibold)
     titleLabel.alignment = .center
-    titleLabel.textColor = .labelColor
+    titleLabel.textColor = .white
     titleLabel.backgroundColor = .clear
     titleLabel.drawsBackground = false
     titleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -519,7 +520,7 @@ class CalendarViewController: NSViewController {
     button.bezelStyle = .inline
     button.isBordered = false
     button.font = NSFont.systemFont(ofSize: 14)
-    button.contentTintColor = .labelColor
+    button.contentTintColor = .white
     return button
   }
   
@@ -631,7 +632,7 @@ class CalendarViewController: NSViewController {
     
     let field = NSTextField(labelWithString: text)
     field.font = NSFont.systemFont(ofSize: 11, weight: .medium)
-    field.textColor = .secondaryLabelColor
+    field.textColor = NSColor(white: 0.6, alpha: 1.0)
     field.alignment = .center
     field.translatesAutoresizingMaskIntoConstraints = false
     container.addSubview(field)
@@ -669,9 +670,9 @@ class CalendarViewController: NSViewController {
     if isToday {
       field.textColor = .white
     } else if !isCurrentMonth {
-      field.textColor = .tertiaryLabelColor
+      field.textColor = NSColor(white: 0.4, alpha: 1.0)
     } else {
-      field.textColor = .labelColor
+      field.textColor = .white
     }
     
     field.translatesAutoresizingMaskIntoConstraints = false
