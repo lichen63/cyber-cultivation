@@ -115,20 +115,20 @@ class _SettingsDialogState extends State<SettingsDialog> {
           ),
           const SizedBox(height: 16),
           _buildSwitchTile(
-            title: l10n.alwaysShowActionsText,
-            value: _isAlwaysShowActionButtons,
-            onChanged: (value) {
-              setState(() => _isAlwaysShowActionButtons = value);
-              widget.onAlwaysShowActionButtonsChanged(value);
-            },
-          ),
-          const SizedBox(height: 16),
-          _buildSwitchTile(
             title: l10n.autoStartText,
             value: _isAutoStartEnabled,
             onChanged: (value) {
               setState(() => _isAutoStartEnabled = value);
               widget.onAutoStartChanged(value);
+            },
+          ),
+          const SizedBox(height: 16),
+          _buildSwitchTile(
+            title: l10n.alwaysShowActionsText,
+            value: _isAlwaysShowActionButtons,
+            onChanged: (value) {
+              setState(() => _isAlwaysShowActionButtons = value);
+              widget.onAlwaysShowActionButtonsChanged(value);
             },
           ),
           const SizedBox(height: 16),
