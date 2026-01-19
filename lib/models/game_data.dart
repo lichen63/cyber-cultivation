@@ -1,4 +1,5 @@
 import 'daily_stats.dart';
+import 'menu_bar_settings.dart';
 import 'todo_item.dart';
 import '../constants.dart';
 
@@ -19,6 +20,7 @@ class GameData {
   final AppThemeMode themeMode;
   final Map<String, DailyStats> dailyStats;
   final List<TodoItem> todos;
+  final MenuBarSettings menuBarSettings;
 
   GameData({
     required this.level,
@@ -37,8 +39,10 @@ class GameData {
     this.themeMode = AppThemeMode.dark,
     Map<String, DailyStats>? dailyStats,
     List<TodoItem>? todos,
-  })  : dailyStats = dailyStats ?? {},
-        todos = todos ?? [];
+    MenuBarSettings? menuBarSettings,
+  }) : dailyStats = dailyStats ?? {},
+       todos = todos ?? [],
+       menuBarSettings = menuBarSettings ?? const MenuBarSettings();
 
   // Convert a GameData object into a Map object
   Map<String, dynamic> toJson() {
@@ -59,6 +63,7 @@ class GameData {
       'themeMode': themeMode.name,
       'dailyStats': dailyStats.map((k, v) => MapEntry(k, v.toJson())),
       'todos': todos.map((t) => t.toJson()).toList(),
+      'menuBarSettings': menuBarSettings.toJson(),
     };
   }
 
@@ -85,10 +90,14 @@ class GameData {
             (k, v) => MapEntry(k, DailyStats.fromJson(v)),
           ) ??
           {},
-      todos: (json['todos'] as List<dynamic>?)
+      todos:
+          (json['todos'] as List<dynamic>?)
               ?.map((t) => TodoItem.fromJson(t as Map<String, dynamic>))
               .toList() ??
           [],
+      menuBarSettings: MenuBarSettings.fromJson(
+        json['menuBarSettings'] as Map<String, dynamic>?,
+      ),
     );
   }
 
@@ -114,6 +123,7 @@ class GameData {
     AppThemeMode? themeMode,
     Map<String, DailyStats>? dailyStats,
     List<TodoItem>? todos,
+    MenuBarSettings? menuBarSettings,
   }) {
     return GameData(
       level: level ?? this.level,
@@ -133,6 +143,7 @@ class GameData {
       themeMode: themeMode ?? this.themeMode,
       dailyStats: dailyStats ?? this.dailyStats,
       todos: todos ?? this.todos,
+      menuBarSettings: menuBarSettings ?? this.menuBarSettings,
     );
   }
 }

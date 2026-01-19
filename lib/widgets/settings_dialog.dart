@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cyber_cultivation/l10n/app_localizations.dart';
 import '../constants.dart';
+import '../models/menu_bar_settings.dart';
+import 'menu_bar_settings_dialog.dart';
 
 class SettingsDialog extends StatefulWidget {
   final bool isAlwaysOnTop;
@@ -13,6 +15,7 @@ class SettingsDialog extends StatefulWidget {
   final String? currentLanguage;
   final AppThemeMode themeMode;
   final AppThemeColors themeColors;
+  final MenuBarSettings menuBarSettings;
   final ValueChanged<bool> onAlwaysOnTopChanged;
   final ValueChanged<bool> onAntiSleepChanged;
   final ValueChanged<bool> onAlwaysShowActionButtonsChanged;
@@ -22,6 +25,7 @@ class SettingsDialog extends StatefulWidget {
   final ValueChanged<bool> onShowMouseTrackChanged;
   final ValueChanged<String?> onLanguageChanged;
   final ValueChanged<AppThemeMode> onThemeModeChanged;
+  final ValueChanged<MenuBarSettings> onMenuBarSettingsChanged;
   final VoidCallback? onResetLevelExp;
 
   const SettingsDialog({
@@ -36,6 +40,7 @@ class SettingsDialog extends StatefulWidget {
     this.currentLanguage,
     required this.themeMode,
     required this.themeColors,
+    required this.menuBarSettings,
     required this.onAlwaysOnTopChanged,
     required this.onAntiSleepChanged,
     required this.onAlwaysShowActionButtonsChanged,
@@ -45,6 +50,7 @@ class SettingsDialog extends StatefulWidget {
     required this.onShowMouseTrackChanged,
     required this.onLanguageChanged,
     required this.onThemeModeChanged,
+    required this.onMenuBarSettingsChanged,
     this.onResetLevelExp,
   });
 
@@ -62,6 +68,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
   late bool _isShowMouseTrack;
   late String? _currentLanguage;
   late AppThemeMode _themeMode;
+  late MenuBarSettings _menuBarSettings;
 
   AppThemeColors get _colors => widget.themeColors;
 
@@ -77,6 +84,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
     _isShowMouseTrack = widget.isShowMouseTrack;
     _currentLanguage = widget.currentLanguage;
     _themeMode = widget.themeMode;
+    _menuBarSettings = widget.menuBarSettings;
   }
 
   @override
@@ -164,6 +172,8 @@ class _SettingsDialogState extends State<SettingsDialog> {
           _buildThemeModeSelector(l10n),
           const SizedBox(height: 16),
           _buildLanguageSelector(l10n),
+          const SizedBox(height: 16),
+          _buildMenuBarSettingsButton(l10n),
           if (widget.onResetLevelExp != null) ...[
             const SizedBox(height: 24),
             _buildResetLevelExpButton(l10n),
@@ -245,6 +255,51 @@ class _SettingsDialogState extends State<SettingsDialog> {
           },
         ),
       ],
+    );
+  }
+
+  Widget _buildMenuBarSettingsButton(AppLocalizations l10n) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          l10n.menuBarSettingsTitle,
+          style: TextStyle(
+            color: _colors.primaryText,
+            fontSize: AppConstants.fontSizeDialogContent,
+          ),
+        ),
+        TextButton(
+          onPressed: _showMenuBarSettingsDialog,
+          style: TextButton.styleFrom(
+            foregroundColor: _colors.accent,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.settings, size: 16, color: _colors.accent),
+              const SizedBox(width: 4),
+              Icon(Icons.chevron_right, size: 16, color: _colors.accent),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showMenuBarSettingsDialog() {
+    showDialog(
+      context: context,
+      barrierColor: _colors.overlay,
+      builder: (context) => MenuBarSettingsDialog(
+        settings: _menuBarSettings,
+        themeColors: _colors,
+        onSettingsChanged: (newSettings) {
+          setState(() => _menuBarSettings = newSettings);
+          widget.onMenuBarSettingsChanged(newSettings);
+        },
+      ),
     );
   }
 

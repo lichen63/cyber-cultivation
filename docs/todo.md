@@ -42,7 +42,10 @@
 - [x] Show todo list in one action button
 - [x] Replace B-1 with game list, first game is greedy snake
 - [x] Add unit/widget/integration tests
-- [ ] Show info in system menu bar
+- [x] Show info in system menu bar
+- [ ] Handle the exception when game_save is corrupted
+- [ ] Can customize default focus time
+- [ ] Customize refresh interval of system stats info
 - [ ] Add windows platform support
 - [ ] Add unix-like platform support
 - [ ] Let player customize the character image

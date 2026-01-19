@@ -190,8 +190,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get snakeGameTitle => 'Snake';
 
   @override
-  String get snakeGameDescription =>
-      'Classic snake game. Eat food to grow and earn EXP!';
+  String get snakeGameDescription => 'Classic snake game. Eat food to grow!';
 
   @override
   String get gameScore => 'Score';
@@ -217,8 +216,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get flappyBirdTitle => 'Flappy Bird';
 
   @override
-  String get flappyBirdDescription =>
-      'Tap to fly through the pipes and earn EXP!';
+  String get flappyBirdDescription => 'Tap to fly through the pipes!';
 
   @override
   String get flappyBirdTapToFlap => 'Tap or press SPACE to flap';
@@ -227,8 +225,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sudokuTitle => 'Sudoku';
 
   @override
-  String get sudokuDescription =>
-      'Classic number puzzle. Fill the grid and earn EXP!';
+  String get sudokuDescription => 'Classic number puzzle. Fill the grid!';
 
   @override
   String get sudokuSelectNumber => 'Select a number below or use keys 1-9';
@@ -273,4 +270,65 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get resetButtonText => 'Reset';
+
+  @override
+  String get menuBarSettingsTitle => 'Menu Bar Info';
+
+  @override
+  String get menuBarSettingsDescription =>
+      'Configure what info to show in the menu bar';
+
+  @override
+  String get menuBarShowTrayIcon => 'Show Tray Icon';
+
+  @override
+  String get menuBarInfoFocus => 'Focus Timer';
+
+  @override
+  String get menuBarInfoTodo => 'Todo';
+
+  @override
+  String get menuBarInfoLevelExp => 'Level & EXP';
+
+  @override
+  String get menuBarInfoCpu => 'CPU';
+
+  @override
+  String get menuBarInfoGpu => 'GPU';
+
+  @override
+  String get menuBarInfoRam => 'RAM';
+
+  @override
+  String get menuBarInfoDisk => 'Disk';
+
+  @override
+  String get menuBarInfoNetwork => 'Network';
+
+  @override
+  String get menuBarInfoKeyboard => 'Keyboard';
+
+  @override
+  String get menuBarInfoMouse => 'Mouse';
+
+  @override
+  String get menuBarSectionSystem => 'System Stats';
+
+  @override
+  String get menuBarSectionTracking => 'Input Tracking';
+
+  @override
+  String get menuBarSectionApp => 'App Info';
+
+  @override
+  String get menuBarFocusText => 'Focus';
+
+  @override
+  String get menuBarKeyboardText => 'Key';
+
+  @override
+  String get menuBarMouseText => 'Mouse';
+
+  @override
+  String get menuBarLevelText => 'Lv.';
 }
