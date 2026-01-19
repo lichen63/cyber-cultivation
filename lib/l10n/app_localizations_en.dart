@@ -312,6 +312,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get menuBarInfoMouse => 'Mouse';
 
   @override
+  String get menuBarInfoSystemTime => 'Time';
+
+  @override
   String get menuBarSectionSystem => 'System Stats';
 
   @override

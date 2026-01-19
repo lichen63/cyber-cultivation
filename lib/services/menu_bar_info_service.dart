@@ -225,13 +225,15 @@ class MenuBarInfoService extends ChangeNotifier {
         final alignment = type == MenuBarInfoType.network ? 'left' : 'center';
         // Fixed widths to prevent layout shifts when values change
         final fixedWidth = _getFixedWidthForType(type);
-        items.add(MenuBarItem(
-          id: type.name,
-          top: top,
-          bottom: bottom,
-          alignment: alignment,
-          fixedWidth: fixedWidth,
-        ));
+        items.add(
+          MenuBarItem(
+            id: type.name,
+            top: top,
+            bottom: bottom,
+            alignment: alignment,
+            fixedWidth: fixedWidth,
+          ),
+        );
       }
     }
 
@@ -260,6 +262,8 @@ class MenuBarInfoService extends ChangeNotifier {
         return 38; // "⌨️" + "999.9K"
       case MenuBarInfoType.mouse:
         return 38; // "🖱" + "99.9km"
+      case MenuBarInfoType.systemTime:
+        return 115; // "2026-01-19 12:34" single row
     }
   }
 
@@ -276,6 +280,7 @@ class MenuBarInfoService extends ChangeNotifier {
       MenuBarInfoType.network,
       MenuBarInfoType.keyboard,
       MenuBarInfoType.mouse,
+      MenuBarInfoType.systemTime,
     ];
 
     return order.where((type) => _settings.isEnabled(type)).toList();
@@ -306,7 +311,18 @@ class MenuBarInfoService extends ChangeNotifier {
         return _buildKeyboardInfo();
       case MenuBarInfoType.mouse:
         return _buildMouseInfo();
+      case MenuBarInfoType.systemTime:
+        return _buildSystemTimeInfo();
     }
+  }
+
+  (String, String) _buildSystemTimeInfo() {
+    final now = DateTime.now();
+    final date =
+        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+    final time =
+        '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+    return (date, time);
   }
 
   (String, String) _buildFocusInfo() {

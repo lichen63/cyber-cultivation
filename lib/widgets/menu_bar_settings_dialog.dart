@@ -125,6 +125,10 @@ class _MenuBarSettingsDialogState extends State<MenuBarSettingsDialog> {
               title: l10n.menuBarInfoMouse,
               type: MenuBarInfoType.mouse,
             ),
+            _buildCheckboxTile(
+              title: l10n.menuBarInfoSystemTime,
+              type: MenuBarInfoType.systemTime,
+            ),
           ],
         ),
       ),

@@ -53,3 +53,5 @@
 - [ ] Check and show multiple screens if there are more than one screen(dependency: could we get the arrangement of the screens?)
 
 ## Bugs
+
+- [ ] Refine AppDelegate.swift

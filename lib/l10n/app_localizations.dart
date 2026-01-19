@@ -680,6 +680,12 @@ abstract class AppLocalizations {
   /// **'Mouse'**
   String get menuBarInfoMouse;
 
+  /// Time info option
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get menuBarInfoSystemTime;
+
   /// Section title for system stats
   ///
   /// In en, this message translates to:

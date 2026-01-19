@@ -406,6 +406,10 @@
     "@menuBarInfoMouse": {
         "description": "Mouse tracking info option"
     },
+    "menuBarInfoSystemTime": "Time",
+    "@menuBarInfoSystemTime": {
+        "description": "Time info option"
+    },
     "menuBarSectionSystem": "System Stats",
     "@menuBarSectionSystem": {
         "description": "Section title for system stats"

@@ -11,6 +11,7 @@ enum MenuBarInfoType {
   network,
   keyboard,
   mouse,
+  systemTime,
 }
 
 /// Settings for menu bar display

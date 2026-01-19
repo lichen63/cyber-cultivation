@@ -307,6 +307,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get menuBarInfoMouse => '鼠标';
 
   @override
+  String get menuBarInfoSystemTime => '时间';
+
+  @override
   String get menuBarSectionSystem => '系统状态';
 
   @override

@@ -97,6 +97,7 @@
     "menuBarInfoNetwork": "网络",
     "menuBarInfoKeyboard": "键盘",
     "menuBarInfoMouse": "鼠标",
+    "menuBarInfoSystemTime": "时间",
     "menuBarSectionSystem": "系统状态",
     "menuBarSectionTracking": "输入追踪",
     "menuBarSectionApp": "应用信息",
