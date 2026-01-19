@@ -140,7 +140,7 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
       iconPath = await _extractAsset(iconPath);
     }
     _trayIconPath = iconPath;
-    await _updateTrayIcon();
+    // Don't set icon here - let _updateMenuBarItems handle it for proper positioning
 
     final menu = Menu(
       items: [
@@ -153,9 +153,7 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
   }
 
   Future<void> _updateTrayIcon() async {
-    if (_menuBarSettings.showTrayIcon && _trayIconPath.isNotEmpty) {
-      await trayManager.setIcon(_trayIconPath);
-    }
+    // Icon is managed by _updateMenuBarItems for proper positioning
   }
 
   Future<void> _updateTrayTitle(String title) async {
@@ -173,18 +171,20 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
     if (items.isEmpty) {
       await MenuBarHelper.clearMenuBarItems();
       _trayIconPositioned = false; // Reset when items are cleared
+      // Also destroy tray icon when items are cleared
+      if (_menuBarSettings.showTrayIcon) {
+        await trayManager.destroy();
+      }
     } else {
-      // Only reposition tray icon once when items are first created
-      // This prevents flickering on subsequent updates
-      final needsRepositioning = !_trayIconPositioned &&
-          _menuBarSettings.showTrayIcon &&
-          _trayIconPath.isNotEmpty;
-
-      if (needsRepositioning) {
-        // To ensure tray icon appears LEFT of our items:
-        // 1. Destroy tray icon (removes its status item)
-        // 2. Set our items (they get created at leftmost positions)
-        // 3. Recreate tray icon (it becomes the new leftmost)
+      // To ensure tray icon appears LEFT of our items:
+      // 1. Destroy tray icon if it exists (removes its status item)
+      // 2. Set our items (they get created at leftmost positions)
+      // 3. Recreate tray icon (it becomes the new leftmost)
+      
+      final shouldShowTrayIcon = _menuBarSettings.showTrayIcon && _trayIconPath.isNotEmpty;
+      
+      // Only destroy/recreate if not yet positioned correctly
+      if (shouldShowTrayIcon && !_trayIconPositioned) {
         await trayManager.destroy();
       }
 
@@ -194,19 +194,22 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
         fontWeight: 'light',
       );
 
-      if (needsRepositioning) {
-        // Recreate tray icon so it appears leftmost
-        await trayManager.setIcon(_trayIconPath);
-        // Re-set context menu after recreating
-        final menu = Menu(
-          items: [
-            MenuItem(key: 'show_window', label: 'Show Window'),
-            MenuItem.separator(),
-            MenuItem(key: 'exit_app', label: 'Exit'),
-          ],
-        );
-        await trayManager.setContextMenu(menu);
-        _trayIconPositioned = true;
+      // Always ensure tray icon is shown when it should be
+      if (shouldShowTrayIcon) {
+        if (!_trayIconPositioned) {
+          // First time - set icon which creates it at leftmost position
+          await trayManager.setIcon(_trayIconPath);
+          // Re-set context menu after creating
+          final menu = Menu(
+            items: [
+              MenuItem(key: 'show_window', label: 'Show Window'),
+              MenuItem.separator(),
+              MenuItem(key: 'exit_app', label: 'Exit'),
+            ],
+          );
+          await trayManager.setContextMenu(menu);
+          _trayIconPositioned = true;
+        }
       }
     }
   }

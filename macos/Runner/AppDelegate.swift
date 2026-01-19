@@ -5,6 +5,7 @@ import FlutterMacOS
 class AppDelegate: FlutterAppDelegate {
   private var methodChannel: FlutterMethodChannel?
   private var statusItems: [String: NSStatusItem] = [:]
+  private var contextMenu: NSMenu?
   
   override func applicationDidFinishLaunching(_ notification: Notification) {
     let controller = mainFlutterWindow?.contentViewController as! FlutterViewController
@@ -12,6 +13,16 @@ class AppDelegate: FlutterAppDelegate {
       name: "menu_bar_helper",
       binaryMessenger: controller.engine.binaryMessenger
     )
+    
+    // Create context menu
+    contextMenu = NSMenu()
+    let showWindowItem = NSMenuItem(title: "Show Window", action: #selector(showWindowClicked), keyEquivalent: "")
+    showWindowItem.target = self
+    contextMenu?.addItem(showWindowItem)
+    contextMenu?.addItem(NSMenuItem.separator())
+    let exitItem = NSMenuItem(title: "Exit", action: #selector(exitClicked), keyEquivalent: "")
+    exitItem.target = self
+    contextMenu?.addItem(exitItem)
     
     methodChannel?.setMethodCallHandler { [weak self] (call, result) in
       switch call.method {
@@ -25,6 +36,15 @@ class AppDelegate: FlutterAppDelegate {
         result(FlutterMethodNotImplemented)
       }
     }
+  }
+  
+  @objc private func showWindowClicked() {
+    mainFlutterWindow?.makeKeyAndOrderFront(nil)
+    NSApp.activate(ignoringOtherApps: true)
+  }
+  
+  @objc private func exitClicked() {
+    NSApp.terminate(nil)
   }
   
   private func setMenuBarItems(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -116,10 +136,25 @@ class AppDelegate: FlutterAppDelegate {
         
         if let button = statusItem.button {
           button.attributedTitle = attributedString
+          // Add click action to show context menu
+          button.target = self
+          button.action = #selector(self.menuBarItemClicked(_:))
+          button.sendAction(on: [.leftMouseUp, .rightMouseUp])
         }
       }
       
       result(true)
+    }
+  }
+  
+  @objc private func menuBarItemClicked(_ sender: NSStatusBarButton) {
+    // Show context menu below the clicked button
+    guard let menu = contextMenu else { return }
+    // Use statusItem's button to show menu properly positioned below
+    if let statusItem = statusItems.values.first(where: { $0.button == sender }) {
+      statusItem.menu = menu
+      statusItem.button?.performClick(nil)
+      statusItem.menu = nil  // Remove menu so clicks still work
     }
   }
   
