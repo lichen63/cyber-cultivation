@@ -254,4 +254,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String sudokuTime(String time) {
     return '用时: $time';
   }
+
+  @override
+  String get resetLevelExpText => '重置等级和经验';
+
+  @override
+  String get resetLevelExpConfirmTitle => '重置进度?';
+
+  @override
+  String get resetLevelExpConfirmContent => '您的等级和经验将被重置到初始状态，此操作无法撤销。';
+
+  @override
+  String get resetButtonText => '重置';
 }

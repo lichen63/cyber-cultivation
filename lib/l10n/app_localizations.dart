@@ -577,6 +577,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Time: {time}'**
   String sudokuTime(String time);
+
+  /// Button text to reset level and experience
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Level & EXP'**
+  String get resetLevelExpText;
+
+  /// Title for reset level confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Progress?'**
+  String get resetLevelExpConfirmTitle;
+
+  /// Content for reset level confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Your level and experience will be reset to the beginning. This action cannot be undone.'**
+  String get resetLevelExpConfirmContent;
+
+  /// Text for reset button
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get resetButtonText;
 }
 
 class _AppLocalizationsDelegate

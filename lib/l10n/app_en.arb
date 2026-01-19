@@ -337,5 +337,21 @@
                 "type": "String"
             }
         }
+    },
+    "resetLevelExpText": "Reset Level & EXP",
+    "@resetLevelExpText": {
+        "description": "Button text to reset level and experience"
+    },
+    "resetLevelExpConfirmTitle": "Reset Progress?",
+    "@resetLevelExpConfirmTitle": {
+        "description": "Title for reset level confirmation dialog"
+    },
+    "resetLevelExpConfirmContent": "Your level and experience will be reset to the beginning. This action cannot be undone.",
+    "@resetLevelExpConfirmContent": {
+        "description": "Content for reset level confirmation dialog"
+    },
+    "resetButtonText": "Reset",
+    "@resetButtonText": {
+        "description": "Text for reset button"
     }
 }

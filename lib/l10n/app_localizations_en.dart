@@ -260,4 +260,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String sudokuTime(String time) {
     return 'Time: $time';
   }
+
+  @override
+  String get resetLevelExpText => 'Reset Level & EXP';
+
+  @override
+  String get resetLevelExpConfirmTitle => 'Reset Progress?';
+
+  @override
+  String get resetLevelExpConfirmContent =>
+      'Your level and experience will be reset to the beginning. This action cannot be undone.';
+
+  @override
+  String get resetButtonText => 'Reset';
 }

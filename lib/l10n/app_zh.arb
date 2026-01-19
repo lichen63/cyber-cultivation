@@ -79,5 +79,9 @@
     "sudokuMistakes": "错误: {count}/{max}",
     "sudokuCompleted": "恭喜完成！",
     "sudokuTooManyMistakes": "错误次数过多！",
-    "sudokuTime": "用时: {time}"
+    "sudokuTime": "用时: {time}",
+    "resetLevelExpText": "重置等级和经验",
+    "resetLevelExpConfirmTitle": "重置进度?",
+    "resetLevelExpConfirmContent": "您的等级和经验将被重置到初始状态，此操作无法撤销。",
+    "resetButtonText": "重置"
 }

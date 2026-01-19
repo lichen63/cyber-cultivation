@@ -661,8 +661,18 @@ class _MyHomePageState extends State<MyHomePage>
           widget.onThemeModeChanged?.call(value);
           _saveGameData();
         },
+        onResetLevelExp: _resetLevelExp,
       ),
     );
+  }
+
+  void _resetLevelExp() {
+    setState(() {
+      _level = AppConstants.initialLevel;
+      _currentExp = 0;
+      _maxExp = AppConstants.initialMaxExp;
+    });
+    _saveGameData(immediate: true);
   }
 
   void _toggleAutoStart(bool value) async {
