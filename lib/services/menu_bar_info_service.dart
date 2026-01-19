@@ -263,7 +263,7 @@ class MenuBarInfoService extends ChangeNotifier {
       case MenuBarInfoType.mouse:
         return 38; // "🖱" + "99.9km"
       case MenuBarInfoType.systemTime:
-        return 115; // "2026-01-19 12:34" single row
+        return 120; // "2026-01-19 12:34" single row
     }
   }
 

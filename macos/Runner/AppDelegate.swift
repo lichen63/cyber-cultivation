@@ -129,7 +129,7 @@ class AppDelegate: FlutterAppDelegate {
         if id == "systemTime" {
           let timeText = "\(topText) \(bottomText)"  // Combine date and time on one line
           let timeAttributes: [NSAttributedString.Key: Any] = [
-            .font: NSFont.monospacedDigitSystemFont(ofSize: 12, weight: .regular),
+            .font: NSFont.monospacedDigitSystemFont(ofSize: 13, weight: .medium),
             .foregroundColor: NSColor.textColor,
             .paragraphStyle: style,
             .baselineOffset: 0
@@ -292,226 +292,219 @@ class AppDelegate: FlutterAppDelegate {
 class CalendarViewController: NSViewController {
   private var currentYear: Int = 0
   private var currentMonth: Int = 0
-  private var selectedDate: Date?
   
   private let calendar = Calendar.current
   private let dateFormatter = DateFormatter()
   
   private var monthLabel: NSTextField!
-  private var gridStackView: NSStackView!
-  private var weekdayStack: NSStackView!
+  private var calendarGrid: NSGridView!
   private var timeLabel: NSTextField!
   private var timeTimer: Timer?
+  
+  private let itemSize: CGSize = CGSize(width: 36, height: 28)
   
   deinit {
     timeTimer?.invalidate()
   }
   
   override func loadView() {
-    let containerView = NSView(frame: NSRect(x: 0, y: 0, width: 340, height: 100))
-    containerView.wantsLayer = true
+    // Main container with border
+    let mainContainer = NSView()
+    mainContainer.wantsLayer = true
+    mainContainer.layer?.cornerRadius = 10
+    mainContainer.layer?.borderColor = NSColor(white: 0.3, alpha: 1.0).cgColor
+    mainContainer.layer?.borderWidth = 1
+    mainContainer.layer?.masksToBounds = true
+    mainContainer.translatesAutoresizingMaskIntoConstraints = false
     
-    // Main stack view
     let mainStack = NSStackView()
     mainStack.orientation = .vertical
-    mainStack.alignment = .centerX
     mainStack.spacing = 0
     mainStack.translatesAutoresizingMaskIntoConstraints = false
-    containerView.addSubview(mainStack)
+    mainContainer.addSubview(mainStack)
     
     NSLayoutConstraint.activate([
-      mainStack.topAnchor.constraint(equalTo: containerView.topAnchor),
-      mainStack.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
-      mainStack.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
-      mainStack.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
+      mainStack.topAnchor.constraint(equalTo: mainContainer.topAnchor),
+      mainStack.leadingAnchor.constraint(equalTo: mainContainer.leadingAnchor),
+      mainStack.trailingAnchor.constraint(equalTo: mainContainer.trailingAnchor),
+      mainStack.bottomAnchor.constraint(equalTo: mainContainer.bottomAnchor)
     ])
     
-    // Calendar container with background
-    let calendarContainer = NSView()
+    // Title bar with calendar icon and "Clock" title
+    let titleBar = createTitleBar()
+    mainStack.addArrangedSubview(titleBar)
+    
+    // Calendar section
+    let calendarContainer = NSStackView()
+    calendarContainer.orientation = .vertical
+    calendarContainer.spacing = 8
     calendarContainer.wantsLayer = true
     calendarContainer.layer?.backgroundColor = NSColor(white: 0.15, alpha: 1.0).cgColor
-    calendarContainer.translatesAutoresizingMaskIntoConstraints = false
+    calendarContainer.edgeInsets = NSEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
     
-    let calendarStack = NSStackView()
-    calendarStack.orientation = .vertical
-    calendarStack.alignment = .centerX
-    calendarStack.spacing = 10
-    calendarStack.edgeInsets = NSEdgeInsets(top: 14, left: 16, bottom: 14, right: 16)
-    calendarStack.translatesAutoresizingMaskIntoConstraints = false
-    calendarContainer.addSubview(calendarStack)
+    // Navigation header
+    let headerView = createNavigationHeader()
+    calendarContainer.addArrangedSubview(headerView)
     
-    NSLayoutConstraint.activate([
-      calendarStack.topAnchor.constraint(equalTo: calendarContainer.topAnchor),
-      calendarStack.leadingAnchor.constraint(equalTo: calendarContainer.leadingAnchor),
-      calendarStack.trailingAnchor.constraint(equalTo: calendarContainer.trailingAnchor),
-      calendarStack.bottomAnchor.constraint(equalTo: calendarContainer.bottomAnchor)
-    ])
-    
-    // Navigation header - use overlay approach for true centering
-    let headerContainer = NSView()
-    headerContainer.translatesAutoresizingMaskIntoConstraints = false
-    
-    // Month label centered
-    monthLabel = NSTextField(labelWithString: "")
-    monthLabel.font = NSFont.systemFont(ofSize: 18, weight: .semibold)
-    monthLabel.alignment = .center
-    monthLabel.translatesAutoresizingMaskIntoConstraints = false
-    headerContainer.addSubview(monthLabel)
-    
-    // Navigation buttons on sides
-    let prevButton = createNavigationButton(title: "◀", action: #selector(previousMonth))
-    prevButton.translatesAutoresizingMaskIntoConstraints = false
-    headerContainer.addSubview(prevButton)
-    
-    let nextButton = createNavigationButton(title: "▶", action: #selector(nextMonth))
-    nextButton.translatesAutoresizingMaskIntoConstraints = false
-    headerContainer.addSubview(nextButton)
-    
-    let todayButton = createNavigationButton(title: "Today", action: #selector(goToToday))
-    todayButton.font = NSFont.systemFont(ofSize: 14)
-    todayButton.translatesAutoresizingMaskIntoConstraints = false
-    headerContainer.addSubview(todayButton)
-    
-    NSLayoutConstraint.activate([
-      // Center month label
-      monthLabel.centerXAnchor.constraint(equalTo: headerContainer.centerXAnchor),
-      monthLabel.centerYAnchor.constraint(equalTo: headerContainer.centerYAnchor),
-      
-      // Prev button on left of month label
-      prevButton.trailingAnchor.constraint(equalTo: monthLabel.leadingAnchor, constant: -8),
-      prevButton.centerYAnchor.constraint(equalTo: headerContainer.centerYAnchor),
-      
-      // Next button on right of month label
-      nextButton.leadingAnchor.constraint(equalTo: monthLabel.trailingAnchor, constant: 8),
-      nextButton.centerYAnchor.constraint(equalTo: headerContainer.centerYAnchor),
-      
-      // Today button on far right
-      todayButton.trailingAnchor.constraint(equalTo: headerContainer.trailingAnchor),
-      todayButton.centerYAnchor.constraint(equalTo: headerContainer.centerYAnchor),
-      
-      // Header height
-      headerContainer.heightAnchor.constraint(equalToConstant: 30)
-    ])
-    
-    calendarStack.addArrangedSubview(headerContainer)
-    
-    // Constrain header to fill width
-    NSLayoutConstraint.activate([
-      headerContainer.leadingAnchor.constraint(equalTo: calendarStack.leadingAnchor, constant: 16),
-      headerContainer.trailingAnchor.constraint(equalTo: calendarStack.trailingAnchor, constant: -16)
-    ])
-    
-    // Weekday headers - use fixed width cells
-    weekdayStack = NSStackView()
-    weekdayStack.orientation = .horizontal
-    weekdayStack.distribution = .fillEqually
-    weekdayStack.spacing = 0
-    weekdayStack.translatesAutoresizingMaskIntoConstraints = false
-    
-    let weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
-    for day in weekdays {
-      let label = NSTextField(labelWithString: day)
-      label.font = NSFont.systemFont(ofSize: 13, weight: .medium)
-      label.textColor = NSColor.secondaryLabelColor
-      label.alignment = .center
-      weekdayStack.addArrangedSubview(label)
-    }
-    
-    calendarStack.addArrangedSubview(weekdayStack)
-    
-    // Constrain weekday to fill width
-    NSLayoutConstraint.activate([
-      weekdayStack.leadingAnchor.constraint(equalTo: calendarStack.leadingAnchor, constant: 16),
-      weekdayStack.trailingAnchor.constraint(equalTo: calendarStack.trailingAnchor, constant: -16)
-    ])
-    
-    // Days grid
-    gridStackView = NSStackView()
-    gridStackView.orientation = .vertical
-    gridStackView.spacing = 4
-    gridStackView.distribution = .fillEqually
-    gridStackView.translatesAutoresizingMaskIntoConstraints = false
-    
-    calendarStack.addArrangedSubview(gridStackView)
-    
-    // Constrain gridStackView to have same width as weekdayStack
-    NSLayoutConstraint.activate([
-      gridStackView.leadingAnchor.constraint(equalTo: weekdayStack.leadingAnchor),
-      gridStackView.trailingAnchor.constraint(equalTo: weekdayStack.trailingAnchor)
-    ])
+    // Calendar grid (weekday headers + days)
+    calendarGrid = NSGridView()
+    calendarGrid.rowSpacing = 2
+    calendarGrid.columnSpacing = 0
+    calendarGrid.translatesAutoresizingMaskIntoConstraints = false
+    calendarContainer.addArrangedSubview(calendarGrid)
     
     mainStack.addArrangedSubview(calendarContainer)
     
-    // Constrain calendar container to fill width
-    NSLayoutConstraint.activate([
-      calendarContainer.leadingAnchor.constraint(equalTo: mainStack.leadingAnchor),
-      calendarContainer.trailingAnchor.constraint(equalTo: mainStack.trailingAnchor)
-    ])
-    
-    // Time label container with different background
+    // Time section
     let timeContainer = NSView()
     timeContainer.wantsLayer = true
     timeContainer.layer?.backgroundColor = NSColor(white: 0.1, alpha: 1.0).cgColor
     timeContainer.translatesAutoresizingMaskIntoConstraints = false
     
     timeLabel = NSTextField(labelWithString: "")
-    timeLabel.font = NSFont.monospacedDigitSystemFont(ofSize: 26, weight: .light)
+    timeLabel.font = NSFont.monospacedDigitSystemFont(ofSize: 18, weight: .light)
     timeLabel.alignment = .center
     timeLabel.textColor = NSColor.labelColor
     timeLabel.translatesAutoresizingMaskIntoConstraints = false
     timeContainer.addSubview(timeLabel)
     
     NSLayoutConstraint.activate([
-      timeLabel.topAnchor.constraint(equalTo: timeContainer.topAnchor, constant: 12),
-      timeLabel.bottomAnchor.constraint(equalTo: timeContainer.bottomAnchor, constant: -12),
+      timeLabel.topAnchor.constraint(equalTo: timeContainer.topAnchor, constant: 10),
+      timeLabel.bottomAnchor.constraint(equalTo: timeContainer.bottomAnchor, constant: -10),
       timeLabel.leadingAnchor.constraint(equalTo: timeContainer.leadingAnchor),
       timeLabel.trailingAnchor.constraint(equalTo: timeContainer.trailingAnchor)
     ])
     
     mainStack.addArrangedSubview(timeContainer)
     
-    // Constrain time container to fill width
+    // Constrain time container width
     NSLayoutConstraint.activate([
       timeContainer.leadingAnchor.constraint(equalTo: mainStack.leadingAnchor),
       timeContainer.trailingAnchor.constraint(equalTo: mainStack.trailingAnchor)
     ])
     
-    self.view = containerView
-    
-    // Update frame to fit content
-    containerView.layoutSubtreeIfNeeded()
-    let fittingSize = mainStack.fittingSize
-    containerView.frame = NSRect(x: 0, y: 0, width: max(340, fittingSize.width), height: fittingSize.height)
+    self.view = mainContainer
   }
   
-  private func createNavigationButton(title: String, action: Selector) -> NSButton {
+  private func createNavigationHeader() -> NSView {
+    let view = NSStackView()
+    view.orientation = .horizontal
+    view.distribution = .fill
+    view.spacing = 8
+    
+    // Month/Year label
+    monthLabel = NSTextField(labelWithString: "")
+    monthLabel.font = NSFont.systemFont(ofSize: 16, weight: .medium)
+    monthLabel.alignment = .left
+    
+    // Buttons container
+    let buttons = NSStackView()
+    buttons.orientation = .horizontal
+    buttons.spacing = 4
+    
+    let prevButton = createNavButton(title: "◀", action: #selector(previousMonth))
+    let nextButton = createNavButton(title: "▶", action: #selector(nextMonth))
+    let todayButton = createNavButton(title: "Today", action: #selector(goToToday))
+    todayButton.font = NSFont.systemFont(ofSize: 12)
+    
+    buttons.addArrangedSubview(prevButton)
+    buttons.addArrangedSubview(nextButton)
+    buttons.addArrangedSubview(todayButton)
+    
+    view.addArrangedSubview(monthLabel)
+    view.addArrangedSubview(NSView()) // Spacer
+    view.addArrangedSubview(buttons)
+    
+    view.heightAnchor.constraint(equalToConstant: 24).isActive = true
+    
+    return view
+  }
+  
+  private func createTitleBar() -> NSView {
+    let titleBar = NSView()
+    titleBar.wantsLayer = true
+    titleBar.layer?.backgroundColor = NSColor(white: 0.12, alpha: 1.0).cgColor
+    titleBar.translatesAutoresizingMaskIntoConstraints = false
+    
+    // Calendar icon button on left edge
+    let calendarButton = NSButton()
+    calendarButton.bezelStyle = .inline
+    calendarButton.isBordered = false
+    calendarButton.target = self
+    calendarButton.action = #selector(openCalendarApp)
+    calendarButton.toolTip = "Open Calendar"
+    calendarButton.translatesAutoresizingMaskIntoConstraints = false
+    
+    // Use SF Symbol for calendar icon
+    if #available(macOS 11.0, *) {
+      let config = NSImage.SymbolConfiguration(pointSize: 18, weight: .regular)
+      if let icon = NSImage(systemSymbolName: "calendar", accessibilityDescription: "Calendar") {
+        calendarButton.image = icon.withSymbolConfiguration(config)
+      }
+    } else {
+      calendarButton.title = "📅"
+    }
+    calendarButton.contentTintColor = .secondaryLabelColor
+    
+    // Centered title
+    let titleLabel = NSTextField(labelWithString: "Clock")
+    titleLabel.font = NSFont.systemFont(ofSize: 18, weight: .semibold)
+    titleLabel.alignment = .center
+    titleLabel.textColor = .labelColor
+    titleLabel.backgroundColor = .clear
+    titleLabel.drawsBackground = false
+    titleLabel.translatesAutoresizingMaskIntoConstraints = false
+    
+    titleBar.addSubview(calendarButton)
+    titleBar.addSubview(titleLabel)
+    
+    NSLayoutConstraint.activate([
+      titleBar.heightAnchor.constraint(equalToConstant: 32),
+      
+      // Calendar button on left edge
+      calendarButton.leadingAnchor.constraint(equalTo: titleBar.leadingAnchor, constant: 8),
+      calendarButton.centerYAnchor.constraint(equalTo: titleBar.centerYAnchor),
+      
+      // Title centered in the title bar
+      titleLabel.centerXAnchor.constraint(equalTo: titleBar.centerXAnchor),
+      titleLabel.centerYAnchor.constraint(equalTo: titleBar.centerYAnchor)
+    ])
+    
+    return titleBar
+  }
+  
+  @objc private func openCalendarApp() {
+    let calendarPath = "/System/Applications/Calendar.app"
+    NSWorkspace.shared.open(URL(fileURLWithPath: calendarPath))
+    
+    // Close popover
+    if let popover = (NSApp.delegate as? AppDelegate)?.calendarPopover {
+      popover.performClose(nil)
+    }
+  }
+  
+  private func createNavButton(title: String, action: Selector) -> NSButton {
     let button = NSButton(title: title, target: self, action: action)
     button.bezelStyle = .inline
     button.isBordered = false
-    button.font = NSFont.systemFont(ofSize: 16)
+    button.font = NSFont.systemFont(ofSize: 14)
+    button.contentTintColor = .labelColor
     return button
   }
   
   func updateToCurrentDate() {
-    // Ensure view is loaded before accessing UI elements
     _ = self.view
     
     let now = Date()
     currentYear = calendar.component(.year, from: now)
     currentMonth = calendar.component(.month, from: now)
-    selectedDate = now
     updateCalendarDisplay()
     startTimeTimer()
   }
   
   private func startTimeTimer() {
-    // Stop existing timer
     timeTimer?.invalidate()
-    
-    // Update time immediately
     updateTimeLabel()
-    
-    // Update every second
     timeTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
       self?.updateTimeLabel()
     }
@@ -542,135 +535,191 @@ class CalendarViewController: NSViewController {
   }
   
   @objc private func goToToday() {
-    updateToCurrentDate()
+    let now = Date()
+    currentYear = calendar.component(.year, from: now)
+    currentMonth = calendar.component(.month, from: now)
+    updateCalendarDisplay()
   }
   
   private func updateCalendarDisplay() {
     // Update month label
-    dateFormatter.dateFormat = "MMMM yyyy"
-    let components = DateComponents(year: currentYear, month: currentMonth, day: 1)
-    if let date = calendar.date(from: components) {
-      monthLabel.stringValue = dateFormatter.string(from: date)
-    }
+    monthLabel.stringValue = "\(calendar.standaloneMonthSymbols[currentMonth - 1]) \(currentYear)"
     
-    // Clear existing day buttons
-    for subview in gridStackView.arrangedSubviews {
-      gridStackView.removeArrangedSubview(subview)
+    // Clear all subviews from the grid first
+    for subview in calendarGrid.subviews {
       subview.removeFromSuperview()
     }
     
-    // Get first day of month and number of days
-    var startComponents = DateComponents()
-    startComponents.year = currentYear
-    startComponents.month = currentMonth
-    startComponents.day = 1
-    
-    guard let firstDayOfMonth = calendar.date(from: startComponents),
-          let range = calendar.range(of: .day, in: .month, for: firstDayOfMonth) else {
-      return
+    // Clear existing rows
+    while calendarGrid.numberOfRows > 0 {
+      calendarGrid.removeRow(at: 0)
     }
     
-    let firstWeekday = calendar.component(.weekday, from: firstDayOfMonth) // 1 = Sunday
-    let numberOfDays = range.count
+    // Add weekday headers
+    let weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+    let headerViews = weekdays.map { createHeaderCell($0) }
+    calendarGrid.addRow(with: headerViews)
     
-    // Get today's date for highlighting
+    // Generate days for the month
+    let weeks = generateDays(for: currentMonth, in: currentYear)
+    
+    // Get today's date
     let today = Date()
     let todayYear = calendar.component(.year, from: today)
     let todayMonth = calendar.component(.month, from: today)
     let todayDay = calendar.component(.day, from: today)
     
-    // Create 6 weeks of rows
-    var dayCounter = 1
-    for week in 0..<6 {
-      let rowStack = NSStackView()
-      rowStack.orientation = .horizontal
-      rowStack.distribution = .fillEqually
-      rowStack.spacing = 0  // Match weekday header spacing
-      rowStack.translatesAutoresizingMaskIntoConstraints = false
-      
-      for weekday in 1...7 {
-        let cellIndex = week * 7 + weekday
-        let dayNumber: Int?
-        
-        if cellIndex < firstWeekday || dayCounter > numberOfDays {
-          dayNumber = nil
-        } else {
-          dayNumber = dayCounter
-          dayCounter += 1
-        }
-        
-        let button = createDayButton(
-          day: dayNumber,
-          isToday: dayNumber != nil &&
-                   currentYear == todayYear &&
-                   currentMonth == todayMonth &&
-                   dayNumber == todayDay
-        )
-        rowStack.addArrangedSubview(button)
+    // Add day rows
+    for week in weeks {
+      let dayViews = week.map { day -> NSView in
+        let isToday = day.year == todayYear && day.month == todayMonth && day.day == todayDay
+        let isCurrentMonth = day.month == currentMonth
+        return createDayCell(day: day.day ?? 0, isToday: isToday, isCurrentMonth: isCurrentMonth, components: day)
       }
+      calendarGrid.addRow(with: dayViews)
+    }
+    
+    // Set column widths and center alignment
+    for i in 0..<calendarGrid.numberOfColumns {
+      let column = calendarGrid.column(at: i)
+      column.width = itemSize.width
+      column.xPlacement = .center
+    }
+    
+    // Set row heights and center alignment
+    for i in 0..<calendarGrid.numberOfRows {
+      let row = calendarGrid.row(at: i)
+      row.height = itemSize.height
+      row.yPlacement = .center
+    }
+  }
+  
+  private func createHeaderCell(_ text: String) -> NSView {
+    let container = NSView()
+    container.translatesAutoresizingMaskIntoConstraints = false
+    
+    let field = NSTextField(labelWithString: text)
+    field.font = NSFont.systemFont(ofSize: 11, weight: .medium)
+    field.textColor = .secondaryLabelColor
+    field.alignment = .center
+    field.translatesAutoresizingMaskIntoConstraints = false
+    container.addSubview(field)
+    
+    NSLayoutConstraint.activate([
+      field.centerXAnchor.constraint(equalTo: container.centerXAnchor),
+      field.centerYAnchor.constraint(equalTo: container.centerYAnchor)
+    ])
+    
+    return container
+  }
+  
+  private func createDayCell(day: Int, isToday: Bool, isCurrentMonth: Bool, components: DateComponents) -> NSView {
+    let container = NSView()
+    container.wantsLayer = true
+    container.translatesAutoresizingMaskIntoConstraints = false
+    
+    // Create background circle for today
+    let backgroundView = NSView()
+    backgroundView.wantsLayer = true
+    backgroundView.translatesAutoresizingMaskIntoConstraints = false
+    if isToday {
+      backgroundView.layer?.backgroundColor = NSColor.systemRed.cgColor
+    }
+    container.addSubview(backgroundView)
+    
+    let field = NSTextField(labelWithString: day > 0 ? "\(day)" : "")
+    field.font = NSFont.systemFont(ofSize: 13)
+    field.alignment = .center
+    field.isBezeled = false
+    field.drawsBackground = false
+    field.isEditable = false
+    field.isSelectable = false
+    
+    if isToday {
+      field.textColor = .white
+    } else if !isCurrentMonth {
+      field.textColor = .tertiaryLabelColor
+    } else {
+      field.textColor = .labelColor
+    }
+    
+    field.translatesAutoresizingMaskIntoConstraints = false
+    container.addSubview(field)
+    
+    // Size for the circle background
+    let circleSize: CGFloat = 26
+    
+    NSLayoutConstraint.activate([
+      // Center the background circle
+      backgroundView.centerXAnchor.constraint(equalTo: container.centerXAnchor),
+      backgroundView.centerYAnchor.constraint(equalTo: container.centerYAnchor),
+      backgroundView.widthAnchor.constraint(equalToConstant: circleSize),
+      backgroundView.heightAnchor.constraint(equalToConstant: circleSize),
       
-      gridStackView.addArrangedSubview(rowStack)
-      
-      // Constrain row to fill the grid width (match weekday header)
-      NSLayoutConstraint.activate([
-        rowStack.leadingAnchor.constraint(equalTo: gridStackView.leadingAnchor),
-        rowStack.trailingAnchor.constraint(equalTo: gridStackView.trailingAnchor)
-      ])
-      
-      // Stop if we've rendered all days and completed the week
-      if dayCounter > numberOfDays && week >= 3 {
+      // Center the text
+      field.centerXAnchor.constraint(equalTo: container.centerXAnchor),
+      field.centerYAnchor.constraint(equalTo: container.centerYAnchor)
+    ])
+    
+    // Set corner radius after layout
+    if isToday {
+      backgroundView.layer?.cornerRadius = circleSize / 2
+    }
+    
+    return container
+  }
+  
+  private func generateDays(for month: Int, in year: Int) -> [[DateComponents]] {
+    let dateComponents = DateComponents(year: year, month: month)
+    
+    guard let range = calendar.range(of: .day, in: .month, for: calendar.date(from: dateComponents)!),
+          let firstDayOfMonth = calendar.date(from: dateComponents),
+          let firstWeekdayOfMonth = calendar.dateComponents([.weekday], from: firstDayOfMonth).weekday else {
+      return []
+    }
+    
+    let daysFromPreviousMonth = firstWeekdayOfMonth - 1
+    
+    // Get previous month info
+    var previousMonthComponents = dateComponents
+    previousMonthComponents.month = (month == 1) ? 12 : month - 1
+    previousMonthComponents.year = (month == 1) ? year - 1 : year
+    let previousMonthDate = calendar.date(from: previousMonthComponents)!
+    let previousMonthDays = calendar.range(of: .day, in: .month, for: previousMonthDate)!.count
+    
+    var allDays: [DateComponents] = []
+    
+    // Previous month days
+    for i in 0..<daysFromPreviousMonth {
+      let day = previousMonthDays - daysFromPreviousMonth + i + 1
+      allDays.append(DateComponents(year: previousMonthComponents.year, month: previousMonthComponents.month, day: day))
+    }
+    
+    // Current month days
+    for day in range {
+      allDays.append(DateComponents(year: year, month: month, day: day))
+    }
+    
+    // Next month days to fill remaining slots
+    let nextMonth = (month == 12) ? 1 : month + 1
+    let nextYear = (month == 12) ? year + 1 : year
+    var nextDay = 1
+    while allDays.count < 42 { // 6 weeks * 7 days
+      allDays.append(DateComponents(year: nextYear, month: nextMonth, day: nextDay))
+      nextDay += 1
+    }
+    
+    // Split into weeks
+    var weeks: [[DateComponents]] = []
+    for i in stride(from: 0, to: allDays.count, by: 7) {
+      let week = Array(allDays[i..<min(i+7, allDays.count)])
+      weeks.append(week)
+      // Stop if we've shown all current month days and completed the week
+      if let lastDay = week.last, lastDay.month != month && weeks.count >= 4 {
         break
       }
     }
-  }
-  
-  private func createDayButton(day: Int?, isToday: Bool) -> NSButton {
-    let button = NSButton()
-    button.bezelStyle = .inline
-    button.isBordered = false
     
-    if let day = day {
-      button.title = "\(day)"
-      button.target = self
-      button.action = #selector(dayClicked(_:))
-      button.tag = day
-      
-      if isToday {
-        button.wantsLayer = true
-        button.layer?.backgroundColor = NSColor.controlAccentColor.cgColor
-        button.layer?.cornerRadius = 8
-        button.contentTintColor = NSColor.white
-      }
-    } else {
-      button.title = ""
-      button.isEnabled = false
-    }
-    
-    button.font = NSFont.systemFont(ofSize: 16)
-    return button
-  }
-  
-  @objc private func dayClicked(_ sender: NSButton) {
-    let day = sender.tag
-    
-    // Create the date for the clicked day
-    var components = DateComponents()
-    components.year = currentYear
-    components.month = currentMonth
-    components.day = day
-    components.hour = 12 // Noon to avoid timezone issues
-    
-    guard let clickedDate = calendar.date(from: components) else { return }
-    
-    // Open system Calendar app at the clicked date
-    let timestamp = clickedDate.timeIntervalSinceReferenceDate
-    if let url = URL(string: "calshow:\(timestamp)") {
-      NSWorkspace.shared.open(url)
-    }
-    
-    // Close the popover
-    if let popover = (NSApp.delegate as? AppDelegate)?.calendarPopover {
-      popover.performClose(nil)
-    }
+    return weeks
   }
 }
