@@ -17,6 +17,7 @@ Please follow these rules in every interaction:
 
 4.  **State Management**:
     - Keep state management consistent. Use `setState` for local state. Do not introduce new libraries without permission.
+    - When adding new settings, consider whether they need to be persisted to the local save file (`game_save.json` via `GameData` model).
 
 5.  **Responsive UI**: 
     - When modifying UI, always consider different screen resolutions and window sizes.
