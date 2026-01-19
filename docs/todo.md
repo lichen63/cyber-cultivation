@@ -42,6 +42,7 @@
 - [x] Show todo list in one action button
 - [x] Replace B-1 with game list, first game is greedy snake
 - [x] Add unit/widget/integration tests
+- [ ] Show info in system menu bar
 - [ ] Add windows platform support
 - [ ] Add unix-like platform support
 - [ ] Let player customize the character image
