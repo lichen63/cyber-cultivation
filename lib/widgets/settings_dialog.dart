@@ -7,6 +7,9 @@ class SettingsDialog extends StatefulWidget {
   final bool isAntiSleepEnabled;
   final bool isAlwaysShowActionButtons;
   final bool isAutoStartEnabled;
+  final bool isShowSystemStats;
+  final bool isShowKeyboardTrack;
+  final bool isShowMouseTrack;
   final String? currentLanguage;
   final AppThemeMode themeMode;
   final AppThemeColors themeColors;
@@ -14,8 +17,12 @@ class SettingsDialog extends StatefulWidget {
   final ValueChanged<bool> onAntiSleepChanged;
   final ValueChanged<bool> onAlwaysShowActionButtonsChanged;
   final ValueChanged<bool> onAutoStartChanged;
+  final ValueChanged<bool> onShowSystemStatsChanged;
+  final ValueChanged<bool> onShowKeyboardTrackChanged;
+  final ValueChanged<bool> onShowMouseTrackChanged;
   final ValueChanged<String?> onLanguageChanged;
   final ValueChanged<AppThemeMode> onThemeModeChanged;
+  final VoidCallback? onResetLevelExp;
 
   const SettingsDialog({
     super.key,
@@ -23,6 +30,9 @@ class SettingsDialog extends StatefulWidget {
     required this.isAntiSleepEnabled,
     required this.isAlwaysShowActionButtons,
     required this.isAutoStartEnabled,
+    required this.isShowSystemStats,
+    required this.isShowKeyboardTrack,
+    required this.isShowMouseTrack,
     this.currentLanguage,
     required this.themeMode,
     required this.themeColors,
@@ -30,8 +40,12 @@ class SettingsDialog extends StatefulWidget {
     required this.onAntiSleepChanged,
     required this.onAlwaysShowActionButtonsChanged,
     required this.onAutoStartChanged,
+    required this.onShowSystemStatsChanged,
+    required this.onShowKeyboardTrackChanged,
+    required this.onShowMouseTrackChanged,
     required this.onLanguageChanged,
     required this.onThemeModeChanged,
+    this.onResetLevelExp,
   });
 
   @override
@@ -43,6 +57,9 @@ class _SettingsDialogState extends State<SettingsDialog> {
   late bool _isAntiSleepEnabled;
   late bool _isAlwaysShowActionButtons;
   late bool _isAutoStartEnabled;
+  late bool _isShowSystemStats;
+  late bool _isShowKeyboardTrack;
+  late bool _isShowMouseTrack;
   late String? _currentLanguage;
   late AppThemeMode _themeMode;
 
@@ -55,6 +72,9 @@ class _SettingsDialogState extends State<SettingsDialog> {
     _isAntiSleepEnabled = widget.isAntiSleepEnabled;
     _isAlwaysShowActionButtons = widget.isAlwaysShowActionButtons;
     _isAutoStartEnabled = widget.isAutoStartEnabled;
+    _isShowSystemStats = widget.isShowSystemStats;
+    _isShowKeyboardTrack = widget.isShowKeyboardTrack;
+    _isShowMouseTrack = widget.isShowMouseTrack;
     _currentLanguage = widget.currentLanguage;
     _themeMode = widget.themeMode;
   }
@@ -97,6 +117,15 @@ class _SettingsDialogState extends State<SettingsDialog> {
           ),
           const SizedBox(height: 16),
           _buildSwitchTile(
+            title: l10n.autoStartText,
+            value: _isAutoStartEnabled,
+            onChanged: (value) {
+              setState(() => _isAutoStartEnabled = value);
+              widget.onAutoStartChanged(value);
+            },
+          ),
+          const SizedBox(height: 16),
+          _buildSwitchTile(
             title: l10n.alwaysShowActionsText,
             value: _isAlwaysShowActionButtons,
             onChanged: (value) {
@@ -106,17 +135,39 @@ class _SettingsDialogState extends State<SettingsDialog> {
           ),
           const SizedBox(height: 16),
           _buildSwitchTile(
-            title: l10n.autoStartText,
-            value: _isAutoStartEnabled,
+            title: l10n.showSystemStatsText,
+            value: _isShowSystemStats,
             onChanged: (value) {
-              setState(() => _isAutoStartEnabled = value);
-              widget.onAutoStartChanged(value);
+              setState(() => _isShowSystemStats = value);
+              widget.onShowSystemStatsChanged(value);
+            },
+          ),
+          const SizedBox(height: 16),
+          _buildSwitchTile(
+            title: l10n.showKeyboardTrackText,
+            value: _isShowKeyboardTrack,
+            onChanged: (value) {
+              setState(() => _isShowKeyboardTrack = value);
+              widget.onShowKeyboardTrackChanged(value);
+            },
+          ),
+          const SizedBox(height: 16),
+          _buildSwitchTile(
+            title: l10n.showMouseTrackText,
+            value: _isShowMouseTrack,
+            onChanged: (value) {
+              setState(() => _isShowMouseTrack = value);
+              widget.onShowMouseTrackChanged(value);
             },
           ),
           const SizedBox(height: 16),
           _buildThemeModeSelector(l10n),
           const SizedBox(height: 16),
           _buildLanguageSelector(l10n),
+          if (widget.onResetLevelExp != null) ...[
+            const SizedBox(height: 24),
+            _buildResetLevelExpButton(l10n),
+          ],
         ],
       ),
       actions: [
@@ -137,7 +188,10 @@ class _SettingsDialogState extends State<SettingsDialog> {
       children: [
         Text(
           l10n.themeMode,
-          style: TextStyle(color: _colors.primaryText, fontSize: AppConstants.fontSizeDialogContent),
+          style: TextStyle(
+            color: _colors.primaryText,
+            fontSize: AppConstants.fontSizeDialogContent,
+          ),
         ),
         ToggleButtons(
           isSelected: [
@@ -156,10 +210,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
           borderColor: _colors.inactive,
           selectedBorderColor: _colors.accent,
           constraints: const BoxConstraints(minWidth: 60, minHeight: 32),
-          children: [
-            Text(l10n.lightMode),
-            Text(l10n.darkMode),
-          ],
+          children: [Text(l10n.lightMode), Text(l10n.darkMode)],
         ),
       ],
     );
@@ -171,7 +222,10 @@ class _SettingsDialogState extends State<SettingsDialog> {
       children: [
         Text(
           l10n.language,
-          style: TextStyle(color: _colors.primaryText, fontSize: AppConstants.fontSizeDialogContent),
+          style: TextStyle(
+            color: _colors.primaryText,
+            fontSize: AppConstants.fontSizeDialogContent,
+          ),
         ),
         DropdownButton<String?>(
           value: _currentLanguage,
@@ -204,7 +258,10 @@ class _SettingsDialogState extends State<SettingsDialog> {
       children: [
         Text(
           title,
-          style: TextStyle(color: _colors.primaryText, fontSize: AppConstants.fontSizeDialogContent),
+          style: TextStyle(
+            color: _colors.primaryText,
+            fontSize: AppConstants.fontSizeDialogContent,
+          ),
         ),
         Switch(
           value: value,
@@ -215,6 +272,64 @@ class _SettingsDialogState extends State<SettingsDialog> {
           inactiveTrackColor: _colors.inactive.withValues(alpha: 0.5),
         ),
       ],
+    );
+  }
+
+  Widget _buildResetLevelExpButton(AppLocalizations l10n) {
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton(
+        onPressed: _showResetLevelExpConfirmation,
+        style: OutlinedButton.styleFrom(
+          foregroundColor: _colors.error,
+          side: BorderSide(color: _colors.error),
+          padding: const EdgeInsets.symmetric(vertical: 12),
+        ),
+        child: Text(l10n.resetLevelExpText),
+      ),
+    );
+  }
+
+  void _showResetLevelExpConfirmation() {
+    final l10n = AppLocalizations.of(context)!;
+    showDialog(
+      context: context,
+      barrierColor: _colors.overlay,
+      builder: (context) => AlertDialog(
+        backgroundColor: _colors.dialogBackground,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+          side: BorderSide(color: _colors.border, width: 2),
+        ),
+        title: Text(
+          l10n.resetLevelExpConfirmTitle,
+          style: TextStyle(color: _colors.error),
+        ),
+        content: Text(
+          l10n.resetLevelExpConfirmContent,
+          style: TextStyle(color: _colors.primaryText),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              l10n.cancelButtonText,
+              style: TextStyle(color: _colors.inactive),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).pop();
+              widget.onResetLevelExp?.call();
+            },
+            child: Text(
+              l10n.resetButtonText,
+              style: TextStyle(color: _colors.error),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

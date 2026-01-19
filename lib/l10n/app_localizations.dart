@@ -290,6 +290,24 @@ abstract class AppLocalizations {
   /// **'No data available'**
   String get noDataAvailable;
 
+  /// Tooltip for clear stats button
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Stats'**
+  String get statsClearData;
+
+  /// Title for clear stats confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Clear All Stats?'**
+  String get statsClearConfirmTitle;
+
+  /// Content for clear stats confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'All saved activity data will be permanently deleted. This action cannot be undone.'**
+  String get statsClearConfirmContent;
+
   /// Label for theme mode selection
   ///
   /// In en, this message translates to:
@@ -313,6 +331,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Auto Start at Login'**
   String get autoStartText;
+
+  /// Option to show system stats panel
+  ///
+  /// In en, this message translates to:
+  /// **'Show System Stats'**
+  String get showSystemStatsText;
+
+  /// Option to show keyboard track area
+  ///
+  /// In en, this message translates to:
+  /// **'Show Keyboard Track'**
+  String get showKeyboardTrackText;
+
+  /// Option to show mouse track area
+  ///
+  /// In en, this message translates to:
+  /// **'Show Mouse Track'**
+  String get showMouseTrackText;
 
   /// Title for the accessibility permission dialog
   ///
@@ -541,6 +577,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Time: {time}'**
   String sudokuTime(String time);
+
+  /// Button text to reset level and experience
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Level & EXP'**
+  String get resetLevelExpText;
+
+  /// Title for reset level confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Progress?'**
+  String get resetLevelExpConfirmTitle;
+
+  /// Content for reset level confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Your level and experience will be reset to the beginning. This action cannot be undone.'**
+  String get resetLevelExpConfirmContent;
+
+  /// Text for reset button
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get resetButtonText;
 }
 
 class _AppLocalizationsDelegate

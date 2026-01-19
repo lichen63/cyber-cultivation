@@ -105,6 +105,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noDataAvailable => 'No data available';
 
   @override
+  String get statsClearData => 'Clear Stats';
+
+  @override
+  String get statsClearConfirmTitle => 'Clear All Stats?';
+
+  @override
+  String get statsClearConfirmContent =>
+      'All saved activity data will be permanently deleted. This action cannot be undone.';
+
+  @override
   String get themeMode => 'Theme';
 
   @override
@@ -115,6 +125,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get autoStartText => 'Auto Start at Login';
+
+  @override
+  String get showSystemStatsText => 'Show System Stats';
+
+  @override
+  String get showKeyboardTrackText => 'Show Keyboard Track';
+
+  @override
+  String get showMouseTrackText => 'Show Mouse Track';
 
   @override
   String get accessibilityDialogTitle => 'Accessibility Permission Required';
@@ -241,4 +260,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String sudokuTime(String time) {
     return 'Time: $time';
   }
+
+  @override
+  String get resetLevelExpText => 'Reset Level & EXP';
+
+  @override
+  String get resetLevelExpConfirmTitle => 'Reset Progress?';
+
+  @override
+  String get resetLevelExpConfirmContent =>
+      'Your level and experience will be reset to the beginning. This action cannot be undone.';
+
+  @override
+  String get resetButtonText => 'Reset';
 }

@@ -128,6 +128,18 @@
     "@noDataAvailable": {
         "description": "Text shown when there is no data"
     },
+    "statsClearData": "Clear Stats",
+    "@statsClearData": {
+        "description": "Tooltip for clear stats button"
+    },
+    "statsClearConfirmTitle": "Clear All Stats?",
+    "@statsClearConfirmTitle": {
+        "description": "Title for clear stats confirmation dialog"
+    },
+    "statsClearConfirmContent": "All saved activity data will be permanently deleted. This action cannot be undone.",
+    "@statsClearConfirmContent": {
+        "description": "Content for clear stats confirmation dialog"
+    },
     "themeMode": "Theme",
     "@themeMode": {
         "description": "Label for theme mode selection"
@@ -143,6 +155,18 @@
     "autoStartText": "Auto Start at Login",
     "@autoStartText": {
         "description": "Option to auto start the app at login"
+    },
+    "showSystemStatsText": "Show System Stats",
+    "@showSystemStatsText": {
+        "description": "Option to show system stats panel"
+    },
+    "showKeyboardTrackText": "Show Keyboard Track",
+    "@showKeyboardTrackText": {
+        "description": "Option to show keyboard track area"
+    },
+    "showMouseTrackText": "Show Mouse Track",
+    "@showMouseTrackText": {
+        "description": "Option to show mouse track area"
     },
     "accessibilityDialogTitle": "Accessibility Permission Required",
     "@accessibilityDialogTitle": {
@@ -212,7 +236,7 @@
     "@snakeGameTitle": {
         "description": "Title for snake game"
     },
-    "snakeGameDescription": "Classic snake game. Eat food to grow and earn EXP!",
+    "snakeGameDescription": "Classic snake game. Eat food to grow!",
     "@snakeGameDescription": {
         "description": "Description for snake game"
     },
@@ -249,7 +273,7 @@
     "@flappyBirdTitle": {
         "description": "Title for flappy bird game"
     },
-    "flappyBirdDescription": "Tap to fly through the pipes and earn EXP!",
+    "flappyBirdDescription": "Tap to fly through the pipes!",
     "@flappyBirdDescription": {
         "description": "Description for flappy bird game"
     },
@@ -261,7 +285,7 @@
     "@sudokuTitle": {
         "description": "Title for sudoku game"
     },
-    "sudokuDescription": "Classic number puzzle. Fill the grid and earn EXP!",
+    "sudokuDescription": "Classic number puzzle. Fill the grid!",
     "@sudokuDescription": {
         "description": "Description for sudoku game"
     },
@@ -313,5 +337,21 @@
                 "type": "String"
             }
         }
+    },
+    "resetLevelExpText": "Reset Level & EXP",
+    "@resetLevelExpText": {
+        "description": "Button text to reset level and experience"
+    },
+    "resetLevelExpConfirmTitle": "Reset Progress?",
+    "@resetLevelExpConfirmTitle": {
+        "description": "Title for reset level confirmation dialog"
+    },
+    "resetLevelExpConfirmContent": "Your level and experience will be reset to the beginning. This action cannot be undone.",
+    "@resetLevelExpConfirmContent": {
+        "description": "Content for reset level confirmation dialog"
+    },
+    "resetButtonText": "Reset",
+    "@resetButtonText": {
+        "description": "Text for reset button"
     }
 }
