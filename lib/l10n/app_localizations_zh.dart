@@ -138,6 +138,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get showMouseTrackText => '显示鼠标跟踪';
 
   @override
+  String get systemStatsRefreshText => '状态刷新间隔';
+
+  @override
+  String systemStatsRefreshSeconds(int seconds) {
+    return '$seconds秒';
+  }
+
+  @override
   String get accessibilityDialogTitle => '需要辅助功能权限';
 
   @override

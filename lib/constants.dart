@@ -116,6 +116,11 @@ class AppConstants {
   static const double maxWindowHeight = 1600.0;
   static const double windowAspectRatio = 1.0;
 
+  // System Stats
+  static const int defaultSystemStatsRefreshSeconds = 2;
+  static const int minSystemStatsRefreshSeconds = 1;
+  static const int maxSystemStatsRefreshSeconds = 10;
+
   // Event Channels
   static const String keyEventsChannel =
       'com.lichen63.cyber_cultivation/key_events';

@@ -356,6 +356,18 @@ abstract class AppLocalizations {
   /// **'Show Mouse Track'**
   String get showMouseTrackText;
 
+  /// Label for system stats refresh interval setting
+  ///
+  /// In en, this message translates to:
+  /// **'Stats Refresh Interval'**
+  String get systemStatsRefreshText;
+
+  /// Seconds format for refresh interval
+  ///
+  /// In en, this message translates to:
+  /// **'{seconds}s'**
+  String systemStatsRefreshSeconds(int seconds);
+
   /// Title for the accessibility permission dialog
   ///
   /// In en, this message translates to:

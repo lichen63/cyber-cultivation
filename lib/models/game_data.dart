@@ -13,6 +13,7 @@ class GameData {
   final bool isShowSystemStats;
   final bool isShowKeyboardTrack;
   final bool isShowMouseTrack;
+  final int systemStatsRefreshSeconds;
   final double? windowWidth;
   final double? windowHeight;
   final String? userId;
@@ -32,6 +33,7 @@ class GameData {
     this.isShowSystemStats = true,
     this.isShowKeyboardTrack = true,
     this.isShowMouseTrack = true,
+    this.systemStatsRefreshSeconds = AppConstants.defaultSystemStatsRefreshSeconds,
     this.windowWidth,
     this.windowHeight,
     this.userId,
@@ -56,6 +58,7 @@ class GameData {
       'isShowSystemStats': isShowSystemStats,
       'isShowKeyboardTrack': isShowKeyboardTrack,
       'isShowMouseTrack': isShowMouseTrack,
+      'systemStatsRefreshSeconds': systemStatsRefreshSeconds,
       'windowWidth': windowWidth,
       'windowHeight': windowHeight,
       'userId': userId,
@@ -80,6 +83,9 @@ class GameData {
       isShowSystemStats: json['isShowSystemStats'] as bool? ?? true,
       isShowKeyboardTrack: json['isShowKeyboardTrack'] as bool? ?? true,
       isShowMouseTrack: json['isShowMouseTrack'] as bool? ?? true,
+      systemStatsRefreshSeconds:
+          json['systemStatsRefreshSeconds'] as int? ??
+          AppConstants.defaultSystemStatsRefreshSeconds,
       windowWidth: (json['windowWidth'] as num?)?.toDouble(),
       windowHeight: (json['windowHeight'] as num?)?.toDouble(),
       userId: json['userId'] as String?,
@@ -116,6 +122,7 @@ class GameData {
     bool? isShowSystemStats,
     bool? isShowKeyboardTrack,
     bool? isShowMouseTrack,
+    int? systemStatsRefreshSeconds,
     double? windowWidth,
     double? windowHeight,
     String? userId,
@@ -136,6 +143,8 @@ class GameData {
       isShowSystemStats: isShowSystemStats ?? this.isShowSystemStats,
       isShowKeyboardTrack: isShowKeyboardTrack ?? this.isShowKeyboardTrack,
       isShowMouseTrack: isShowMouseTrack ?? this.isShowMouseTrack,
+      systemStatsRefreshSeconds:
+          systemStatsRefreshSeconds ?? this.systemStatsRefreshSeconds,
       windowWidth: windowWidth ?? this.windowWidth,
       windowHeight: windowHeight ?? this.windowHeight,
       userId: userId ?? this.userId,

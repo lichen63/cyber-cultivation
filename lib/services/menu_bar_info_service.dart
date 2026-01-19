@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import '../constants.dart';
 import '../models/menu_bar_settings.dart';
 import '../models/todo_item.dart';
 import '../services/menu_bar_helper.dart';
@@ -80,18 +81,33 @@ class MenuBarInfoService extends ChangeNotifier {
   Timer? _statsTimer;
   MenuBarInfoData _data = const MenuBarInfoData();
   MenuBarSettings _settings = const MenuBarSettings();
+  int _refreshSeconds = AppConstants.defaultSystemStatsRefreshSeconds;
 
   MenuBarInfoData get data => _data;
   MenuBarSettings get settings => _settings;
 
-  /// Initialize the service
-  void initialize() {
-    // Start periodic system stats update
+  /// Initialize the service with optional refresh interval
+  void initialize({int? refreshSeconds}) {
+    _refreshSeconds =
+        refreshSeconds ?? AppConstants.defaultSystemStatsRefreshSeconds;
+    _startStatsTimer();
+    _updateSystemStats();
+  }
+
+  void _startStatsTimer() {
+    _statsTimer?.cancel();
     _statsTimer = Timer.periodic(
-      const Duration(seconds: 2),
+      Duration(seconds: _refreshSeconds),
       (_) => _updateSystemStats(),
     );
-    _updateSystemStats();
+  }
+
+  /// Update the refresh interval
+  void updateRefreshInterval(int seconds) {
+    if (seconds != _refreshSeconds) {
+      _refreshSeconds = seconds;
+      _startStatsTimer();
+    }
   }
 
   @override

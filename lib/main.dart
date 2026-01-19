@@ -339,6 +339,8 @@ class _MyHomePageState extends State<MyHomePage>
   bool _isShowSystemStats = true;
   bool _isShowKeyboardTrack = true;
   bool _isShowMouseTrack = true;
+  int _systemStatsRefreshSeconds =
+      AppConstants.defaultSystemStatsRefreshSeconds;
   late AppThemeMode _themeMode;
   late MenuBarSettings _menuBarSettings;
 
@@ -405,7 +407,7 @@ class _MyHomePageState extends State<MyHomePage>
 
     _menuBarInfoService = MenuBarInfoService();
     _menuBarInfoService.updateSettings(_menuBarSettings);
-    _menuBarInfoService.initialize();
+    _menuBarInfoService.initialize(refreshSeconds: _systemStatsRefreshSeconds);
 
     // Update tray/menu bar items periodically
     _trayUpdateTimer = Timer.periodic(
@@ -503,6 +505,7 @@ class _MyHomePageState extends State<MyHomePage>
       _isShowSystemStats = data.isShowSystemStats;
       _isShowKeyboardTrack = data.isShowKeyboardTrack;
       _isShowMouseTrack = data.isShowMouseTrack;
+      _systemStatsRefreshSeconds = data.systemStatsRefreshSeconds;
       _userId = data.userId;
       _language = data.language;
       _themeMode = data.themeMode;
@@ -562,6 +565,7 @@ class _MyHomePageState extends State<MyHomePage>
           isShowSystemStats: _isShowSystemStats,
           isShowKeyboardTrack: _isShowKeyboardTrack,
           isShowMouseTrack: _isShowMouseTrack,
+          systemStatsRefreshSeconds: _systemStatsRefreshSeconds,
           windowWidth: _windowWidth,
           windowHeight: _windowHeight,
           userId: _userId,
@@ -760,6 +764,7 @@ class _MyHomePageState extends State<MyHomePage>
         isShowSystemStats: _isShowSystemStats,
         isShowKeyboardTrack: _isShowKeyboardTrack,
         isShowMouseTrack: _isShowMouseTrack,
+        systemStatsRefreshSeconds: _systemStatsRefreshSeconds,
         currentLanguage: _language,
         themeMode: _themeMode,
         themeColors: _themeColors,
@@ -784,6 +789,11 @@ class _MyHomePageState extends State<MyHomePage>
         },
         onShowMouseTrackChanged: (value) {
           setState(() => _isShowMouseTrack = value);
+          _saveGameData();
+        },
+        onSystemStatsRefreshSecondsChanged: (value) {
+          setState(() => _systemStatsRefreshSeconds = value);
+          _menuBarInfoService.updateRefreshInterval(value);
           _saveGameData();
         },
         onLanguageChanged: (value) {
@@ -949,6 +959,7 @@ class _MyHomePageState extends State<MyHomePage>
           isShowSystemStats: _isShowSystemStats,
           isShowKeyboardTrack: _isShowKeyboardTrack,
           isShowMouseTrack: _isShowMouseTrack,
+          systemStatsRefreshSeconds: _systemStatsRefreshSeconds,
           pomodoroState: _pomodoroService.state,
           todos: _todos,
           themeColors: _themeColors,

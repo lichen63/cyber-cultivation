@@ -139,6 +139,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get showMouseTrackText => 'Show Mouse Track';
 
   @override
+  String get systemStatsRefreshText => 'Stats Refresh Interval';
+
+  @override
+  String systemStatsRefreshSeconds(int seconds) {
+    return '${seconds}s';
+  }
+
+  @override
   String get accessibilityDialogTitle => 'Accessibility Permission Required';
 
   @override

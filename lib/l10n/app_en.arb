@@ -172,6 +172,19 @@
     "@showMouseTrackText": {
         "description": "Option to show mouse track area"
     },
+    "systemStatsRefreshText": "Stats Refresh Interval",
+    "@systemStatsRefreshText": {
+        "description": "Label for system stats refresh interval setting"
+    },
+    "systemStatsRefreshSeconds": "{seconds}s",
+    "@systemStatsRefreshSeconds": {
+        "description": "Seconds format for refresh interval",
+        "placeholders": {
+            "seconds": {
+                "type": "int"
+            }
+        }
+    },
     "accessibilityDialogTitle": "Accessibility Permission Required",
     "@accessibilityDialogTitle": {
         "description": "Title for the accessibility permission dialog"
