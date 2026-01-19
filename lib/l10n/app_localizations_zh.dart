@@ -105,6 +105,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noDataAvailable => '暂无数据';
 
   @override
+  String get statsClearData => '清除统计';
+
+  @override
+  String get statsClearConfirmTitle => '清除所有统计数据?';
+
+  @override
+  String get statsClearConfirmContent => '所有保存的活动数据将被永久删除，此操作无法撤销。';
+
+  @override
   String get themeMode => '主题';
 
   @override
@@ -115,6 +124,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get autoStartText => '登录时自动启动';
+
+  @override
+  String get showSystemStatsText => '显示系统状态';
+
+  @override
+  String get showKeyboardTrackText => '显示键盘跟踪';
+
+  @override
+  String get showMouseTrackText => '显示鼠标跟踪';
 
   @override
   String get accessibilityDialogTitle => '需要辅助功能权限';
@@ -236,4 +254,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String sudokuTime(String time) {
     return '用时: $time';
   }
+
+  @override
+  String get resetLevelExpText => '重置等级和经验';
+
+  @override
+  String get resetLevelExpConfirmTitle => '重置进度?';
+
+  @override
+  String get resetLevelExpConfirmContent => '您的等级和经验将被重置到初始状态，此操作无法撤销。';
+
+  @override
+  String get resetButtonText => '重置';
 }
