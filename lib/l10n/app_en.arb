@@ -236,7 +236,7 @@
     "@snakeGameTitle": {
         "description": "Title for snake game"
     },
-    "snakeGameDescription": "Classic snake game. Eat food to grow and earn EXP!",
+    "snakeGameDescription": "Classic snake game. Eat food to grow!",
     "@snakeGameDescription": {
         "description": "Description for snake game"
     },
@@ -273,7 +273,7 @@
     "@flappyBirdTitle": {
         "description": "Title for flappy bird game"
     },
-    "flappyBirdDescription": "Tap to fly through the pipes and earn EXP!",
+    "flappyBirdDescription": "Tap to fly through the pipes!",
     "@flappyBirdDescription": {
         "description": "Description for flappy bird game"
     },
@@ -285,7 +285,7 @@
     "@sudokuTitle": {
         "description": "Title for sudoku game"
     },
-    "sudokuDescription": "Classic number puzzle. Fill the grid and earn EXP!",
+    "sudokuDescription": "Classic number puzzle. Fill the grid!",
     "@sudokuDescription": {
         "description": "Description for sudoku game"
     },
