@@ -161,7 +161,7 @@ class AppConstants {
   static const double buttonPaddingVertical = 0.0;
   static const double monitorWidgetSize = 120.0;
   static const double mouseDotSize = 16.0;
-  static const double systemStatBoxSize = 110.0;
+  static const double systemStatBoxSize = 130.0;
   static const double systemStatSpacing = 10.0;
 
   // EXP Bar Dimensions
