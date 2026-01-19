@@ -180,9 +180,10 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
       // 1. Destroy tray icon if it exists (removes its status item)
       // 2. Set our items (they get created at leftmost positions)
       // 3. Recreate tray icon (it becomes the new leftmost)
-      
-      final shouldShowTrayIcon = _menuBarSettings.showTrayIcon && _trayIconPath.isNotEmpty;
-      
+
+      final shouldShowTrayIcon =
+          _menuBarSettings.showTrayIcon && _trayIconPath.isNotEmpty;
+
       // Only destroy/recreate if not yet positioned correctly
       if (shouldShowTrayIcon && !_trayIconPositioned) {
         await trayManager.destroy();
@@ -203,6 +204,7 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
           final menu = Menu(
             items: [
               MenuItem(key: 'show_window', label: 'Show Window'),
+              MenuItem(key: 'hide_window', label: 'Hide Window'),
               MenuItem.separator(),
               MenuItem(key: 'exit_app', label: 'Exit'),
             ],
@@ -240,6 +242,8 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
       case 'show_window':
         windowManager.show();
         windowManager.focus();
+      case 'hide_window':
+        windowManager.hide();
       case 'exit_app':
         windowManager.close();
     }
@@ -857,6 +861,10 @@ class _MyHomePageState extends State<MyHomePage>
           isChecked: _inputMonitorService.enableAntiSleep,
         ),
         _buildMenuItem(
+          value: AppConstants.hideWindowValue,
+          label: l10n.hideWindowText,
+        ),
+        _buildMenuItem(
           value: AppConstants.exitGameValue,
           label: l10n.exitGameText,
           isDestructive: true,
@@ -910,6 +918,8 @@ class _MyHomePageState extends State<MyHomePage>
               !_inputMonitorService.enableAntiSleep;
         });
         _saveGameData();
+      case AppConstants.hideWindowValue:
+        windowManager.hide();
       case AppConstants.exitGameValue:
         windowManager.close();
     }

@@ -16,6 +16,10 @@
     "@antiSleepText": {
         "description": "Option to prevent the system from sleeping"
     },
+    "hideWindowText": "Hide Window",
+    "@hideWindowText": {
+        "description": "Option to hide the game window"
+    },
     "exitGameText": "Exit Game",
     "@exitGameText": {
         "description": "Option to exit the game"

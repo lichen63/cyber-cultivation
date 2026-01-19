@@ -43,9 +43,9 @@
 - [x] Replace B-1 with game list, first game is greedy snake
 - [x] Add unit/widget/integration tests
 - [x] Show info in system menu bar
-- [ ] Customize sub page info when clicking other items in menu bar
-- [ ] Add hide window in context menu and system context menu
+- [x] Add hide window in context menu and system context menu
 - [ ] Handle the exception when game_save is corrupted
+- [ ] Customize sub page info when clicking other items in menu bar
 - [ ] Can customize default focus time
 - [ ] Customize refresh interval of system stats info
 - [ ] Add windows platform support

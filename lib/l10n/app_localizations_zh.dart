@@ -21,6 +21,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get antiSleepText => '防休眠';
 
   @override
+  String get hideWindowText => '隐藏窗口';
+
+  @override
   String get exitGameText => '退出游戏';
 
   @override

@@ -21,6 +21,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get antiSleepText => 'Anti-Sleep';
 
   @override
+  String get hideWindowText => 'Hide Window';
+
+  @override
   String get exitGameText => 'Exit Game';
 
   @override

@@ -122,6 +122,12 @@ abstract class AppLocalizations {
   /// **'Anti-Sleep'**
   String get antiSleepText;
 
+  /// Option to hide the game window
+  ///
+  /// In en, this message translates to:
+  /// **'Hide Window'**
+  String get hideWindowText;
+
   /// Option to exit the game
   ///
   /// In en, this message translates to:

@@ -21,6 +21,9 @@ class AppDelegate: FlutterAppDelegate {
     let showWindowItem = NSMenuItem(title: "Show Window", action: #selector(showWindowClicked), keyEquivalent: "")
     showWindowItem.target = self
     contextMenu?.addItem(showWindowItem)
+    let hideWindowItem = NSMenuItem(title: "Hide Window", action: #selector(hideWindowClicked), keyEquivalent: "")
+    hideWindowItem.target = self
+    contextMenu?.addItem(hideWindowItem)
     contextMenu?.addItem(NSMenuItem.separator())
     let exitItem = NSMenuItem(title: "Exit", action: #selector(exitClicked), keyEquivalent: "")
     exitItem.target = self
@@ -43,6 +46,10 @@ class AppDelegate: FlutterAppDelegate {
   @objc private func showWindowClicked() {
     mainFlutterWindow?.makeKeyAndOrderFront(nil)
     NSApp.activate(ignoringOtherApps: true)
+  }
+  
+  @objc private func hideWindowClicked() {
+    mainFlutterWindow?.orderOut(nil)
   }
   
   @objc private func exitClicked() {
@@ -303,7 +310,7 @@ class AppDelegate: FlutterAppDelegate {
   }
   
   override func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-    return true
+    return false  // Keep app running when window is hidden
   }
 
   override func applicationSupportsSecureRestorableState(_ app: NSApplication) -> Bool {
