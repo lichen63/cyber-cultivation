@@ -126,6 +126,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get autoStartText => '登录时自动启动';
 
   @override
+  String get showSystemStatsText => '显示系统状态';
+
+  @override
+  String get showKeyboardTrackText => '显示键盘跟踪';
+
+  @override
+  String get showMouseTrackText => '显示鼠标跟踪';
+
+  @override
   String get accessibilityDialogTitle => '需要辅助功能权限';
 
   @override

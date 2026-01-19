@@ -20,6 +20,9 @@ class GameAreaWidget extends StatelessWidget {
   final double screenWidth;
   final double screenHeight;
   final bool isMouseClicking;
+  final bool isShowSystemStats;
+  final bool isShowKeyboardTrack;
+  final bool isShowMouseTrack;
   final PomodoroState pomodoroState;
   final AppThemeColors themeColors;
 
@@ -34,6 +37,9 @@ class GameAreaWidget extends StatelessWidget {
     required this.screenWidth,
     required this.screenHeight,
     required this.isMouseClicking,
+    required this.isShowSystemStats,
+    required this.isShowKeyboardTrack,
+    required this.isShowMouseTrack,
     required this.pomodoroState,
     required this.themeColors,
   });
@@ -61,8 +67,8 @@ class GameAreaWidget extends StatelessWidget {
                 Expanded(child: _buildCharacterArea(scale)),
               ],
             ),
-            _buildKeyboardMonitor(scale),
-            _buildMouseMonitor(scale),
+            if (isShowKeyboardTrack) _buildKeyboardMonitor(scale),
+            if (isShowMouseTrack) _buildMouseMonitor(scale),
           ],
         );
       },
@@ -81,12 +87,13 @@ class GameAreaWidget extends StatelessWidget {
             size: 240 * scale,
             timeText: pomodoroState.formattedTime,
           ),
-        Positioned(
-          top: 0,
-          left: 0,
-          right: 0,
-          child: SystemStatsPanel(scale: scale, themeColors: themeColors),
-        ),
+        if (isShowSystemStats)
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: SystemStatsPanel(scale: scale, themeColors: themeColors),
+          ),
       ],
     );
   }

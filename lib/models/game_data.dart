@@ -9,6 +9,9 @@ class GameData {
   final bool isAntiSleepEnabled;
   final bool isAlwaysShowActionButtons;
   final bool isAutoStartEnabled;
+  final bool isShowSystemStats;
+  final bool isShowKeyboardTrack;
+  final bool isShowMouseTrack;
   final double? windowWidth;
   final double? windowHeight;
   final String? userId;
@@ -24,6 +27,9 @@ class GameData {
     this.isAntiSleepEnabled = false,
     this.isAlwaysShowActionButtons = false,
     this.isAutoStartEnabled = false,
+    this.isShowSystemStats = true,
+    this.isShowKeyboardTrack = true,
+    this.isShowMouseTrack = true,
     this.windowWidth,
     this.windowHeight,
     this.userId,
@@ -43,6 +49,9 @@ class GameData {
       'isAntiSleepEnabled': isAntiSleepEnabled,
       'isAlwaysShowActionButtons': isAlwaysShowActionButtons,
       'isAutoStartEnabled': isAutoStartEnabled,
+      'isShowSystemStats': isShowSystemStats,
+      'isShowKeyboardTrack': isShowKeyboardTrack,
+      'isShowMouseTrack': isShowMouseTrack,
       'windowWidth': windowWidth,
       'windowHeight': windowHeight,
       'userId': userId,
@@ -63,6 +72,9 @@ class GameData {
       isAlwaysShowActionButtons:
           json['isAlwaysShowActionButtons'] as bool? ?? false,
       isAutoStartEnabled: json['isAutoStartEnabled'] as bool? ?? false,
+      isShowSystemStats: json['isShowSystemStats'] as bool? ?? true,
+      isShowKeyboardTrack: json['isShowKeyboardTrack'] as bool? ?? true,
+      isShowMouseTrack: json['isShowMouseTrack'] as bool? ?? true,
       windowWidth: (json['windowWidth'] as num?)?.toDouble(),
       windowHeight: (json['windowHeight'] as num?)?.toDouble(),
       userId: json['userId'] as String?,
@@ -92,6 +104,9 @@ class GameData {
     bool? isAntiSleepEnabled,
     bool? isAlwaysShowActionButtons,
     bool? isAutoStartEnabled,
+    bool? isShowSystemStats,
+    bool? isShowKeyboardTrack,
+    bool? isShowMouseTrack,
     double? windowWidth,
     double? windowHeight,
     String? userId,
@@ -108,6 +123,9 @@ class GameData {
       isAlwaysShowActionButtons:
           isAlwaysShowActionButtons ?? this.isAlwaysShowActionButtons,
       isAutoStartEnabled: isAutoStartEnabled ?? this.isAutoStartEnabled,
+      isShowSystemStats: isShowSystemStats ?? this.isShowSystemStats,
+      isShowKeyboardTrack: isShowKeyboardTrack ?? this.isShowKeyboardTrack,
+      isShowMouseTrack: isShowMouseTrack ?? this.isShowMouseTrack,
       windowWidth: windowWidth ?? this.windowWidth,
       windowHeight: windowHeight ?? this.windowHeight,
       userId: userId ?? this.userId,

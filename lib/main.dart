@@ -245,6 +245,9 @@ class _MyHomePageState extends State<MyHomePage>
   bool _isAlwaysOnTop = true;
   bool _isAlwaysShowActionButtons = false;
   bool _isAutoStartEnabled = false;
+  bool _isShowSystemStats = true;
+  bool _isShowKeyboardTrack = true;
+  bool _isShowMouseTrack = true;
   late AppThemeMode _themeMode;
 
   // EXP System
@@ -370,6 +373,9 @@ class _MyHomePageState extends State<MyHomePage>
       _inputMonitorService.enableAntiSleep = data.isAntiSleepEnabled;
       _isAlwaysShowActionButtons = data.isAlwaysShowActionButtons;
       _isAutoStartEnabled = data.isAutoStartEnabled;
+      _isShowSystemStats = data.isShowSystemStats;
+      _isShowKeyboardTrack = data.isShowKeyboardTrack;
+      _isShowMouseTrack = data.isShowMouseTrack;
       _userId = data.userId;
       _language = data.language;
       _themeMode = data.themeMode;
@@ -420,6 +426,9 @@ class _MyHomePageState extends State<MyHomePage>
           isAntiSleepEnabled: _inputMonitorService.enableAntiSleep,
           isAlwaysShowActionButtons: _isAlwaysShowActionButtons,
           isAutoStartEnabled: _isAutoStartEnabled,
+          isShowSystemStats: _isShowSystemStats,
+          isShowKeyboardTrack: _isShowKeyboardTrack,
+          isShowMouseTrack: _isShowMouseTrack,
           windowWidth: _windowWidth,
           windowHeight: _windowHeight,
           userId: _userId,
@@ -614,6 +623,9 @@ class _MyHomePageState extends State<MyHomePage>
         isAntiSleepEnabled: _inputMonitorService.enableAntiSleep,
         isAlwaysShowActionButtons: _isAlwaysShowActionButtons,
         isAutoStartEnabled: _isAutoStartEnabled,
+        isShowSystemStats: _isShowSystemStats,
+        isShowKeyboardTrack: _isShowKeyboardTrack,
+        isShowMouseTrack: _isShowMouseTrack,
         currentLanguage: _language,
         themeMode: _themeMode,
         themeColors: _themeColors,
@@ -627,6 +639,18 @@ class _MyHomePageState extends State<MyHomePage>
           _saveGameData();
         },
         onAutoStartChanged: _toggleAutoStart,
+        onShowSystemStatsChanged: (value) {
+          setState(() => _isShowSystemStats = value);
+          _saveGameData();
+        },
+        onShowKeyboardTrackChanged: (value) {
+          setState(() => _isShowKeyboardTrack = value);
+          _saveGameData();
+        },
+        onShowMouseTrackChanged: (value) {
+          setState(() => _isShowMouseTrack = value);
+          _saveGameData();
+        },
         onLanguageChanged: (value) {
           setState(() => _language = value);
           widget.onLanguageChanged?.call(value);
@@ -765,6 +789,9 @@ class _MyHomePageState extends State<MyHomePage>
           isMouseClicking: mouseData.isClicking,
           isHovering: _isHovering,
           isAlwaysShowActionButtons: _isAlwaysShowActionButtons,
+          isShowSystemStats: _isShowSystemStats,
+          isShowKeyboardTrack: _isShowKeyboardTrack,
+          isShowMouseTrack: _isShowMouseTrack,
           pomodoroState: _pomodoroService.state,
           todos: _todos,
           themeColors: _themeColors,

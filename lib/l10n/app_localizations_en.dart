@@ -127,6 +127,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get autoStartText => 'Auto Start at Login';
 
   @override
+  String get showSystemStatsText => 'Show System Stats';
+
+  @override
+  String get showKeyboardTrackText => 'Show Keyboard Track';
+
+  @override
+  String get showMouseTrackText => 'Show Mouse Track';
+
+  @override
   String get accessibilityDialogTitle => 'Accessibility Permission Required';
 
   @override

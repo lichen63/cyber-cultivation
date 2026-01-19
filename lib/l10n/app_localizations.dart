@@ -332,6 +332,24 @@ abstract class AppLocalizations {
   /// **'Auto Start at Login'**
   String get autoStartText;
 
+  /// Option to show system stats panel
+  ///
+  /// In en, this message translates to:
+  /// **'Show System Stats'**
+  String get showSystemStatsText;
+
+  /// Option to show keyboard track area
+  ///
+  /// In en, this message translates to:
+  /// **'Show Keyboard Track'**
+  String get showKeyboardTrackText;
+
+  /// Option to show mouse track area
+  ///
+  /// In en, this message translates to:
+  /// **'Show Mouse Track'**
+  String get showMouseTrackText;
+
   /// Title for the accessibility permission dialog
   ///
   /// In en, this message translates to:

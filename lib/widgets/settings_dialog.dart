@@ -7,6 +7,9 @@ class SettingsDialog extends StatefulWidget {
   final bool isAntiSleepEnabled;
   final bool isAlwaysShowActionButtons;
   final bool isAutoStartEnabled;
+  final bool isShowSystemStats;
+  final bool isShowKeyboardTrack;
+  final bool isShowMouseTrack;
   final String? currentLanguage;
   final AppThemeMode themeMode;
   final AppThemeColors themeColors;
@@ -14,6 +17,9 @@ class SettingsDialog extends StatefulWidget {
   final ValueChanged<bool> onAntiSleepChanged;
   final ValueChanged<bool> onAlwaysShowActionButtonsChanged;
   final ValueChanged<bool> onAutoStartChanged;
+  final ValueChanged<bool> onShowSystemStatsChanged;
+  final ValueChanged<bool> onShowKeyboardTrackChanged;
+  final ValueChanged<bool> onShowMouseTrackChanged;
   final ValueChanged<String?> onLanguageChanged;
   final ValueChanged<AppThemeMode> onThemeModeChanged;
 
@@ -23,6 +29,9 @@ class SettingsDialog extends StatefulWidget {
     required this.isAntiSleepEnabled,
     required this.isAlwaysShowActionButtons,
     required this.isAutoStartEnabled,
+    required this.isShowSystemStats,
+    required this.isShowKeyboardTrack,
+    required this.isShowMouseTrack,
     this.currentLanguage,
     required this.themeMode,
     required this.themeColors,
@@ -30,6 +39,9 @@ class SettingsDialog extends StatefulWidget {
     required this.onAntiSleepChanged,
     required this.onAlwaysShowActionButtonsChanged,
     required this.onAutoStartChanged,
+    required this.onShowSystemStatsChanged,
+    required this.onShowKeyboardTrackChanged,
+    required this.onShowMouseTrackChanged,
     required this.onLanguageChanged,
     required this.onThemeModeChanged,
   });
@@ -43,6 +55,9 @@ class _SettingsDialogState extends State<SettingsDialog> {
   late bool _isAntiSleepEnabled;
   late bool _isAlwaysShowActionButtons;
   late bool _isAutoStartEnabled;
+  late bool _isShowSystemStats;
+  late bool _isShowKeyboardTrack;
+  late bool _isShowMouseTrack;
   late String? _currentLanguage;
   late AppThemeMode _themeMode;
 
@@ -55,6 +70,9 @@ class _SettingsDialogState extends State<SettingsDialog> {
     _isAntiSleepEnabled = widget.isAntiSleepEnabled;
     _isAlwaysShowActionButtons = widget.isAlwaysShowActionButtons;
     _isAutoStartEnabled = widget.isAutoStartEnabled;
+    _isShowSystemStats = widget.isShowSystemStats;
+    _isShowKeyboardTrack = widget.isShowKeyboardTrack;
+    _isShowMouseTrack = widget.isShowMouseTrack;
     _currentLanguage = widget.currentLanguage;
     _themeMode = widget.themeMode;
   }
@@ -111,6 +129,33 @@ class _SettingsDialogState extends State<SettingsDialog> {
             onChanged: (value) {
               setState(() => _isAutoStartEnabled = value);
               widget.onAutoStartChanged(value);
+            },
+          ),
+          const SizedBox(height: 16),
+          _buildSwitchTile(
+            title: l10n.showSystemStatsText,
+            value: _isShowSystemStats,
+            onChanged: (value) {
+              setState(() => _isShowSystemStats = value);
+              widget.onShowSystemStatsChanged(value);
+            },
+          ),
+          const SizedBox(height: 16),
+          _buildSwitchTile(
+            title: l10n.showKeyboardTrackText,
+            value: _isShowKeyboardTrack,
+            onChanged: (value) {
+              setState(() => _isShowKeyboardTrack = value);
+              widget.onShowKeyboardTrackChanged(value);
+            },
+          ),
+          const SizedBox(height: 16),
+          _buildSwitchTile(
+            title: l10n.showMouseTrackText,
+            value: _isShowMouseTrack,
+            onChanged: (value) {
+              setState(() => _isShowMouseTrack = value);
+              widget.onShowMouseTrackChanged(value);
             },
           ),
           const SizedBox(height: 16),

@@ -156,6 +156,18 @@
     "@autoStartText": {
         "description": "Option to auto start the app at login"
     },
+    "showSystemStatsText": "Show System Stats",
+    "@showSystemStatsText": {
+        "description": "Option to show system stats panel"
+    },
+    "showKeyboardTrackText": "Show Keyboard Track",
+    "@showKeyboardTrackText": {
+        "description": "Option to show keyboard track area"
+    },
+    "showMouseTrackText": "Show Mouse Track",
+    "@showMouseTrackText": {
+        "description": "Option to show mouse track area"
+    },
     "accessibilityDialogTitle": "Accessibility Permission Required",
     "@accessibilityDialogTitle": {
         "description": "Title for the accessibility permission dialog"
