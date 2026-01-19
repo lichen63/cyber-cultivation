@@ -372,10 +372,11 @@ class MenuBarInfoService extends ChangeNotifier {
       return ('🍅', '--:--');
     }
 
-    // Add F for focus, R for relax prefix
+    // Show loop info on top row (e.g., "🍅 1/4"), time with F/R prefix on bottom
+    final loopInfo = '🍅 ${state.currentLoop}/${state.totalLoops}';
     final prefix = state.isRelaxing ? 'R' : 'F';
     final time = '$prefix ${state.formattedTime}';
-    return ('🍅', time);
+    return (loopInfo, time);
   }
 
   (String, String) _buildTodoInfo() {
