@@ -88,7 +88,7 @@ class AppThemeColors {
     error: const Color(0xFFD32F2F),
     expBarBackground: const Color(0xFFE8E8EC).withValues(alpha: 0.85),
     expBarText: const Color(0xFF1A1A2E),
-    expBarTextShadow: Colors.white54,
+    expBarTextShadow: Colors.transparent,
     levelTextShadow: Colors.black45,
     progressBarFill: const Color(0xFF673AB7),
     chartAccent: const Color(0xFF43A047),
