@@ -195,6 +195,10 @@ class InputMonitorService extends ChangeNotifier {
         'dx': offset,
         'dy': offset,
       });
+      // Update the last mouse move time to prevent immediate re-triggering
+      // This is needed because the synthetic move event may not be captured
+      // by the event stream, or there could be a race condition
+      _lastMouseMoveTime = DateTime.now();
     } catch (e) {
       debugPrint("Failed to move mouse via channel: $e");
     }
