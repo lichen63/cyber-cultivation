@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cyber_cultivation/l10n/app_localizations.dart';
 import '../constants.dart';
+import '../models/menu_bar_settings.dart';
+import 'menu_bar_settings_dialog.dart';
 
 class SettingsDialog extends StatefulWidget {
   final bool isAlwaysOnTop;
@@ -10,9 +12,11 @@ class SettingsDialog extends StatefulWidget {
   final bool isShowSystemStats;
   final bool isShowKeyboardTrack;
   final bool isShowMouseTrack;
+  final int systemStatsRefreshSeconds;
   final String? currentLanguage;
   final AppThemeMode themeMode;
   final AppThemeColors themeColors;
+  final MenuBarSettings menuBarSettings;
   final ValueChanged<bool> onAlwaysOnTopChanged;
   final ValueChanged<bool> onAntiSleepChanged;
   final ValueChanged<bool> onAlwaysShowActionButtonsChanged;
@@ -20,8 +24,10 @@ class SettingsDialog extends StatefulWidget {
   final ValueChanged<bool> onShowSystemStatsChanged;
   final ValueChanged<bool> onShowKeyboardTrackChanged;
   final ValueChanged<bool> onShowMouseTrackChanged;
+  final ValueChanged<int> onSystemStatsRefreshSecondsChanged;
   final ValueChanged<String?> onLanguageChanged;
   final ValueChanged<AppThemeMode> onThemeModeChanged;
+  final ValueChanged<MenuBarSettings> onMenuBarSettingsChanged;
   final VoidCallback? onResetLevelExp;
 
   const SettingsDialog({
@@ -33,9 +39,11 @@ class SettingsDialog extends StatefulWidget {
     required this.isShowSystemStats,
     required this.isShowKeyboardTrack,
     required this.isShowMouseTrack,
+    required this.systemStatsRefreshSeconds,
     this.currentLanguage,
     required this.themeMode,
     required this.themeColors,
+    required this.menuBarSettings,
     required this.onAlwaysOnTopChanged,
     required this.onAntiSleepChanged,
     required this.onAlwaysShowActionButtonsChanged,
@@ -43,8 +51,10 @@ class SettingsDialog extends StatefulWidget {
     required this.onShowSystemStatsChanged,
     required this.onShowKeyboardTrackChanged,
     required this.onShowMouseTrackChanged,
+    required this.onSystemStatsRefreshSecondsChanged,
     required this.onLanguageChanged,
     required this.onThemeModeChanged,
+    required this.onMenuBarSettingsChanged,
     this.onResetLevelExp,
   });
 
@@ -60,8 +70,10 @@ class _SettingsDialogState extends State<SettingsDialog> {
   late bool _isShowSystemStats;
   late bool _isShowKeyboardTrack;
   late bool _isShowMouseTrack;
+  late int _systemStatsRefreshSeconds;
   late String? _currentLanguage;
   late AppThemeMode _themeMode;
+  late MenuBarSettings _menuBarSettings;
 
   AppThemeColors get _colors => widget.themeColors;
 
@@ -75,8 +87,10 @@ class _SettingsDialogState extends State<SettingsDialog> {
     _isShowSystemStats = widget.isShowSystemStats;
     _isShowKeyboardTrack = widget.isShowKeyboardTrack;
     _isShowMouseTrack = widget.isShowMouseTrack;
+    _systemStatsRefreshSeconds = widget.systemStatsRefreshSeconds;
     _currentLanguage = widget.currentLanguage;
     _themeMode = widget.themeMode;
+    _menuBarSettings = widget.menuBarSettings;
   }
 
   @override
@@ -161,9 +175,13 @@ class _SettingsDialogState extends State<SettingsDialog> {
             },
           ),
           const SizedBox(height: 16),
+          _buildRefreshIntervalSelector(l10n),
+          const SizedBox(height: 16),
           _buildThemeModeSelector(l10n),
           const SizedBox(height: 16),
           _buildLanguageSelector(l10n),
+          const SizedBox(height: 16),
+          _buildMenuBarSettingsButton(l10n),
           if (widget.onResetLevelExp != null) ...[
             const SizedBox(height: 24),
             _buildResetLevelExpButton(l10n),
@@ -177,6 +195,64 @@ class _SettingsDialogState extends State<SettingsDialog> {
             l10n.closeButtonText,
             style: TextStyle(color: _colors.accent),
           ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRefreshIntervalSelector(AppLocalizations l10n) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          l10n.systemStatsRefreshText,
+          style: TextStyle(
+            color: _colors.primaryText,
+            fontSize: AppConstants.fontSizeDialogContent,
+          ),
+        ),
+        Row(
+          children: [
+            IconButton(
+              icon: Icon(Icons.remove, color: _colors.accent, size: 20),
+              onPressed: _systemStatsRefreshSeconds >
+                      AppConstants.minSystemStatsRefreshSeconds
+                  ? () {
+                      setState(() => _systemStatsRefreshSeconds--);
+                      widget.onSystemStatsRefreshSecondsChanged(
+                        _systemStatsRefreshSeconds,
+                      );
+                    }
+                  : null,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+            ),
+            Container(
+              width: 40,
+              alignment: Alignment.center,
+              child: Text(
+                l10n.systemStatsRefreshSeconds(_systemStatsRefreshSeconds),
+                style: TextStyle(
+                  color: _colors.primaryText,
+                  fontSize: AppConstants.fontSizeDialogContent,
+                ),
+              ),
+            ),
+            IconButton(
+              icon: Icon(Icons.add, color: _colors.accent, size: 20),
+              onPressed: _systemStatsRefreshSeconds <
+                      AppConstants.maxSystemStatsRefreshSeconds
+                  ? () {
+                      setState(() => _systemStatsRefreshSeconds++);
+                      widget.onSystemStatsRefreshSecondsChanged(
+                        _systemStatsRefreshSeconds,
+                      );
+                    }
+                  : null,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+            ),
+          ],
         ),
       ],
     );
@@ -245,6 +321,51 @@ class _SettingsDialogState extends State<SettingsDialog> {
           },
         ),
       ],
+    );
+  }
+
+  Widget _buildMenuBarSettingsButton(AppLocalizations l10n) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          l10n.menuBarSettingsTitle,
+          style: TextStyle(
+            color: _colors.primaryText,
+            fontSize: AppConstants.fontSizeDialogContent,
+          ),
+        ),
+        TextButton(
+          onPressed: _showMenuBarSettingsDialog,
+          style: TextButton.styleFrom(
+            foregroundColor: _colors.accent,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.settings, size: 16, color: _colors.accent),
+              const SizedBox(width: 4),
+              Icon(Icons.chevron_right, size: 16, color: _colors.accent),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showMenuBarSettingsDialog() {
+    showDialog(
+      context: context,
+      barrierColor: _colors.overlay,
+      builder: (context) => MenuBarSettingsDialog(
+        settings: _menuBarSettings,
+        themeColors: _colors,
+        onSettingsChanged: (newSettings) {
+          setState(() => _menuBarSettings = newSettings);
+          widget.onMenuBarSettingsChanged(newSettings);
+        },
+      ),
     );
   }
 

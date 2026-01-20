@@ -122,6 +122,12 @@ abstract class AppLocalizations {
   /// **'Anti-Sleep'**
   String get antiSleepText;
 
+  /// Option to hide the game window
+  ///
+  /// In en, this message translates to:
+  /// **'Hide Window'**
+  String get hideWindowText;
+
   /// Option to exit the game
   ///
   /// In en, this message translates to:
@@ -350,6 +356,18 @@ abstract class AppLocalizations {
   /// **'Show Mouse Track'**
   String get showMouseTrackText;
 
+  /// Label for system stats refresh interval setting
+  ///
+  /// In en, this message translates to:
+  /// **'Stats Refresh Interval'**
+  String get systemStatsRefreshText;
+
+  /// Seconds format for refresh interval
+  ///
+  /// In en, this message translates to:
+  /// **'{seconds}s'**
+  String systemStatsRefreshSeconds(int seconds);
+
   /// Title for the accessibility permission dialog
   ///
   /// In en, this message translates to:
@@ -455,7 +473,7 @@ abstract class AppLocalizations {
   /// Description for snake game
   ///
   /// In en, this message translates to:
-  /// **'Classic snake game. Eat food to grow and earn EXP!'**
+  /// **'Classic snake game. Eat food to grow!'**
   String get snakeGameDescription;
 
   /// Score label in games
@@ -503,7 +521,7 @@ abstract class AppLocalizations {
   /// Description for flappy bird game
   ///
   /// In en, this message translates to:
-  /// **'Tap to fly through the pipes and earn EXP!'**
+  /// **'Tap to fly through the pipes!'**
   String get flappyBirdDescription;
 
   /// Control instructions for flappy bird
@@ -521,7 +539,7 @@ abstract class AppLocalizations {
   /// Description for sudoku game
   ///
   /// In en, this message translates to:
-  /// **'Classic number puzzle. Fill the grid and earn EXP!'**
+  /// **'Classic number puzzle. Fill the grid!'**
   String get sudokuDescription;
 
   /// Control instructions for sudoku
@@ -601,6 +619,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reset'**
   String get resetButtonText;
+
+  /// Title for menu bar settings
+  ///
+  /// In en, this message translates to:
+  /// **'Menu Bar Info'**
+  String get menuBarSettingsTitle;
+
+  /// Description for menu bar settings
+  ///
+  /// In en, this message translates to:
+  /// **'Configure what info to show in the menu bar'**
+  String get menuBarSettingsDescription;
+
+  /// Option to show/hide tray icon
+  ///
+  /// In en, this message translates to:
+  /// **'Show Tray Icon'**
+  String get menuBarShowTrayIcon;
+
+  /// Focus timer info option
+  ///
+  /// In en, this message translates to:
+  /// **'Focus Timer'**
+  String get menuBarInfoFocus;
+
+  /// Todo info option
+  ///
+  /// In en, this message translates to:
+  /// **'Todo'**
+  String get menuBarInfoTodo;
+
+  /// Level and EXP info option
+  ///
+  /// In en, this message translates to:
+  /// **'Level & EXP'**
+  String get menuBarInfoLevelExp;
+
+  /// CPU info option
+  ///
+  /// In en, this message translates to:
+  /// **'CPU'**
+  String get menuBarInfoCpu;
+
+  /// GPU info option
+  ///
+  /// In en, this message translates to:
+  /// **'GPU'**
+  String get menuBarInfoGpu;
+
+  /// RAM info option
+  ///
+  /// In en, this message translates to:
+  /// **'RAM'**
+  String get menuBarInfoRam;
+
+  /// Disk info option
+  ///
+  /// In en, this message translates to:
+  /// **'Disk'**
+  String get menuBarInfoDisk;
+
+  /// Network speed info option
+  ///
+  /// In en, this message translates to:
+  /// **'Network'**
+  String get menuBarInfoNetwork;
+
+  /// Keyboard tracking info option
+  ///
+  /// In en, this message translates to:
+  /// **'Keyboard'**
+  String get menuBarInfoKeyboard;
+
+  /// Mouse tracking info option
+  ///
+  /// In en, this message translates to:
+  /// **'Mouse'**
+  String get menuBarInfoMouse;
+
+  /// Time info option
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get menuBarInfoSystemTime;
+
+  /// Section title for system stats
+  ///
+  /// In en, this message translates to:
+  /// **'System Stats'**
+  String get menuBarSectionSystem;
+
+  /// Section title for input tracking
+  ///
+  /// In en, this message translates to:
+  /// **'Input Tracking'**
+  String get menuBarSectionTracking;
+
+  /// Section title for app info
+  ///
+  /// In en, this message translates to:
+  /// **'App Info'**
+  String get menuBarSectionApp;
+
+  /// Focus label in menu bar
+  ///
+  /// In en, this message translates to:
+  /// **'Focus'**
+  String get menuBarFocusText;
+
+  /// Keyboard label in menu bar
+  ///
+  /// In en, this message translates to:
+  /// **'Key'**
+  String get menuBarKeyboardText;
+
+  /// Mouse label in menu bar
+  ///
+  /// In en, this message translates to:
+  /// **'Mouse'**
+  String get menuBarMouseText;
+
+  /// Level label in menu bar
+  ///
+  /// In en, this message translates to:
+  /// **'Lv.'**
+  String get menuBarLevelText;
 }
 
 class _AppLocalizationsDelegate

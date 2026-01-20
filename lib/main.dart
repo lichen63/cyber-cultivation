@@ -15,9 +15,12 @@ import 'constants.dart';
 import 'l10n/app_localizations.dart';
 import 'models/daily_stats.dart';
 import 'models/game_data.dart';
+import 'models/menu_bar_settings.dart';
 import 'models/todo_item.dart';
 import 'services/game_data_service.dart';
 import 'services/input_monitor_service.dart';
+import 'services/menu_bar_helper.dart';
+import 'services/menu_bar_info_service.dart';
 import 'services/pomodoro_service.dart';
 import 'widgets/accessibility_dialog.dart';
 import 'widgets/games_list_dialog.dart';
@@ -98,6 +101,9 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
   Locale? _locale;
   AppThemeMode _themeMode = AppThemeMode.dark;
+  MenuBarSettings _menuBarSettings = const MenuBarSettings();
+  String _trayIconPath = '';
+  bool _trayIconPositioned = false; // Track if icon has been positioned left
 
   AppThemeColors get _themeColors => AppThemeColors.fromMode(_themeMode);
 
@@ -117,6 +123,7 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
         _locale = Locale(data.language!);
       }
       _themeMode = data.themeMode;
+      _menuBarSettings = data.menuBarSettings;
     }
   }
 
@@ -132,7 +139,8 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
     if (Platform.isMacOS) {
       iconPath = await _extractAsset(iconPath);
     }
-    await trayManager.setIcon(iconPath);
+    _trayIconPath = iconPath;
+    // Don't set icon here - let _updateMenuBarItems handle it for proper positioning
 
     final menu = Menu(
       items: [
@@ -142,6 +150,75 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
       ],
     );
     await trayManager.setContextMenu(menu);
+  }
+
+  Future<void> _updateTrayIcon() async {
+    // Icon is managed by _updateMenuBarItems for proper positioning
+  }
+
+  Future<void> _updateTrayTitle(String title) async {
+    // Only update if we have any enabled info types
+    if (_menuBarSettings.enabledInfoTypes.isEmpty) {
+      await trayManager.setTitle('');
+      await MenuBarHelper.clearMenuBarItems();
+    } else {
+      // Hide tray_manager's title (we'll use our own separate items)
+      await trayManager.setTitle('');
+    }
+  }
+
+  Future<void> _updateMenuBarItems(List<MenuBarItem> items) async {
+    if (items.isEmpty) {
+      await MenuBarHelper.clearMenuBarItems();
+      _trayIconPositioned = false; // Reset when items are cleared
+      // Also destroy tray icon when items are cleared
+      if (_menuBarSettings.showTrayIcon) {
+        await trayManager.destroy();
+      }
+    } else {
+      // To ensure tray icon appears LEFT of our items:
+      // 1. Destroy tray icon if it exists (removes its status item)
+      // 2. Set our items (they get created at leftmost positions)
+      // 3. Recreate tray icon (it becomes the new leftmost)
+
+      final shouldShowTrayIcon =
+          _menuBarSettings.showTrayIcon && _trayIconPath.isNotEmpty;
+
+      // Only destroy/recreate if not yet positioned correctly
+      if (shouldShowTrayIcon && !_trayIconPositioned) {
+        await trayManager.destroy();
+      }
+
+      await MenuBarHelper.setMenuBarItems(
+        items: items,
+        fontSize: 10.0,
+        fontWeight: 'light',
+      );
+
+      // Always ensure tray icon is shown when it should be
+      if (shouldShowTrayIcon) {
+        if (!_trayIconPositioned) {
+          // First time - set icon which creates it at leftmost position
+          await trayManager.setIcon(_trayIconPath);
+          // Re-set context menu after creating
+          final menu = Menu(
+            items: [
+              MenuItem(key: 'show_window', label: 'Show Window'),
+              MenuItem(key: 'hide_window', label: 'Hide Window'),
+              MenuItem.separator(),
+              MenuItem(key: 'exit_app', label: 'Exit'),
+            ],
+          );
+          await trayManager.setContextMenu(menu);
+          _trayIconPositioned = true;
+        }
+      }
+    }
+  }
+
+  void _onMenuBarSettingsChanged(MenuBarSettings settings) {
+    setState(() => _menuBarSettings = settings);
+    _updateTrayIcon();
   }
 
   Future<String> _extractAsset(String assetPath) async {
@@ -165,6 +242,8 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
       case 'show_window':
         windowManager.show();
         windowManager.focus();
+      case 'hide_window':
+        windowManager.hide();
       case 'exit_app':
         windowManager.close();
     }
@@ -204,12 +283,16 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
         initialGameData: widget.initialGameData,
         themeMode: _themeMode,
         themeColors: _themeColors,
+        menuBarSettings: _menuBarSettings,
         onLanguageChanged: (lang) {
           setState(() => _locale = lang != null ? Locale(lang) : null);
         },
         onThemeModeChanged: (mode) {
           setState(() => _themeMode = mode);
         },
+        onMenuBarSettingsChanged: _onMenuBarSettingsChanged,
+        onTrayTitleChanged: _updateTrayTitle,
+        onMenuBarItemsChanged: _updateMenuBarItems,
       ),
     );
   }
@@ -219,16 +302,24 @@ class MyHomePage extends StatefulWidget {
   final GameData? initialGameData;
   final AppThemeMode themeMode;
   final AppThemeColors themeColors;
+  final MenuBarSettings menuBarSettings;
   final ValueChanged<String?>? onLanguageChanged;
   final ValueChanged<AppThemeMode>? onThemeModeChanged;
+  final ValueChanged<MenuBarSettings>? onMenuBarSettingsChanged;
+  final ValueChanged<String>? onTrayTitleChanged;
+  final ValueChanged<List<MenuBarItem>>? onMenuBarItemsChanged;
 
   const MyHomePage({
     super.key,
     this.initialGameData,
     required this.themeMode,
     required this.themeColors,
+    required this.menuBarSettings,
     this.onLanguageChanged,
     this.onThemeModeChanged,
+    this.onMenuBarSettingsChanged,
+    this.onTrayTitleChanged,
+    this.onMenuBarItemsChanged,
   });
 
   @override
@@ -248,7 +339,10 @@ class _MyHomePageState extends State<MyHomePage>
   bool _isShowSystemStats = true;
   bool _isShowKeyboardTrack = true;
   bool _isShowMouseTrack = true;
+  int _systemStatsRefreshSeconds =
+      AppConstants.defaultSystemStatsRefreshSeconds;
   late AppThemeMode _themeMode;
+  late MenuBarSettings _menuBarSettings;
 
   // EXP System
   int _level = AppConstants.initialLevel;
@@ -271,7 +365,9 @@ class _MyHomePageState extends State<MyHomePage>
   final GameDataService _gameDataService = GameDataService();
   late final PomodoroService _pomodoroService;
   late final InputMonitorService _inputMonitorService;
+  late final MenuBarInfoService _menuBarInfoService;
   Timer? _saveDebounce;
+  Timer? _trayUpdateTimer;
 
   AppThemeColors get _themeColors => widget.themeColors;
 
@@ -281,6 +377,7 @@ class _MyHomePageState extends State<MyHomePage>
     WidgetsBinding.instance.addObserver(this);
     windowManager.addListener(this);
     _themeMode = widget.themeMode;
+    _menuBarSettings = widget.menuBarSettings;
 
     _initializeServices();
 
@@ -307,6 +404,18 @@ class _MyHomePageState extends State<MyHomePage>
     );
     _inputMonitorService.addListener(_onInputMonitorChanged);
     _inputMonitorService.initialize();
+
+    _menuBarInfoService = MenuBarInfoService();
+    _menuBarInfoService.updateSettings(_menuBarSettings);
+    _menuBarInfoService.initialize(refreshSeconds: _systemStatsRefreshSeconds);
+
+    // Update tray/menu bar items periodically
+    _trayUpdateTimer = Timer.periodic(
+      const Duration(seconds: 1),
+      (_) => _updateMenuBarInfo(),
+    );
+    // Initial update
+    WidgetsBinding.instance.addPostFrameCallback((_) => _updateMenuBarInfo());
   }
 
   void _onPomodoroStateChanged() {
@@ -317,12 +426,32 @@ class _MyHomePageState extends State<MyHomePage>
     if (mounted) setState(() {});
   }
 
+  void _updateMenuBarInfo() {
+    // Update the data without notifying listeners to avoid recursion
+    _menuBarInfoService.updateDataSilently(
+      pomodoroState: _pomodoroService.state,
+      todos: _todos,
+      level: _level,
+      currentExp: _currentExp,
+      maxExp: _maxExp,
+      currentKey: _inputMonitorService.currentKey,
+      todayMouseDistance: _todayStats.mouseMoveDistance,
+      todayKeyboardCount: _todayStats.keyboardCount,
+    );
+
+    // Build and update separate menu bar items
+    final items = _menuBarInfoService.buildMenuBarItems();
+    widget.onMenuBarItemsChanged?.call(items);
+  }
+
   @override
   void dispose() {
     _pomodoroService.removeListener(_onPomodoroStateChanged);
     _pomodoroService.dispose();
     _inputMonitorService.removeListener(_onInputMonitorChanged);
     _inputMonitorService.dispose();
+    _menuBarInfoService.dispose();
+    _trayUpdateTimer?.cancel();
     _saveGameData(immediate: true);
     WidgetsBinding.instance.removeObserver(this);
     windowManager.removeListener(this);
@@ -376,9 +505,11 @@ class _MyHomePageState extends State<MyHomePage>
       _isShowSystemStats = data.isShowSystemStats;
       _isShowKeyboardTrack = data.isShowKeyboardTrack;
       _isShowMouseTrack = data.isShowMouseTrack;
+      _systemStatsRefreshSeconds = data.systemStatsRefreshSeconds;
       _userId = data.userId;
       _language = data.language;
       _themeMode = data.themeMode;
+      _menuBarSettings = data.menuBarSettings;
       _windowWidth = data.windowWidth ?? AppConstants.defaultWindowWidth;
       _windowHeight = data.windowHeight ?? AppConstants.defaultWindowHeight;
       _todos = List.from(data.todos);
@@ -400,6 +531,11 @@ class _MyHomePageState extends State<MyHomePage>
       }
     });
     windowManager.setAlwaysOnTop(_isAlwaysOnTop);
+    _menuBarInfoService.updateSettings(_menuBarSettings);
+    // Defer the callback to after build is complete
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.onMenuBarSettingsChanged?.call(_menuBarSettings);
+    });
   }
 
   Future<void> _loadGameData() async {
@@ -429,6 +565,7 @@ class _MyHomePageState extends State<MyHomePage>
           isShowSystemStats: _isShowSystemStats,
           isShowKeyboardTrack: _isShowKeyboardTrack,
           isShowMouseTrack: _isShowMouseTrack,
+          systemStatsRefreshSeconds: _systemStatsRefreshSeconds,
           windowWidth: _windowWidth,
           windowHeight: _windowHeight,
           userId: _userId,
@@ -436,6 +573,7 @@ class _MyHomePageState extends State<MyHomePage>
           themeMode: _themeMode,
           dailyStats: _dailyStatsMap,
           todos: _todos,
+          menuBarSettings: _menuBarSettings,
         ),
       );
     }
@@ -472,7 +610,7 @@ class _MyHomePageState extends State<MyHomePage>
     double moveDistance = 0,
   }) {
     if (!mounted) return;
-    
+
     // Check if date has changed (midnight crossed)
     final todayKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
     if (todayKey != _currentDateKey) {
@@ -483,7 +621,7 @@ class _MyHomePageState extends State<MyHomePage>
       _dailyStatsMap[todayKey] = _todayStats;
       _saveGameData(immediate: true);
     }
-    
+
     setState(() {
       _todayStats.keyboardCount += keyboardCount;
       _todayStats.mouseClickCount += clickCount;
@@ -626,9 +764,11 @@ class _MyHomePageState extends State<MyHomePage>
         isShowSystemStats: _isShowSystemStats,
         isShowKeyboardTrack: _isShowKeyboardTrack,
         isShowMouseTrack: _isShowMouseTrack,
+        systemStatsRefreshSeconds: _systemStatsRefreshSeconds,
         currentLanguage: _language,
         themeMode: _themeMode,
         themeColors: _themeColors,
+        menuBarSettings: _menuBarSettings,
         onAlwaysOnTopChanged: _toggleAlwaysOnTop,
         onAntiSleepChanged: (value) {
           setState(() => _inputMonitorService.enableAntiSleep = value);
@@ -651,6 +791,11 @@ class _MyHomePageState extends State<MyHomePage>
           setState(() => _isShowMouseTrack = value);
           _saveGameData();
         },
+        onSystemStatsRefreshSecondsChanged: (value) {
+          setState(() => _systemStatsRefreshSeconds = value);
+          _menuBarInfoService.updateRefreshInterval(value);
+          _saveGameData();
+        },
         onLanguageChanged: (value) {
           setState(() => _language = value);
           widget.onLanguageChanged?.call(value);
@@ -659,6 +804,12 @@ class _MyHomePageState extends State<MyHomePage>
         onThemeModeChanged: (value) {
           setState(() => _themeMode = value);
           widget.onThemeModeChanged?.call(value);
+          _saveGameData();
+        },
+        onMenuBarSettingsChanged: (value) {
+          setState(() => _menuBarSettings = value);
+          _menuBarInfoService.updateSettings(value);
+          widget.onMenuBarSettingsChanged?.call(value);
           _saveGameData();
         },
         onResetLevelExp: _resetLevelExp,
@@ -720,6 +871,10 @@ class _MyHomePageState extends State<MyHomePage>
           isChecked: _inputMonitorService.enableAntiSleep,
         ),
         _buildMenuItem(
+          value: AppConstants.hideWindowValue,
+          label: l10n.hideWindowText,
+        ),
+        _buildMenuItem(
           value: AppConstants.exitGameValue,
           label: l10n.exitGameText,
           isDestructive: true,
@@ -773,6 +928,8 @@ class _MyHomePageState extends State<MyHomePage>
               !_inputMonitorService.enableAntiSleep;
         });
         _saveGameData();
+      case AppConstants.hideWindowValue:
+        windowManager.hide();
       case AppConstants.exitGameValue:
         windowManager.close();
     }
@@ -802,6 +959,7 @@ class _MyHomePageState extends State<MyHomePage>
           isShowSystemStats: _isShowSystemStats,
           isShowKeyboardTrack: _isShowKeyboardTrack,
           isShowMouseTrack: _isShowMouseTrack,
+          systemStatsRefreshSeconds: _systemStatsRefreshSeconds,
           pomodoroState: _pomodoroService.state,
           todos: _todos,
           themeColors: _themeColors,

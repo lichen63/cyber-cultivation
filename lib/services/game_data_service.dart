@@ -31,7 +31,8 @@ class GameDataService {
     try {
       if (Platform.isAndroid) {
         final androidInfo = await deviceInfo.androidInfo;
-        deviceIdentifier = '${androidInfo.brand}:${androidInfo.device}:${androidInfo.id}';
+        deviceIdentifier =
+            '${androidInfo.brand}:${androidInfo.device}:${androidInfo.id}';
       } else if (Platform.isIOS) {
         final iosInfo = await deviceInfo.iosInfo;
         deviceIdentifier = '${iosInfo.name}:${iosInfo.identifierForVendor}';
@@ -67,7 +68,37 @@ class GameDataService {
       }
     } catch (e) {
       debugPrint('Error loading game data: $e');
+      // Backup corrupted file and start fresh
+      await _backupCorruptedFile();
     }
     return null;
+  }
+
+  /// Backs up a corrupted save file with timestamp
+  Future<void> _backupCorruptedFile() async {
+    try {
+      final path = await _getFilePath();
+      final file = File(path);
+
+      if (await file.exists()) {
+        final timestamp = DateTime.now().millisecondsSinceEpoch;
+        final backupPath = '$path.corrupted.$timestamp';
+        await file.rename(backupPath);
+        debugPrint('Corrupted save file backed up to: $backupPath');
+      }
+    } catch (e) {
+      debugPrint('Error backing up corrupted file: $e');
+      // If backup fails, try to delete the corrupted file
+      try {
+        final path = await _getFilePath();
+        final file = File(path);
+        if (await file.exists()) {
+          await file.delete();
+          debugPrint('Deleted corrupted save file');
+        }
+      } catch (deleteError) {
+        debugPrint('Error deleting corrupted file: $deleteError');
+      }
+    }
   }
 }
