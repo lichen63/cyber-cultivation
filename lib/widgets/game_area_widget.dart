@@ -23,6 +23,7 @@ class GameAreaWidget extends StatelessWidget {
   final bool isShowSystemStats;
   final bool isShowKeyboardTrack;
   final bool isShowMouseTrack;
+  final int systemStatsRefreshSeconds;
   final PomodoroState pomodoroState;
   final AppThemeColors themeColors;
 
@@ -40,6 +41,7 @@ class GameAreaWidget extends StatelessWidget {
     required this.isShowSystemStats,
     required this.isShowKeyboardTrack,
     required this.isShowMouseTrack,
+    required this.systemStatsRefreshSeconds,
     required this.pomodoroState,
     required this.themeColors,
   });
@@ -92,7 +94,11 @@ class GameAreaWidget extends StatelessWidget {
             top: 0,
             left: 0,
             right: 0,
-            child: SystemStatsPanel(scale: scale, themeColors: themeColors),
+            child: SystemStatsPanel(
+              scale: scale,
+              themeColors: themeColors,
+              refreshSeconds: systemStatsRefreshSeconds,
+            ),
           ),
       ],
     );

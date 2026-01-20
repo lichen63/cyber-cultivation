@@ -16,6 +16,10 @@
     "@antiSleepText": {
         "description": "Option to prevent the system from sleeping"
     },
+    "hideWindowText": "Hide Window",
+    "@hideWindowText": {
+        "description": "Option to hide the game window"
+    },
     "exitGameText": "Exit Game",
     "@exitGameText": {
         "description": "Option to exit the game"
@@ -167,6 +171,19 @@
     "showMouseTrackText": "Show Mouse Track",
     "@showMouseTrackText": {
         "description": "Option to show mouse track area"
+    },
+    "systemStatsRefreshText": "Stats Refresh Interval",
+    "@systemStatsRefreshText": {
+        "description": "Label for system stats refresh interval setting"
+    },
+    "systemStatsRefreshSeconds": "{seconds}s",
+    "@systemStatsRefreshSeconds": {
+        "description": "Seconds format for refresh interval",
+        "placeholders": {
+            "seconds": {
+                "type": "int"
+            }
+        }
     },
     "accessibilityDialogTitle": "Accessibility Permission Required",
     "@accessibilityDialogTitle": {
@@ -353,5 +370,89 @@
     "resetButtonText": "Reset",
     "@resetButtonText": {
         "description": "Text for reset button"
+    },
+    "menuBarSettingsTitle": "Menu Bar Info",
+    "@menuBarSettingsTitle": {
+        "description": "Title for menu bar settings"
+    },
+    "menuBarSettingsDescription": "Configure what info to show in the menu bar",
+    "@menuBarSettingsDescription": {
+        "description": "Description for menu bar settings"
+    },
+    "menuBarShowTrayIcon": "Show Tray Icon",
+    "@menuBarShowTrayIcon": {
+        "description": "Option to show/hide tray icon"
+    },
+    "menuBarInfoFocus": "Focus Timer",
+    "@menuBarInfoFocus": {
+        "description": "Focus timer info option"
+    },
+    "menuBarInfoTodo": "Todo",
+    "@menuBarInfoTodo": {
+        "description": "Todo info option"
+    },
+    "menuBarInfoLevelExp": "Level & EXP",
+    "@menuBarInfoLevelExp": {
+        "description": "Level and EXP info option"
+    },
+    "menuBarInfoCpu": "CPU",
+    "@menuBarInfoCpu": {
+        "description": "CPU info option"
+    },
+    "menuBarInfoGpu": "GPU",
+    "@menuBarInfoGpu": {
+        "description": "GPU info option"
+    },
+    "menuBarInfoRam": "RAM",
+    "@menuBarInfoRam": {
+        "description": "RAM info option"
+    },
+    "menuBarInfoDisk": "Disk",
+    "@menuBarInfoDisk": {
+        "description": "Disk info option"
+    },
+    "menuBarInfoNetwork": "Network",
+    "@menuBarInfoNetwork": {
+        "description": "Network speed info option"
+    },
+    "menuBarInfoKeyboard": "Keyboard",
+    "@menuBarInfoKeyboard": {
+        "description": "Keyboard tracking info option"
+    },
+    "menuBarInfoMouse": "Mouse",
+    "@menuBarInfoMouse": {
+        "description": "Mouse tracking info option"
+    },
+    "menuBarInfoSystemTime": "Time",
+    "@menuBarInfoSystemTime": {
+        "description": "Time info option"
+    },
+    "menuBarSectionSystem": "System Stats",
+    "@menuBarSectionSystem": {
+        "description": "Section title for system stats"
+    },
+    "menuBarSectionTracking": "Input Tracking",
+    "@menuBarSectionTracking": {
+        "description": "Section title for input tracking"
+    },
+    "menuBarSectionApp": "App Info",
+    "@menuBarSectionApp": {
+        "description": "Section title for app info"
+    },
+    "menuBarFocusText": "Focus",
+    "@menuBarFocusText": {
+        "description": "Focus label in menu bar"
+    },
+    "menuBarKeyboardText": "Key",
+    "@menuBarKeyboardText": {
+        "description": "Keyboard label in menu bar"
+    },
+    "menuBarMouseText": "Mouse",
+    "@menuBarMouseText": {
+        "description": "Mouse label in menu bar"
+    },
+    "menuBarLevelText": "Lv.",
+    "@menuBarLevelText": {
+        "description": "Level label in menu bar"
     }
 }

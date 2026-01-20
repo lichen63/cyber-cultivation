@@ -272,11 +272,13 @@ class _NetworkStatBox extends StatelessWidget {
 class SystemStatsPanel extends StatefulWidget {
   final double scale;
   final AppThemeColors themeColors;
+  final int refreshSeconds;
 
   const SystemStatsPanel({
     super.key,
     required this.scale,
     required this.themeColors,
+    required this.refreshSeconds,
   });
 
   @override
@@ -285,6 +287,7 @@ class SystemStatsPanel extends StatefulWidget {
 
 class _SystemStatsPanelState extends State<SystemStatsPanel> {
   Timer? _updateTimer;
+  int _currentRefreshSeconds = 0;
 
   double _cpuUsage = 0.0;
   double _gpuUsage = 0.0;
@@ -296,9 +299,24 @@ class _SystemStatsPanelState extends State<SystemStatsPanel> {
   @override
   void initState() {
     super.initState();
+    _currentRefreshSeconds = widget.refreshSeconds;
     _fetchStats();
+    _startTimer();
+  }
+
+  @override
+  void didUpdateWidget(SystemStatsPanel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.refreshSeconds != widget.refreshSeconds) {
+      _currentRefreshSeconds = widget.refreshSeconds;
+      _updateTimer?.cancel();
+      _startTimer();
+    }
+  }
+
+  void _startTimer() {
     _updateTimer = Timer.periodic(
-      const Duration(seconds: 2),
+      Duration(seconds: _currentRefreshSeconds),
       (_) => _fetchStats(),
     );
   }

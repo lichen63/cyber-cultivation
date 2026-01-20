@@ -24,6 +24,7 @@ class HomePageContent extends StatelessWidget {
   final bool isShowSystemStats;
   final bool isShowKeyboardTrack;
   final bool isShowMouseTrack;
+  final int systemStatsRefreshSeconds;
   final PomodoroState pomodoroState;
   final List<TodoItem> todos;
   final AppThemeColors themeColors;
@@ -50,6 +51,7 @@ class HomePageContent extends StatelessWidget {
     required this.isShowSystemStats,
     required this.isShowKeyboardTrack,
     required this.isShowMouseTrack,
+    required this.systemStatsRefreshSeconds,
     required this.pomodoroState,
     required this.todos,
     required this.themeColors,
@@ -115,6 +117,7 @@ class HomePageContent extends StatelessWidget {
                   isShowSystemStats: isShowSystemStats,
                   isShowKeyboardTrack: isShowKeyboardTrack,
                   isShowMouseTrack: isShowMouseTrack,
+                  systemStatsRefreshSeconds: systemStatsRefreshSeconds,
                   pomodoroState: pomodoroState,
                   themeColors: themeColors,
                 ),

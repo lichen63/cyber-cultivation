@@ -21,6 +21,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get antiSleepText => '防休眠';
 
   @override
+  String get hideWindowText => '隐藏窗口';
+
+  @override
   String get exitGameText => '退出游戏';
 
   @override
@@ -135,6 +138,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get showMouseTrackText => '显示鼠标跟踪';
 
   @override
+  String get systemStatsRefreshText => '状态刷新间隔';
+
+  @override
+  String systemStatsRefreshSeconds(int seconds) {
+    return '$seconds秒';
+  }
+
+  @override
   String get accessibilityDialogTitle => '需要辅助功能权限';
 
   @override
@@ -187,7 +198,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get snakeGameTitle => '贪吃蛇';
 
   @override
-  String get snakeGameDescription => '经典贪吃蛇游戏。吃食物来成长并获得经验值！';
+  String get snakeGameDescription => '经典贪吃蛇游戏，吃食物来成长！';
 
   @override
   String get gameScore => '分数';
@@ -213,7 +224,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get flappyBirdTitle => '飞翔小鸟';
 
   @override
-  String get flappyBirdDescription => '点击飞过管道来获得经验值！';
+  String get flappyBirdDescription => '点击屏幕飞过管道！';
 
   @override
   String get flappyBirdTapToFlap => '点击或按空格键来拍打翅膀';
@@ -222,7 +233,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sudokuTitle => '数独';
 
   @override
-  String get sudokuDescription => '经典数字谜题。填满格子来获得经验值！';
+  String get sudokuDescription => '经典数字谜题，填满格子！';
 
   @override
   String get sudokuSelectNumber => '点击下方数字或使用按键 1-9';
@@ -266,4 +277,67 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get resetButtonText => '重置';
+
+  @override
+  String get menuBarSettingsTitle => '菜单栏信息';
+
+  @override
+  String get menuBarSettingsDescription => '配置菜单栏中显示的信息';
+
+  @override
+  String get menuBarShowTrayIcon => '显示托盘图标';
+
+  @override
+  String get menuBarInfoFocus => '专注计时';
+
+  @override
+  String get menuBarInfoTodo => '待办事项';
+
+  @override
+  String get menuBarInfoLevelExp => '等级和经验';
+
+  @override
+  String get menuBarInfoCpu => 'CPU';
+
+  @override
+  String get menuBarInfoGpu => 'GPU';
+
+  @override
+  String get menuBarInfoRam => '内存';
+
+  @override
+  String get menuBarInfoDisk => '磁盘';
+
+  @override
+  String get menuBarInfoNetwork => '网络';
+
+  @override
+  String get menuBarInfoKeyboard => '键盘';
+
+  @override
+  String get menuBarInfoMouse => '鼠标';
+
+  @override
+  String get menuBarInfoSystemTime => '时间';
+
+  @override
+  String get menuBarSectionSystem => '系统状态';
+
+  @override
+  String get menuBarSectionTracking => '输入追踪';
+
+  @override
+  String get menuBarSectionApp => '应用信息';
+
+  @override
+  String get menuBarFocusText => '专注';
+
+  @override
+  String get menuBarKeyboardText => '按键';
+
+  @override
+  String get menuBarMouseText => '鼠标';
+
+  @override
+  String get menuBarLevelText => '等级';
 }

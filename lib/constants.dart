@@ -116,6 +116,11 @@ class AppConstants {
   static const double maxWindowHeight = 1600.0;
   static const double windowAspectRatio = 1.0;
 
+  // System Stats
+  static const int defaultSystemStatsRefreshSeconds = 2;
+  static const int minSystemStatsRefreshSeconds = 1;
+  static const int maxSystemStatsRefreshSeconds = 10;
+
   // Event Channels
   static const String keyEventsChannel =
       'com.lichen63.cyber_cultivation/key_events';
@@ -134,6 +139,7 @@ class AppConstants {
   static const String toggleAlwaysOnTopValue = 'toggleAlwaysOnTop';
   static const String antiSleepText = 'Anti-Sleep';
   static const String toggleAntiSleepValue = 'toggle_anti_sleep';
+  static const String hideWindowValue = 'hide_window';
   static const String exitGameText = 'Exit Game';
   static const String exitGameValue = 'exit_game';
 
@@ -473,4 +479,26 @@ class SudokuConstants {
   static const Color userNumberColor = Color(0xFF1976D2);
   static const Color errorNumberColor = Color(0xFFD32F2F);
   static const Color highlightColor = Color(0x20FFD700);
+}
+
+/// Constants for menu bar info display
+class MenuBarConstants {
+  // Dialog dimensions
+  static const double settingsDialogWidth = 300.0;
+
+  // Menu bar item dimensions
+  static const double itemSpacing = 8.0;
+  static const double itemPaddingH = 4.0;
+  static const double itemPaddingV = 2.0;
+  static const double itemBorderRadius = 4.0;
+
+  // Font sizes
+  static const double upperLineFontSize = 10.0;
+  static const double lowerLineFontSize = 9.0;
+
+  // Colors (used in tray title)
+  static const String focusColorHex = '#FF5252'; // Red for focus
+  static const String relaxColorHex = '#69F0AE'; // Green for relax
+  static const String uploadColorHex = '#FF5252'; // Red for upload
+  static const String downloadColorHex = '#448AFF'; // Blue for download
 }
