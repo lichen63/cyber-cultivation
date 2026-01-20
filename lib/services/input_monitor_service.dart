@@ -189,7 +189,7 @@ class InputMonitorService extends ChangeNotifier {
   Future<void> _performMouseMove() async {
     try {
       _moveToggle = !_moveToggle;
-      final double offset = _moveToggle ? 2.0 : -2.0;
+      final double offset = _moveToggle ? 1.0 : -1.0;
 
       await _mouseControlChannel.invokeMethod('moveMouse', {
         'dx': offset,
