@@ -189,12 +189,16 @@ class InputMonitorService extends ChangeNotifier {
   Future<void> _performMouseMove() async {
     try {
       _moveToggle = !_moveToggle;
-      final double offset = _moveToggle ? 2.0 : -2.0;
+      final double offset = _moveToggle ? 1.0 : -1.0;
 
       await _mouseControlChannel.invokeMethod('moveMouse', {
         'dx': offset,
         'dy': offset,
       });
+      // Update the last mouse move time to prevent immediate re-triggering
+      // This is needed because the synthetic move event may not be captured
+      // by the event stream, or there could be a race condition
+      _lastMouseMoveTime = DateTime.now();
     } catch (e) {
       debugPrint("Failed to move mouse via channel: $e");
     }

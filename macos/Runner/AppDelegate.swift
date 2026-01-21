@@ -162,7 +162,7 @@ class AppDelegate: FlutterAppDelegate {
           bottomStyle.maximumLineHeight = bottomFontSize + 1
           
           let topAttributes: [NSAttributedString.Key: Any] = [
-            .font: NSFont.systemFont(ofSize: topFontSize, weight: .regular),
+            .font: NSFont.systemFont(ofSize: topFontSize, weight: fontWeight),
             .foregroundColor: NSColor.textColor,
             .paragraphStyle: topStyle,
             .baselineOffset: -4
