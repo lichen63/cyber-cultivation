@@ -119,6 +119,28 @@ class AppDelegate: FlutterAppDelegate {
           self.statusItems[id] = statusItem
         }
         
+        // Check for battery special handling
+        if id == "battery" && topText.hasPrefix("BATTERY:") {
+          // Parse battery info: "BATTERY:<level>:<charging>"
+          let parts = topText.split(separator: ":")
+          if parts.count >= 3,
+             let level = Int(parts[1]) {
+            let isCharging = parts[2] == "1"
+            if let button = statusItem.button {
+              // Create battery icon with percentage inside
+              let batteryImage = self.createBatteryImage(level: level, isCharging: isCharging, width: CGFloat(fixedWidth > 0 ? fixedWidth : 45))
+              button.image = batteryImage
+              button.imagePosition = .imageOnly
+              button.attributedTitle = NSAttributedString(string: "")
+              button.target = self
+              button.action = #selector(self.menuBarItemClicked(_:))
+              button.sendAction(on: [.leftMouseUp, .rightMouseUp])
+              button.identifier = NSUserInterfaceItemIdentifier(id)
+            }
+          }
+          continue
+        }
+        
         // Create attributed string
         let style = NSMutableParagraphStyle()
         switch alignmentStr {
@@ -183,6 +205,8 @@ class AppDelegate: FlutterAppDelegate {
         }
         
         if let button = statusItem.button {
+          button.image = nil
+          button.imagePosition = .noImage
           button.attributedTitle = attributedString
           // Add click action to show context menu or calendar
           button.target = self
@@ -195,6 +219,115 @@ class AppDelegate: FlutterAppDelegate {
       
       result(true)
     }
+  }
+  
+  /// Create a battery icon image with percentage text inside
+  private func createBatteryImage(level: Int, isCharging: Bool, width: CGFloat) -> NSImage {
+    let height: CGFloat = 22  // Menu bar height
+    let batteryWidth: CGFloat = 36
+    let batteryHeight: CGFloat = 16
+    let tipWidth: CGFloat = 3
+    let tipHeight: CGFloat = 7
+    let cornerRadius: CGFloat = 3
+    let borderWidth: CGFloat = 1.5
+    let chargingIconWidth: CGFloat = isCharging ? 10 : 0  // Space for charging icon on the left
+    
+    let image = NSImage(size: NSSize(width: width, height: height), flipped: false) { rect in
+      let batteryX = (width - batteryWidth - tipWidth + chargingIconWidth) / 2
+      let batteryY = (height - batteryHeight) / 2
+      
+      // Always use white for border
+      let borderColor = NSColor.white
+      // Use white for fill, black for text
+      let fillColor = NSColor.white
+      let textColor = NSColor.black
+      
+      // Draw charging indicator (lightning bolt) to the left of the battery
+      if isCharging {
+        let boltCenterX = batteryX - 7
+        let boltCenterY = batteryY + batteryHeight / 2
+        
+        // Draw a cleaner, wider lightning bolt shape
+        let boltPath = NSBezierPath()
+        // Top point
+        boltPath.move(to: NSPoint(x: boltCenterX + 2, y: boltCenterY + 7))
+        // Left side going down to middle
+        boltPath.line(to: NSPoint(x: boltCenterX - 3, y: boltCenterY + 1))
+        // Middle notch (left)
+        boltPath.line(to: NSPoint(x: boltCenterX - 1, y: boltCenterY + 1))
+        // Bottom point
+        boltPath.line(to: NSPoint(x: boltCenterX - 2, y: boltCenterY - 7))
+        // Right side going up to middle
+        boltPath.line(to: NSPoint(x: boltCenterX + 3, y: boltCenterY - 1))
+        // Middle notch (right)
+        boltPath.line(to: NSPoint(x: boltCenterX + 1, y: boltCenterY - 1))
+        boltPath.close()
+        
+        NSColor.white.setFill()
+        boltPath.fill()
+      }
+      
+      // Draw battery body outline
+      let bodyRect = NSRect(x: batteryX, y: batteryY, width: batteryWidth, height: batteryHeight)
+      let bodyPath = NSBezierPath(roundedRect: bodyRect, xRadius: cornerRadius, yRadius: cornerRadius)
+      borderColor.setStroke()
+      bodyPath.lineWidth = borderWidth
+      bodyPath.stroke()
+      
+      // Draw battery tip (positive terminal)
+      let tipRect = NSRect(
+        x: batteryX + batteryWidth,
+        y: batteryY + (batteryHeight - tipHeight) / 2,
+        width: tipWidth,
+        height: tipHeight
+      )
+      let tipPath = NSBezierPath(roundedRect: tipRect, xRadius: 1, yRadius: 1)
+      borderColor.setFill()
+      tipPath.fill()
+      
+      // Draw fill level (white fill)
+      let inset: CGFloat = 2.5
+      let fillWidth = (batteryWidth - inset * 2) * CGFloat(level) / 100.0
+      if fillWidth > 0 {
+        let fillRect = NSRect(
+          x: batteryX + inset,
+          y: batteryY + inset,
+          width: fillWidth,
+          height: batteryHeight - inset * 2
+        )
+        let fillPath = NSBezierPath(roundedRect: fillRect, xRadius: 1.5, yRadius: 1.5)
+        fillColor.setFill()
+        fillPath.fill()
+      }
+      
+      // Draw percentage number inside the battery (no % symbol, black text with white outline)
+      let percentText = "\(level)"
+      let font = NSFont.monospacedDigitSystemFont(ofSize: 10, weight: .bold)
+      let textSize = (percentText as NSString).size(withAttributes: [.font: font])
+      let textX = batteryX + (batteryWidth - textSize.width) / 2
+      let textY = batteryY + (batteryHeight - textSize.height) / 2
+      
+      // Draw white outline (stroke) first
+      let strokeAttributes: [NSAttributedString.Key: Any] = [
+        .font: font,
+        .foregroundColor: NSColor.white,
+        .strokeColor: NSColor.white,
+        .strokeWidth: -3.0  // Negative value fills the text and adds stroke
+      ]
+      (percentText as NSString).draw(at: NSPoint(x: textX, y: textY), withAttributes: strokeAttributes)
+      
+      // Draw black fill on top
+      let fillAttributes: [NSAttributedString.Key: Any] = [
+        .font: font,
+        .foregroundColor: textColor
+      ]
+      (percentText as NSString).draw(at: NSPoint(x: textX, y: textY), withAttributes: fillAttributes)
+      
+      return true
+    }
+    
+    image.isTemplate = false
+    return image
   }
   
   @objc private func menuBarItemClicked(_ sender: NSStatusBarButton) {

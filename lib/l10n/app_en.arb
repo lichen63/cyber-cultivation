@@ -415,6 +415,10 @@
     "@menuBarInfoNetwork": {
         "description": "Network speed info option"
     },
+    "menuBarInfoBattery": "Battery",
+    "@menuBarInfoBattery": {
+        "description": "Battery info option"
+    },
     "menuBarInfoKeyboard": "Keyboard",
     "@menuBarInfoKeyboard": {
         "description": "Keyboard tracking info option"

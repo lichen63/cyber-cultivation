@@ -1,5 +1,6 @@
 import Cocoa
 import IOKit
+import IOKit.ps
 
 class SystemInfoHandler {
   private var previousCpuInfo: host_cpu_load_info?
@@ -191,13 +192,47 @@ class SystemInfoHandler {
     // Update network stats once before getting all stats
     updateNetworkStats()
     
+    // Get battery info
+    let batteryInfo = getBatteryInfo()
+    
     return [
       "cpu": getCpuUsage(),
       "gpu": getGpuUsage(),
       "ram": getRamUsage(),
       "disk": getDiskUsage(),
       "networkUp": lastNetworkUploadSpeed,
-      "networkDown": lastNetworkDownloadSpeed
+      "networkDown": lastNetworkDownloadSpeed,
+      "batteryLevel": batteryInfo.level,
+      "isBatteryCharging": batteryInfo.isCharging
     ]
+  }
+  
+  /// Get battery level and charging status
+  /// Returns (level: Int, isCharging: Bool) where level is -1 if no battery
+  func getBatteryInfo() -> (level: Int, isCharging: Bool) {
+    guard let powerSourceInfo = IOPSCopyPowerSourcesInfo()?.takeRetainedValue(),
+          let powerSources = IOPSCopyPowerSourcesList(powerSourceInfo)?.takeRetainedValue() as? [CFTypeRef],
+          !powerSources.isEmpty else {
+      // No battery (desktop Mac or error)
+      return (-1, false)
+    }
+    
+    for source in powerSources {
+      if let description = IOPSGetPowerSourceDescription(powerSourceInfo, source)?.takeUnretainedValue() as? [String: Any] {
+        // Check if this is a battery
+        if let type = description[kIOPSTypeKey] as? String,
+           type == kIOPSInternalBatteryType {
+          let currentCapacity = description[kIOPSCurrentCapacityKey] as? Int ?? 0
+          let maxCapacity = description[kIOPSMaxCapacityKey] as? Int ?? 100
+          let isCharging = description[kIOPSIsChargingKey] as? Bool ?? false
+          
+          // Calculate percentage
+          let level = maxCapacity > 0 ? (currentCapacity * 100) / maxCapacity : 0
+          return (level, isCharging)
+        }
+      }
+    }
+    
+    return (-1, false)
   }
 }

@@ -317,6 +317,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get menuBarInfoNetwork => 'Network';
 
   @override
+  String get menuBarInfoBattery => 'Battery';
+
+  @override
   String get menuBarInfoKeyboard => 'Keyboard';
 
   @override

@@ -1,19 +1,23 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../constants.dart';
 import '../l10n/app_localizations.dart';
 import '../models/menu_bar_settings.dart';
+import '../services/menu_bar_info_service.dart';
 
 /// Dialog for configuring menu bar info display settings
 class MenuBarSettingsDialog extends StatefulWidget {
   final MenuBarSettings settings;
   final AppThemeColors themeColors;
   final ValueChanged<MenuBarSettings> onSettingsChanged;
+  final MenuBarInfoService? menuBarInfoService;
 
   const MenuBarSettingsDialog({
     super.key,
     required this.settings,
     required this.themeColors,
     required this.onSettingsChanged,
+    this.menuBarInfoService,
   });
 
   @override
@@ -111,6 +115,14 @@ class _MenuBarSettingsDialogState extends State<MenuBarSettingsDialog> {
               title: l10n.menuBarInfoNetwork,
               type: MenuBarInfoType.network,
             ),
+            _buildCheckboxTile(
+              title: l10n.menuBarInfoBattery,
+              type: MenuBarInfoType.battery,
+            ),
+
+            // Battery simulation controls (debug mode only)
+            if (kDebugMode && widget.menuBarInfoService != null)
+              _buildBatterySimulationControls(),
 
             const SizedBox(height: 16),
 
@@ -216,6 +228,105 @@ class _MenuBarSettingsDialogState extends State<MenuBarSettingsDialog> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// Build battery simulation controls for debug mode
+  Widget _buildBatterySimulationControls() {
+    final service = widget.menuBarInfoService!;
+    final isSimulating = service.isSimulatingBattery;
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 36, top: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                '🔧 Simulate Battery',
+                style: TextStyle(
+                  color: _colors.secondaryText,
+                  fontSize: AppConstants.fontSizeDialogContent - 1,
+                ),
+              ),
+              const Spacer(),
+              Switch(
+                value: isSimulating,
+                onChanged: (_) {
+                  service.toggleBatterySimulation();
+                  setState(() {});
+                },
+                activeThumbColor: _colors.accent,
+                activeTrackColor: _colors.accent.withValues(alpha: 0.5),
+                inactiveThumbColor: _colors.inactive,
+                inactiveTrackColor: _colors.inactive.withValues(alpha: 0.5),
+              ),
+            ],
+          ),
+          if (isSimulating) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Text(
+                  'Level:',
+                  style: TextStyle(
+                    color: _colors.secondaryText,
+                    fontSize: AppConstants.fontSizeDialogContent - 1,
+                  ),
+                ),
+                Expanded(
+                  child: Slider(
+                    value: service.simulatedBatteryLevel.toDouble(),
+                    min: 0,
+                    max: 100,
+                    divisions: 20,
+                    label: '${service.simulatedBatteryLevel}%',
+                    activeColor: _colors.accent,
+                    onChanged: (value) {
+                      service.setSimulatedBattery(level: value.toInt());
+                      setState(() {});
+                    },
+                  ),
+                ),
+                SizedBox(
+                  width: 40,
+                  child: Text(
+                    '${service.simulatedBatteryLevel}%',
+                    style: TextStyle(
+                      color: _colors.secondaryText,
+                      fontSize: AppConstants.fontSizeDialogContent - 1,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                Text(
+                  'Charging:',
+                  style: TextStyle(
+                    color: _colors.secondaryText,
+                    fontSize: AppConstants.fontSizeDialogContent - 1,
+                  ),
+                ),
+                const Spacer(),
+                Switch(
+                  value: service.simulatedBatteryCharging,
+                  onChanged: (value) {
+                    service.setSimulatedBattery(isCharging: value);
+                    setState(() {});
+                  },
+                  activeThumbColor: _colors.accent,
+                  activeTrackColor: _colors.accent.withValues(alpha: 0.5),
+                  inactiveThumbColor: _colors.inactive,
+                  inactiveTrackColor: _colors.inactive.withValues(alpha: 0.5),
+                ),
+              ],
+            ),
+          ],
+        ],
       ),
     );
   }

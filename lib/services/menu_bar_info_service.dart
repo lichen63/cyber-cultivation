@@ -23,6 +23,8 @@ class MenuBarInfoData {
   final String currentKey;
   final int todayMouseDistance;
   final int todayKeyboardCount;
+  final int batteryLevel;
+  final bool isBatteryCharging;
 
   const MenuBarInfoData({
     this.pomodoroState,
@@ -39,6 +41,8 @@ class MenuBarInfoData {
     this.currentKey = '',
     this.todayMouseDistance = 0,
     this.todayKeyboardCount = 0,
+    this.batteryLevel = -1,
+    this.isBatteryCharging = false,
   });
 
   MenuBarInfoData copyWith({
@@ -56,6 +60,8 @@ class MenuBarInfoData {
     String? currentKey,
     int? todayMouseDistance,
     int? todayKeyboardCount,
+    int? batteryLevel,
+    bool? isBatteryCharging,
   }) {
     return MenuBarInfoData(
       pomodoroState: pomodoroState ?? this.pomodoroState,
@@ -72,6 +78,8 @@ class MenuBarInfoData {
       currentKey: currentKey ?? this.currentKey,
       todayMouseDistance: todayMouseDistance ?? this.todayMouseDistance,
       todayKeyboardCount: todayKeyboardCount ?? this.todayKeyboardCount,
+      batteryLevel: batteryLevel ?? this.batteryLevel,
+      isBatteryCharging: isBatteryCharging ?? this.isBatteryCharging,
     );
   }
 }
@@ -83,8 +91,35 @@ class MenuBarInfoService extends ChangeNotifier {
   MenuBarSettings _settings = const MenuBarSettings();
   int _refreshSeconds = AppConstants.defaultSystemStatsRefreshSeconds;
 
+  /// Simulation mode for testing battery on devices without batteries
+  bool _simulateBattery = false;
+  int _simulatedBatteryLevel = 59;
+  bool _simulatedBatteryCharging = true;
+
   MenuBarInfoData get data => _data;
   MenuBarSettings get settings => _settings;
+
+  /// Whether battery simulation is enabled
+  bool get isSimulatingBattery => _simulateBattery;
+
+  /// Get the current simulated battery level
+  int get simulatedBatteryLevel => _simulatedBatteryLevel;
+
+  /// Get the current simulated charging state
+  bool get simulatedBatteryCharging => _simulatedBatteryCharging;
+
+  /// Toggle battery simulation mode (for testing on Macs without battery)
+  void toggleBatterySimulation() {
+    _simulateBattery = !_simulateBattery;
+    notifyListeners();
+  }
+
+  /// Set simulated battery values
+  void setSimulatedBattery({int? level, bool? isCharging}) {
+    if (level != null) _simulatedBatteryLevel = level.clamp(0, 100);
+    if (isCharging != null) _simulatedBatteryCharging = isCharging;
+    notifyListeners();
+  }
 
   /// Initialize the service with optional refresh interval
   void initialize({int? refreshSeconds}) {
@@ -191,6 +226,15 @@ class MenuBarInfoService extends ChangeNotifier {
   Future<void> _updateSystemStats() async {
     try {
       final stats = await SystemInfoService.getAllStats();
+
+      // Use simulated battery values if simulation is enabled
+      final batteryLevel = _simulateBattery
+          ? _simulatedBatteryLevel
+          : (stats['batteryLevel'] as num?)?.toInt() ?? -1;
+      final isBatteryCharging = _simulateBattery
+          ? _simulatedBatteryCharging
+          : (stats['isBatteryCharging'] as bool?) ?? false;
+
       _data = _data.copyWith(
         cpuUsage: (stats['cpu'] as num?)?.toDouble() ?? 0.0,
         gpuUsage: (stats['gpu'] as num?)?.toDouble() ?? 0.0,
@@ -198,6 +242,8 @@ class MenuBarInfoService extends ChangeNotifier {
         diskUsage: (stats['disk'] as num?)?.toDouble() ?? 0.0,
         networkUpload: (stats['networkUp'] as num?)?.toInt() ?? 0,
         networkDownload: (stats['networkDown'] as num?)?.toInt() ?? 0,
+        batteryLevel: batteryLevel,
+        isBatteryCharging: isBatteryCharging,
       );
       notifyListeners();
     } catch (e) {
@@ -273,6 +319,7 @@ class MenuBarInfoService extends ChangeNotifier {
       case MenuBarInfoType.keyboard:
       case MenuBarInfoType.mouse:
       case MenuBarInfoType.systemTime:
+      case MenuBarInfoType.battery:
         return 'center';
     }
   }
@@ -293,6 +340,7 @@ class MenuBarInfoService extends ChangeNotifier {
       case MenuBarInfoType.keyboard:
       case MenuBarInfoType.mouse:
       case MenuBarInfoType.systemTime:
+      case MenuBarInfoType.battery:
         return (8.0, 12.0); // Smaller top, larger bottom
     }
   }
@@ -307,7 +355,7 @@ class MenuBarInfoService extends ChangeNotifier {
       case MenuBarInfoType.todo:
         return 35; // "✅" + "99/99"
       case MenuBarInfoType.levelExp:
-        return 70; // "Lv99" + "999K/999K"
+        return 80; // "Lv99" + "999K/999K"
       case MenuBarInfoType.cpu:
       case MenuBarInfoType.gpu:
       case MenuBarInfoType.ram:
@@ -321,6 +369,8 @@ class MenuBarInfoService extends ChangeNotifier {
         return 40; // "🖱" + "99.9km"
       case MenuBarInfoType.systemTime:
         return 120; // "2026-01-19 12:34" single row
+      case MenuBarInfoType.battery:
+        return 45; // Battery icon with percentage inside
     }
   }
 
@@ -337,6 +387,7 @@ class MenuBarInfoService extends ChangeNotifier {
       MenuBarInfoType.network,
       MenuBarInfoType.keyboard,
       MenuBarInfoType.mouse,
+      MenuBarInfoType.battery,
       MenuBarInfoType.systemTime,
     ];
 
@@ -370,6 +421,8 @@ class MenuBarInfoService extends ChangeNotifier {
         return _buildMouseInfo();
       case MenuBarInfoType.systemTime:
         return _buildSystemTimeInfo();
+      case MenuBarInfoType.battery:
+        return _buildBatteryInfo();
     }
   }
 
@@ -433,6 +486,20 @@ class MenuBarInfoService extends ChangeNotifier {
   (String, String) _buildMouseInfo() {
     final distance = _formatDistance(_data.todayMouseDistance);
     return ('🖱', distance);
+  }
+
+  (String, String) _buildBatteryInfo() {
+    final level = _data.batteryLevel;
+    final isCharging = _data.isBatteryCharging;
+
+    // If battery level is -1, it means no battery (desktop Mac)
+    if (level < 0) {
+      return ('🔌', 'AC');
+    }
+
+    // Use special marker for battery - native code will render the icon
+    // Format: "BATTERY:<level>:<charging>" for native parsing
+    return ('BATTERY:$level:${isCharging ? '1' : '0'}', '');
   }
 
   String _formatNumber(double value) {

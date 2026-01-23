@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cyber_cultivation/l10n/app_localizations.dart';
 import '../constants.dart';
 import '../models/menu_bar_settings.dart';
+import '../services/menu_bar_info_service.dart';
 import 'menu_bar_settings_dialog.dart';
 
 class SettingsDialog extends StatefulWidget {
@@ -17,6 +18,7 @@ class SettingsDialog extends StatefulWidget {
   final AppThemeMode themeMode;
   final AppThemeColors themeColors;
   final MenuBarSettings menuBarSettings;
+  final MenuBarInfoService? menuBarInfoService;
   final ValueChanged<bool> onAlwaysOnTopChanged;
   final ValueChanged<bool> onAntiSleepChanged;
   final ValueChanged<bool> onAlwaysShowActionButtonsChanged;
@@ -44,6 +46,7 @@ class SettingsDialog extends StatefulWidget {
     required this.themeMode,
     required this.themeColors,
     required this.menuBarSettings,
+    this.menuBarInfoService,
     required this.onAlwaysOnTopChanged,
     required this.onAntiSleepChanged,
     required this.onAlwaysShowActionButtonsChanged,
@@ -215,7 +218,8 @@ class _SettingsDialogState extends State<SettingsDialog> {
           children: [
             IconButton(
               icon: Icon(Icons.remove, color: _colors.accent, size: 20),
-              onPressed: _systemStatsRefreshSeconds >
+              onPressed:
+                  _systemStatsRefreshSeconds >
                       AppConstants.minSystemStatsRefreshSeconds
                   ? () {
                       setState(() => _systemStatsRefreshSeconds--);
@@ -240,7 +244,8 @@ class _SettingsDialogState extends State<SettingsDialog> {
             ),
             IconButton(
               icon: Icon(Icons.add, color: _colors.accent, size: 20),
-              onPressed: _systemStatsRefreshSeconds <
+              onPressed:
+                  _systemStatsRefreshSeconds <
                       AppConstants.maxSystemStatsRefreshSeconds
                   ? () {
                       setState(() => _systemStatsRefreshSeconds++);
@@ -361,6 +366,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
       builder: (context) => MenuBarSettingsDialog(
         settings: _menuBarSettings,
         themeColors: _colors,
+        menuBarInfoService: widget.menuBarInfoService,
         onSettingsChanged: (newSettings) {
           setState(() => _menuBarSettings = newSettings);
           widget.onMenuBarSettingsChanged(newSettings);

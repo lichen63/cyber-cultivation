@@ -686,6 +686,12 @@ abstract class AppLocalizations {
   /// **'Network'**
   String get menuBarInfoNetwork;
 
+  /// Battery info option
+  ///
+  /// In en, this message translates to:
+  /// **'Battery'**
+  String get menuBarInfoBattery;
+
   /// Keyboard tracking info option
   ///
   /// In en, this message translates to:

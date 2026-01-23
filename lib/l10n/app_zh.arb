@@ -98,6 +98,7 @@
     "menuBarInfoRam": "内存",
     "menuBarInfoDisk": "磁盘",
     "menuBarInfoNetwork": "网络",
+    "menuBarInfoBattery": "电池",
     "menuBarInfoKeyboard": "键盘",
     "menuBarInfoMouse": "鼠标",
     "menuBarInfoSystemTime": "时间",

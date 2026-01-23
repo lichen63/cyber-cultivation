@@ -769,6 +769,7 @@ class _MyHomePageState extends State<MyHomePage>
         themeMode: _themeMode,
         themeColors: _themeColors,
         menuBarSettings: _menuBarSettings,
+        menuBarInfoService: _menuBarInfoService,
         onAlwaysOnTopChanged: _toggleAlwaysOnTop,
         onAntiSleepChanged: (value) {
           setState(() => _inputMonitorService.enableAntiSleep = value);

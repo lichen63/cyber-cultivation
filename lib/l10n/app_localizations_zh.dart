@@ -312,6 +312,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get menuBarInfoNetwork => '网络';
 
   @override
+  String get menuBarInfoBattery => '电池';
+
+  @override
   String get menuBarInfoKeyboard => '键盘';
 
   @override
