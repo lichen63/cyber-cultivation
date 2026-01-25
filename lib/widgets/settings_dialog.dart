@@ -412,7 +412,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
 
   Future<void> _openSaveFolder() async {
     try {
-      final directory = await getApplicationDocumentsDirectory();
+      final directory = await getApplicationSupportDirectory();
       final path = directory.path;
       if (Platform.isMacOS) {
         await Process.run('open', [path]);

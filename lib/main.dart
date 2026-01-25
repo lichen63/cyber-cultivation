@@ -280,8 +280,23 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
       if (items.isEmpty) {
         await MenuBarHelper.clearMenuBarItems();
         _trayIconPositioned = false; // Reset when items are cleared
-        // Also destroy tray icon when items are cleared
-        if (_menuBarSettings.showTrayIcon) {
+        // Show tray icon even when no info items are enabled
+        if (_menuBarSettings.showTrayIcon && _trayIconPath.isNotEmpty) {
+          await trayManager.setIcon(
+            _trayIconPath,
+            iconSize: TrayConstants.macOSIconSize,
+          );
+          final menu = Menu(
+            items: [
+              MenuItem(key: 'show_window', label: 'Show Window'),
+              MenuItem(key: 'hide_window', label: 'Hide Window'),
+              MenuItem.separator(),
+              MenuItem(key: 'exit_app', label: 'Exit'),
+            ],
+          );
+          await trayManager.setContextMenu(menu);
+          _trayIconPositioned = true;
+        } else {
           await trayManager.destroy();
         }
       } else {
