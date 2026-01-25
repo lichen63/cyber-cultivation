@@ -363,5 +363,20 @@ class AppLocalizationsZh extends AppLocalizations {
   String get cpuPopupHeaderProcess => '进程';
 
   @override
+  String get cpuPopupHeaderPid => 'PID';
+
+  @override
   String get cpuPopupHeaderUsage => '占用';
+
+  @override
+  String get diskPopupHeaderRead => '读取';
+
+  @override
+  String get diskPopupHeaderWrite => '写入';
+
+  @override
+  String get networkPopupHeaderDownload => '↓下载';
+
+  @override
+  String get networkPopupHeaderUpload => '↑上传';
 }

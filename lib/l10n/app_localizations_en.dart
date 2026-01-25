@@ -368,5 +368,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cpuPopupHeaderProcess => 'Process';
 
   @override
+  String get cpuPopupHeaderPid => 'PID';
+
+  @override
   String get cpuPopupHeaderUsage => 'Usage';
+
+  @override
+  String get diskPopupHeaderRead => 'Read';
+
+  @override
+  String get diskPopupHeaderWrite => 'Write';
+
+  @override
+  String get networkPopupHeaderDownload => '↓Down';
+
+  @override
+  String get networkPopupHeaderUpload => '↑Up';
 }

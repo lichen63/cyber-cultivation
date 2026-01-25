@@ -788,11 +788,41 @@ abstract class AppLocalizations {
   /// **'Process'**
   String get cpuPopupHeaderProcess;
 
+  /// Column header for process ID in popup
+  ///
+  /// In en, this message translates to:
+  /// **'PID'**
+  String get cpuPopupHeaderPid;
+
   /// Column header for CPU usage in CPU popup
   ///
   /// In en, this message translates to:
   /// **'Usage'**
   String get cpuPopupHeaderUsage;
+
+  /// Column header for disk read in popup
+  ///
+  /// In en, this message translates to:
+  /// **'Read'**
+  String get diskPopupHeaderRead;
+
+  /// Column header for disk write in popup
+  ///
+  /// In en, this message translates to:
+  /// **'Write'**
+  String get diskPopupHeaderWrite;
+
+  /// Column header for network download in popup
+  ///
+  /// In en, this message translates to:
+  /// **'↓Down'**
+  String get networkPopupHeaderDownload;
+
+  /// Column header for network upload in popup
+  ///
+  /// In en, this message translates to:
+  /// **'↑Up'**
+  String get networkPopupHeaderUpload;
 }
 
 class _AppLocalizationsDelegate

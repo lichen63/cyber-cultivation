@@ -115,5 +115,10 @@
     "menuBarHideWindow": "隐藏窗口",
     "menuBarExit": "退出",
     "cpuPopupHeaderProcess": "进程",
-    "cpuPopupHeaderUsage": "占用"
+    "cpuPopupHeaderPid": "PID",
+    "cpuPopupHeaderUsage": "占用",
+    "diskPopupHeaderRead": "读取",
+    "diskPopupHeaderWrite": "写入",
+    "networkPopupHeaderDownload": "↓下载",
+    "networkPopupHeaderUpload": "↑上传"
 }
