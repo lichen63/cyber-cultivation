@@ -136,11 +136,13 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
   }
 
   Future<void> _initTray() async {
-    String iconPath = 'assets/images/tray_icon.png';
+    // On macOS, tray_manager expects the asset path directly (it loads via rootBundle)
+    // On other platforms, we may need the extracted file path
     if (Platform.isMacOS) {
-      iconPath = await _extractAsset(iconPath);
+      _trayIconPath = TrayConstants.trayIconAssetPath;
+    } else {
+      _trayIconPath = await _extractAsset(TrayConstants.trayIconAssetPath);
     }
-    _trayIconPath = iconPath;
     // Don't set icon here - let _updateMenuBarItems handle it for proper positioning
 
     final menu = Menu(
@@ -200,7 +202,11 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
       if (shouldShowTrayIcon) {
         if (!_trayIconPositioned) {
           // First time - set icon which creates it at leftmost position
-          await trayManager.setIcon(_trayIconPath);
+          // On macOS, specify iconSize for proper menu bar icon scaling
+          await trayManager.setIcon(
+            _trayIconPath,
+            iconSize: TrayConstants.macOSIconSize,
+          );
           // Re-set context menu after creating
           final menu = Menu(
             items: [

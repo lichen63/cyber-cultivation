@@ -502,3 +502,12 @@ class MenuBarConstants {
   static const String uploadColorHex = '#FF5252'; // Red for upload
   static const String downloadColorHex = '#448AFF'; // Blue for download
 }
+
+/// Constants for system tray icon
+class TrayConstants {
+  /// Asset path for the tray icon (used on macOS where tray_manager loads from assets)
+  static const String trayIconAssetPath = 'assets/images/tray_icon.png';
+
+  /// Icon size for macOS menu bar (standard size is 18-22 pixels)
+  static const int macOSIconSize = 22;
+}
