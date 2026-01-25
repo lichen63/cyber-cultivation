@@ -83,6 +83,9 @@ class _MenuBarPopupWindowState extends State<MenuBarPopupWindow>
 
     await windowManager.waitUntilReadyToShow(windowOptions, () async {
       await windowManager.setPosition(Offset(x, y));
+      await windowManager.setMovable(
+        false,
+      ); // Prevent window from being dragged
       await windowManager.show();
       await windowManager.focus();
     });
