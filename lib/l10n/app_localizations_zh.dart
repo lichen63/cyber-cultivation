@@ -346,4 +346,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get menuBarLevelText => '等级';
+
+  @override
+  String get openSaveFolderText => '存档位置';
 }

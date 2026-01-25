@@ -462,5 +462,9 @@
     "menuBarLevelText": "Lv.",
     "@menuBarLevelText": {
         "description": "Level label in menu bar"
+    },
+    "openSaveFolderText": "Save Data Location",
+    "@openSaveFolderText": {
+        "description": "Button to open the folder containing save data"
     }
 }

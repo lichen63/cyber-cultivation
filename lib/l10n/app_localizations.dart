@@ -757,6 +757,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Lv.'**
   String get menuBarLevelText;
+
+  /// Button to open the folder containing save data
+  ///
+  /// In en, this message translates to:
+  /// **'Save Data Location'**
+  String get openSaveFolderText;
 }
 
 class _AppLocalizationsDelegate

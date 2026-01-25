@@ -109,5 +109,6 @@
     "menuBarFocusText": "专注",
     "menuBarKeyboardText": "按键",
     "menuBarMouseText": "鼠标",
-    "menuBarLevelText": "等级"
+    "menuBarLevelText": "等级",
+    "openSaveFolderText": "存档位置"
 }

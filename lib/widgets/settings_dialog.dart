@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:cyber_cultivation/l10n/app_localizations.dart';
 import '../constants.dart';
 import '../models/menu_bar_settings.dart';
@@ -185,6 +188,8 @@ class _SettingsDialogState extends State<SettingsDialog> {
           _buildLanguageSelector(l10n),
           const SizedBox(height: 16),
           _buildMenuBarSettingsButton(l10n),
+          const SizedBox(height: 16),
+          _buildOpenSaveFolderButton(l10n),
           if (widget.onResetLevelExp != null) ...[
             const SizedBox(height: 24),
             _buildResetLevelExpButton(l10n),
@@ -373,6 +378,52 @@ class _SettingsDialogState extends State<SettingsDialog> {
         },
       ),
     );
+  }
+
+  Widget _buildOpenSaveFolderButton(AppLocalizations l10n) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          l10n.openSaveFolderText,
+          style: TextStyle(
+            color: _colors.primaryText,
+            fontSize: AppConstants.fontSizeDialogContent,
+          ),
+        ),
+        TextButton(
+          onPressed: _openSaveFolder,
+          style: TextButton.styleFrom(
+            foregroundColor: _colors.accent,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.folder_open, size: 16, color: _colors.accent),
+              const SizedBox(width: 4),
+              Icon(Icons.chevron_right, size: 16, color: _colors.accent),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _openSaveFolder() async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final path = directory.path;
+      if (Platform.isMacOS) {
+        await Process.run('open', [path]);
+      } else if (Platform.isWindows) {
+        await Process.run('explorer', [path]);
+      } else if (Platform.isLinux) {
+        await Process.run('xdg-open', [path]);
+      }
+    } catch (e) {
+      debugPrint('Error opening save folder: $e');
+    }
   }
 
   Widget _buildSwitchTile({

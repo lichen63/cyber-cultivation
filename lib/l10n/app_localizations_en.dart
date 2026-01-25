@@ -351,4 +351,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get menuBarLevelText => 'Lv.';
+
+  @override
+  String get openSaveFolderText => 'Save Data Location';
 }
