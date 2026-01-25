@@ -151,9 +151,10 @@ class MenuBarInfoService extends ChangeNotifier {
     super.dispose();
   }
 
-  /// Update settings
+  /// Update settings and notify listeners for immediate UI update
   void updateSettings(MenuBarSettings newSettings) {
     _settings = newSettings;
+    notifyListeners();
   }
 
   /// Update all info data (with notification)

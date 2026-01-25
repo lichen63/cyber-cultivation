@@ -26,6 +26,7 @@ class MenuBarSettingsDialog extends StatefulWidget {
 
 class _MenuBarSettingsDialogState extends State<MenuBarSettingsDialog> {
   late MenuBarSettings _settings;
+  bool _isOnCooldown = false; // Prevents rapid toggling
 
   AppThemeColors get _colors => widget.themeColors;
 
@@ -36,8 +37,24 @@ class _MenuBarSettingsDialogState extends State<MenuBarSettingsDialog> {
   }
 
   void _updateSettings(MenuBarSettings newSettings) {
-    setState(() => _settings = newSettings);
+    // Prevent updates during cooldown
+    if (_isOnCooldown) return;
+
+    setState(() {
+      _settings = newSettings;
+      _isOnCooldown = true;
+    });
     widget.onSettingsChanged(newSettings);
+
+    // Reset cooldown after delay
+    Future.delayed(
+      const Duration(milliseconds: MenuBarConstants.toggleCooldownMs),
+      () {
+        if (mounted) {
+          setState(() => _isOnCooldown = false);
+        }
+      },
+    );
   }
 
   @override
@@ -172,25 +189,30 @@ class _MenuBarSettingsDialogState extends State<MenuBarSettingsDialog> {
     required bool value,
     required ValueChanged<bool> onChanged,
   }) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          title,
-          style: TextStyle(
-            color: _colors.primaryText,
-            fontSize: AppConstants.fontSizeDialogContent,
+    // Reduce opacity during cooldown to indicate disabled state
+    final opacity = _isOnCooldown ? 0.5 : 1.0;
+    return Opacity(
+      opacity: opacity,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              color: _colors.primaryText,
+              fontSize: AppConstants.fontSizeDialogContent,
+            ),
           ),
-        ),
-        Switch(
-          value: value,
-          onChanged: onChanged,
-          activeThumbColor: _colors.accent,
-          activeTrackColor: _colors.accent.withValues(alpha: 0.5),
-          inactiveThumbColor: _colors.inactive,
-          inactiveTrackColor: _colors.inactive.withValues(alpha: 0.5),
-        ),
-      ],
+          Switch(
+            value: value,
+            onChanged: _isOnCooldown ? null : onChanged,
+            activeThumbColor: _colors.accent,
+            activeTrackColor: _colors.accent.withValues(alpha: 0.5),
+            inactiveThumbColor: _colors.inactive,
+            inactiveTrackColor: _colors.inactive.withValues(alpha: 0.5),
+          ),
+        ],
+      ),
     );
   }
 
@@ -199,34 +221,43 @@ class _MenuBarSettingsDialogState extends State<MenuBarSettingsDialog> {
     required MenuBarInfoType type,
   }) {
     final isEnabled = _settings.isEnabled(type);
-    return InkWell(
-      onTap: () => _updateSettings(_settings.toggleType(type)),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 24,
-              height: 24,
-              child: Checkbox(
-                value: isEnabled,
-                onChanged: (_) => _updateSettings(_settings.toggleType(type)),
-                activeColor: _colors.accent,
-                checkColor: _colors.primaryText,
-                side: BorderSide(color: _colors.inactive),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                title,
-                style: TextStyle(
-                  color: _colors.primaryText,
-                  fontSize: AppConstants.fontSizeDialogContent,
+    // Reduce opacity during cooldown to indicate disabled state
+    final opacity = _isOnCooldown ? 0.5 : 1.0;
+    return Opacity(
+      opacity: opacity,
+      child: InkWell(
+        onTap: _isOnCooldown
+            ? null
+            : () => _updateSettings(_settings.toggleType(type)),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 24,
+                height: 24,
+                child: Checkbox(
+                  value: isEnabled,
+                  onChanged: _isOnCooldown
+                      ? null
+                      : (_) => _updateSettings(_settings.toggleType(type)),
+                  activeColor: _colors.accent,
+                  checkColor: _colors.primaryText,
+                  side: BorderSide(color: _colors.inactive),
                 ),
               ),
-            ),
-          ],
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    color: _colors.primaryText,
+                    fontSize: AppConstants.fontSizeDialogContent,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

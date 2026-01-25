@@ -127,6 +127,9 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
   MenuBarSettings _menuBarSettings = const MenuBarSettings();
   String _trayIconPath = '';
   bool _trayIconPositioned = false; // Track if icon has been positioned left
+  bool _isMenuBarUpdating = false; // Lock to prevent concurrent updates
+  List<MenuBarItem>?
+  _pendingMenuBarItems; // Store latest pending items if update is in progress
 
   AppThemeColors get _themeColors => AppThemeColors.fromMode(_themeMode);
 
@@ -257,55 +260,80 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
     }
   }
 
-  Future<void> _updateMenuBarItems(List<MenuBarItem> items) async {
-    if (items.isEmpty) {
-      await MenuBarHelper.clearMenuBarItems();
-      _trayIconPositioned = false; // Reset when items are cleared
-      // Also destroy tray icon when items are cleared
-      if (_menuBarSettings.showTrayIcon) {
-        await trayManager.destroy();
-      }
-    } else {
-      // To ensure tray icon appears LEFT of our items:
-      // 1. Destroy tray icon if it exists (removes its status item)
-      // 2. Set our items (they get created at leftmost positions)
-      // 3. Recreate tray icon (it becomes the new leftmost)
+  void _updateMenuBarItems(List<MenuBarItem> items) {
+    // If an update is in progress, store as pending (overwrites any previous pending)
+    if (_isMenuBarUpdating) {
+      _pendingMenuBarItems = items;
+      return;
+    }
 
-      final shouldShowTrayIcon =
-          _menuBarSettings.showTrayIcon && _trayIconPath.isNotEmpty;
+    _executeMenuBarUpdate(items);
+  }
 
-      // Only destroy/recreate if not yet positioned correctly
-      if (shouldShowTrayIcon && !_trayIconPositioned) {
-        await trayManager.destroy();
-      }
+  Future<void> _executeMenuBarUpdate(List<MenuBarItem> items) async {
+    _isMenuBarUpdating = true;
+    _pendingMenuBarItems = null;
 
-      await MenuBarHelper.setMenuBarItems(
-        items: items,
-        fontSize: 10.0,
-        fontWeight: 'light',
-      );
-
-      // Always ensure tray icon is shown when it should be
-      if (shouldShowTrayIcon) {
-        if (!_trayIconPositioned) {
-          // First time - set icon which creates it at leftmost position
-          // On macOS, specify iconSize for proper menu bar icon scaling
-          await trayManager.setIcon(
-            _trayIconPath,
-            iconSize: TrayConstants.macOSIconSize,
-          );
-          // Re-set context menu after creating
-          final menu = Menu(
-            items: [
-              MenuItem(key: 'show_window', label: 'Show Window'),
-              MenuItem(key: 'hide_window', label: 'Hide Window'),
-              MenuItem.separator(),
-              MenuItem(key: 'exit_app', label: 'Exit'),
-            ],
-          );
-          await trayManager.setContextMenu(menu);
-          _trayIconPositioned = true;
+    try {
+      if (items.isEmpty) {
+        await MenuBarHelper.clearMenuBarItems();
+        _trayIconPositioned = false; // Reset when items are cleared
+        // Also destroy tray icon when items are cleared
+        if (_menuBarSettings.showTrayIcon) {
+          await trayManager.destroy();
         }
+      } else {
+        // To ensure tray icon appears LEFT of our items:
+        // 1. Destroy tray icon if it exists (removes its status item)
+        // 2. Set our items (they get created at leftmost positions)
+        // 3. Recreate tray icon (it becomes the new leftmost)
+
+        final shouldShowTrayIcon =
+            _menuBarSettings.showTrayIcon && _trayIconPath.isNotEmpty;
+
+        // Only destroy/recreate if not yet positioned correctly
+        if (shouldShowTrayIcon && !_trayIconPositioned) {
+          await trayManager.destroy();
+        }
+
+        await MenuBarHelper.setMenuBarItems(
+          items: items,
+          fontSize: 10.0,
+          fontWeight: 'light',
+        );
+
+        // Always ensure tray icon is shown when it should be
+        if (shouldShowTrayIcon) {
+          if (!_trayIconPositioned) {
+            // First time - set icon which creates it at leftmost position
+            // On macOS, specify iconSize for proper menu bar icon scaling
+            await trayManager.setIcon(
+              _trayIconPath,
+              iconSize: TrayConstants.macOSIconSize,
+            );
+            // Re-set context menu after creating
+            final menu = Menu(
+              items: [
+                MenuItem(key: 'show_window', label: 'Show Window'),
+                MenuItem(key: 'hide_window', label: 'Hide Window'),
+                MenuItem.separator(),
+                MenuItem(key: 'exit_app', label: 'Exit'),
+              ],
+            );
+            await trayManager.setContextMenu(menu);
+            _trayIconPositioned = true;
+          }
+        }
+      }
+    } finally {
+      _isMenuBarUpdating = false;
+
+      // If there are pending items, process them (only the latest)
+      if (_pendingMenuBarItems != null) {
+        final pending = _pendingMenuBarItems!;
+        _pendingMenuBarItems = null;
+        // Use Future.microtask to avoid stack overflow on rapid calls
+        Future.microtask(() => _executeMenuBarUpdate(pending));
       }
     }
   }
@@ -930,6 +958,7 @@ class _MyHomePageState extends State<MyHomePage>
         onMenuBarSettingsChanged: (value) {
           setState(() => _menuBarSettings = value);
           _menuBarInfoService.updateSettings(value);
+          _updateMenuBarInfo(); // Immediate update for responsive UI
           widget.onMenuBarSettingsChanged?.call(value);
           _saveGameData();
         },

@@ -81,13 +81,29 @@ class AppDelegate: FlutterAppDelegate {
     }
     
     DispatchQueue.main.async {
-      // Remove items that are no longer in the list
+      // Check if we need to add any NEW items
       let newItemIds = Set(items.compactMap { $0["id"] as? String })
       let existingIds = Set(self.statusItems.keys)
-      for idToRemove in existingIds.subtracting(newItemIds) {
-        if let item = self.statusItems[idToRemove] {
+      let itemsToAdd = newItemIds.subtracting(existingIds)
+      let itemsToRemove = existingIds.subtracting(newItemIds)
+      
+      // If we need to add new items, we must recreate ALL items to maintain correct order
+      // This is because NSStatusBar always inserts new items at the leftmost position
+      let needsFullRecreate = !itemsToAdd.isEmpty
+      
+      if needsFullRecreate {
+        // Remove ALL existing items
+        for (_, item) in self.statusItems {
           NSStatusBar.system.removeStatusItem(item)
-          self.statusItems.removeValue(forKey: idToRemove)
+        }
+        self.statusItems.removeAll()
+      } else {
+        // Only remove items that are no longer needed
+        for idToRemove in itemsToRemove {
+          if let item = self.statusItems[idToRemove] {
+            NSStatusBar.system.removeStatusItem(item)
+            self.statusItems.removeValue(forKey: idToRemove)
+          }
         }
       }
       
