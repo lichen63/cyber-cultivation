@@ -5,7 +5,6 @@ import FlutterMacOS
 class AppDelegate: FlutterAppDelegate {
   private var methodChannel: FlutterMethodChannel?
   private var statusItems: [String: NSStatusItem] = [:]
-  private var contextMenu: NSMenu?
   var calendarPopover: NSPopover?
   private var calendarViewController: CalendarViewController?
   private var popoverEventMonitor: Any?
@@ -17,19 +16,6 @@ class AppDelegate: FlutterAppDelegate {
       binaryMessenger: controller.engine.binaryMessenger
     )
     
-    // Create context menu
-    contextMenu = NSMenu()
-    let showWindowItem = NSMenuItem(title: "Show Window", action: #selector(showWindowClicked), keyEquivalent: "")
-    showWindowItem.target = self
-    contextMenu?.addItem(showWindowItem)
-    let hideWindowItem = NSMenuItem(title: "Hide Window", action: #selector(hideWindowClicked), keyEquivalent: "")
-    hideWindowItem.target = self
-    contextMenu?.addItem(hideWindowItem)
-    contextMenu?.addItem(NSMenuItem.separator())
-    let exitItem = NSMenuItem(title: "Exit", action: #selector(exitClicked), keyEquivalent: "")
-    exitItem.target = self
-    contextMenu?.addItem(exitItem)
-    
     methodChannel?.setMethodCallHandler { [weak self] (call, result) in
       switch call.method {
       case "setAttributedTitle":
@@ -38,6 +24,15 @@ class AppDelegate: FlutterAppDelegate {
         self?.setMenuBarItems(call, result: result)
       case "clearMenuBarItems":
         self?.clearMenuBarItems(result: result)
+      case "showWindow":
+        self?.showWindowClicked()
+        result(true)
+      case "hideWindow":
+        self?.hideWindowClicked()
+        result(true)
+      case "exitApp":
+        self?.exitClicked()
+        result(true)
       default:
         result(FlutterMethodNotImplemented)
       }
@@ -340,10 +335,20 @@ class AppDelegate: FlutterAppDelegate {
       if let popover = calendarPopover, popover.isShown {
         closeCalendarPopover()
       }
-      // Show context menu below the clicked button
-      guard let menu = contextMenu else { return }
-      // Pop up menu at the mouse location
-      menu.popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height + 5), in: sender)
+      
+      // Send click event to Dart with the item id and position
+      // The popup window is a separate window, so we don't need to show the main window
+      let itemId = sender.identifier?.rawValue ?? ""
+      let screenFrame = sender.window?.convertToScreen(sender.frame) ?? NSRect.zero
+      let screenHeight = NSScreen.main?.frame.height ?? 0
+      methodChannel?.invokeMethod("onMenuBarItemClicked", arguments: [
+        "itemId": itemId,
+        "x": screenFrame.origin.x,
+        "y": screenFrame.origin.y,
+        "width": screenFrame.size.width,
+        "height": screenFrame.size.height,
+        "screenHeight": screenHeight
+      ])
     }
   }
   

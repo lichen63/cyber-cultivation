@@ -1,6 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+
+import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -25,14 +28,33 @@ import 'services/pomodoro_service.dart';
 import 'widgets/accessibility_dialog.dart';
 import 'widgets/games_list_dialog.dart';
 import 'widgets/home_page_content.dart';
+import 'widgets/menu_bar_popup.dart';
 import 'widgets/pomodoro_dialog.dart';
 import 'widgets/settings_dialog.dart';
 import 'widgets/stats_window.dart';
 import 'widgets/system_stats_panel.dart';
 import 'widgets/todo_dialog.dart';
 
-void main() async {
+void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Get the current window controller to check if this is a sub-window
+  final currentWindowController = await WindowController.fromCurrentEngine();
+
+  // If there are arguments, this is a sub-window (popup window)
+  if (currentWindowController.arguments.isNotEmpty) {
+    final argument =
+        jsonDecode(currentWindowController.arguments) as Map<String, dynamic>;
+    runApp(
+      MenuBarPopupWindow(
+        windowController: currentWindowController,
+        args: argument,
+      ),
+    );
+    return;
+  }
+
+  // Main window initialization
   await windowManager.ensureInitialized();
 
   launchAtStartup.setup(
@@ -115,6 +137,71 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
     trayManager.addListener(this);
     _initializeFromGameData();
     _initTray();
+    _initMenuBarHelper();
+    _setupWindowMethodHandler();
+  }
+
+  /// Set up handler for commands from popup window using WindowController
+  Future<void> _setupWindowMethodHandler() async {
+    final controller = await WindowController.fromCurrentEngine();
+    await controller.setWindowMethodHandler((call) async {
+      switch (call.method) {
+        case 'showWindow':
+          await windowManager.show();
+          await windowManager.focus();
+          return true;
+        case 'hideWindow':
+          await windowManager.hide();
+          return true;
+        case 'exitApp':
+          // Use the native method to properly exit
+          MenuBarHelper.exitApp();
+          return true;
+        default:
+          return null;
+      }
+    });
+  }
+
+  void _initMenuBarHelper() {
+    MenuBarHelper.initialize(onItemClicked: _onMenuBarItemClicked);
+  }
+
+  Future<void> _onMenuBarItemClicked(
+    String itemId,
+    Rect screenRect,
+    double screenHeight,
+  ) async {
+    // Calculate popup position - below the menu bar item
+    // screenRect is in macOS coordinates (origin at bottom-left)
+    // screenRect.top is origin.y (bottom of button), screenRect.bottom is top of button
+    const popupWidth = MenuBarPopupConstants.popupWidth;
+
+    // Position popup below the clicked item, centered horizontally
+    final popupX = screenRect.left + (screenRect.width - popupWidth) / 2;
+
+    // Convert macOS coordinates (bottom-left origin) to window_manager coordinates (top-left origin)
+    // In macOS: screenRect.top is the bottom of the button (origin.y)
+    // The top of the button in macOS coords is screenRect.bottom
+    // In top-left coords, the top of popup should be just below the button:
+    // popupTop = screenHeight - screenRect.bottom (this puts popup top at button's bottom in top-left)
+    final popupY = screenHeight - screenRect.bottom;
+
+    // Create the popup window with position, theme and locale info
+    // The popup window will configure itself using window_manager
+    await WindowController.create(
+      WindowConfiguration(
+        arguments: jsonEncode({
+          'itemId': itemId,
+          'x': popupX,
+          'y': popupY,
+          'brightness': _themeMode == AppThemeMode.dark ? 'dark' : 'light',
+          'locale': _locale?.languageCode,
+        }),
+        hiddenAtLaunch: true,
+      ),
+    );
+    // We don't need to store the controller - the popup will close itself
   }
 
   void _initializeFromGameData() {
@@ -130,6 +217,7 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
 
   @override
   void dispose() {
+    MenuBarHelper.dispose();
     windowManager.removeListener(this);
     trayManager.removeListener(this);
     super.dispose();

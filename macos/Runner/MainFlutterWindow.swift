@@ -3,6 +3,7 @@ import FlutterMacOS
 import QuartzCore
 import ApplicationServices
 import ServiceManagement
+import desktop_multi_window
 
 class MainFlutterWindow: NSWindow {
   private var layerObserver: NSKeyValueObservation?
@@ -14,6 +15,12 @@ class MainFlutterWindow: NSWindow {
     self.setFrame(windowFrame, display: false)
 
     RegisterGeneratedPlugins(registry: flutterViewController)
+    
+    // Register callback for desktop_multi_window sub-windows
+    FlutterMultiWindowPlugin.setOnWindowCreatedCallback { controller in
+      // Register plugins for the new window
+      RegisterGeneratedPlugins(registry: controller)
+    }
 
     let keyEventChannel = FlutterEventChannel(name: "com.lichen63.cyber_cultivation/key_events", binaryMessenger: flutterViewController.engine.binaryMessenger)
     keyEventChannel.setStreamHandler(KeyMonitorStreamHandler())

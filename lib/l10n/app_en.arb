@@ -466,5 +466,17 @@
     "openSaveFolderText": "Save Data Location",
     "@openSaveFolderText": {
         "description": "Button to open the folder containing save data"
+    },
+    "menuBarShowWindow": "Show Window",
+    "@menuBarShowWindow": {
+        "description": "Menu bar popup item to show the main window"
+    },
+    "menuBarHideWindow": "Hide Window",
+    "@menuBarHideWindow": {
+        "description": "Menu bar popup item to hide the main window"
+    },
+    "menuBarExit": "Exit",
+    "@menuBarExit": {
+        "description": "Menu bar popup item to exit the application"
     }
 }

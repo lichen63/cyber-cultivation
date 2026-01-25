@@ -354,4 +354,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get openSaveFolderText => 'Save Data Location';
+
+  @override
+  String get menuBarShowWindow => 'Show Window';
+
+  @override
+  String get menuBarHideWindow => 'Hide Window';
+
+  @override
+  String get menuBarExit => 'Exit';
 }

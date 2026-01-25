@@ -349,4 +349,13 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get openSaveFolderText => '存档位置';
+
+  @override
+  String get menuBarShowWindow => '显示窗口';
+
+  @override
+  String get menuBarHideWindow => '隐藏窗口';
+
+  @override
+  String get menuBarExit => '退出';
 }

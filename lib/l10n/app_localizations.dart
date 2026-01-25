@@ -763,6 +763,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save Data Location'**
   String get openSaveFolderText;
+
+  /// Menu bar popup item to show the main window
+  ///
+  /// In en, this message translates to:
+  /// **'Show Window'**
+  String get menuBarShowWindow;
+
+  /// Menu bar popup item to hide the main window
+  ///
+  /// In en, this message translates to:
+  /// **'Hide Window'**
+  String get menuBarHideWindow;
+
+  /// Menu bar popup item to exit the application
+  ///
+  /// In en, this message translates to:
+  /// **'Exit'**
+  String get menuBarExit;
 }
 
 class _AppLocalizationsDelegate
