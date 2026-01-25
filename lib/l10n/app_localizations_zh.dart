@@ -45,6 +45,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pomodoroStartButtonText => '开始';
 
   @override
+  String get pomodoroSaveAsDefaultButtonText => '保存默认值';
+
+  @override
   String get cancelButtonText => '取消';
 
   @override
@@ -76,6 +79,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get relaxState => '休息';
+
+  @override
+  String get idleState => '空闲';
+
+  @override
+  String get focusPopupStatus => '状态';
+
+  @override
+  String get focusPopupTimeRemaining => '剩余时间';
 
   @override
   String get alwaysShowActionsText => '总是显示操作按钮';
@@ -312,6 +324,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get menuBarInfoNetwork => '网络';
 
   @override
+  String get menuBarInfoBattery => '电池';
+
+  @override
   String get menuBarInfoKeyboard => '键盘';
 
   @override
@@ -340,4 +355,37 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get menuBarLevelText => '等级';
+
+  @override
+  String get openSaveFolderText => '存档位置';
+
+  @override
+  String get menuBarShowWindow => '显示窗口';
+
+  @override
+  String get menuBarHideWindow => '隐藏窗口';
+
+  @override
+  String get menuBarExit => '退出';
+
+  @override
+  String get cpuPopupHeaderProcess => '进程';
+
+  @override
+  String get cpuPopupHeaderPid => 'PID';
+
+  @override
+  String get cpuPopupHeaderUsage => '占用';
+
+  @override
+  String get diskPopupHeaderRead => '读取';
+
+  @override
+  String get diskPopupHeaderWrite => '写入';
+
+  @override
+  String get networkPopupHeaderDownload => '↓下载';
+
+  @override
+  String get networkPopupHeaderUpload => '↑上传';
 }

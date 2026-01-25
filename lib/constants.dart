@@ -486,6 +486,9 @@ class MenuBarConstants {
   // Dialog dimensions
   static const double settingsDialogWidth = 300.0;
 
+  // Cooldown duration for toggling menu bar items (prevents rapid switching issues)
+  static const int toggleCooldownMs = 1000;
+
   // Menu bar item dimensions
   static const double itemSpacing = 8.0;
   static const double itemPaddingH = 4.0;
@@ -501,4 +504,13 @@ class MenuBarConstants {
   static const String relaxColorHex = '#69F0AE'; // Green for relax
   static const String uploadColorHex = '#FF5252'; // Red for upload
   static const String downloadColorHex = '#448AFF'; // Blue for download
+}
+
+/// Constants for system tray icon
+class TrayConstants {
+  /// Asset path for the tray icon (used on macOS where tray_manager loads from assets)
+  static const String trayIconAssetPath = 'assets/images/tray_icon.png';
+
+  /// Icon size for macOS menu bar (standard size is 18-22 pixels)
+  static const int macOSIconSize = 22;
 }

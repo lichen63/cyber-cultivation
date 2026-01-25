@@ -45,6 +45,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pomodoroStartButtonText => 'Start';
 
   @override
+  String get pomodoroSaveAsDefaultButtonText => 'Save as Default';
+
+  @override
   String get cancelButtonText => 'Cancel';
 
   @override
@@ -76,6 +79,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get relaxState => 'Relax';
+
+  @override
+  String get idleState => 'Idle';
+
+  @override
+  String get focusPopupStatus => 'Status';
+
+  @override
+  String get focusPopupTimeRemaining => 'Time Remaining';
 
   @override
   String get alwaysShowActionsText => 'Always Show Actions';
@@ -317,6 +329,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get menuBarInfoNetwork => 'Network';
 
   @override
+  String get menuBarInfoBattery => 'Battery';
+
+  @override
   String get menuBarInfoKeyboard => 'Keyboard';
 
   @override
@@ -345,4 +360,37 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get menuBarLevelText => 'Lv.';
+
+  @override
+  String get openSaveFolderText => 'Save Data Location';
+
+  @override
+  String get menuBarShowWindow => 'Show Window';
+
+  @override
+  String get menuBarHideWindow => 'Hide Window';
+
+  @override
+  String get menuBarExit => 'Exit';
+
+  @override
+  String get cpuPopupHeaderProcess => 'Process';
+
+  @override
+  String get cpuPopupHeaderPid => 'PID';
+
+  @override
+  String get cpuPopupHeaderUsage => 'Usage';
+
+  @override
+  String get diskPopupHeaderRead => 'Read';
+
+  @override
+  String get diskPopupHeaderWrite => 'Write';
+
+  @override
+  String get networkPopupHeaderDownload => '↓Down';
+
+  @override
+  String get networkPopupHeaderUpload => '↑Up';
 }

@@ -170,6 +170,12 @@ abstract class AppLocalizations {
   /// **'Start'**
   String get pomodoroStartButtonText;
 
+  /// Text for saving current pomodoro values as default
+  ///
+  /// In en, this message translates to:
+  /// **'Save as Default'**
+  String get pomodoroSaveAsDefaultButtonText;
+
   /// Text for the cancel button
   ///
   /// In en, this message translates to:
@@ -235,6 +241,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Relax'**
   String get relaxState;
+
+  /// Label for idle state
+  ///
+  /// In en, this message translates to:
+  /// **'Idle'**
+  String get idleState;
+
+  /// Label for focus popup status
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get focusPopupStatus;
+
+  /// Label for focus popup time remaining
+  ///
+  /// In en, this message translates to:
+  /// **'Time Remaining'**
+  String get focusPopupTimeRemaining;
 
   /// Option to always show action buttons
   ///
@@ -686,6 +710,12 @@ abstract class AppLocalizations {
   /// **'Network'**
   String get menuBarInfoNetwork;
 
+  /// Battery info option
+  ///
+  /// In en, this message translates to:
+  /// **'Battery'**
+  String get menuBarInfoBattery;
+
   /// Keyboard tracking info option
   ///
   /// In en, this message translates to:
@@ -745,6 +775,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Lv.'**
   String get menuBarLevelText;
+
+  /// Button to open the folder containing save data
+  ///
+  /// In en, this message translates to:
+  /// **'Save Data Location'**
+  String get openSaveFolderText;
+
+  /// Menu bar popup item to show the main window
+  ///
+  /// In en, this message translates to:
+  /// **'Show Window'**
+  String get menuBarShowWindow;
+
+  /// Menu bar popup item to hide the main window
+  ///
+  /// In en, this message translates to:
+  /// **'Hide Window'**
+  String get menuBarHideWindow;
+
+  /// Menu bar popup item to exit the application
+  ///
+  /// In en, this message translates to:
+  /// **'Exit'**
+  String get menuBarExit;
+
+  /// Column header for process name in CPU popup
+  ///
+  /// In en, this message translates to:
+  /// **'Process'**
+  String get cpuPopupHeaderProcess;
+
+  /// Column header for process ID in popup
+  ///
+  /// In en, this message translates to:
+  /// **'PID'**
+  String get cpuPopupHeaderPid;
+
+  /// Column header for CPU usage in CPU popup
+  ///
+  /// In en, this message translates to:
+  /// **'Usage'**
+  String get cpuPopupHeaderUsage;
+
+  /// Column header for disk read in popup
+  ///
+  /// In en, this message translates to:
+  /// **'Read'**
+  String get diskPopupHeaderRead;
+
+  /// Column header for disk write in popup
+  ///
+  /// In en, this message translates to:
+  /// **'Write'**
+  String get diskPopupHeaderWrite;
+
+  /// Column header for network download in popup
+  ///
+  /// In en, this message translates to:
+  /// **'↓Down'**
+  String get networkPopupHeaderDownload;
+
+  /// Column header for network upload in popup
+  ///
+  /// In en, this message translates to:
+  /// **'↑Up'**
+  String get networkPopupHeaderUpload;
 }
 
 class _AppLocalizationsDelegate

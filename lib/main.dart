@@ -1,6 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+
+import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -25,13 +28,33 @@ import 'services/pomodoro_service.dart';
 import 'widgets/accessibility_dialog.dart';
 import 'widgets/games_list_dialog.dart';
 import 'widgets/home_page_content.dart';
+import 'widgets/menu_bar_popup.dart';
 import 'widgets/pomodoro_dialog.dart';
 import 'widgets/settings_dialog.dart';
 import 'widgets/stats_window.dart';
+import 'widgets/system_stats_panel.dart';
 import 'widgets/todo_dialog.dart';
 
-void main() async {
+void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Get the current window controller to check if this is a sub-window
+  final currentWindowController = await WindowController.fromCurrentEngine();
+
+  // If there are arguments, this is a sub-window (popup window)
+  if (currentWindowController.arguments.isNotEmpty) {
+    final argument =
+        jsonDecode(currentWindowController.arguments) as Map<String, dynamic>;
+    runApp(
+      MenuBarPopupWindow(
+        windowController: currentWindowController,
+        args: argument,
+      ),
+    );
+    return;
+  }
+
+  // Main window initialization
   await windowManager.ensureInitialized();
 
   launchAtStartup.setup(
@@ -104,6 +127,17 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
   MenuBarSettings _menuBarSettings = const MenuBarSettings();
   String _trayIconPath = '';
   bool _trayIconPositioned = false; // Track if icon has been positioned left
+  bool _isMenuBarUpdating = false; // Lock to prevent concurrent updates
+  List<MenuBarItem>?
+  _pendingMenuBarItems; // Store latest pending items if update is in progress
+  Set<String> _currentMenuBarItemIds =
+      {}; // Track current item IDs for ordering
+  PomodoroState _pomodoroState =
+      const PomodoroState(); // Current pomodoro state for popup
+  // Level/Exp state for popup
+  int _level = AppConstants.initialLevel;
+  double _currentExp = 0;
+  double _maxExp = AppConstants.initialMaxExp;
 
   AppThemeColors get _themeColors => AppThemeColors.fromMode(_themeMode);
 
@@ -114,6 +148,80 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
     trayManager.addListener(this);
     _initializeFromGameData();
     _initTray();
+    _initMenuBarHelper();
+    _setupWindowMethodHandler();
+  }
+
+  /// Set up handler for commands from popup window using WindowController
+  Future<void> _setupWindowMethodHandler() async {
+    final controller = await WindowController.fromCurrentEngine();
+    await controller.setWindowMethodHandler((call) async {
+      switch (call.method) {
+        case 'showWindow':
+          await windowManager.show();
+          await windowManager.focus();
+          return true;
+        case 'hideWindow':
+          await windowManager.hide();
+          return true;
+        case 'exitApp':
+          // Use the native method to properly exit
+          MenuBarHelper.exitApp();
+          return true;
+        default:
+          return null;
+      }
+    });
+  }
+
+  void _initMenuBarHelper() {
+    MenuBarHelper.initialize(onItemClicked: _onMenuBarItemClicked);
+  }
+
+  Future<void> _onMenuBarItemClicked(
+    String itemId,
+    Rect screenRect,
+    double screenHeight,
+  ) async {
+    // Calculate popup position - below the menu bar item
+    // screenRect is in macOS coordinates (origin at bottom-left)
+    // screenRect.top is origin.y (bottom of button), screenRect.bottom is top of button
+    const popupWidth = MenuBarPopupConstants.popupWidth;
+
+    // Position popup below the clicked item, centered horizontally
+    final popupX = screenRect.left + (screenRect.width - popupWidth) / 2;
+
+    // Convert macOS coordinates (bottom-left origin) to window_manager coordinates (top-left origin)
+    // In macOS: screenRect.top is the bottom of the button (origin.y)
+    // The top of the button in macOS coords is screenRect.bottom
+    // In top-left coords, the top of popup should be just below the menu bar
+    final popupY = screenHeight - screenRect.bottom;
+
+    // Create the popup window with position, theme and locale info
+    // The popup window will configure itself using window_manager
+    await WindowController.create(
+      WindowConfiguration(
+        arguments: jsonEncode({
+          'itemId': itemId,
+          'x': popupX,
+          'y': popupY,
+          'brightness': _themeMode == AppThemeMode.dark ? 'dark' : 'light',
+          'locale': _locale?.languageCode,
+          // Focus state for popup
+          'focusIsActive': _pomodoroState.isActive,
+          'focusIsRelaxing': _pomodoroState.isRelaxing,
+          'focusSecondsRemaining': _pomodoroState.secondsRemaining,
+          'focusCurrentLoop': _pomodoroState.currentLoop,
+          'focusTotalLoops': _pomodoroState.totalLoops,
+          // Level/Exp state for popup
+          'level': _level,
+          'currentExp': _currentExp,
+          'maxExp': _maxExp,
+        }),
+        hiddenAtLaunch: true,
+      ),
+    );
+    // We don't need to store the controller - the popup will close itself
   }
 
   void _initializeFromGameData() {
@@ -129,17 +237,20 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
 
   @override
   void dispose() {
+    MenuBarHelper.dispose();
     windowManager.removeListener(this);
     trayManager.removeListener(this);
     super.dispose();
   }
 
   Future<void> _initTray() async {
-    String iconPath = 'assets/images/tray_icon.png';
+    // On macOS, tray_manager expects the asset path directly (it loads via rootBundle)
+    // On other platforms, we may need the extracted file path
     if (Platform.isMacOS) {
-      iconPath = await _extractAsset(iconPath);
+      _trayIconPath = TrayConstants.trayIconAssetPath;
+    } else {
+      _trayIconPath = await _extractAsset(TrayConstants.trayIconAssetPath);
     }
-    _trayIconPath = iconPath;
     // Don't set icon here - let _updateMenuBarItems handle it for proper positioning
 
     final menu = Menu(
@@ -167,40 +278,30 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
     }
   }
 
-  Future<void> _updateMenuBarItems(List<MenuBarItem> items) async {
-    if (items.isEmpty) {
-      await MenuBarHelper.clearMenuBarItems();
-      _trayIconPositioned = false; // Reset when items are cleared
-      // Also destroy tray icon when items are cleared
-      if (_menuBarSettings.showTrayIcon) {
-        await trayManager.destroy();
-      }
-    } else {
-      // To ensure tray icon appears LEFT of our items:
-      // 1. Destroy tray icon if it exists (removes its status item)
-      // 2. Set our items (they get created at leftmost positions)
-      // 3. Recreate tray icon (it becomes the new leftmost)
+  void _updateMenuBarItems(List<MenuBarItem> items) {
+    // If an update is in progress, store as pending (overwrites any previous pending)
+    if (_isMenuBarUpdating) {
+      _pendingMenuBarItems = items;
+      return;
+    }
 
-      final shouldShowTrayIcon =
-          _menuBarSettings.showTrayIcon && _trayIconPath.isNotEmpty;
+    _executeMenuBarUpdate(items);
+  }
 
-      // Only destroy/recreate if not yet positioned correctly
-      if (shouldShowTrayIcon && !_trayIconPositioned) {
-        await trayManager.destroy();
-      }
+  Future<void> _executeMenuBarUpdate(List<MenuBarItem> items) async {
+    _isMenuBarUpdating = true;
+    _pendingMenuBarItems = null;
 
-      await MenuBarHelper.setMenuBarItems(
-        items: items,
-        fontSize: 10.0,
-        fontWeight: 'light',
-      );
-
-      // Always ensure tray icon is shown when it should be
-      if (shouldShowTrayIcon) {
-        if (!_trayIconPositioned) {
-          // First time - set icon which creates it at leftmost position
-          await trayManager.setIcon(_trayIconPath);
-          // Re-set context menu after creating
+    try {
+      if (items.isEmpty) {
+        await MenuBarHelper.clearMenuBarItems();
+        _trayIconPositioned = false; // Reset when items are cleared
+        // Show tray icon even when no info items are enabled
+        if (_menuBarSettings.showTrayIcon && _trayIconPath.isNotEmpty) {
+          await trayManager.setIcon(
+            _trayIconPath,
+            iconSize: TrayConstants.macOSIconSize,
+          );
           final menu = Menu(
             items: [
               MenuItem(key: 'show_window', label: 'Show Window'),
@@ -211,7 +312,73 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
           );
           await trayManager.setContextMenu(menu);
           _trayIconPositioned = true;
+        } else {
+          await trayManager.destroy();
         }
+      } else {
+        // To ensure tray icon appears LEFT of our items:
+        // 1. Destroy tray icon if it exists (removes its status item)
+        // 2. Set our items (they get created at leftmost positions)
+        // 3. Recreate tray icon (it becomes the new leftmost)
+
+        final shouldShowTrayIcon =
+            _menuBarSettings.showTrayIcon && _trayIconPath.isNotEmpty;
+
+        // Check if we're adding new items (same logic as Swift side)
+        // When new items are added, Swift recreates ALL items, so we need to
+        // reposition the tray icon to maintain correct left-to-right order
+        final newItemIds = items.map((item) => item.id).toSet();
+        final hasNewItems = newItemIds
+            .difference(_currentMenuBarItemIds)
+            .isNotEmpty;
+        if (hasNewItems) {
+          _trayIconPositioned = false; // Reset so tray icon gets repositioned
+        }
+        _currentMenuBarItemIds = newItemIds;
+
+        // Destroy tray icon if not yet positioned correctly
+        if (shouldShowTrayIcon && !_trayIconPositioned) {
+          await trayManager.destroy();
+        }
+
+        await MenuBarHelper.setMenuBarItems(
+          items: items,
+          fontSize: 10.0,
+          fontWeight: 'light',
+        );
+
+        // Always ensure tray icon is shown when it should be
+        if (shouldShowTrayIcon) {
+          if (!_trayIconPositioned) {
+            // First time - set icon which creates it at leftmost position
+            // On macOS, specify iconSize for proper menu bar icon scaling
+            await trayManager.setIcon(
+              _trayIconPath,
+              iconSize: TrayConstants.macOSIconSize,
+            );
+            // Re-set context menu after creating
+            final menu = Menu(
+              items: [
+                MenuItem(key: 'show_window', label: 'Show Window'),
+                MenuItem(key: 'hide_window', label: 'Hide Window'),
+                MenuItem.separator(),
+                MenuItem(key: 'exit_app', label: 'Exit'),
+              ],
+            );
+            await trayManager.setContextMenu(menu);
+            _trayIconPositioned = true;
+          }
+        }
+      }
+    } finally {
+      _isMenuBarUpdating = false;
+
+      // If there are pending items, process them (only the latest)
+      if (_pendingMenuBarItems != null) {
+        final pending = _pendingMenuBarItems!;
+        _pendingMenuBarItems = null;
+        // Use Future.microtask to avoid stack overflow on rapid calls
+        Future.microtask(() => _executeMenuBarUpdate(pending));
       }
     }
   }
@@ -293,6 +460,12 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
         onMenuBarSettingsChanged: _onMenuBarSettingsChanged,
         onTrayTitleChanged: _updateTrayTitle,
         onMenuBarItemsChanged: _updateMenuBarItems,
+        onPomodoroStateChanged: (state) => _pomodoroState = state,
+        onLevelExpChanged: (level, currentExp, maxExp) {
+          _level = level;
+          _currentExp = currentExp;
+          _maxExp = maxExp;
+        },
       ),
     );
   }
@@ -308,6 +481,9 @@ class MyHomePage extends StatefulWidget {
   final ValueChanged<MenuBarSettings>? onMenuBarSettingsChanged;
   final ValueChanged<String>? onTrayTitleChanged;
   final ValueChanged<List<MenuBarItem>>? onMenuBarItemsChanged;
+  final ValueChanged<PomodoroState>? onPomodoroStateChanged;
+  final void Function(int level, double currentExp, double maxExp)?
+  onLevelExpChanged;
 
   const MyHomePage({
     super.key,
@@ -320,6 +496,8 @@ class MyHomePage extends StatefulWidget {
     this.onMenuBarSettingsChanged,
     this.onTrayTitleChanged,
     this.onMenuBarItemsChanged,
+    this.onPomodoroStateChanged,
+    this.onLevelExpChanged,
   });
 
   @override
@@ -355,6 +533,11 @@ class _MyHomePageState extends State<MyHomePage>
 
   // Todos
   List<TodoItem> _todos = [];
+
+  // Pomodoro defaults
+  int _defaultPomodoroDuration = AppConstants.defaultPomodoroDuration;
+  int _defaultPomodoroRelax = AppConstants.defaultRelaxDuration;
+  int _defaultPomodoroLoops = AppConstants.defaultPomodoroLoops;
 
   // Stats
   DailyStats _todayStats = DailyStats();
@@ -408,6 +591,7 @@ class _MyHomePageState extends State<MyHomePage>
     _menuBarInfoService = MenuBarInfoService();
     _menuBarInfoService.updateSettings(_menuBarSettings);
     _menuBarInfoService.initialize(refreshSeconds: _systemStatsRefreshSeconds);
+    _menuBarInfoService.addListener(_onMenuBarInfoChanged);
 
     // Update tray/menu bar items periodically
     _trayUpdateTimer = Timer.periodic(
@@ -419,10 +603,17 @@ class _MyHomePageState extends State<MyHomePage>
   }
 
   void _onPomodoroStateChanged() {
-    if (mounted) setState(() {});
+    if (mounted) {
+      setState(() {});
+      widget.onPomodoroStateChanged?.call(_pomodoroService.state);
+    }
   }
 
   void _onInputMonitorChanged() {
+    if (mounted) setState(() {});
+  }
+
+  void _onMenuBarInfoChanged() {
     if (mounted) setState(() {});
   }
 
@@ -450,6 +641,7 @@ class _MyHomePageState extends State<MyHomePage>
     _pomodoroService.dispose();
     _inputMonitorService.removeListener(_onInputMonitorChanged);
     _inputMonitorService.dispose();
+    _menuBarInfoService.removeListener(_onMenuBarInfoChanged);
     _menuBarInfoService.dispose();
     _trayUpdateTimer?.cancel();
     _saveGameData(immediate: true);
@@ -520,6 +712,10 @@ class _MyHomePageState extends State<MyHomePage>
       _todayStats = _dailyStatsMap[todayKey] ?? DailyStats();
       _dailyStatsMap[todayKey] = _todayStats;
 
+      _defaultPomodoroDuration = data.defaultPomodoroDuration;
+      _defaultPomodoroRelax = data.defaultPomodoroRelax;
+      _defaultPomodoroLoops = data.defaultPomodoroLoops;
+
       if (_level >= AppConstants.maxLevel) {
         _currentExp = double.infinity;
         _maxExp = double.infinity;
@@ -530,6 +726,7 @@ class _MyHomePageState extends State<MyHomePage>
             pow(AppConstants.expGrowthFactor, _level - 1);
       }
     });
+    widget.onLevelExpChanged?.call(_level, _currentExp, _maxExp);
     windowManager.setAlwaysOnTop(_isAlwaysOnTop);
     _menuBarInfoService.updateSettings(_menuBarSettings);
     // Defer the callback to after build is complete
@@ -574,6 +771,9 @@ class _MyHomePageState extends State<MyHomePage>
           dailyStats: _dailyStatsMap,
           todos: _todos,
           menuBarSettings: _menuBarSettings,
+          defaultPomodoroDuration: _defaultPomodoroDuration,
+          defaultPomodoroRelax: _defaultPomodoroRelax,
+          defaultPomodoroLoops: _defaultPomodoroLoops,
         ),
       );
     }
@@ -601,6 +801,7 @@ class _MyHomePageState extends State<MyHomePage>
         _maxExp = double.infinity;
       }
     });
+    widget.onLevelExpChanged?.call(_level, _currentExp, _maxExp);
     _saveGameData();
   }
 
@@ -639,9 +840,9 @@ class _MyHomePageState extends State<MyHomePage>
       context: context,
       barrierColor: _themeColors.overlay,
       builder: (context) => PomodoroDialog(
-        initialDuration: AppConstants.defaultPomodoroDuration,
-        initialRelax: AppConstants.defaultRelaxDuration,
-        initialLoops: AppConstants.defaultPomodoroLoops,
+        initialDuration: _defaultPomodoroDuration,
+        initialRelax: _defaultPomodoroRelax,
+        initialLoops: _defaultPomodoroLoops,
         themeColors: _themeColors,
         onStart: (duration, relax, loops) {
           Navigator.of(context).pop();
@@ -650,6 +851,14 @@ class _MyHomePageState extends State<MyHomePage>
             relaxMinutes: relax,
             loops: loops,
           );
+        },
+        onSaveAsDefault: (duration, relax, loops) {
+          setState(() {
+            _defaultPomodoroDuration = duration;
+            _defaultPomodoroRelax = relax;
+            _defaultPomodoroLoops = loops;
+          });
+          _saveGameData(immediate: true);
         },
       ),
     );
@@ -769,6 +978,7 @@ class _MyHomePageState extends State<MyHomePage>
         themeMode: _themeMode,
         themeColors: _themeColors,
         menuBarSettings: _menuBarSettings,
+        menuBarInfoService: _menuBarInfoService,
         onAlwaysOnTopChanged: _toggleAlwaysOnTop,
         onAntiSleepChanged: (value) {
           setState(() => _inputMonitorService.enableAntiSleep = value);
@@ -809,6 +1019,7 @@ class _MyHomePageState extends State<MyHomePage>
         onMenuBarSettingsChanged: (value) {
           setState(() => _menuBarSettings = value);
           _menuBarInfoService.updateSettings(value);
+          _updateMenuBarInfo(); // Immediate update for responsive UI
           widget.onMenuBarSettingsChanged?.call(value);
           _saveGameData();
         },
@@ -938,6 +1149,7 @@ class _MyHomePageState extends State<MyHomePage>
   @override
   Widget build(BuildContext context) {
     final mouseData = _inputMonitorService.mouseData;
+    final menuBarData = _menuBarInfoService.data;
 
     return Scaffold(
       backgroundColor: AppConstants.transparentColor,
@@ -959,7 +1171,14 @@ class _MyHomePageState extends State<MyHomePage>
           isShowSystemStats: _isShowSystemStats,
           isShowKeyboardTrack: _isShowKeyboardTrack,
           isShowMouseTrack: _isShowMouseTrack,
-          systemStatsRefreshSeconds: _systemStatsRefreshSeconds,
+          systemStats: SystemStatsData(
+            cpuUsage: menuBarData.cpuUsage,
+            gpuUsage: menuBarData.gpuUsage,
+            ramUsage: menuBarData.ramUsage,
+            diskUsage: menuBarData.diskUsage,
+            networkUpload: menuBarData.networkUpload,
+            networkDownload: menuBarData.networkDownload,
+          ),
           pomodoroState: _pomodoroService.state,
           todos: _todos,
           themeColors: _themeColors,

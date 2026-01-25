@@ -1,9 +1,50 @@
 import 'package:flutter/services.dart';
 
+/// Callback type for menu bar item clicks.
+/// Provides itemId, the screen position of the clicked item, and screen height.
+typedef MenuBarItemClickCallback =
+    void Function(String itemId, Rect screenRect, double screenHeight);
+
 /// Helper class to set menu bar title with custom font size on macOS.
 /// Uses native code to support NSAttributedString with custom font.
 class MenuBarHelper {
   static const MethodChannel _channel = MethodChannel('menu_bar_helper');
+  static MenuBarItemClickCallback? _onItemClicked;
+
+  /// Initialize the helper and set up method call handlers.
+  static void initialize({MenuBarItemClickCallback? onItemClicked}) {
+    _onItemClicked = onItemClicked;
+    _channel.setMethodCallHandler(_handleMethodCall);
+  }
+
+  /// Dispose of the helper and clean up.
+  static void dispose() {
+    _onItemClicked = null;
+    _channel.setMethodCallHandler(null);
+  }
+
+  static Future<dynamic> _handleMethodCall(MethodCall call) async {
+    switch (call.method) {
+      case 'onMenuBarItemClicked':
+        final args = call.arguments as Map<dynamic, dynamic>;
+        final itemId = args['itemId'] as String;
+        final x = (args['x'] as num).toDouble();
+        final y = (args['y'] as num).toDouble();
+        final width = (args['width'] as num).toDouble();
+        final height = (args['height'] as num).toDouble();
+        final screenHeight = (args['screenHeight'] as num).toDouble();
+        // Store screenHeight in the Rect's unused property by encoding it
+        // We pass it as a 5-element list in a custom way
+        _onItemClicked?.call(
+          itemId,
+          Rect.fromLTWH(x, y, width, height),
+          screenHeight,
+        );
+        return true;
+      default:
+        return null;
+    }
+  }
 
   /// Set the menu bar title with a custom font size.
   ///
@@ -59,6 +100,36 @@ class MenuBarHelper {
       return false;
     }
   }
+
+  /// Show the main window.
+  static Future<bool> showWindow() async {
+    try {
+      final result = await _channel.invokeMethod('showWindow');
+      return result == true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Hide the main window.
+  static Future<bool> hideWindow() async {
+    try {
+      final result = await _channel.invokeMethod('hideWindow');
+      return result == true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Exit the application.
+  static Future<bool> exitApp() async {
+    try {
+      final result = await _channel.invokeMethod('exitApp');
+      return result == true;
+    } catch (e) {
+      return false;
+    }
+  }
 }
 
 /// Represents a single menu bar item with top and bottom text.
@@ -82,12 +153,12 @@ class MenuBarItem {
   });
 
   Map<String, dynamic> toMap() => {
-        'id': id,
-        'top': top,
-        'bottom': bottom,
-        'alignment': alignment,
-        'fixedWidth': fixedWidth ?? -1,
-        'topFontSize': topFontSize ?? -1,
-        'bottomFontSize': bottomFontSize ?? -1,
-      };
+    'id': id,
+    'top': top,
+    'bottom': bottom,
+    'alignment': alignment,
+    'fixedWidth': fixedWidth ?? -1,
+    'topFontSize': topFontSize ?? -1,
+    'bottomFontSize': bottomFontSize ?? -1,
+  };
 }
