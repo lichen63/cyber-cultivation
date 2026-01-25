@@ -46,7 +46,7 @@
 - [x] Add hide window in context menu and system context menu
 - [x] Handle the exception when game_save is corrupted
 - [x] Customize refresh interval of system stats info
-- [ ] Add battery info in system menu bar
+- [x] Add battery info in system menu bar
 - [ ] Can customize default focus time
 - [ ] Customize sub page info when clicking other items in menu bar
 - [ ] Add windows platform support
