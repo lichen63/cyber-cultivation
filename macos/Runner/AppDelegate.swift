@@ -8,6 +8,7 @@ class AppDelegate: FlutterAppDelegate {
   private var contextMenu: NSMenu?
   var calendarPopover: NSPopover?
   private var calendarViewController: CalendarViewController?
+  private var popoverEventMonitor: Any?
   
   override func applicationDidFinishLaunching(_ notification: Notification) {
     let controller = mainFlutterWindow?.contentViewController as! FlutterViewController
@@ -335,6 +336,10 @@ class AppDelegate: FlutterAppDelegate {
     if sender.identifier?.rawValue == "systemTime" {
       showCalendarPopover(from: sender)
     } else {
+      // Close calendar popover if open when clicking other menu bar items
+      if let popover = calendarPopover, popover.isShown {
+        closeCalendarPopover()
+      }
       // Show context menu below the clicked button
       guard let menu = contextMenu else { return }
       // Pop up menu at the mouse location
@@ -345,7 +350,7 @@ class AppDelegate: FlutterAppDelegate {
   private func showCalendarPopover(from sender: NSStatusBarButton) {
     // Close if already open
     if let popover = calendarPopover, popover.isShown {
-      popover.performClose(nil)
+      closeCalendarPopover()
       return
     }
     
@@ -363,6 +368,19 @@ class AppDelegate: FlutterAppDelegate {
     
     // Show popover below the button
     calendarPopover?.show(relativeTo: sender.bounds, of: sender, preferredEdge: .minY)
+    
+    // Add global event monitor to close popover when clicking outside
+    popoverEventMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] _ in
+      self?.closeCalendarPopover()
+    }
+  }
+  
+  private func closeCalendarPopover() {
+    calendarPopover?.performClose(nil)
+    if let monitor = popoverEventMonitor {
+      NSEvent.removeMonitor(monitor)
+      popoverEventMonitor = nil
+    }
   }
   
   private func clearMenuBarItems(result: @escaping FlutterResult) {
