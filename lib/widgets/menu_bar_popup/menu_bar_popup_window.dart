@@ -65,22 +65,21 @@ class _MenuBarPopupWindowState extends State<MenuBarPopupWindow>
     final popupHeight = _getPopupHeight(itemId);
     final popupWidth = _getPopupWidth(itemId);
 
-    final windowOptions = WindowOptions(
-      size: Size(popupWidth, popupHeight),
-      backgroundColor: Colors.transparent,
-      skipTaskbar: true,
-      titleBarStyle: TitleBarStyle.hidden,
+    // Set window properties manually instead of using waitUntilReadyToShow
+    // to avoid "Resize timed out" issue on macOS
+    await windowManager.setSize(Size(popupWidth, popupHeight));
+    await windowManager.setPosition(Offset(x, y));
+    await windowManager.setBackgroundColor(Colors.transparent);
+    await windowManager.setSkipTaskbar(true);
+    await windowManager.setTitleBarStyle(
+      TitleBarStyle.hidden,
       windowButtonVisibility: false,
-      alwaysOnTop: true,
     );
-
-    await windowManager.waitUntilReadyToShow(windowOptions, () async {
-      await windowManager.setPosition(Offset(x, y));
-      await windowManager.setResizable(false);
-      await windowManager.setMovable(false);
-      await windowManager.show();
-      await windowManager.focus();
-    });
+    await windowManager.setAlwaysOnTop(true);
+    await windowManager.setResizable(false);
+    await windowManager.setMovable(false);
+    await windowManager.show();
+    await windowManager.focus();
   }
 
   /// Get popup width based on item type
@@ -114,6 +113,8 @@ class _MenuBarPopupWindowState extends State<MenuBarPopupWindow>
         return MenuBarPopupConstants.cpuPopupHeight;
       case 'levelExp':
       case 'focus':
+      case 'keyboard':
+      case 'mouse':
         return MenuBarPopupConstants.popupHeightMedium;
       default:
         return MenuBarPopupConstants.popupHeight;
