@@ -873,7 +873,8 @@ class _MenuBarPopupContentState extends State<_MenuBarPopupContent> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: Center(
+      body: Align(
+        alignment: Alignment.topCenter,
         child: Material(
           color: Colors.transparent,
           child: ClipRRect(
