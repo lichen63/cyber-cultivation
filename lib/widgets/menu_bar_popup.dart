@@ -18,7 +18,7 @@ import '../services/game_data_service.dart';
 class MenuBarPopupConstants {
   static const double popupWidth = 340.0;
   static const double popupWidthWide =
-      480.0; // For disk/network with extra columns
+      400.0; // For disk/network with extra columns
   static const double popupBorderRadius = 6.0;
   static const double popupPadding = 8.0;
 
@@ -729,6 +729,26 @@ class _MenuBarPopupContentState extends State<_MenuBarPopupContent> {
   GameData? _gameData;
   DailyStats? _todayStats;
 
+  /// Get content width based on item type
+  double _getContentWidth() {
+    switch (widget.itemId) {
+      case 'disk':
+      case 'network':
+        // Extra wide for 3+ columns (name, pid, value1, value2)
+        return MenuBarPopupConstants.popupWidthWide +
+            MenuBarPopupConstants.pidColumnWidth;
+      case 'cpu':
+      case 'gpu':
+      case 'ram':
+      case 'battery':
+        // Wide enough for name, pid, value columns
+        return MenuBarPopupConstants.popupWidth +
+            MenuBarPopupConstants.pidColumnWidth;
+      default:
+        return MenuBarPopupConstants.popupWidth;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -884,7 +904,7 @@ class _MenuBarPopupContentState extends State<_MenuBarPopupContent> {
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
               child: Container(
-                width: MenuBarPopupConstants.popupWidth,
+                width: _getContentWidth(),
                 decoration: BoxDecoration(
                   color: const Color(0xF0F6F6F6),
                   borderRadius: BorderRadius.circular(
