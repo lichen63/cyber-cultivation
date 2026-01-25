@@ -45,6 +45,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pomodoroStartButtonText => 'Start';
 
   @override
+  String get pomodoroSaveAsDefaultButtonText => 'Save as Default';
+
+  @override
   String get cancelButtonText => 'Cancel';
 
   @override

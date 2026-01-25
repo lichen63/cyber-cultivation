@@ -22,6 +22,9 @@ class GameData {
   final Map<String, DailyStats> dailyStats;
   final List<TodoItem> todos;
   final MenuBarSettings menuBarSettings;
+  final int defaultPomodoroDuration;
+  final int defaultPomodoroRelax;
+  final int defaultPomodoroLoops;
 
   GameData({
     required this.level,
@@ -33,7 +36,8 @@ class GameData {
     this.isShowSystemStats = true,
     this.isShowKeyboardTrack = true,
     this.isShowMouseTrack = true,
-    this.systemStatsRefreshSeconds = AppConstants.defaultSystemStatsRefreshSeconds,
+    this.systemStatsRefreshSeconds =
+        AppConstants.defaultSystemStatsRefreshSeconds,
     this.windowWidth,
     this.windowHeight,
     this.userId,
@@ -42,6 +46,9 @@ class GameData {
     Map<String, DailyStats>? dailyStats,
     List<TodoItem>? todos,
     MenuBarSettings? menuBarSettings,
+    this.defaultPomodoroDuration = AppConstants.defaultPomodoroDuration,
+    this.defaultPomodoroRelax = AppConstants.defaultRelaxDuration,
+    this.defaultPomodoroLoops = AppConstants.defaultPomodoroLoops,
   }) : dailyStats = dailyStats ?? {},
        todos = todos ?? [],
        menuBarSettings = menuBarSettings ?? const MenuBarSettings();
@@ -67,6 +74,9 @@ class GameData {
       'dailyStats': dailyStats.map((k, v) => MapEntry(k, v.toJson())),
       'todos': todos.map((t) => t.toJson()).toList(),
       'menuBarSettings': menuBarSettings.toJson(),
+      'defaultPomodoroDuration': defaultPomodoroDuration,
+      'defaultPomodoroRelax': defaultPomodoroRelax,
+      'defaultPomodoroLoops': defaultPomodoroLoops,
     };
   }
 
@@ -104,6 +114,15 @@ class GameData {
       menuBarSettings: MenuBarSettings.fromJson(
         json['menuBarSettings'] as Map<String, dynamic>?,
       ),
+      defaultPomodoroDuration:
+          json['defaultPomodoroDuration'] as int? ??
+          AppConstants.defaultPomodoroDuration,
+      defaultPomodoroRelax:
+          json['defaultPomodoroRelax'] as int? ??
+          AppConstants.defaultRelaxDuration,
+      defaultPomodoroLoops:
+          json['defaultPomodoroLoops'] as int? ??
+          AppConstants.defaultPomodoroLoops,
     );
   }
 
@@ -131,6 +150,9 @@ class GameData {
     Map<String, DailyStats>? dailyStats,
     List<TodoItem>? todos,
     MenuBarSettings? menuBarSettings,
+    int? defaultPomodoroDuration,
+    int? defaultPomodoroRelax,
+    int? defaultPomodoroLoops,
   }) {
     return GameData(
       level: level ?? this.level,
@@ -153,6 +175,10 @@ class GameData {
       dailyStats: dailyStats ?? this.dailyStats,
       todos: todos ?? this.todos,
       menuBarSettings: menuBarSettings ?? this.menuBarSettings,
+      defaultPomodoroDuration:
+          defaultPomodoroDuration ?? this.defaultPomodoroDuration,
+      defaultPomodoroRelax: defaultPomodoroRelax ?? this.defaultPomodoroRelax,
+      defaultPomodoroLoops: defaultPomodoroLoops ?? this.defaultPomodoroLoops,
     );
   }
 }

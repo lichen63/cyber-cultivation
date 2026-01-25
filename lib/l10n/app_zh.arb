@@ -12,6 +12,7 @@
     "pomodoroLoopsLabel": "循环次数:",
     "pomodoroExpectedExpLabel": "预计经验: ",
     "pomodoroStartButtonText": "开始",
+    "pomodoroSaveAsDefaultButtonText": "保存默认值",
     "cancelButtonText": "取消",
     "confirmStopTitle": "停止专注?",
     "confirmStopContent": "当前的专注进度将丢失。",

@@ -45,6 +45,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pomodoroStartButtonText => '开始';
 
   @override
+  String get pomodoroSaveAsDefaultButtonText => '保存默认值';
+
+  @override
   String get cancelButtonText => '取消';
 
   @override

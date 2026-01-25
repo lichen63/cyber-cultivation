@@ -48,6 +48,10 @@
     "@pomodoroStartButtonText": {
         "description": "Text for the start button"
     },
+    "pomodoroSaveAsDefaultButtonText": "Save as Default",
+    "@pomodoroSaveAsDefaultButtonText": {
+        "description": "Text for saving current pomodoro values as default"
+    },
     "cancelButtonText": "Cancel",
     "@cancelButtonText": {
         "description": "Text for the cancel button"

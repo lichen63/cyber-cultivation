@@ -363,6 +363,11 @@ class _MyHomePageState extends State<MyHomePage>
   // Todos
   List<TodoItem> _todos = [];
 
+  // Pomodoro defaults
+  int _defaultPomodoroDuration = AppConstants.defaultPomodoroDuration;
+  int _defaultPomodoroRelax = AppConstants.defaultRelaxDuration;
+  int _defaultPomodoroLoops = AppConstants.defaultPomodoroLoops;
+
   // Stats
   DailyStats _todayStats = DailyStats();
   Map<String, DailyStats> _dailyStatsMap = {};
@@ -533,6 +538,10 @@ class _MyHomePageState extends State<MyHomePage>
       _todayStats = _dailyStatsMap[todayKey] ?? DailyStats();
       _dailyStatsMap[todayKey] = _todayStats;
 
+      _defaultPomodoroDuration = data.defaultPomodoroDuration;
+      _defaultPomodoroRelax = data.defaultPomodoroRelax;
+      _defaultPomodoroLoops = data.defaultPomodoroLoops;
+
       if (_level >= AppConstants.maxLevel) {
         _currentExp = double.infinity;
         _maxExp = double.infinity;
@@ -587,6 +596,9 @@ class _MyHomePageState extends State<MyHomePage>
           dailyStats: _dailyStatsMap,
           todos: _todos,
           menuBarSettings: _menuBarSettings,
+          defaultPomodoroDuration: _defaultPomodoroDuration,
+          defaultPomodoroRelax: _defaultPomodoroRelax,
+          defaultPomodoroLoops: _defaultPomodoroLoops,
         ),
       );
     }
@@ -652,9 +664,9 @@ class _MyHomePageState extends State<MyHomePage>
       context: context,
       barrierColor: _themeColors.overlay,
       builder: (context) => PomodoroDialog(
-        initialDuration: AppConstants.defaultPomodoroDuration,
-        initialRelax: AppConstants.defaultRelaxDuration,
-        initialLoops: AppConstants.defaultPomodoroLoops,
+        initialDuration: _defaultPomodoroDuration,
+        initialRelax: _defaultPomodoroRelax,
+        initialLoops: _defaultPomodoroLoops,
         themeColors: _themeColors,
         onStart: (duration, relax, loops) {
           Navigator.of(context).pop();
@@ -663,6 +675,14 @@ class _MyHomePageState extends State<MyHomePage>
             relaxMinutes: relax,
             loops: loops,
           );
+        },
+        onSaveAsDefault: (duration, relax, loops) {
+          setState(() {
+            _defaultPomodoroDuration = duration;
+            _defaultPomodoroRelax = relax;
+            _defaultPomodoroLoops = loops;
+          });
+          _saveGameData(immediate: true);
         },
       ),
     );

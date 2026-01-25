@@ -170,6 +170,12 @@ abstract class AppLocalizations {
   /// **'Start'**
   String get pomodoroStartButtonText;
 
+  /// Text for saving current pomodoro values as default
+  ///
+  /// In en, this message translates to:
+  /// **'Save as Default'**
+  String get pomodoroSaveAsDefaultButtonText;
+
   /// Text for the cancel button
   ///
   /// In en, this message translates to:
