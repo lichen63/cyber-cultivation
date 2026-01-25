@@ -147,7 +147,10 @@ class _StatsWindowState extends State<StatsWindow> {
             children: [
               if (widget.onClearStats != null)
                 IconButton(
-                  icon: Icon(Icons.delete_outline, color: _colors.secondaryText),
+                  icon: Icon(
+                    Icons.delete_outline,
+                    color: _colors.secondaryText,
+                  ),
                   tooltip: AppLocalizations.of(context)!.statsClearData,
                   onPressed: _showClearConfirmation,
                 ),
@@ -269,7 +272,10 @@ class _StatsWindowState extends State<StatsWindow> {
             fit: BoxFit.scaleDown,
             child: Text(
               title,
-              style: TextStyle(color: _colors.secondaryText, fontSize: AppConstants.fontSizeDialogStatLabel),
+              style: TextStyle(
+                color: _colors.secondaryText,
+                fontSize: AppConstants.fontSizeDialogStatLabel,
+              ),
             ),
           ),
         ],
@@ -374,9 +380,14 @@ class _StatsWindowState extends State<StatsWindow> {
     }
     if (maxY == 0) maxY = 10;
 
-    // Add nice interval
+    // Add nice interval - use integer intervals for keyboard/click metrics
     double interval = maxY / 5;
     if (interval == 0) interval = 1;
+    // For keyboard and click metrics, round up to whole numbers
+    if (metric != 'move') {
+      interval = interval.ceilToDouble();
+      if (interval < 1) interval = 1;
+    }
 
     return SizedBox(
       height: 300,
@@ -440,19 +451,27 @@ class _StatsWindowState extends State<StatsWindow> {
                   showTitles: true,
                   interval: interval,
                   getTitlesWidget: (value, meta) {
-                    final suffix = metric == 'move' ? ' m' : '';
+                    // For keyboard/click, show integers; for distance, show with suffix
+                    String label;
+                    if (metric == 'move') {
+                      label = '${_formatNumber(value)} m';
+                    } else {
+                      label = _formatNumber(value.round());
+                    }
                     return SideTitleWidget(
                       meta: meta,
                       child: Text(
-                        '${_formatNumber(value)}$suffix',
+                        label,
                         style: TextStyle(
                           color: _colors.secondaryText,
                           fontSize: AppConstants.fontSizeDialogHint,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.visible,
                       ),
                     );
                   },
-                  reservedSize: 50,
+                  reservedSize: 60,
                 ),
               ),
             ),
