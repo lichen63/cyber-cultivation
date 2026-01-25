@@ -129,7 +129,7 @@ class AppDelegate: FlutterAppDelegate {
             let isCharging = parts[2] == "1"
             if let button = statusItem.button {
               // Create battery icon with percentage inside
-              let batteryImage = self.createBatteryImage(level: level, isCharging: isCharging, width: CGFloat(fixedWidth > 0 ? fixedWidth : 45))
+              let batteryImage = self.createBatteryImage(level: level, isCharging: isCharging, width: CGFloat(fixedWidth > 0 ? fixedWidth : 38))
               button.image = batteryImage
               button.imagePosition = .imageOnly
               button.attributedTitle = NSAttributedString(string: "")
@@ -225,12 +225,12 @@ class AppDelegate: FlutterAppDelegate {
   /// Create a battery icon image with percentage text inside
   private func createBatteryImage(level: Int, isCharging: Bool, width: CGFloat) -> NSImage {
     let height: CGFloat = 22  // Menu bar height
-    let batteryWidth: CGFloat = 36
-    let batteryHeight: CGFloat = 16
-    let tipWidth: CGFloat = 3
-    let tipHeight: CGFloat = 7
-    let cornerRadius: CGFloat = 3
-    let borderWidth: CGFloat = 1.5
+    let batteryWidth: CGFloat = 26
+    let batteryHeight: CGFloat = 12
+    let tipWidth: CGFloat = 2
+    let tipHeight: CGFloat = 5
+    let cornerRadius: CGFloat = 2.5
+    let borderWidth: CGFloat = 1.0
     let chargingIconWidth: CGFloat = isCharging ? 10 : 0  // Space for charging icon on the left
     
     let image = NSImage(size: NSSize(width: width, height: height), flipped: false) { rect in
@@ -245,23 +245,23 @@ class AppDelegate: FlutterAppDelegate {
       
       // Draw charging indicator (lightning bolt) to the left of the battery
       if isCharging {
-        let boltCenterX = batteryX - 7
+        let boltCenterX = batteryX - 6
         let boltCenterY = batteryY + batteryHeight / 2
         
         // Draw a cleaner, wider lightning bolt shape
         let boltPath = NSBezierPath()
         // Top point
-        boltPath.move(to: NSPoint(x: boltCenterX + 2, y: boltCenterY + 7))
+        boltPath.move(to: NSPoint(x: boltCenterX + 1.5, y: boltCenterY + 6))
         // Left side going down to middle
-        boltPath.line(to: NSPoint(x: boltCenterX - 3, y: boltCenterY + 1))
+        boltPath.line(to: NSPoint(x: boltCenterX - 2.5, y: boltCenterY + 0.5))
         // Middle notch (left)
-        boltPath.line(to: NSPoint(x: boltCenterX - 1, y: boltCenterY + 1))
+        boltPath.line(to: NSPoint(x: boltCenterX - 0.5, y: boltCenterY + 0.5))
         // Bottom point
-        boltPath.line(to: NSPoint(x: boltCenterX - 2, y: boltCenterY - 7))
+        boltPath.line(to: NSPoint(x: boltCenterX - 1.5, y: boltCenterY - 6))
         // Right side going up to middle
-        boltPath.line(to: NSPoint(x: boltCenterX + 3, y: boltCenterY - 1))
+        boltPath.line(to: NSPoint(x: boltCenterX + 2.5, y: boltCenterY - 0.5))
         // Middle notch (right)
-        boltPath.line(to: NSPoint(x: boltCenterX + 1, y: boltCenterY - 1))
+        boltPath.line(to: NSPoint(x: boltCenterX + 0.5, y: boltCenterY - 0.5))
         boltPath.close()
         
         NSColor.white.setFill()
@@ -287,7 +287,7 @@ class AppDelegate: FlutterAppDelegate {
       tipPath.fill()
       
       // Draw fill level (white fill)
-      let inset: CGFloat = 2.5
+      let inset: CGFloat = 1.5
       let fillWidth = (batteryWidth - inset * 2) * CGFloat(level) / 100.0
       if fillWidth > 0 {
         let fillRect = NSRect(
@@ -296,14 +296,14 @@ class AppDelegate: FlutterAppDelegate {
           width: fillWidth,
           height: batteryHeight - inset * 2
         )
-        let fillPath = NSBezierPath(roundedRect: fillRect, xRadius: 1.5, yRadius: 1.5)
+        let fillPath = NSBezierPath(roundedRect: fillRect, xRadius: 1.0, yRadius: 1.0)
         fillColor.setFill()
         fillPath.fill()
       }
       
       // Draw percentage number inside the battery (no % symbol, black text with white outline)
       let percentText = "\(level)"
-      let font = NSFont.monospacedDigitSystemFont(ofSize: 10, weight: .bold)
+      let font = NSFont.monospacedDigitSystemFont(ofSize: 9, weight: .bold)
       let textSize = (percentText as NSString).size(withAttributes: [.font: font])
       let textX = batteryX + (batteryWidth - textSize.width) / 2
       let textY = batteryY + (batteryHeight - textSize.height) / 2
