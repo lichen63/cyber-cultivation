@@ -28,6 +28,7 @@ import 'widgets/home_page_content.dart';
 import 'widgets/pomodoro_dialog.dart';
 import 'widgets/settings_dialog.dart';
 import 'widgets/stats_window.dart';
+import 'widgets/system_stats_panel.dart';
 import 'widgets/todo_dialog.dart';
 
 void main() async {
@@ -408,6 +409,7 @@ class _MyHomePageState extends State<MyHomePage>
     _menuBarInfoService = MenuBarInfoService();
     _menuBarInfoService.updateSettings(_menuBarSettings);
     _menuBarInfoService.initialize(refreshSeconds: _systemStatsRefreshSeconds);
+    _menuBarInfoService.addListener(_onMenuBarInfoChanged);
 
     // Update tray/menu bar items periodically
     _trayUpdateTimer = Timer.periodic(
@@ -423,6 +425,10 @@ class _MyHomePageState extends State<MyHomePage>
   }
 
   void _onInputMonitorChanged() {
+    if (mounted) setState(() {});
+  }
+
+  void _onMenuBarInfoChanged() {
     if (mounted) setState(() {});
   }
 
@@ -450,6 +456,7 @@ class _MyHomePageState extends State<MyHomePage>
     _pomodoroService.dispose();
     _inputMonitorService.removeListener(_onInputMonitorChanged);
     _inputMonitorService.dispose();
+    _menuBarInfoService.removeListener(_onMenuBarInfoChanged);
     _menuBarInfoService.dispose();
     _trayUpdateTimer?.cancel();
     _saveGameData(immediate: true);
@@ -939,6 +946,7 @@ class _MyHomePageState extends State<MyHomePage>
   @override
   Widget build(BuildContext context) {
     final mouseData = _inputMonitorService.mouseData;
+    final menuBarData = _menuBarInfoService.data;
 
     return Scaffold(
       backgroundColor: AppConstants.transparentColor,
@@ -960,7 +968,14 @@ class _MyHomePageState extends State<MyHomePage>
           isShowSystemStats: _isShowSystemStats,
           isShowKeyboardTrack: _isShowKeyboardTrack,
           isShowMouseTrack: _isShowMouseTrack,
-          systemStatsRefreshSeconds: _systemStatsRefreshSeconds,
+          systemStats: SystemStatsData(
+            cpuUsage: menuBarData.cpuUsage,
+            gpuUsage: menuBarData.gpuUsage,
+            ramUsage: menuBarData.ramUsage,
+            diskUsage: menuBarData.diskUsage,
+            networkUpload: menuBarData.networkUpload,
+            networkDownload: menuBarData.networkDownload,
+          ),
           pomodoroState: _pomodoroService.state,
           todos: _todos,
           themeColors: _themeColors,

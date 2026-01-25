@@ -268,82 +268,41 @@ class _NetworkStatBox extends StatelessWidget {
   }
 }
 
+/// Data class to hold system stats for the panel
+/// This allows the stats to be passed from a central source (MenuBarInfoService)
+/// to ensure synchronization with menu bar display
+class SystemStatsData {
+  final double cpuUsage;
+  final double gpuUsage;
+  final double ramUsage;
+  final double diskUsage;
+  final int networkUpload;
+  final int networkDownload;
+
+  const SystemStatsData({
+    this.cpuUsage = 0,
+    this.gpuUsage = 0,
+    this.ramUsage = 0,
+    this.diskUsage = 0,
+    this.networkUpload = 0,
+    this.networkDownload = 0,
+  });
+}
+
 /// Panel containing all system stats arranged in a grid
-class SystemStatsPanel extends StatefulWidget {
+/// Uses [systemStats] data from a central source to ensure
+/// synchronization with menu bar display
+class SystemStatsPanel extends StatelessWidget {
   final double scale;
   final AppThemeColors themeColors;
-  final int refreshSeconds;
+  final SystemStatsData systemStats;
 
   const SystemStatsPanel({
     super.key,
     required this.scale,
     required this.themeColors,
-    required this.refreshSeconds,
+    required this.systemStats,
   });
-
-  @override
-  State<SystemStatsPanel> createState() => _SystemStatsPanelState();
-}
-
-class _SystemStatsPanelState extends State<SystemStatsPanel> {
-  Timer? _updateTimer;
-  int _currentRefreshSeconds = 0;
-
-  double _cpuUsage = 0.0;
-  double _gpuUsage = 0.0;
-  double _ramUsage = 0.0;
-  double _diskUsage = 0.0;
-  int _networkUpload = 0;
-  int _networkDownload = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _currentRefreshSeconds = widget.refreshSeconds;
-    _fetchStats();
-    _startTimer();
-  }
-
-  @override
-  void didUpdateWidget(SystemStatsPanel oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.refreshSeconds != widget.refreshSeconds) {
-      _currentRefreshSeconds = widget.refreshSeconds;
-      _updateTimer?.cancel();
-      _startTimer();
-    }
-  }
-
-  void _startTimer() {
-    _updateTimer = Timer.periodic(
-      Duration(seconds: _currentRefreshSeconds),
-      (_) => _fetchStats(),
-    );
-  }
-
-  @override
-  void dispose() {
-    _updateTimer?.cancel();
-    super.dispose();
-  }
-
-  Future<void> _fetchStats() async {
-    try {
-      final stats = await SystemInfoService.getAllStats();
-      if (mounted) {
-        setState(() {
-          _cpuUsage = (stats['cpu'] as num?)?.toDouble() ?? 0.0;
-          _gpuUsage = (stats['gpu'] as num?)?.toDouble() ?? 0.0;
-          _ramUsage = (stats['ram'] as num?)?.toDouble() ?? 0.0;
-          _diskUsage = (stats['disk'] as num?)?.toDouble() ?? 0.0;
-          _networkUpload = (stats['networkUp'] as num?)?.toInt() ?? 0;
-          _networkDownload = (stats['networkDown'] as num?)?.toInt() ?? 0;
-        });
-      }
-    } catch (e) {
-      debugPrint('Failed to fetch system stats: $e');
-    }
-  }
 
   String _formatBytes(int bytes) {
     if (bytes < 1024) {
@@ -359,8 +318,8 @@ class _SystemStatsPanelState extends State<SystemStatsPanel> {
 
   @override
   Widget build(BuildContext context) {
-    final boxSize = AppConstants.systemStatBoxSize * widget.scale;
-    final spacing = AppConstants.systemStatSpacing * widget.scale;
+    final boxSize = AppConstants.systemStatBoxSize * scale;
+    final spacing = AppConstants.systemStatSpacing * scale;
 
     // Calculate positions for the 5 stat boxes around the character
     // Top row: 3 boxes (left, center, right) - positioned near top of character area
@@ -391,10 +350,10 @@ class _SystemStatsPanelState extends State<SystemStatsPanel> {
                   height: boxSize,
                   child: SystemStatBox(
                     label: 'CPU',
-                    value: '${_cpuUsage.toStringAsFixed(0)}%',
-                    scale: widget.scale,
-                    themeColors: widget.themeColors,
-                    progress: _cpuUsage / 100,
+                    value: '${systemStats.cpuUsage.toStringAsFixed(0)}%',
+                    scale: scale,
+                    themeColors: themeColors,
+                    progress: systemStats.cpuUsage / 100,
                   ),
                 ),
               ),
@@ -407,10 +366,10 @@ class _SystemStatsPanelState extends State<SystemStatsPanel> {
                   height: boxSize,
                   child: SystemStatBox(
                     label: 'GPU',
-                    value: '${_gpuUsage.toStringAsFixed(0)}%',
-                    scale: widget.scale,
-                    themeColors: widget.themeColors,
-                    progress: _gpuUsage / 100,
+                    value: '${systemStats.gpuUsage.toStringAsFixed(0)}%',
+                    scale: scale,
+                    themeColors: themeColors,
+                    progress: systemStats.gpuUsage / 100,
                   ),
                 ),
               ),
@@ -423,10 +382,10 @@ class _SystemStatsPanelState extends State<SystemStatsPanel> {
                   height: boxSize,
                   child: SystemStatBox(
                     label: 'RAM',
-                    value: '${_ramUsage.toStringAsFixed(0)}%',
-                    scale: widget.scale,
-                    themeColors: widget.themeColors,
-                    progress: _ramUsage / 100,
+                    value: '${systemStats.ramUsage.toStringAsFixed(0)}%',
+                    scale: scale,
+                    themeColors: themeColors,
+                    progress: systemStats.ramUsage / 100,
                   ),
                 ),
               ),
@@ -439,10 +398,10 @@ class _SystemStatsPanelState extends State<SystemStatsPanel> {
                   height: boxSize,
                   child: SystemStatBox(
                     label: 'DISK',
-                    value: '${_diskUsage.toStringAsFixed(0)}%',
-                    scale: widget.scale,
-                    themeColors: widget.themeColors,
-                    progress: _diskUsage / 100,
+                    value: '${systemStats.diskUsage.toStringAsFixed(0)}%',
+                    scale: scale,
+                    themeColors: themeColors,
+                    progress: systemStats.diskUsage / 100,
                   ),
                 ),
               ),
@@ -454,11 +413,11 @@ class _SystemStatsPanelState extends State<SystemStatsPanel> {
                   width: boxSize,
                   height: boxSize,
                   child: _NetworkStatBox(
-                    upload: _networkUpload,
-                    download: _networkDownload,
+                    upload: systemStats.networkUpload,
+                    download: systemStats.networkDownload,
                     formatBytes: _formatBytes,
-                    scale: widget.scale,
-                    themeColors: widget.themeColors,
+                    scale: scale,
+                    themeColors: themeColors,
                   ),
                 ),
               ),
