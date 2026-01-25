@@ -81,6 +81,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get relaxState => 'Relax';
 
   @override
+  String get idleState => 'Idle';
+
+  @override
+  String get focusPopupStatus => 'Status';
+
+  @override
+  String get focusPopupTimeRemaining => 'Time Remaining';
+
+  @override
   String get alwaysShowActionsText => 'Always Show Actions';
 
   @override

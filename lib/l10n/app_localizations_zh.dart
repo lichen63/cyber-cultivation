@@ -81,6 +81,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get relaxState => '休息';
 
   @override
+  String get idleState => '空闲';
+
+  @override
+  String get focusPopupStatus => '状态';
+
+  @override
+  String get focusPopupTimeRemaining => '剩余时间';
+
+  @override
   String get alwaysShowActionsText => '总是显示操作按钮';
 
   @override

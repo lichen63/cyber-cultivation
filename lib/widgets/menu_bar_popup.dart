@@ -4,10 +4,15 @@ import 'dart:ui';
 import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/intl.dart';
 import 'package:window_manager/window_manager.dart';
 
 import '../constants.dart';
 import '../l10n/app_localizations.dart';
+import '../models/daily_stats.dart';
+import '../models/game_data.dart';
+import '../models/todo_item.dart';
+import '../services/game_data_service.dart';
 
 /// Constants for menu bar popup
 class MenuBarPopupConstants {
@@ -41,6 +46,11 @@ class MenuBarPopupConstants {
   /// Calculate total popup height for default content
   static double get popupHeight {
     return titleBarHeight + contentMinHeight + (popupPadding * 2);
+  }
+
+  /// Calculate popup height for medium content (3-4 rows)
+  static double get popupHeightMedium {
+    return titleBarHeight + 120 + (popupPadding * 2);
   }
 
   /// Calculate popup height for CPU processes
@@ -608,7 +618,11 @@ class _MenuBarPopupWindowState extends State<MenuBarPopupWindow>
       case 'disk':
       case 'network':
       case 'battery':
+      case 'todo': // Todo can have many items
         return MenuBarPopupConstants.cpuPopupHeight;
+      case 'levelExp': // Has 3 rows
+      case 'focus': // Has 3 rows
+        return MenuBarPopupConstants.popupHeightMedium;
       default:
         return MenuBarPopupConstants.popupHeight;
     }
@@ -661,6 +675,17 @@ class _MenuBarPopupWindowState extends State<MenuBarPopupWindow>
         itemId: widget.args['itemId'] as String? ?? '',
         themeColors: _themeColors,
         onClose: _closePopup,
+        focusIsActive: widget.args['focusIsActive'] as bool? ?? false,
+        focusIsRelaxing: widget.args['focusIsRelaxing'] as bool? ?? false,
+        focusSecondsRemaining:
+            widget.args['focusSecondsRemaining'] as int? ?? 0,
+        focusCurrentLoop: widget.args['focusCurrentLoop'] as int? ?? 1,
+        focusTotalLoops: widget.args['focusTotalLoops'] as int? ?? 1,
+        level: widget.args['level'] as int? ?? 1,
+        currentExp: (widget.args['currentExp'] as num?)?.toDouble() ?? 0,
+        maxExp:
+            (widget.args['maxExp'] as num?)?.toDouble() ??
+            AppConstants.initialMaxExp,
       ),
     );
   }
@@ -671,11 +696,27 @@ class _MenuBarPopupContent extends StatefulWidget {
   final String itemId;
   final AppThemeColors themeColors;
   final VoidCallback onClose;
+  final bool focusIsActive;
+  final bool focusIsRelaxing;
+  final int focusSecondsRemaining;
+  final int focusCurrentLoop;
+  final int focusTotalLoops;
+  final int level;
+  final double currentExp;
+  final double maxExp;
 
   const _MenuBarPopupContent({
     required this.itemId,
     required this.themeColors,
     required this.onClose,
+    this.focusIsActive = false,
+    this.focusIsRelaxing = false,
+    this.focusSecondsRemaining = 0,
+    this.focusCurrentLoop = 1,
+    this.focusTotalLoops = 1,
+    this.level = 1,
+    this.currentExp = 0,
+    this.maxExp = AppConstants.initialMaxExp,
   });
 
   @override
@@ -685,16 +726,18 @@ class _MenuBarPopupContent extends StatefulWidget {
 class _MenuBarPopupContentState extends State<_MenuBarPopupContent> {
   List<Map<String, dynamic>>? _processes;
   bool _isLoading = false;
+  GameData? _gameData;
+  DailyStats? _todayStats;
 
   @override
   void initState() {
     super.initState();
-    _loadProcesses();
+    _loadData();
   }
 
-  Future<void> _loadProcesses() async {
-    // Only load for supported item types
-    if (![
+  Future<void> _loadData() async {
+    // Load processes for system stats
+    if ([
       'cpu',
       'gpu',
       'ram',
@@ -702,9 +745,50 @@ class _MenuBarPopupContentState extends State<_MenuBarPopupContent> {
       'network',
       'battery',
     ].contains(widget.itemId)) {
-      return;
+      await _loadProcesses();
     }
 
+    // Load game data for other types
+    if ([
+      'focus',
+      'todo',
+      'levelExp',
+      'keyboard',
+      'mouse',
+    ].contains(widget.itemId)) {
+      await _loadGameData();
+    }
+  }
+
+  Future<void> _loadGameData() async {
+    setState(() => _isLoading = true);
+
+    try {
+      final gameDataService = GameDataService();
+      final gameData = await gameDataService.loadGameData();
+
+      if (mounted && gameData != null) {
+        // Get today's stats
+        final todayKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
+        final todayStats = gameData.dailyStats[todayKey] ?? DailyStats();
+
+        setState(() {
+          _gameData = gameData;
+          _todayStats = todayStats;
+          _isLoading = false;
+        });
+      } else if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    } catch (e) {
+      debugPrint('Failed to load game data: $e');
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _loadProcesses() async {
     setState(() => _isLoading = true);
 
     List<Map<String, dynamic>> processes;
@@ -937,6 +1021,16 @@ class _MenuBarPopupContentState extends State<_MenuBarPopupContent> {
       case 'network':
       case 'battery':
         return _buildProcessListContent(context);
+      case 'focus':
+        return _buildFocusContent(context);
+      case 'todo':
+        return _buildTodoContent(context);
+      case 'levelExp':
+        return _buildLevelExpContent(context);
+      case 'keyboard':
+        return _buildKeyboardContent(context);
+      case 'mouse':
+        return _buildMouseContent(context);
       default:
         return _buildPlaceholderContent();
     }
@@ -955,6 +1049,242 @@ class _MenuBarPopupContentState extends State<_MenuBarPopupContent> {
         ),
       ),
     );
+  }
+
+  Widget _buildLoadingContent() {
+    return Container(
+      constraints: const BoxConstraints(
+        minHeight: MenuBarPopupConstants.contentMinHeight,
+      ),
+      padding: const EdgeInsets.all(MenuBarPopupConstants.popupPadding),
+      child: const Center(
+        child: SizedBox(
+          width: 16,
+          height: 16,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFocusContent(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    // Format remaining time as MM:SS
+    final minutes = (widget.focusSecondsRemaining ~/ 60).toString().padLeft(
+      2,
+      '0',
+    );
+    final seconds = (widget.focusSecondsRemaining % 60).toString().padLeft(
+      2,
+      '0',
+    );
+    final timeString = '$minutes:$seconds';
+
+    // Determine state label
+    String stateLabel;
+    if (!widget.focusIsActive) {
+      stateLabel = l10n.idleState;
+    } else if (widget.focusIsRelaxing) {
+      stateLabel = l10n.relaxState;
+    } else {
+      stateLabel = l10n.focusState;
+    }
+
+    return Container(
+      constraints: const BoxConstraints(
+        minHeight: MenuBarPopupConstants.contentMinHeight,
+      ),
+      padding: const EdgeInsets.all(MenuBarPopupConstants.popupPadding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildInfoRow(l10n.focusPopupStatus, stateLabel),
+          const SizedBox(height: 8),
+          _buildInfoRow(l10n.focusPopupTimeRemaining, timeString),
+          const SizedBox(height: 8),
+          _buildInfoRow(
+            l10n.pomodoroLoopsLabel,
+            '${widget.focusCurrentLoop}/${widget.focusTotalLoops}',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTodoContent(BuildContext context) {
+    if (_isLoading) return _buildLoadingContent();
+
+    final todos = _gameData?.todos ?? [];
+
+    if (todos.isEmpty) {
+      return Container(
+        constraints: const BoxConstraints(
+          minHeight: MenuBarPopupConstants.contentMinHeight,
+        ),
+        padding: const EdgeInsets.all(MenuBarPopupConstants.popupPadding),
+        child: const Center(
+          child: Text(
+            'No todos',
+            style: TextStyle(fontSize: 12, color: Color(0xFF8E8E93)),
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      constraints: const BoxConstraints(
+        minHeight: MenuBarPopupConstants.contentMinHeight,
+      ),
+      padding: const EdgeInsets.all(MenuBarPopupConstants.popupPadding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (int i = 0; i < todos.length && i < 10; i++) ...[
+            _buildTodoRow(todos[i]),
+            if (i < todos.length - 1 && i < 9) const SizedBox(height: 6),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTodoRow(TodoItem todo) {
+    IconData icon;
+    Color iconColor;
+
+    switch (todo.status) {
+      case TodoStatus.done:
+        icon = Icons.check_circle;
+        iconColor = const Color(0xFF34C759);
+      case TodoStatus.doing:
+        icon = Icons.radio_button_checked;
+        iconColor = const Color(0xFFFF9500);
+      case TodoStatus.todo:
+        icon = Icons.radio_button_unchecked;
+        iconColor = const Color(0xFF8E8E93);
+    }
+
+    return Row(
+      children: [
+        Icon(icon, size: 14, color: iconColor),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            todo.title,
+            style: TextStyle(
+              fontSize: MenuBarPopupConstants.processNameFontSize,
+              color: todo.status == TodoStatus.done
+                  ? const Color(0xFF8E8E93)
+                  : const Color(0xFF1D1D1F),
+              decoration: todo.status == TodoStatus.done
+                  ? TextDecoration.lineThrough
+                  : null,
+            ),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLevelExpContent(BuildContext context) {
+    return Container(
+      constraints: const BoxConstraints(
+        minHeight: MenuBarPopupConstants.contentMinHeight,
+      ),
+      padding: const EdgeInsets.all(MenuBarPopupConstants.popupPadding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildInfoRow('Level', widget.level.toString()),
+          const SizedBox(height: 8),
+          _buildInfoRow('Current EXP', '${widget.currentExp.toInt()}'),
+          const SizedBox(height: 8),
+          _buildInfoRow('Max EXP', '${widget.maxExp.toInt()}'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildKeyboardContent(BuildContext context) {
+    if (_isLoading) return _buildLoadingContent();
+
+    final keyCount = _todayStats?.keyboardCount ?? 0;
+
+    return Container(
+      constraints: const BoxConstraints(
+        minHeight: MenuBarPopupConstants.contentMinHeight,
+      ),
+      padding: const EdgeInsets.all(MenuBarPopupConstants.popupPadding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [_buildInfoRow('Today Key Events', _formatNumber(keyCount))],
+      ),
+    );
+  }
+
+  Widget _buildMouseContent(BuildContext context) {
+    if (_isLoading) return _buildLoadingContent();
+
+    final distance = _todayStats?.mouseMoveDistance ?? 0;
+
+    return Container(
+      constraints: const BoxConstraints(
+        minHeight: MenuBarPopupConstants.contentMinHeight,
+      ),
+      padding: const EdgeInsets.all(MenuBarPopupConstants.popupPadding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildInfoRow('Today Mouse Distance', _formatDistance(distance)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: MenuBarPopupConstants.processNameFontSize,
+            color: Color(0xFF8E8E93),
+          ),
+        ),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: MenuBarPopupConstants.processNameFontSize,
+            fontWeight: FontWeight.w500,
+            color: Color(0xFF1D1D1F),
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _formatNumber(int num) {
+    if (num >= 1000000) {
+      return '${(num / 1000000).toStringAsFixed(1)}M';
+    } else if (num >= 1000) {
+      return '${(num / 1000).toStringAsFixed(1)}K';
+    }
+    return num.toString();
+  }
+
+  String _formatDistance(int pixels) {
+    // Convert pixels to meters (assuming 96 DPI, 1 inch = 2.54 cm)
+    final meters = pixels / 96 * 2.54 / 100;
+    if (meters >= 1000) {
+      return '${(meters / 1000).toStringAsFixed(2)} km';
+    } else if (meters >= 1) {
+      return '${meters.toStringAsFixed(1)} m';
+    }
+    return '${(meters * 100).toStringAsFixed(0)} cm';
   }
 
   Widget _buildProcessListContent(BuildContext context) {

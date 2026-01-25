@@ -132,6 +132,12 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
   _pendingMenuBarItems; // Store latest pending items if update is in progress
   Set<String> _currentMenuBarItemIds =
       {}; // Track current item IDs for ordering
+  PomodoroState _pomodoroState =
+      const PomodoroState(); // Current pomodoro state for popup
+  // Level/Exp state for popup
+  int _level = AppConstants.initialLevel;
+  double _currentExp = 0;
+  double _maxExp = AppConstants.initialMaxExp;
 
   AppThemeColors get _themeColors => AppThemeColors.fromMode(_themeMode);
 
@@ -201,6 +207,16 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
           'y': popupY,
           'brightness': _themeMode == AppThemeMode.dark ? 'dark' : 'light',
           'locale': _locale?.languageCode,
+          // Focus state for popup
+          'focusIsActive': _pomodoroState.isActive,
+          'focusIsRelaxing': _pomodoroState.isRelaxing,
+          'focusSecondsRemaining': _pomodoroState.secondsRemaining,
+          'focusCurrentLoop': _pomodoroState.currentLoop,
+          'focusTotalLoops': _pomodoroState.totalLoops,
+          // Level/Exp state for popup
+          'level': _level,
+          'currentExp': _currentExp,
+          'maxExp': _maxExp,
         }),
         hiddenAtLaunch: true,
       ),
@@ -444,6 +460,12 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
         onMenuBarSettingsChanged: _onMenuBarSettingsChanged,
         onTrayTitleChanged: _updateTrayTitle,
         onMenuBarItemsChanged: _updateMenuBarItems,
+        onPomodoroStateChanged: (state) => _pomodoroState = state,
+        onLevelExpChanged: (level, currentExp, maxExp) {
+          _level = level;
+          _currentExp = currentExp;
+          _maxExp = maxExp;
+        },
       ),
     );
   }
@@ -459,6 +481,9 @@ class MyHomePage extends StatefulWidget {
   final ValueChanged<MenuBarSettings>? onMenuBarSettingsChanged;
   final ValueChanged<String>? onTrayTitleChanged;
   final ValueChanged<List<MenuBarItem>>? onMenuBarItemsChanged;
+  final ValueChanged<PomodoroState>? onPomodoroStateChanged;
+  final void Function(int level, double currentExp, double maxExp)?
+  onLevelExpChanged;
 
   const MyHomePage({
     super.key,
@@ -471,6 +496,8 @@ class MyHomePage extends StatefulWidget {
     this.onMenuBarSettingsChanged,
     this.onTrayTitleChanged,
     this.onMenuBarItemsChanged,
+    this.onPomodoroStateChanged,
+    this.onLevelExpChanged,
   });
 
   @override
@@ -576,7 +603,10 @@ class _MyHomePageState extends State<MyHomePage>
   }
 
   void _onPomodoroStateChanged() {
-    if (mounted) setState(() {});
+    if (mounted) {
+      setState(() {});
+      widget.onPomodoroStateChanged?.call(_pomodoroService.state);
+    }
   }
 
   void _onInputMonitorChanged() {
@@ -696,6 +726,7 @@ class _MyHomePageState extends State<MyHomePage>
             pow(AppConstants.expGrowthFactor, _level - 1);
       }
     });
+    widget.onLevelExpChanged?.call(_level, _currentExp, _maxExp);
     windowManager.setAlwaysOnTop(_isAlwaysOnTop);
     _menuBarInfoService.updateSettings(_menuBarSettings);
     // Defer the callback to after build is complete
@@ -770,6 +801,7 @@ class _MyHomePageState extends State<MyHomePage>
         _maxExp = double.infinity;
       }
     });
+    widget.onLevelExpChanged?.call(_level, _currentExp, _maxExp);
     _saveGameData();
   }
 

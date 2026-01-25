@@ -96,6 +96,18 @@
     "@relaxState": {
         "description": "Label for relax state"
     },
+    "idleState": "Idle",
+    "@idleState": {
+        "description": "Label for idle state"
+    },
+    "focusPopupStatus": "Status",
+    "@focusPopupStatus": {
+        "description": "Label for focus popup status"
+    },
+    "focusPopupTimeRemaining": "Time Remaining",
+    "@focusPopupTimeRemaining": {
+        "description": "Label for focus popup time remaining"
+    },
     "alwaysShowActionsText": "Always Show Actions",
     "@alwaysShowActionsText": {
         "description": "Option to always show action buttons"

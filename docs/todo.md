@@ -48,7 +48,7 @@
 - [x] Customize refresh interval of system stats info
 - [x] Add battery info in system menu bar
 - [x] Can customize default focus time
-- [ ] Customize sub page info when clicking other items in menu bar
+- [x] Customize sub page info when clicking other items in menu bar
 - [ ] Add windows platform support
 - [ ] Add unix-like platform support
 - [ ] Let player customize the character image

@@ -242,6 +242,24 @@ abstract class AppLocalizations {
   /// **'Relax'**
   String get relaxState;
 
+  /// Label for idle state
+  ///
+  /// In en, this message translates to:
+  /// **'Idle'**
+  String get idleState;
+
+  /// Label for focus popup status
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get focusPopupStatus;
+
+  /// Label for focus popup time remaining
+  ///
+  /// In en, this message translates to:
+  /// **'Time Remaining'**
+  String get focusPopupTimeRemaining;
+
   /// Option to always show action buttons
   ///
   /// In en, this message translates to:
