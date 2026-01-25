@@ -88,6 +88,27 @@ class SystemInfoService {
       return {};
     }
   }
+
+  /// Get top CPU consuming processes
+  /// Returns a list of maps with 'name', 'pid', and 'cpu' keys
+  static Future<List<Map<String, dynamic>>> getTopCpuProcesses({
+    int limit = 5,
+  }) async {
+    try {
+      final result = await _channel.invokeMethod<List>('getTopCpuProcesses', {
+        'limit': limit,
+      });
+      if (result != null) {
+        return result
+            .map((item) => Map<String, dynamic>.from(item as Map))
+            .toList();
+      }
+      return [];
+    } catch (e) {
+      debugPrint('Failed to get top CPU processes: $e');
+      return [];
+    }
+  }
 }
 
 /// Widget that displays a single system stat

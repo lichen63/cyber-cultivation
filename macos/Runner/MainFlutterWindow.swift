@@ -106,6 +106,9 @@ class MainFlutterWindow: NSWindow {
             result(systemInfoHandler.getNetworkDownload())
         case "getAllStats":
             result(systemInfoHandler.getAllStats())
+        case "getTopCpuProcesses":
+            let limit = (call.arguments as? [String: Any])?["limit"] as? Int ?? 5
+            result(systemInfoHandler.getTopCpuProcesses(limit: limit))
         default:
             result(FlutterMethodNotImplemented)
         }

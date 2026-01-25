@@ -363,4 +363,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get menuBarExit => 'Exit';
+
+  @override
+  String get cpuPopupHeaderProcess => 'Process';
+
+  @override
+  String get cpuPopupHeaderUsage => 'Usage';
 }

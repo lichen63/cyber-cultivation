@@ -478,5 +478,13 @@
     "menuBarExit": "Exit",
     "@menuBarExit": {
         "description": "Menu bar popup item to exit the application"
+    },
+    "cpuPopupHeaderProcess": "Process",
+    "@cpuPopupHeaderProcess": {
+        "description": "Column header for process name in CPU popup"
+    },
+    "cpuPopupHeaderUsage": "Usage",
+    "@cpuPopupHeaderUsage": {
+        "description": "Column header for CPU usage in CPU popup"
     }
 }

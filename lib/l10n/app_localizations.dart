@@ -781,6 +781,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Exit'**
   String get menuBarExit;
+
+  /// Column header for process name in CPU popup
+  ///
+  /// In en, this message translates to:
+  /// **'Process'**
+  String get cpuPopupHeaderProcess;
+
+  /// Column header for CPU usage in CPU popup
+  ///
+  /// In en, this message translates to:
+  /// **'Usage'**
+  String get cpuPopupHeaderUsage;
 }
 
 class _AppLocalizationsDelegate

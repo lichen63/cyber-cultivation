@@ -358,4 +358,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get menuBarExit => '退出';
+
+  @override
+  String get cpuPopupHeaderProcess => '进程';
+
+  @override
+  String get cpuPopupHeaderUsage => '占用';
 }

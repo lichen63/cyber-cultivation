@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:desktop_multi_window/desktop_multi_window.dart';
@@ -10,7 +11,7 @@ import '../l10n/app_localizations.dart';
 
 /// Constants for menu bar popup
 class MenuBarPopupConstants {
-  static const double popupWidth = 200.0;
+  static const double popupWidth = 280.0;
   static const double popupBorderRadius = 6.0;
   static const double popupPadding = 8.0;
 
@@ -22,9 +23,87 @@ class MenuBarPopupConstants {
   // Content area
   static const double contentMinHeight = 80.0;
 
-  /// Calculate total popup height
+  // CPU processes
+  static const int topProcessesCount = 10;
+  static const double processNameFontSize = 11.0;
+  static const double processRowHeight = 21.0; // Includes vertical padding from InkWell
+  static const double processRowSpacing = 4.0;
+  static const double headerFontSize = 10.0;
+  static const double headerBottomSpacing = 6.0;
+
+  /// Calculate total popup height for default content
   static double get popupHeight {
     return titleBarHeight + contentMinHeight + (popupPadding * 2);
+  }
+
+  /// Calculate popup height for CPU processes
+  static double get cpuPopupHeight {
+    // Header row + spacing + process rows
+    final contentHeight =
+        headerFontSize +
+        headerBottomSpacing +
+        (processRowHeight * topProcessesCount) +
+        (processRowSpacing * (topProcessesCount - 1)) +
+        (popupPadding * 2);
+    return titleBarHeight + contentHeight;
+  }
+}
+
+/// Helper class to get top CPU processes using dart:io
+class CpuProcessHelper {
+  /// Get top CPU consuming processes using the `ps` command
+  static Future<List<Map<String, dynamic>>> getTopCpuProcesses({
+    int limit = 5,
+  }) async {
+    try {
+      final result = await Process.run('/bin/ps', [
+        '-arcwwxo',
+        'pid,pcpu,comm',
+        '-r',
+      ]);
+
+      if (result.exitCode != 0) {
+        return [];
+      }
+
+      final output = result.stdout as String;
+      final processes = <Map<String, dynamic>>[];
+      final lines = output.split('\n');
+
+      // Skip header line
+      for (int i = 1; i < lines.length && processes.length < limit; i++) {
+        final line = lines[i].trim();
+        if (line.isEmpty) continue;
+
+        // Parse: PID %CPU COMMAND
+        final parts = line.split(RegExp(r'\s+'));
+        if (parts.length >= 3) {
+          final pid = int.tryParse(parts[0]);
+          final cpu = double.tryParse(parts[1]);
+          if (pid != null && cpu != null) {
+            // Get the command name (may contain spaces, so join remaining parts)
+            final fullPath = parts.sublist(2).join(' ');
+            // Extract just the app name from path
+            final name = fullPath.split('/').last;
+            processes.add({'pid': pid, 'cpu': cpu, 'name': name});
+          }
+        }
+      }
+
+      return processes;
+    } catch (e) {
+      debugPrint('Failed to get top CPU processes: $e');
+      return [];
+    }
+  }
+
+  /// Open macOS Activity Monitor app
+  static Future<void> openActivityMonitor() async {
+    try {
+      await Process.run('open', ['-a', 'Activity Monitor']);
+    } catch (e) {
+      debugPrint('Failed to open Activity Monitor: $e');
+    }
   }
 }
 
@@ -68,12 +147,15 @@ class _MenuBarPopupWindowState extends State<MenuBarPopupWindow>
     // Get position from args
     final x = (widget.args['x'] as num?)?.toDouble() ?? 0;
     final y = (widget.args['y'] as num?)?.toDouble() ?? 0;
+    final itemId = widget.args['itemId'] as String? ?? '';
+
+    // Calculate popup height based on item type
+    final popupHeight = itemId == 'cpu'
+        ? MenuBarPopupConstants.cpuPopupHeight
+        : MenuBarPopupConstants.popupHeight;
 
     final windowOptions = WindowOptions(
-      size: Size(
-        MenuBarPopupConstants.popupWidth,
-        MenuBarPopupConstants.popupHeight,
-      ),
+      size: Size(MenuBarPopupConstants.popupWidth, popupHeight),
       backgroundColor: Colors.transparent,
       skipTaskbar: true,
       titleBarStyle: TitleBarStyle.hidden,
@@ -144,7 +226,7 @@ class _MenuBarPopupWindowState extends State<MenuBarPopupWindow>
 }
 
 /// The actual content of the popup window
-class _MenuBarPopupContent extends StatelessWidget {
+class _MenuBarPopupContent extends StatefulWidget {
   final String itemId;
   final AppThemeColors themeColors;
   final VoidCallback onClose;
@@ -154,6 +236,35 @@ class _MenuBarPopupContent extends StatelessWidget {
     required this.themeColors,
     required this.onClose,
   });
+
+  @override
+  State<_MenuBarPopupContent> createState() => _MenuBarPopupContentState();
+}
+
+class _MenuBarPopupContentState extends State<_MenuBarPopupContent> {
+  List<Map<String, dynamic>>? _cpuProcesses;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.itemId == 'cpu') {
+      _loadCpuProcesses();
+    }
+  }
+
+  Future<void> _loadCpuProcesses() async {
+    setState(() => _isLoading = true);
+    final processes = await CpuProcessHelper.getTopCpuProcesses(
+      limit: MenuBarPopupConstants.topProcessesCount,
+    );
+    if (mounted) {
+      setState(() {
+        _cpuProcesses = processes;
+        _isLoading = false;
+      });
+    }
+  }
 
   /// Send a command to the main window via WindowController
   Future<void> _sendCommandToMainWindow(String command) async {
@@ -171,7 +282,7 @@ class _MenuBarPopupContent extends StatelessWidget {
   /// Get display title based on itemId
   String _getTitle(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    switch (itemId) {
+    switch (widget.itemId) {
       case 'focus':
         return l10n.menuBarInfoFocus;
       case 'cpu':
@@ -189,7 +300,7 @@ class _MenuBarPopupContent extends StatelessWidget {
       case 'levelExp':
         return l10n.menuBarInfoLevelExp;
       default:
-        return itemId.isNotEmpty ? itemId : 'Menu';
+        return widget.itemId.isNotEmpty ? widget.itemId : 'Menu';
     }
   }
 
@@ -278,7 +389,7 @@ class _MenuBarPopupContent extends StatelessWidget {
                     tooltip: 'Show Window',
                     onTap: () {
                       _sendCommandToMainWindow('showWindow');
-                      onClose();
+                      widget.onClose();
                     },
                   ),
                   const SizedBox(width: 4),
@@ -287,7 +398,7 @@ class _MenuBarPopupContent extends StatelessWidget {
                     tooltip: 'Hide Window',
                     onTap: () {
                       _sendCommandToMainWindow('hideWindow');
-                      onClose();
+                      widget.onClose();
                     },
                   ),
                 ],
@@ -298,7 +409,7 @@ class _MenuBarPopupContent extends StatelessWidget {
                 tooltip: 'Exit Game',
                 onTap: () {
                   _sendCommandToMainWindow('exitApp');
-                  onClose();
+                  widget.onClose();
                 },
                 isDestructive: true,
               ),
@@ -337,7 +448,15 @@ class _MenuBarPopupContent extends StatelessWidget {
   }
 
   Widget _buildContentArea(BuildContext context) {
-    // Placeholder content - to be implemented later
+    switch (widget.itemId) {
+      case 'cpu':
+        return _buildCpuContent(context);
+      default:
+        return _buildPlaceholderContent();
+    }
+  }
+
+  Widget _buildPlaceholderContent() {
     return Container(
       constraints: const BoxConstraints(
         minHeight: MenuBarPopupConstants.contentMinHeight,
@@ -347,6 +466,127 @@ class _MenuBarPopupContent extends StatelessWidget {
         child: Text(
           'Content placeholder',
           style: TextStyle(fontSize: 12, color: Color(0xFF8E8E93)),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCpuContent(BuildContext context) {
+    if (_isLoading) {
+      return Container(
+        constraints: const BoxConstraints(
+          minHeight: MenuBarPopupConstants.contentMinHeight,
+        ),
+        padding: const EdgeInsets.all(MenuBarPopupConstants.popupPadding),
+        child: const Center(
+          child: SizedBox(
+            width: 16,
+            height: 16,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+        ),
+      );
+    }
+
+    final processes = _cpuProcesses ?? [];
+    if (processes.isEmpty) {
+      return Container(
+        constraints: const BoxConstraints(
+          minHeight: MenuBarPopupConstants.contentMinHeight,
+        ),
+        padding: const EdgeInsets.all(MenuBarPopupConstants.popupPadding),
+        child: const Center(
+          child: Text(
+            'No processes found',
+            style: TextStyle(fontSize: 12, color: Color(0xFF8E8E93)),
+          ),
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: MenuBarPopupConstants.popupPadding,
+        vertical: MenuBarPopupConstants.popupPadding / 2,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Column headers
+          _buildColumnHeaders(context),
+          const SizedBox(height: MenuBarPopupConstants.headerBottomSpacing),
+          // Process rows
+          for (int i = 0; i < processes.length; i++) ...[
+            _buildProcessRow(processes[i]),
+            if (i < processes.length - 1) const SizedBox(height: 4),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildColumnHeaders(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            l10n.cpuPopupHeaderProcess,
+            style: const TextStyle(
+              fontSize: MenuBarPopupConstants.headerFontSize,
+              fontWeight: FontWeight.w500,
+              color: Color(0xFF8E8E93),
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          l10n.cpuPopupHeaderUsage,
+          style: const TextStyle(
+            fontSize: MenuBarPopupConstants.headerFontSize,
+            fontWeight: FontWeight.w500,
+            color: Color(0xFF8E8E93),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProcessRow(Map<String, dynamic> process) {
+    final name = process['name'] as String? ?? 'Unknown';
+    final cpu = process['cpu'] as num? ?? 0;
+
+    return InkWell(
+      onTap: () {
+        CpuProcessHelper.openActivityMonitor();
+        widget.onClose();
+      },
+      borderRadius: BorderRadius.circular(4),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 2),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                name,
+                style: const TextStyle(
+                  fontSize: MenuBarPopupConstants.processNameFontSize,
+                  color: Color(0xFF1D1D1F),
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              '${cpu.toStringAsFixed(1)}%',
+              style: const TextStyle(
+                fontSize: MenuBarPopupConstants.processNameFontSize,
+                color: Color(0xFF8E8E93),
+                fontFeatures: [FontFeature.tabularFigures()],
+              ),
+            ),
+          ],
         ),
       ),
     );

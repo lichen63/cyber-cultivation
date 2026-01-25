@@ -207,6 +207,59 @@ class SystemInfoHandler {
     ]
   }
   
+  /// Get top CPU consuming processes
+  /// Returns an array of dictionaries with process info: name, pid, cpu
+  func getTopCpuProcesses(limit: Int = 5) -> [[String: Any]] {
+    let pipe = Pipe()
+    let process = Foundation.Process()
+    process.executableURL = URL(fileURLWithPath: "/bin/ps")
+    process.arguments = ["-arcwwxo", "pid,pcpu,comm", "-r"]
+    process.standardOutput = pipe
+    process.standardError = FileHandle.nullDevice
+    
+    do {
+      try process.run()
+      process.waitUntilExit()
+      
+      let data = pipe.fileHandleForReading.readDataToEndOfFile()
+      guard let output = String(data: data, encoding: .utf8) else {
+        return []
+      }
+      
+      var processes: [[String: Any]] = []
+      let lines = output.components(separatedBy: "\n")
+      
+      // Skip header line
+      for (index, line) in lines.enumerated() {
+        if index == 0 { continue } // Skip header
+        if processes.count >= limit { break }
+        
+        let trimmed = line.trimmingCharacters(in: .whitespaces)
+        if trimmed.isEmpty { continue }
+        
+        // Parse: PID %CPU COMMAND
+        let components = trimmed.split(separator: " ", maxSplits: 2, omittingEmptySubsequences: true)
+        if components.count >= 3 {
+          if let pid = Int(components[0]),
+             let cpu = Double(components[1]) {
+            let name = String(components[2])
+            // Extract just the app name from path
+            let appName = (name as NSString).lastPathComponent
+            processes.append([
+              "pid": pid,
+              "cpu": cpu,
+              "name": appName
+            ])
+          }
+        }
+      }
+      
+      return processes
+    } catch {
+      return []
+    }
+  }
+  
   /// Get battery level and charging status
   /// Returns (level: Int, isCharging: Bool) where level is -1 if no battery
   func getBatteryInfo() -> (level: Int, isCharging: Bool) {
