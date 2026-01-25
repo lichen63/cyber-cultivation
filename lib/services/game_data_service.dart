@@ -10,7 +10,7 @@ class GameDataService {
   static const String _fileName = 'game_save.json';
 
   Future<String> _getFilePath() async {
-    final directory = await getApplicationDocumentsDirectory();
+    final directory = await getApplicationSupportDirectory();
     return '${directory.path}/$_fileName';
   }
 

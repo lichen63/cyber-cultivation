@@ -1,5 +1,6 @@
 import Cocoa
 import IOKit
+import IOKit.ps
 
 class SystemInfoHandler {
   private var previousCpuInfo: host_cpu_load_info?
@@ -191,13 +192,100 @@ class SystemInfoHandler {
     // Update network stats once before getting all stats
     updateNetworkStats()
     
+    // Get battery info
+    let batteryInfo = getBatteryInfo()
+    
     return [
       "cpu": getCpuUsage(),
       "gpu": getGpuUsage(),
       "ram": getRamUsage(),
       "disk": getDiskUsage(),
       "networkUp": lastNetworkUploadSpeed,
-      "networkDown": lastNetworkDownloadSpeed
+      "networkDown": lastNetworkDownloadSpeed,
+      "batteryLevel": batteryInfo.level,
+      "isBatteryCharging": batteryInfo.isCharging
     ]
+  }
+  
+  /// Get top CPU consuming processes
+  /// Returns an array of dictionaries with process info: name, pid, cpu
+  func getTopCpuProcesses(limit: Int = 5) -> [[String: Any]] {
+    let pipe = Pipe()
+    let process = Foundation.Process()
+    process.executableURL = URL(fileURLWithPath: "/bin/ps")
+    process.arguments = ["-arcwwxo", "pid,pcpu,comm", "-r"]
+    process.standardOutput = pipe
+    process.standardError = FileHandle.nullDevice
+    
+    do {
+      try process.run()
+      process.waitUntilExit()
+      
+      let data = pipe.fileHandleForReading.readDataToEndOfFile()
+      guard let output = String(data: data, encoding: .utf8) else {
+        return []
+      }
+      
+      var processes: [[String: Any]] = []
+      let lines = output.components(separatedBy: "\n")
+      
+      // Skip header line
+      for (index, line) in lines.enumerated() {
+        if index == 0 { continue } // Skip header
+        if processes.count >= limit { break }
+        
+        let trimmed = line.trimmingCharacters(in: .whitespaces)
+        if trimmed.isEmpty { continue }
+        
+        // Parse: PID %CPU COMMAND
+        let components = trimmed.split(separator: " ", maxSplits: 2, omittingEmptySubsequences: true)
+        if components.count >= 3 {
+          if let pid = Int(components[0]),
+             let cpu = Double(components[1]) {
+            let name = String(components[2])
+            // Extract just the app name from path
+            let appName = (name as NSString).lastPathComponent
+            processes.append([
+              "pid": pid,
+              "cpu": cpu,
+              "name": appName
+            ])
+          }
+        }
+      }
+      
+      return processes
+    } catch {
+      return []
+    }
+  }
+  
+  /// Get battery level and charging status
+  /// Returns (level: Int, isCharging: Bool) where level is -1 if no battery
+  func getBatteryInfo() -> (level: Int, isCharging: Bool) {
+    guard let powerSourceInfo = IOPSCopyPowerSourcesInfo()?.takeRetainedValue(),
+          let powerSources = IOPSCopyPowerSourcesList(powerSourceInfo)?.takeRetainedValue() as? [CFTypeRef],
+          !powerSources.isEmpty else {
+      // No battery (desktop Mac or error)
+      return (-1, false)
+    }
+    
+    for source in powerSources {
+      if let description = IOPSGetPowerSourceDescription(powerSourceInfo, source)?.takeUnretainedValue() as? [String: Any] {
+        // Check if this is a battery
+        if let type = description[kIOPSTypeKey] as? String,
+           type == kIOPSInternalBatteryType {
+          let currentCapacity = description[kIOPSCurrentCapacityKey] as? Int ?? 0
+          let maxCapacity = description[kIOPSMaxCapacityKey] as? Int ?? 100
+          let isCharging = description[kIOPSIsChargingKey] as? Bool ?? false
+          
+          // Calculate percentage
+          let level = maxCapacity > 0 ? (currentCapacity * 100) / maxCapacity : 0
+          return (level, isCharging)
+        }
+      }
+    }
+    
+    return (-1, false)
   }
 }

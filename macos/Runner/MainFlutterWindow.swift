@@ -3,6 +3,7 @@ import FlutterMacOS
 import QuartzCore
 import ApplicationServices
 import ServiceManagement
+import desktop_multi_window
 
 class MainFlutterWindow: NSWindow {
   private var layerObserver: NSKeyValueObservation?
@@ -14,6 +15,21 @@ class MainFlutterWindow: NSWindow {
     self.setFrame(windowFrame, display: false)
 
     RegisterGeneratedPlugins(registry: flutterViewController)
+    
+    // Register callback for desktop_multi_window sub-windows
+    FlutterMultiWindowPlugin.setOnWindowCreatedCallback { controller in
+      // Register plugins for the new window
+      RegisterGeneratedPlugins(registry: controller)
+      
+      // Configure sub-window for transparency (needed for popup windows)
+      // Use multiple delayed attempts like main window to catch Metal layer
+      let delays: [TimeInterval] = [0.01, 0.05, 0.1, 0.2, 0.3]
+      delays.forEach { delay in
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+          MainFlutterWindow.configureSubWindowTransparency(controller: controller)
+        }
+      }
+    }
 
     let keyEventChannel = FlutterEventChannel(name: "com.lichen63.cyber_cultivation/key_events", binaryMessenger: flutterViewController.engine.binaryMessenger)
     keyEventChannel.setStreamHandler(KeyMonitorStreamHandler())
@@ -90,6 +106,9 @@ class MainFlutterWindow: NSWindow {
             result(systemInfoHandler.getNetworkDownload())
         case "getAllStats":
             result(systemInfoHandler.getAllStats())
+        case "getTopCpuProcesses":
+            let limit = (call.arguments as? [String: Any])?["limit"] as? Int ?? 5
+            result(systemInfoHandler.getTopCpuProcesses(limit: limit))
         default:
             result(FlutterMethodNotImplemented)
         }
@@ -191,5 +210,50 @@ class MainFlutterWindow: NSWindow {
     
     // Process all sublayers recursively
     layer.sublayers?.forEach { configureSublayers($0) }
+  }
+  
+  /// Configure transparency for sub-windows created by desktop_multi_window
+  static func configureSubWindowTransparency(controller: FlutterViewController) {
+    guard let window = controller.view.window else { return }
+    
+    // Configure window
+    window.isOpaque = false
+    window.backgroundColor = .clear
+    window.hasShadow = true
+    
+    // Configure content view
+    if let contentView = window.contentView {
+      contentView.wantsLayer = true
+      contentView.layer?.backgroundColor = .clear
+      contentView.layer?.isOpaque = false
+    }
+    
+    // Configure Flutter view
+    let flutterView = controller.view
+    flutterView.wantsLayer = true
+    
+    guard let layer = flutterView.layer else { return }
+    
+    // Configure the main layer
+    layer.backgroundColor = .clear
+    layer.isOpaque = false
+    
+    // Recursively configure all sublayers (including Metal layers)
+    configureSubWindowSublayers(layer)
+  }
+  
+  private static func configureSubWindowSublayers(_ layer: CALayer) {
+    layer.backgroundColor = .clear
+    layer.isOpaque = false
+    
+    // Special handling for Metal layers
+    if let metalLayer = layer as? CAMetalLayer {
+      metalLayer.isOpaque = false
+      metalLayer.backgroundColor = .clear
+      metalLayer.framebufferOnly = false
+    }
+    
+    // Process all sublayers recursively
+    layer.sublayers?.forEach { configureSubWindowSublayers($0) }
   }
 }

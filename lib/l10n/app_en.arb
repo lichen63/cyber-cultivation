@@ -48,6 +48,10 @@
     "@pomodoroStartButtonText": {
         "description": "Text for the start button"
     },
+    "pomodoroSaveAsDefaultButtonText": "Save as Default",
+    "@pomodoroSaveAsDefaultButtonText": {
+        "description": "Text for saving current pomodoro values as default"
+    },
     "cancelButtonText": "Cancel",
     "@cancelButtonText": {
         "description": "Text for the cancel button"
@@ -91,6 +95,18 @@
     "relaxState": "Relax",
     "@relaxState": {
         "description": "Label for relax state"
+    },
+    "idleState": "Idle",
+    "@idleState": {
+        "description": "Label for idle state"
+    },
+    "focusPopupStatus": "Status",
+    "@focusPopupStatus": {
+        "description": "Label for focus popup status"
+    },
+    "focusPopupTimeRemaining": "Time Remaining",
+    "@focusPopupTimeRemaining": {
+        "description": "Label for focus popup time remaining"
     },
     "alwaysShowActionsText": "Always Show Actions",
     "@alwaysShowActionsText": {
@@ -415,6 +431,10 @@
     "@menuBarInfoNetwork": {
         "description": "Network speed info option"
     },
+    "menuBarInfoBattery": "Battery",
+    "@menuBarInfoBattery": {
+        "description": "Battery info option"
+    },
     "menuBarInfoKeyboard": "Keyboard",
     "@menuBarInfoKeyboard": {
         "description": "Keyboard tracking info option"
@@ -454,5 +474,49 @@
     "menuBarLevelText": "Lv.",
     "@menuBarLevelText": {
         "description": "Level label in menu bar"
+    },
+    "openSaveFolderText": "Save Data Location",
+    "@openSaveFolderText": {
+        "description": "Button to open the folder containing save data"
+    },
+    "menuBarShowWindow": "Show Window",
+    "@menuBarShowWindow": {
+        "description": "Menu bar popup item to show the main window"
+    },
+    "menuBarHideWindow": "Hide Window",
+    "@menuBarHideWindow": {
+        "description": "Menu bar popup item to hide the main window"
+    },
+    "menuBarExit": "Exit",
+    "@menuBarExit": {
+        "description": "Menu bar popup item to exit the application"
+    },
+    "cpuPopupHeaderProcess": "Process",
+    "@cpuPopupHeaderProcess": {
+        "description": "Column header for process name in CPU popup"
+    },
+    "cpuPopupHeaderPid": "PID",
+    "@cpuPopupHeaderPid": {
+        "description": "Column header for process ID in popup"
+    },
+    "cpuPopupHeaderUsage": "Usage",
+    "@cpuPopupHeaderUsage": {
+        "description": "Column header for CPU usage in CPU popup"
+    },
+    "diskPopupHeaderRead": "Read",
+    "@diskPopupHeaderRead": {
+        "description": "Column header for disk read in popup"
+    },
+    "diskPopupHeaderWrite": "Write",
+    "@diskPopupHeaderWrite": {
+        "description": "Column header for disk write in popup"
+    },
+    "networkPopupHeaderDownload": "↓Down",
+    "@networkPopupHeaderDownload": {
+        "description": "Column header for network download in popup"
+    },
+    "networkPopupHeaderUpload": "↑Up",
+    "@networkPopupHeaderUpload": {
+        "description": "Column header for network upload in popup"
     }
 }

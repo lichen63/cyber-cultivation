@@ -46,8 +46,9 @@
 - [x] Add hide window in context menu and system context menu
 - [x] Handle the exception when game_save is corrupted
 - [x] Customize refresh interval of system stats info
-- [ ] Can customize default focus time
-- [ ] Customize sub page info when clicking other items in menu bar
+- [x] Add battery info in system menu bar
+- [x] Can customize default focus time
+- [x] Customize sub page info when clicking other items in menu bar
 - [ ] Add windows platform support
 - [ ] Add unix-like platform support
 - [ ] Let player customize the character image

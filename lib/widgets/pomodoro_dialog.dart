@@ -9,6 +9,7 @@ class PomodoroDialog extends StatefulWidget {
   final int initialLoops;
   final AppThemeColors themeColors;
   final Function(int, int, int) onStart;
+  final Function(int, int, int)? onSaveAsDefault;
 
   const PomodoroDialog({
     super.key,
@@ -17,6 +18,7 @@ class PomodoroDialog extends StatefulWidget {
     required this.initialLoops,
     required this.themeColors,
     required this.onStart,
+    this.onSaveAsDefault,
   });
 
   @override
@@ -37,12 +39,15 @@ class _PomodoroDialogState extends State<PomodoroDialog> {
   @override
   void initState() {
     super.initState();
-    _durationController =
-        TextEditingController(text: widget.initialDuration.toString());
-    _relaxController =
-        TextEditingController(text: widget.initialRelax.toString());
-    _loopsController =
-        TextEditingController(text: widget.initialLoops.toString());
+    _durationController = TextEditingController(
+      text: widget.initialDuration.toString(),
+    );
+    _relaxController = TextEditingController(
+      text: widget.initialRelax.toString(),
+    );
+    _loopsController = TextEditingController(
+      text: widget.initialLoops.toString(),
+    );
   }
 
   @override
@@ -53,20 +58,42 @@ class _PomodoroDialogState extends State<PomodoroDialog> {
     super.dispose();
   }
 
-  void _validateAndStart() {
+  /// Validates input values and returns parsed values if valid, null otherwise
+  (int?, int?, int?) _validateInputs() {
     final l10n = AppLocalizations.of(context)!;
     final duration = int.tryParse(_durationController.text);
     final relax = int.tryParse(_relaxController.text);
     final loops = int.tryParse(_loopsController.text);
 
     setState(() {
-      _durationError = (duration == null || duration <= 0) ? l10n.invalidInputErrorText : null;
-      _relaxError = (relax == null || relax <= 0) ? l10n.invalidInputErrorText : null;
-      _loopsError = (loops == null || loops <= 0) ? l10n.invalidInputErrorText : null;
+      _durationError = (duration == null || duration <= 0)
+          ? l10n.invalidInputErrorText
+          : null;
+      _relaxError = (relax == null || relax <= 0)
+          ? l10n.invalidInputErrorText
+          : null;
+      _loopsError = (loops == null || loops <= 0)
+          ? l10n.invalidInputErrorText
+          : null;
     });
 
     if (_durationError == null && _relaxError == null && _loopsError == null) {
-      widget.onStart(duration!, relax!, loops!);
+      return (duration, relax, loops);
+    }
+    return (null, null, null);
+  }
+
+  void _validateAndStart() {
+    final (duration, relax, loops) = _validateInputs();
+    if (duration != null && relax != null && loops != null) {
+      widget.onStart(duration, relax, loops);
+    }
+  }
+
+  void _saveAsDefault() {
+    final (duration, relax, loops) = _validateInputs();
+    if (duration != null && relax != null && loops != null) {
+      widget.onSaveAsDefault?.call(duration, relax, loops);
     }
   }
 
@@ -138,45 +165,62 @@ class _PomodoroDialogState extends State<PomodoroDialog> {
       actions: [
         TextButton(
           style: ButtonStyle(
-            overlayColor: WidgetStateProperty.resolveWith<Color?>(
-              (Set<WidgetState> states) {
-                if (states.contains(WidgetState.hovered)) {
-                  return _colors.inactive.withValues(alpha: 0.2);
-                }
-                if (states.contains(WidgetState.pressed)) {
-                  return _colors.inactive.withValues(alpha: 0.4);
-                }
-                return null;
-              },
-            ),
-            foregroundColor:
-                WidgetStateProperty.all<Color>(_colors.inactive),
+            overlayColor: WidgetStateProperty.resolveWith<Color?>((
+              Set<WidgetState> states,
+            ) {
+              if (states.contains(WidgetState.hovered)) {
+                return _colors.inactive.withValues(alpha: 0.2);
+              }
+              if (states.contains(WidgetState.pressed)) {
+                return _colors.inactive.withValues(alpha: 0.4);
+              }
+              return null;
+            }),
+            foregroundColor: WidgetStateProperty.all<Color>(_colors.inactive),
           ),
           onPressed: () => Navigator.of(context).pop(),
           child: Text(l10n.cancelButtonText),
         ),
-        TextButton(
-          style: ButtonStyle(
-            overlayColor: WidgetStateProperty.resolveWith<Color?>(
-              (Set<WidgetState> states) {
+        if (widget.onSaveAsDefault != null)
+          TextButton(
+            style: ButtonStyle(
+              overlayColor: WidgetStateProperty.resolveWith<Color?>((
+                Set<WidgetState> states,
+              ) {
                 if (states.contains(WidgetState.hovered)) {
-                  return _colors.accent.withValues(alpha: 0.2);
+                  return _colors.accentSecondary.withValues(alpha: 0.2);
                 }
                 if (states.contains(WidgetState.pressed)) {
-                  return _colors.accent.withValues(alpha: 0.4);
+                  return _colors.accentSecondary.withValues(alpha: 0.4);
                 }
                 return null;
-              },
+              }),
+              foregroundColor: WidgetStateProperty.all<Color>(
+                _colors.accentSecondary,
+              ),
             ),
-            foregroundColor:
-                WidgetStateProperty.all<Color>(_colors.accent),
+            onPressed: _saveAsDefault,
+            child: Text(l10n.pomodoroSaveAsDefaultButtonText),
+          ),
+        TextButton(
+          style: ButtonStyle(
+            overlayColor: WidgetStateProperty.resolveWith<Color?>((
+              Set<WidgetState> states,
+            ) {
+              if (states.contains(WidgetState.hovered)) {
+                return _colors.accent.withValues(alpha: 0.2);
+              }
+              if (states.contains(WidgetState.pressed)) {
+                return _colors.accent.withValues(alpha: 0.4);
+              }
+              return null;
+            }),
+            foregroundColor: WidgetStateProperty.all<Color>(_colors.accent),
           ),
           onPressed: () {
             _validateAndStart();
           },
-          child: Text(
-            l10n.pomodoroStartButtonText,
-          ),
+          child: Text(l10n.pomodoroStartButtonText),
         ),
       ],
     );
@@ -201,8 +245,10 @@ class _PomodoroDialogState extends State<PomodoroDialog> {
           child: Row(
             children: [
               IconButton(
-                icon: Icon(Icons.remove_circle_outline,
-                    color: _colors.primaryText),
+                icon: Icon(
+                  Icons.remove_circle_outline,
+                  color: _colors.primaryText,
+                ),
                 onPressed: () {
                   final currentValue = int.tryParse(controller.text) ?? 0;
                   if (currentValue > 1) {
@@ -233,14 +279,14 @@ class _PomodoroDialogState extends State<PomodoroDialog> {
                     decoration: InputDecoration(
                       isDense: true,
                       contentPadding: const EdgeInsets.symmetric(
-                          vertical: 8.0, horizontal: 4.0),
+                        vertical: 8.0,
+                        horizontal: 4.0,
+                      ),
                       enabledBorder: UnderlineInputBorder(
-                        borderSide:
-                            BorderSide(color: _colors.secondaryText),
+                        borderSide: BorderSide(color: _colors.secondaryText),
                       ),
                       focusedBorder: UnderlineInputBorder(
-                        borderSide:
-                            BorderSide(color: _colors.accent),
+                        borderSide: BorderSide(color: _colors.accent),
                       ),
                       errorText: errorText,
                     ),
@@ -248,8 +294,10 @@ class _PomodoroDialogState extends State<PomodoroDialog> {
                 ),
               ),
               IconButton(
-                icon:
-                    Icon(Icons.add_circle_outline, color: _colors.primaryText),
+                icon: Icon(
+                  Icons.add_circle_outline,
+                  color: _colors.primaryText,
+                ),
                 onPressed: () {
                   final currentValue = int.tryParse(controller.text) ?? 0;
                   controller.text = (currentValue + 1).toString();

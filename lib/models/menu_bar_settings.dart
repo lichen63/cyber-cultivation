@@ -12,6 +12,7 @@ enum MenuBarInfoType {
   keyboard,
   mouse,
   systemTime,
+  battery,
 }
 
 /// Settings for menu bar display

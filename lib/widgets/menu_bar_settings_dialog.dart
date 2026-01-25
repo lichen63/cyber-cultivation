@@ -1,19 +1,23 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../constants.dart';
 import '../l10n/app_localizations.dart';
 import '../models/menu_bar_settings.dart';
+import '../services/menu_bar_info_service.dart';
 
 /// Dialog for configuring menu bar info display settings
 class MenuBarSettingsDialog extends StatefulWidget {
   final MenuBarSettings settings;
   final AppThemeColors themeColors;
   final ValueChanged<MenuBarSettings> onSettingsChanged;
+  final MenuBarInfoService? menuBarInfoService;
 
   const MenuBarSettingsDialog({
     super.key,
     required this.settings,
     required this.themeColors,
     required this.onSettingsChanged,
+    this.menuBarInfoService,
   });
 
   @override
@@ -22,6 +26,7 @@ class MenuBarSettingsDialog extends StatefulWidget {
 
 class _MenuBarSettingsDialogState extends State<MenuBarSettingsDialog> {
   late MenuBarSettings _settings;
+  bool _isOnCooldown = false; // Prevents rapid toggling
 
   AppThemeColors get _colors => widget.themeColors;
 
@@ -32,8 +37,24 @@ class _MenuBarSettingsDialogState extends State<MenuBarSettingsDialog> {
   }
 
   void _updateSettings(MenuBarSettings newSettings) {
-    setState(() => _settings = newSettings);
+    // Prevent updates during cooldown
+    if (_isOnCooldown) return;
+
+    setState(() {
+      _settings = newSettings;
+      _isOnCooldown = true;
+    });
     widget.onSettingsChanged(newSettings);
+
+    // Reset cooldown after delay
+    Future.delayed(
+      const Duration(milliseconds: MenuBarConstants.toggleCooldownMs),
+      () {
+        if (mounted) {
+          setState(() => _isOnCooldown = false);
+        }
+      },
+    );
   }
 
   @override
@@ -111,6 +132,14 @@ class _MenuBarSettingsDialogState extends State<MenuBarSettingsDialog> {
               title: l10n.menuBarInfoNetwork,
               type: MenuBarInfoType.network,
             ),
+            _buildCheckboxTile(
+              title: l10n.menuBarInfoBattery,
+              type: MenuBarInfoType.battery,
+            ),
+
+            // Battery simulation controls (debug mode only)
+            if (kDebugMode && widget.menuBarInfoService != null)
+              _buildBatterySimulationControls(),
 
             const SizedBox(height: 16),
 
@@ -160,25 +189,30 @@ class _MenuBarSettingsDialogState extends State<MenuBarSettingsDialog> {
     required bool value,
     required ValueChanged<bool> onChanged,
   }) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          title,
-          style: TextStyle(
-            color: _colors.primaryText,
-            fontSize: AppConstants.fontSizeDialogContent,
+    // Reduce opacity during cooldown to indicate disabled state
+    final opacity = _isOnCooldown ? 0.5 : 1.0;
+    return Opacity(
+      opacity: opacity,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              color: _colors.primaryText,
+              fontSize: AppConstants.fontSizeDialogContent,
+            ),
           ),
-        ),
-        Switch(
-          value: value,
-          onChanged: onChanged,
-          activeThumbColor: _colors.accent,
-          activeTrackColor: _colors.accent.withValues(alpha: 0.5),
-          inactiveThumbColor: _colors.inactive,
-          inactiveTrackColor: _colors.inactive.withValues(alpha: 0.5),
-        ),
-      ],
+          Switch(
+            value: value,
+            onChanged: _isOnCooldown ? null : onChanged,
+            activeThumbColor: _colors.accent,
+            activeTrackColor: _colors.accent.withValues(alpha: 0.5),
+            inactiveThumbColor: _colors.inactive,
+            inactiveTrackColor: _colors.inactive.withValues(alpha: 0.5),
+          ),
+        ],
+      ),
     );
   }
 
@@ -187,35 +221,143 @@ class _MenuBarSettingsDialogState extends State<MenuBarSettingsDialog> {
     required MenuBarInfoType type,
   }) {
     final isEnabled = _settings.isEnabled(type);
-    return InkWell(
-      onTap: () => _updateSettings(_settings.toggleType(type)),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 24,
-              height: 24,
-              child: Checkbox(
-                value: isEnabled,
-                onChanged: (_) => _updateSettings(_settings.toggleType(type)),
-                activeColor: _colors.accent,
-                checkColor: _colors.primaryText,
-                side: BorderSide(color: _colors.inactive),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                title,
-                style: TextStyle(
-                  color: _colors.primaryText,
-                  fontSize: AppConstants.fontSizeDialogContent,
+    // Reduce opacity during cooldown to indicate disabled state
+    final opacity = _isOnCooldown ? 0.5 : 1.0;
+    return Opacity(
+      opacity: opacity,
+      child: InkWell(
+        onTap: _isOnCooldown
+            ? null
+            : () => _updateSettings(_settings.toggleType(type)),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 24,
+                height: 24,
+                child: Checkbox(
+                  value: isEnabled,
+                  onChanged: _isOnCooldown
+                      ? null
+                      : (_) => _updateSettings(_settings.toggleType(type)),
+                  activeColor: _colors.accent,
+                  checkColor: _colors.primaryText,
+                  side: BorderSide(color: _colors.inactive),
                 ),
               ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    color: _colors.primaryText,
+                    fontSize: AppConstants.fontSizeDialogContent,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Build battery simulation controls for debug mode
+  Widget _buildBatterySimulationControls() {
+    final service = widget.menuBarInfoService!;
+    final isSimulating = service.isSimulatingBattery;
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 36, top: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                '🔧 Simulate Battery',
+                style: TextStyle(
+                  color: _colors.secondaryText,
+                  fontSize: AppConstants.fontSizeDialogContent - 1,
+                ),
+              ),
+              const Spacer(),
+              Switch(
+                value: isSimulating,
+                onChanged: (_) {
+                  service.toggleBatterySimulation();
+                  setState(() {});
+                },
+                activeThumbColor: _colors.accent,
+                activeTrackColor: _colors.accent.withValues(alpha: 0.5),
+                inactiveThumbColor: _colors.inactive,
+                inactiveTrackColor: _colors.inactive.withValues(alpha: 0.5),
+              ),
+            ],
+          ),
+          if (isSimulating) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Text(
+                  'Level:',
+                  style: TextStyle(
+                    color: _colors.secondaryText,
+                    fontSize: AppConstants.fontSizeDialogContent - 1,
+                  ),
+                ),
+                Expanded(
+                  child: Slider(
+                    value: service.simulatedBatteryLevel.toDouble(),
+                    min: 0,
+                    max: 100,
+                    divisions: 20,
+                    label: '${service.simulatedBatteryLevel}%',
+                    activeColor: _colors.accent,
+                    onChanged: (value) {
+                      service.setSimulatedBattery(level: value.toInt());
+                      setState(() {});
+                    },
+                  ),
+                ),
+                SizedBox(
+                  width: 40,
+                  child: Text(
+                    '${service.simulatedBatteryLevel}%',
+                    style: TextStyle(
+                      color: _colors.secondaryText,
+                      fontSize: AppConstants.fontSizeDialogContent - 1,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                Text(
+                  'Charging:',
+                  style: TextStyle(
+                    color: _colors.secondaryText,
+                    fontSize: AppConstants.fontSizeDialogContent - 1,
+                  ),
+                ),
+                const Spacer(),
+                Switch(
+                  value: service.simulatedBatteryCharging,
+                  onChanged: (value) {
+                    service.setSimulatedBattery(isCharging: value);
+                    setState(() {});
+                  },
+                  activeThumbColor: _colors.accent,
+                  activeTrackColor: _colors.accent.withValues(alpha: 0.5),
+                  inactiveThumbColor: _colors.inactive,
+                  inactiveTrackColor: _colors.inactive.withValues(alpha: 0.5),
+                ),
+              ],
             ),
           ],
-        ),
+        ],
       ),
     );
   }
