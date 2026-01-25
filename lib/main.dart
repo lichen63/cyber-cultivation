@@ -185,7 +185,8 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
     // The top of the button in macOS coords is screenRect.bottom
     // In top-left coords, the top of popup should be just below the button:
     // popupTop = screenHeight - screenRect.bottom (this puts popup top at button's bottom in top-left)
-    final popupY = screenHeight - screenRect.bottom;
+    // Subtract offset to move popup higher (closer to menu bar)
+    final popupY = screenHeight - screenRect.bottom - 10;
 
     // Create the popup window with position, theme and locale info
     // The popup window will configure itself using window_manager

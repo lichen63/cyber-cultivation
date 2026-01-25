@@ -10,25 +10,21 @@ import '../l10n/app_localizations.dart';
 
 /// Constants for menu bar popup
 class MenuBarPopupConstants {
-  static const double popupWidth = 160.0;
-  static const double popupItemHeight = 22.0;
+  static const double popupWidth = 200.0;
   static const double popupBorderRadius = 6.0;
-  static const double popupPadding = 5.0;
-  static const double popupItemPadding = 10.0;
-  static const double popupIconSize = 14.0;
-  static const double popupFontSize = 13.0;
-  static const double popupSeparatorHeight = 1.0;
-  static const double popupSeparatorMargin = 4.0;
+  static const double popupPadding = 8.0;
 
-  /// Calculate total popup height based on content
-  /// Adding extra padding for border and safety margin
+  // Title bar
+  static const double titleBarHeight = 28.0;
+  static const double titleBarIconSize = 14.0;
+  static const double titleFontSize = 12.0;
+
+  // Content area
+  static const double contentMinHeight = 80.0;
+
+  /// Calculate total popup height
   static double get popupHeight {
-    // 3 menu items + 1 separator + padding + border + safety margin
-    return (popupItemHeight * 3) +
-        popupSeparatorHeight +
-        (popupSeparatorMargin * 2) +
-        (popupPadding * 2) +
-        4.0; // Safety margin for border and rounding
+    return titleBarHeight + contentMinHeight + (popupPadding * 2);
   }
 }
 
@@ -131,7 +127,12 @@ class _MenuBarPopupWindowState extends State<MenuBarPopupWindow>
         ),
         canvasColor: Colors.transparent,
       ),
+      builder: (context, child) {
+        // Ensure fully transparent background
+        return Container(color: Colors.transparent, child: child);
+      },
       home: _MenuBarPopupContent(
+        itemId: widget.args['itemId'] as String? ?? '',
         themeColors: _themeColors,
         onClose: _closePopup,
       ),
@@ -141,34 +142,56 @@ class _MenuBarPopupWindowState extends State<MenuBarPopupWindow>
 
 /// The actual content of the popup window
 class _MenuBarPopupContent extends StatelessWidget {
+  final String itemId;
   final AppThemeColors themeColors;
   final VoidCallback onClose;
 
   const _MenuBarPopupContent({
+    required this.itemId,
     required this.themeColors,
     required this.onClose,
   });
 
   /// Send a command to the main window via WindowController
-  /// The main window has windowId "0" (or we can get it from WindowController.getAll())
   Future<void> _sendCommandToMainWindow(String command) async {
     try {
-      // Get all window controllers and find the main window (first one, or id "0")
       final controllers = await WindowController.getAll();
       if (controllers.isNotEmpty) {
-        // The main window is typically the first one created
         final mainWindowController = controllers.first;
         await mainWindowController.invokeMethod(command);
       }
     } catch (e) {
-      // Ignore errors - the command might fail if window is already closed
+      // Ignore errors
+    }
+  }
+
+  /// Get display title based on itemId
+  String _getTitle(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (itemId) {
+      case 'focus':
+        return l10n.menuBarInfoFocus;
+      case 'cpu':
+        return l10n.menuBarInfoCpu;
+      case 'ram':
+        return l10n.menuBarInfoRam;
+      case 'network':
+        return l10n.menuBarInfoNetwork;
+      case 'gpu':
+        return l10n.menuBarInfoGpu;
+      case 'disk':
+        return l10n.menuBarInfoDisk;
+      case 'todo':
+        return l10n.menuBarInfoTodo;
+      case 'levelExp':
+        return l10n.menuBarInfoLevelExp;
+      default:
+        return itemId.isNotEmpty ? itemId : 'Menu';
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Center(
@@ -183,7 +206,6 @@ class _MenuBarPopupContent extends StatelessWidget {
               child: Container(
                 width: MenuBarPopupConstants.popupWidth,
                 decoration: BoxDecoration(
-                  // Native macOS menu uses a light translucent background
                   color: const Color(0xF0F6F6F6),
                   borderRadius: BorderRadius.circular(
                     MenuBarPopupConstants.popupBorderRadius,
@@ -201,38 +223,15 @@ class _MenuBarPopupContent extends StatelessWidget {
                     ),
                   ],
                 ),
-                padding: const EdgeInsets.symmetric(
-                  vertical: MenuBarPopupConstants.popupPadding,
-                ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    _buildMenuItem(
-                      icon: Icons.open_in_new,
-                      label: l10n.menuBarShowWindow,
-                      onTap: () {
-                        _sendCommandToMainWindow('showWindow');
-                        onClose();
-                      },
-                    ),
-                    _buildMenuItem(
-                      icon: Icons.visibility_off_outlined,
-                      label: l10n.menuBarHideWindow,
-                      onTap: () {
-                        _sendCommandToMainWindow('hideWindow');
-                        onClose();
-                      },
-                    ),
-                    _buildSeparator(),
-                    _buildMenuItem(
-                      icon: Icons.exit_to_app,
-                      label: l10n.menuBarExit,
-                      onTap: () {
-                        _sendCommandToMainWindow('exitApp');
-                        onClose();
-                      },
-                      isDestructive: true,
-                    ),
+                    // Title bar
+                    _buildTitleBar(context),
+                    // Separator
+                    Container(height: 0.5, color: const Color(0x20000000)),
+                    // Content area placeholder
+                    _buildContentArea(context),
                   ],
                 ),
               ),
@@ -243,63 +242,110 @@ class _MenuBarPopupContent extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuItem({
+  Widget _buildTitleBar(BuildContext context) {
+    return Container(
+      height: MenuBarPopupConstants.titleBarHeight,
+      padding: const EdgeInsets.symmetric(
+        horizontal: MenuBarPopupConstants.popupPadding,
+      ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // Center: Title (in Stack so it's truly centered)
+          Center(
+            child: Text(
+              _getTitle(context),
+              style: const TextStyle(
+                fontSize: MenuBarPopupConstants.titleFontSize,
+                fontWeight: FontWeight.w500,
+                color: Color(0xFF1D1D1F),
+              ),
+            ),
+          ),
+          // Left and Right icons positioned absolutely
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Left: Show/Hide window icons
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildTitleBarIcon(
+                    icon: Icons.visibility_outlined,
+                    tooltip: 'Show Window',
+                    onTap: () {
+                      _sendCommandToMainWindow('showWindow');
+                      onClose();
+                    },
+                  ),
+                  const SizedBox(width: 4),
+                  _buildTitleBarIcon(
+                    icon: Icons.visibility_off_outlined,
+                    tooltip: 'Hide Window',
+                    onTap: () {
+                      _sendCommandToMainWindow('hideWindow');
+                      onClose();
+                    },
+                  ),
+                ],
+              ),
+              // Right: Exit icon
+              _buildTitleBarIcon(
+                icon: Icons.power_settings_new,
+                tooltip: 'Exit Game',
+                onTap: () {
+                  _sendCommandToMainWindow('exitApp');
+                  onClose();
+                },
+                isDestructive: true,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTitleBarIcon({
     required IconData icon,
-    required String label,
+    required String tooltip,
     required VoidCallback onTap,
     bool isDestructive = false,
   }) {
-    // Native macOS menu uses black text, red for destructive actions
     final color = isDestructive
         ? const Color(0xFFFF3B30)
-        : const Color(0xFF1D1D1F);
+        : const Color(0xFF6E6E73);
 
-    return Material(
-      color: Colors.transparent,
+    return Tooltip(
+      message: tooltip,
       child: InkWell(
         onTap: onTap,
-        hoverColor: const Color(0xFF007AFF), // macOS selection blue
         borderRadius: BorderRadius.circular(4),
-        child: Ink(
-          child: Container(
-            height: MenuBarPopupConstants.popupItemHeight,
-            padding: const EdgeInsets.symmetric(
-              horizontal: MenuBarPopupConstants.popupItemPadding,
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  icon,
-                  size: MenuBarPopupConstants.popupIconSize,
-                  color: color,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    label,
-                    style: TextStyle(
-                      fontSize: MenuBarPopupConstants.popupFontSize,
-                      color: color,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+        child: Padding(
+          padding: const EdgeInsets.all(4),
+          child: Icon(
+            icon,
+            size: MenuBarPopupConstants.titleBarIconSize,
+            color: color,
           ),
         ),
       ),
     );
   }
 
-  Widget _buildSeparator() {
+  Widget _buildContentArea(BuildContext context) {
+    // Placeholder content - to be implemented later
     return Container(
-      height: MenuBarPopupConstants.popupSeparatorHeight,
-      margin: const EdgeInsets.symmetric(
-        vertical: MenuBarPopupConstants.popupSeparatorMargin,
-        horizontal: MenuBarPopupConstants.popupItemPadding,
+      constraints: const BoxConstraints(
+        minHeight: MenuBarPopupConstants.contentMinHeight,
       ),
-      color: const Color(0x20000000), // Light gray separator like macOS
+      padding: const EdgeInsets.all(MenuBarPopupConstants.popupPadding),
+      child: const Center(
+        child: Text(
+          'Content placeholder',
+          style: TextStyle(fontSize: 12, color: Color(0xFF8E8E93)),
+        ),
+      ),
     );
   }
 }
