@@ -130,6 +130,8 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
   bool _isMenuBarUpdating = false; // Lock to prevent concurrent updates
   List<MenuBarItem>?
   _pendingMenuBarItems; // Store latest pending items if update is in progress
+  Set<String> _currentMenuBarItemIds =
+      {}; // Track current item IDs for ordering
 
   AppThemeColors get _themeColors => AppThemeColors.fromMode(_themeMode);
 
@@ -291,7 +293,19 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
         final shouldShowTrayIcon =
             _menuBarSettings.showTrayIcon && _trayIconPath.isNotEmpty;
 
-        // Only destroy/recreate if not yet positioned correctly
+        // Check if we're adding new items (same logic as Swift side)
+        // When new items are added, Swift recreates ALL items, so we need to
+        // reposition the tray icon to maintain correct left-to-right order
+        final newItemIds = items.map((item) => item.id).toSet();
+        final hasNewItems = newItemIds
+            .difference(_currentMenuBarItemIds)
+            .isNotEmpty;
+        if (hasNewItems) {
+          _trayIconPositioned = false; // Reset so tray icon gets repositioned
+        }
+        _currentMenuBarItemIds = newItemIds;
+
+        // Destroy tray icon if not yet positioned correctly
         if (shouldShowTrayIcon && !_trayIconPositioned) {
           await trayManager.destroy();
         }

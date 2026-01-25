@@ -487,7 +487,7 @@ class MenuBarConstants {
   static const double settingsDialogWidth = 300.0;
 
   // Cooldown duration for toggling menu bar items (prevents rapid switching issues)
-  static const int toggleCooldownMs = 3000;
+  static const int toggleCooldownMs = 1000;
 
   // Menu bar item dimensions
   static const double itemSpacing = 8.0;
