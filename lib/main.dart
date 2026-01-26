@@ -1142,7 +1142,8 @@ class _MyHomePageState extends State<MyHomePage>
       case AppConstants.hideWindowValue:
         windowManager.hide();
       case AppConstants.exitGameValue:
-        windowManager.close();
+        // Use native method to properly exit the app
+        MenuBarHelper.exitApp();
     }
   }
 

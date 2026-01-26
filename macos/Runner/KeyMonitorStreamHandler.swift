@@ -6,6 +6,9 @@ class KeyMonitorStreamHandler: NSObject, FlutterStreamHandler {
   private var runLoopSource: CFRunLoopSource?
   private var eventSink: FlutterEventSink?
   
+  // Track the previous modifier flags to detect key-down vs key-up
+  private var previousModifierFlags: CGEventFlags = []
+  
   // Keycode to string mapping dictionary
   private static let keyCodeMap: [Int: String] = [
     // Numbers
@@ -115,11 +118,35 @@ class KeyMonitorStreamHandler: NSObject, FlutterStreamHandler {
         eventSink(formatted)
       }
     } else if type == .flagsChanged {
-      let flags = event.flags
-      if let formatted = formatModifierFlags(flags) {
-        eventSink(formatted)
+      let currentFlags = event.flags
+      
+      // Only count modifier key presses, not releases
+      // A key press is detected when the number of active modifiers increases
+      let previousCount = countModifiers(previousModifierFlags)
+      let currentCount = countModifiers(currentFlags)
+      
+      // Update the previous flags for next comparison
+      previousModifierFlags = currentFlags
+      
+      // Only send event if a modifier was pressed (not released)
+      if currentCount > previousCount {
+        if let formatted = formatModifierFlags(currentFlags) {
+          eventSink(formatted)
+        }
       }
     }
+  }
+  
+  /// Count the number of active modifier keys
+  private func countModifiers(_ flags: CGEventFlags) -> Int {
+    var count = 0
+    if flags.contains(.maskAlphaShift) { count += 1 }
+    if flags.contains(.maskSecondaryFn) { count += 1 }
+    if flags.contains(.maskCommand) { count += 1 }
+    if flags.contains(.maskControl) { count += 1 }
+    if flags.contains(.maskAlternate) { count += 1 }
+    if flags.contains(.maskShift) { count += 1 }
+    return count
   }
   
   private func formatCGEvent(keyCode: Int, flags: CGEventFlags) -> String? {
