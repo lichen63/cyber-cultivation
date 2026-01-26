@@ -21,6 +21,35 @@ class MainFlutterWindow: NSWindow {
       // Register plugins for the new window
       RegisterGeneratedPlugins(registry: controller)
       
+      // Register menu_bar_helper channel for sub-windows to control main window
+      let subWindowChannel = FlutterMethodChannel(
+        name: "menu_bar_helper",
+        binaryMessenger: controller.engine.binaryMessenger
+      )
+      subWindowChannel.setMethodCallHandler { (call, result) in
+        switch call.method {
+        case "showWindow":
+          // Show the main window
+          if let appDelegate = NSApp.delegate as? AppDelegate {
+            appDelegate.mainFlutterWindow?.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+          }
+          result(true)
+        case "hideWindow":
+          // Hide the main window
+          if let appDelegate = NSApp.delegate as? AppDelegate {
+            appDelegate.mainFlutterWindow?.orderOut(nil)
+          }
+          result(true)
+        case "exitApp":
+          // Exit the application
+          NSApp.terminate(nil)
+          result(true)
+        default:
+          result(FlutterMethodNotImplemented)
+        }
+      }
+      
       // Configure sub-window for transparency (needed for popup windows)
       // Use multiple delayed attempts like main window to catch Metal layer
       let delays: [TimeInterval] = [0.01, 0.05, 0.1, 0.2, 0.3]
