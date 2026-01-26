@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:window_manager/window_manager.dart';
@@ -334,16 +335,15 @@ class _MenuBarPopupContentState extends State<_MenuBarPopupContent> {
     }
   }
 
-  /// Send a command to the main window via WindowController
+  /// Platform channel to communicate with native code
+  static const MethodChannel _nativeChannel = MethodChannel('menu_bar_helper');
+
+  /// Send a command to control the main window via native platform channel
   Future<void> _sendCommandToMainWindow(String command) async {
     try {
-      final controllers = await WindowController.getAll();
-      if (controllers.isNotEmpty) {
-        final mainWindowController = controllers.first;
-        await mainWindowController.invokeMethod(command);
-      }
+      await _nativeChannel.invokeMethod(command);
     } catch (e) {
-      // Ignore errors
+      // Ignore errors - channel might not be available
     }
   }
 
@@ -407,6 +407,7 @@ class _MenuBarPopupContentState extends State<_MenuBarPopupContent> {
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // Title bar
                     PopupTitleBar(

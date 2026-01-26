@@ -115,14 +115,14 @@ class SystemProcessHelper {
         "lsof -n 2>/dev/null | awk '\$5==\"REG\" {print \$2, \$1}' | sort | uniq -c | sort -rn | head -${limit * 2}",
       ]);
 
-      final processes = <Map<String, dynamic>>[];
+      final pidToData = <int, Map<String, dynamic>>{};
       final seenPids = <int>{};
 
       if (result.exitCode == 0) {
         final output = result.stdout as String;
         final lines = output.split('\n');
 
-        for (int i = 0; i < lines.length && processes.length < limit; i++) {
+        for (int i = 0; i < lines.length && pidToData.length < limit; i++) {
           final line = lines[i].trim();
           if (line.isEmpty) continue;
 
@@ -130,8 +130,8 @@ class SystemProcessHelper {
           if (parts.length >= 3) {
             final count = int.tryParse(parts[0]);
             final pid = int.tryParse(parts[1]);
-            final name = parts[2];
-            if (name == 'COMMAND' || name == 'PID') continue;
+            final truncatedName = parts[2];
+            if (truncatedName == 'COMMAND' || truncatedName == 'PID') continue;
             if (pid != null &&
                 !seenPids.contains(pid) &&
                 count != null &&
@@ -139,17 +139,54 @@ class SystemProcessHelper {
               seenPids.add(pid);
               // Estimate read/write based on open file count
               // This is an approximation since actual I/O stats require elevated privileges
-              processes.add({
+              pidToData[pid] = {
                 'pid': pid,
-                'name': name,
+                'name': truncatedName, // Will be replaced with full name
                 'read': count * 4.0, // Estimated read KB
                 'write': count * 2.0, // Estimated write KB
                 'value': count.toDouble(),
-              });
+              };
             }
           }
         }
       }
+
+      // Get full process names using ps command for all PIDs at once
+      if (pidToData.isNotEmpty) {
+        final pids = pidToData.keys.toList();
+        final psResult = await Process.run('/bin/ps', [
+          '-o',
+          'pid=,comm=',
+          '-p',
+          pids.join(','),
+        ]);
+
+        if (psResult.exitCode == 0) {
+          final psOutput = psResult.stdout as String;
+          for (final line in psOutput.split('\n')) {
+            final trimmed = line.trim();
+            if (trimmed.isEmpty) continue;
+
+            // Parse "  PID COMMAND" format
+            final match = RegExp(r'^\s*(\d+)\s+(.+)$').firstMatch(trimmed);
+            if (match != null) {
+              final pid = int.tryParse(match.group(1) ?? '') ?? 0;
+              var fullName = match.group(2) ?? '';
+
+              // Extract just the process name from the path
+              if (fullName.contains('/')) {
+                fullName = fullName.split('/').last;
+              }
+
+              if (pidToData.containsKey(pid) && fullName.isNotEmpty) {
+                pidToData[pid]!['name'] = fullName;
+              }
+            }
+          }
+        }
+      }
+
+      var processes = pidToData.values.toList();
 
       // If lsof approach didn't work, fallback to processes with high disk potential
       if (processes.isEmpty) {
@@ -220,6 +257,9 @@ class SystemProcessHelper {
       final processes = <Map<String, dynamic>>[];
       final lines = output.split('\n');
 
+      // Collect PIDs for batch lookup
+      final pidToData = <int, Map<String, dynamic>>{};
+
       // nettop output: process_name.pid, bytes_in, bytes_out
       for (int i = 1; i < lines.length; i++) {
         final line = lines[i].trim();
@@ -235,23 +275,62 @@ class SystemProcessHelper {
           if (totalBytes > 0) {
             // Extract process name and pid (format: name.pid)
             final dotIndex = processInfo.lastIndexOf('.');
-            final name = dotIndex > 0
+            final truncatedName = dotIndex > 0
                 ? processInfo.substring(0, dotIndex)
                 : processInfo;
             final pid = dotIndex > 0
                 ? int.tryParse(processInfo.substring(dotIndex + 1)) ?? 0
                 : 0;
 
-            processes.add({
-              'pid': pid,
-              'name': name,
-              'download': bytesIn.toDouble(), // bytes/sec (approximate)
-              'upload': bytesOut.toDouble(), // bytes/sec (approximate)
-              'value': totalBytes.toDouble(), // total for sorting
-            });
+            if (pid > 0) {
+              pidToData[pid] = {
+                'pid': pid,
+                'name': truncatedName, // Will be replaced with full name
+                'download': bytesIn.toDouble(),
+                'upload': bytesOut.toDouble(),
+                'value': totalBytes.toDouble(),
+              };
+            }
           }
         }
       }
+
+      // Get full process names using ps command for all PIDs at once
+      if (pidToData.isNotEmpty) {
+        final pids = pidToData.keys.toList();
+        final psResult = await Process.run('/bin/ps', [
+          '-o',
+          'pid=,comm=',
+          '-p',
+          pids.join(','),
+        ]);
+
+        if (psResult.exitCode == 0) {
+          final psOutput = psResult.stdout as String;
+          for (final line in psOutput.split('\n')) {
+            final trimmed = line.trim();
+            if (trimmed.isEmpty) continue;
+
+            // Parse "  PID COMMAND" format
+            final match = RegExp(r'^\s*(\d+)\s+(.+)$').firstMatch(trimmed);
+            if (match != null) {
+              final pid = int.tryParse(match.group(1) ?? '') ?? 0;
+              var fullName = match.group(2) ?? '';
+
+              // Extract just the process name from the path
+              if (fullName.contains('/')) {
+                fullName = fullName.split('/').last;
+              }
+
+              if (pidToData.containsKey(pid) && fullName.isNotEmpty) {
+                pidToData[pid]!['name'] = fullName;
+              }
+            }
+          }
+        }
+      }
+
+      processes.addAll(pidToData.values);
 
       // Sort by total value descending
       processes.sort(

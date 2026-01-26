@@ -365,9 +365,9 @@ class MenuBarInfoService extends ChangeNotifier {
       case MenuBarInfoType.network:
         return 55; // "↑ 999M/s"
       case MenuBarInfoType.keyboard:
-        return 40; // "⌨️" + "999.9K"
+        return 50; // "⌨️" + "999.9K"
       case MenuBarInfoType.mouse:
-        return 40; // "🖱" + "99.9km"
+        return 50; // "🖱" + "99.9km"
       case MenuBarInfoType.systemTime:
         return 120; // "2026-01-19 12:34" single row
       case MenuBarInfoType.battery:

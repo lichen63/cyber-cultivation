@@ -261,7 +261,8 @@ class SystemInfoHandler {
   }
   
   /// Get battery level and charging status
-  /// Returns (level: Int, isCharging: Bool) where level is -1 if no battery
+  /// Returns (level: Int, isOnPower: Bool) where level is -1 if no battery
+  /// isOnPower is true when connected to AC power (shows charging icon even at 100%)
   func getBatteryInfo() -> (level: Int, isCharging: Bool) {
     guard let powerSourceInfo = IOPSCopyPowerSourcesInfo()?.takeRetainedValue(),
           let powerSources = IOPSCopyPowerSourcesList(powerSourceInfo)?.takeRetainedValue() as? [CFTypeRef],
@@ -277,11 +278,15 @@ class SystemInfoHandler {
            type == kIOPSInternalBatteryType {
           let currentCapacity = description[kIOPSCurrentCapacityKey] as? Int ?? 0
           let maxCapacity = description[kIOPSMaxCapacityKey] as? Int ?? 100
-          let isCharging = description[kIOPSIsChargingKey] as? Bool ?? false
+          
+          // Check if on AC power (not just actively charging)
+          // kIOPSPowerSourceStateKey is "AC Power" when plugged in, "Battery Power" when unplugged
+          let powerSource = description[kIOPSPowerSourceStateKey] as? String ?? ""
+          let isOnPower = powerSource == kIOPSACPowerValue
           
           // Calculate percentage
           let level = maxCapacity > 0 ? (currentCapacity * 100) / maxCapacity : 0
-          return (level, isCharging)
+          return (level, isOnPower)
         }
       }
     }
