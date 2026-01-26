@@ -407,6 +407,7 @@ class _MenuBarPopupContentState extends State<_MenuBarPopupContent> {
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // Title bar
                     PopupTitleBar(

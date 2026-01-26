@@ -39,6 +39,7 @@ class ProcessListContent extends StatelessWidget {
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Column headers
           _buildColumnHeaders(context),
