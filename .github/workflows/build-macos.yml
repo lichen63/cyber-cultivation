@@ -70,7 +70,7 @@ jobs:
     if: needs.check-version.outputs.version_changed == 'true'
     runs-on: macos-latest
     outputs:
-      dmg_name: ${{ steps.create_dmg.outputs.dmg_name }}
+      dmg_name: ${{ steps.build_dmg.outputs.dmg_name }}
       version: ${{ needs.check-version.outputs.version }}
     steps:
       - uses: actions/checkout@v4
@@ -87,115 +87,26 @@ jobs:
       - name: Build macOS app (Release)
         run: flutter build macos --release
 
-      - name: Ad-hoc sign the app (for unsigned distribution)
+      - name: Build DMG
+        id: build_dmg
         run: |
-          APP_PATH="build/macos/Build/Products/Release/CyberCultivation.app"
-          echo "Ad-hoc signing the app..."
+          chmod +x ./tools/build_macos_dmg.sh
+          ./tools/build_macos_dmg.sh --ci
           
-          # Sign all frameworks and dylibs first
-          find "$APP_PATH" -name "*.framework" -type d | while read framework; do
-            echo "Signing: $framework"
-            codesign --force --deep --sign - "$framework" || true
-          done
-          
-          find "$APP_PATH" -name "*.dylib" -type f | while read dylib; do
-            echo "Signing: $dylib"
-            codesign --force --sign - "$dylib" || true
-          done
-          
-          # Sign the main app bundle
-          echo "Signing main app bundle..."
-          codesign --force --deep --sign - "$APP_PATH"
-          
-          # Verify the signature
-          echo "Verifying signature..."
-          codesign --verify --verbose "$APP_PATH"
-
-      - name: Create DMG
-        id: create_dmg
-        run: |
+          # Get DMG name for outputs
           VERSION="${{ needs.check-version.outputs.version }}"
-          # Extract just the version number (before the +)
           VERSION_NUMBER=$(echo "$VERSION" | cut -d'+' -f1)
           DMG_NAME="CyberCultivation-${VERSION_NUMBER}-macos.dmg"
-
-          echo "Creating DMG: $DMG_NAME"
-
-          # Create a temporary directory for DMG contents
-          mkdir -p dmg_contents
-          cp -R "build/macos/Build/Products/Release/CyberCultivation.app" dmg_contents/
-
-          # Create a symbolic link to Applications folder
-          ln -s /Applications dmg_contents/Applications
-
-          # DMG window settings
-          DMG_WINDOW_WIDTH=500
-          DMG_WINDOW_HEIGHT=300
-          ICON_SIZE=80
-          APP_ICON_X=120
-          APP_ICON_Y=150
-          APPLICATIONS_ICON_X=380
-          APPLICATIONS_ICON_Y=150
-          VOLUME_NAME="Cyber Cultivation"
-          MOUNT_DIR="/Volumes/$VOLUME_NAME"
-
-          # Create a temporary writable DMG first
-          TEMP_DMG="temp_dmg.dmg"
-          hdiutil create -volname "$VOLUME_NAME" \
-            -srcfolder dmg_contents \
-            -ov -format UDRW \
-            "$TEMP_DMG"
-
-          # Detach if already mounted
-          hdiutil detach "$MOUNT_DIR" 2>/dev/null || true
-
-          # Mount the temporary DMG
-          hdiutil attach -readwrite -noverify "$TEMP_DMG"
-          sleep 2
-
-          # Configure DMG window appearance using AppleScript
-          echo "Configuring DMG window appearance..."
-          osascript <<EOF
-          tell application "Finder"
-              tell disk "$VOLUME_NAME"
-                  open
-                  set current view of container window to icon view
-                  set toolbar visible of container window to false
-                  set statusbar visible of container window to false
-                  set the bounds of container window to {100, 100, $((100 + DMG_WINDOW_WIDTH)), $((100 + DMG_WINDOW_HEIGHT))}
-                  set viewOptions to the icon view options of container window
-                  set arrangement of viewOptions to not arranged
-                  set icon size of viewOptions to $ICON_SIZE
-                  set position of item "CyberCultivation.app" of container window to {$APP_ICON_X, $APP_ICON_Y}
-                  set position of item "Applications" of container window to {$APPLICATIONS_ICON_X, $APPLICATIONS_ICON_Y}
-                  close
-                  open
-                  update without registering applications
-                  delay 2
-                  close
-              end tell
-          end tell
-          EOF
-
-          # Unmount the temporary DMG
-          sync
-          sleep 1
-          hdiutil detach "$MOUNT_DIR" -force
-
-          # Convert to compressed read-only DMG
-          hdiutil convert "$TEMP_DMG" -format UDZO -o "$DMG_NAME"
-
           echo "dmg_name=$DMG_NAME" >> $GITHUB_OUTPUT
-
-          # Clean up
-          rm -f "$TEMP_DMG"
-          rm -rf dmg_contents
+          
+          # Move DMG to root for artifact upload
+          mv "dist/$DMG_NAME" "$DMG_NAME"
 
       - name: Upload DMG artifact
         uses: actions/upload-artifact@v4
         with:
           name: macos-dmg
-          path: ${{ steps.create_dmg.outputs.dmg_name }}
+          path: ${{ steps.build_dmg.outputs.dmg_name }}
           retention-days: 30
 
   release:

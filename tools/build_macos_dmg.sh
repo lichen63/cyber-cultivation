@@ -1,8 +1,20 @@
 #!/bin/bash
-# Local script to build macOS DMG
-# Usage: ./tools/build_macos_dmg.sh
+# Script to build macOS DMG
+# Usage: ./tools/build_macos_dmg.sh [--ci]
+#   --ci: Skip clean, pub get, and build steps (for CI where these are done separately)
 
 set -e
+
+# Parse arguments
+CI_MODE=false
+for arg in "$@"; do
+    case $arg in
+        --ci)
+            CI_MODE=true
+            shift
+            ;;
+    esac
+done
 
 # Colors for output
 RED='\033[0;31m'
@@ -22,17 +34,21 @@ DMG_NAME="dist/CyberCultivation-${VERSION_NUMBER}-macos.dmg"
 
 echo -e "${YELLOW}Building version: $VERSION_NUMBER${NC}"
 
-# Clean previous builds
-echo -e "${YELLOW}Cleaning previous builds...${NC}"
-flutter clean
+if [ "$CI_MODE" = false ]; then
+    # Clean previous builds
+    echo -e "${YELLOW}Cleaning previous builds...${NC}"
+    flutter clean
 
-# Get dependencies
-echo -e "${YELLOW}Getting dependencies...${NC}"
-flutter pub get
+    # Get dependencies
+    echo -e "${YELLOW}Getting dependencies...${NC}"
+    flutter pub get
 
-# Build release
-echo -e "${YELLOW}Building macOS release...${NC}"
-flutter build macos --release
+    # Build release
+    echo -e "${YELLOW}Building macOS release...${NC}"
+    flutter build macos --release
+else
+    echo -e "${YELLOW}CI mode: Skipping clean, pub get, and build steps${NC}"
+fi
 
 APP_PATH="build/macos/Build/Products/Release/CyberCultivation.app"
 
