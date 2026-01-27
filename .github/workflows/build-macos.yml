@@ -128,15 +128,67 @@ jobs:
           # Create a symbolic link to Applications folder
           ln -s /Applications dmg_contents/Applications
 
-          # Create DMG using hdiutil
-          hdiutil create -volname "Cyber Cultivation" \
+          # DMG window settings
+          DMG_WINDOW_WIDTH=500
+          DMG_WINDOW_HEIGHT=300
+          ICON_SIZE=80
+          APP_ICON_X=120
+          APP_ICON_Y=150
+          APPLICATIONS_ICON_X=380
+          APPLICATIONS_ICON_Y=150
+          VOLUME_NAME="Cyber Cultivation"
+          MOUNT_DIR="/Volumes/$VOLUME_NAME"
+
+          # Create a temporary writable DMG first
+          TEMP_DMG="temp_dmg.dmg"
+          hdiutil create -volname "$VOLUME_NAME" \
             -srcfolder dmg_contents \
-            -ov -format UDZO \
-            "$DMG_NAME"
+            -ov -format UDRW \
+            "$TEMP_DMG"
+
+          # Detach if already mounted
+          hdiutil detach "$MOUNT_DIR" 2>/dev/null || true
+
+          # Mount the temporary DMG
+          hdiutil attach -readwrite -noverify "$TEMP_DMG"
+          sleep 2
+
+          # Configure DMG window appearance using AppleScript
+          echo "Configuring DMG window appearance..."
+          osascript <<EOF
+          tell application "Finder"
+              tell disk "$VOLUME_NAME"
+                  open
+                  set current view of container window to icon view
+                  set toolbar visible of container window to false
+                  set statusbar visible of container window to false
+                  set the bounds of container window to {100, 100, $((100 + DMG_WINDOW_WIDTH)), $((100 + DMG_WINDOW_HEIGHT))}
+                  set viewOptions to the icon view options of container window
+                  set arrangement of viewOptions to not arranged
+                  set icon size of viewOptions to $ICON_SIZE
+                  set position of item "CyberCultivation.app" of container window to {$APP_ICON_X, $APP_ICON_Y}
+                  set position of item "Applications" of container window to {$APPLICATIONS_ICON_X, $APPLICATIONS_ICON_Y}
+                  close
+                  open
+                  update without registering applications
+                  delay 2
+                  close
+              end tell
+          end tell
+          EOF
+
+          # Unmount the temporary DMG
+          sync
+          sleep 1
+          hdiutil detach "$MOUNT_DIR" -force
+
+          # Convert to compressed read-only DMG
+          hdiutil convert "$TEMP_DMG" -format UDZO -o "$DMG_NAME"
 
           echo "dmg_name=$DMG_NAME" >> $GITHUB_OUTPUT
 
           # Clean up
+          rm -f "$TEMP_DMG"
           rm -rf dmg_contents
 
       - name: Upload DMG artifact

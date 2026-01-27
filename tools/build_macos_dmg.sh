@@ -72,20 +72,90 @@ rm -f "$DMG_NAME"
 
 # Create a temporary directory for DMG contents
 DMG_TEMP="dmg_temp_$$"
+TEMP_DMG="temp_dmg_$$.dmg"
+
+# Set up cleanup trap to ensure temp files are removed even on error
+cleanup() {
+    echo -e "${YELLOW}Cleaning up temporary files...${NC}"
+    rm -f "$TEMP_DMG" 2>/dev/null || true
+    rm -rf "$DMG_TEMP" 2>/dev/null || true
+}
+trap cleanup EXIT
+
 mkdir -p "$DMG_TEMP"
 cp -R "$APP_PATH" "$DMG_TEMP/"
 
 # Create a symbolic link to Applications folder
 ln -s /Applications "$DMG_TEMP/Applications"
 
-# Create DMG using hdiutil
+# DMG window settings
+DMG_WINDOW_WIDTH=500
+DMG_WINDOW_HEIGHT=300
+ICON_SIZE=80
+APP_ICON_X=120
+APP_ICON_Y=150
+APPLICATIONS_ICON_X=380
+APPLICATIONS_ICON_Y=150
+
+# Create a temporary writable DMG first
 hdiutil create -volname "Cyber Cultivation" \
     -srcfolder "$DMG_TEMP" \
-    -ov -format UDZO \
-    "$DMG_NAME"
+    -ov -format UDRW \
+    "$TEMP_DMG"
 
-# Clean up
-rm -rf "$DMG_TEMP"
+# Mount the temporary DMG
+VOLUME_NAME="Cyber Cultivation"
+MOUNT_DIR="/Volumes/$VOLUME_NAME"
+
+# Detach if already mounted
+hdiutil detach "$MOUNT_DIR" 2>/dev/null || true
+
+hdiutil attach -readwrite -noverify "$TEMP_DMG"
+sleep 2
+
+# Verify mount
+if [ ! -d "$MOUNT_DIR" ]; then
+    echo -e "${RED}Error: Failed to mount DMG at $MOUNT_DIR${NC}"
+    rm -f "$TEMP_DMG"
+    rm -rf "$DMG_TEMP"
+    exit 1
+fi
+
+echo -e "${GREEN}DMG mounted at: $MOUNT_DIR${NC}"
+
+# Use AppleScript to configure the DMG window appearance
+echo -e "${YELLOW}Configuring DMG window appearance...${NC}"
+osascript <<EOF
+tell application "Finder"
+    tell disk "$VOLUME_NAME"
+        open
+        set current view of container window to icon view
+        set toolbar visible of container window to false
+        set statusbar visible of container window to false
+        set the bounds of container window to {100, 100, $((100 + DMG_WINDOW_WIDTH)), $((100 + DMG_WINDOW_HEIGHT))}
+        set viewOptions to the icon view options of container window
+        set arrangement of viewOptions to not arranged
+        set icon size of viewOptions to $ICON_SIZE
+        set position of item "CyberCultivation.app" of container window to {$APP_ICON_X, $APP_ICON_Y}
+        set position of item "Applications" of container window to {$APPLICATIONS_ICON_X, $APPLICATIONS_ICON_Y}
+        close
+        open
+        update without registering applications
+        delay 2
+        close
+    end tell
+end tell
+EOF
+
+# Unmount the temporary DMG
+sync
+sleep 1
+hdiutil detach "$MOUNT_DIR" -force
+
+# Convert to compressed read-only DMG
+hdiutil convert "$TEMP_DMG" -format UDZO -o "$DMG_NAME"
+
+# Note: Cleanup is handled by trap on EXIT
 
 echo -e "${GREEN}=== Build Complete ===${NC}"
 echo -e "${GREEN}DMG created: $DMG_NAME${NC}"
