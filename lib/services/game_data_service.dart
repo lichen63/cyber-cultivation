@@ -13,7 +13,6 @@ class GameDataService {
     if (kDebugMode) {
       // In debug mode, save to current working directory for easier debugging
       final currentDir = Directory.current.path;
-      debugPrint('Debug mode: Saving game data to: $currentDir/$_fileName');
       return '$currentDir/$_fileName';
     } else {
       // In release/production mode, use Application Support directory

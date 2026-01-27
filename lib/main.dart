@@ -26,6 +26,7 @@ import 'services/menu_bar_helper.dart';
 import 'services/menu_bar_info_service.dart';
 import 'services/pomodoro_service.dart';
 import 'widgets/accessibility_dialog.dart';
+import 'widgets/floating_exp_indicator.dart';
 import 'widgets/games_list_dialog.dart';
 import 'widgets/home_page_content.dart';
 import 'widgets/menu_bar_popup.dart';
@@ -552,6 +553,10 @@ class _MyHomePageState extends State<MyHomePage>
   Timer? _saveDebounce;
   Timer? _trayUpdateTimer;
 
+  // Floating exp indicator manager key
+  final GlobalKey<FloatingExpIndicatorManagerState> _floatingExpKey =
+      GlobalKey<FloatingExpIndicatorManagerState>();
+
   AppThemeColors get _themeColors => widget.themeColors;
 
   @override
@@ -787,6 +792,9 @@ class _MyHomePageState extends State<MyHomePage>
 
   void _gainExp(double amount) {
     if (_level >= AppConstants.maxLevel) return;
+
+    // Trigger floating exp indicator
+    _floatingExpKey.currentState?.addExpGain(amount);
 
     setState(() {
       _currentExp += amount;
@@ -1183,6 +1191,7 @@ class _MyHomePageState extends State<MyHomePage>
           pomodoroState: _pomodoroService.state,
           todos: _todos,
           themeColors: _themeColors,
+          floatingExpKey: _floatingExpKey,
           onPomodoroPressed: _showPomodoroDialog,
           onStatsPressed: _showStatsWindow,
           onTodoPressed: _showTodoDialog,

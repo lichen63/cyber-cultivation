@@ -25,6 +25,10 @@ class AppThemeColors {
   final Color networkUpload;
   final Color networkDownload;
   final Brightness brightness;
+  final Color expGainBackground;
+  final Color expGainText;
+  final Color expGainBorder;
+  final Color expGainShadow;
 
   const AppThemeColors({
     required this.primaryText,
@@ -47,6 +51,10 @@ class AppThemeColors {
     required this.networkUpload,
     required this.networkDownload,
     required this.brightness,
+    required this.expGainBackground,
+    required this.expGainText,
+    required this.expGainBorder,
+    required this.expGainShadow,
   });
 
   /// Dark theme colors (default)
@@ -71,6 +79,10 @@ class AppThemeColors {
     networkUpload: Colors.red,
     networkDownload: Colors.blue,
     brightness: Brightness.dark,
+    expGainBackground: const Color(0xFF2E7D32).withValues(alpha: 0.9),
+    expGainText: const Color(0xFFFFD700),
+    expGainBorder: const Color(0xFF66BB6A),
+    expGainShadow: Colors.black.withValues(alpha: 0.5),
   );
 
   /// Light theme colors
@@ -95,6 +107,10 @@ class AppThemeColors {
     networkUpload: const Color(0xFFD32F2F),
     networkDownload: const Color(0xFF1976D2),
     brightness: Brightness.light,
+    expGainBackground: const Color(0xFF43A047).withValues(alpha: 0.95),
+    expGainText: const Color(0xFFFF8F00),
+    expGainBorder: const Color(0xFF2E7D32),
+    expGainShadow: Colors.black.withValues(alpha: 0.3),
   );
 
   /// Get theme colors by mode
@@ -221,6 +237,18 @@ class AppConstants {
   static const int defaultPomodoroDuration = 25;
   static const int defaultRelaxDuration = 5;
   static const int defaultPomodoroLoops = 1;
+
+  // Floating Exp Indicator
+  static const Duration floatingExpDuration = Duration(milliseconds: 1500);
+  static const double floatingExpDistance = 100.0;
+  static const double floatingExpStartOffset = 30.0;
+  static const Duration floatingExpQueueInterval = Duration(milliseconds: 500);
+  static const int floatingExpMaxQueueSize = 10;
+  static const double floatingExpPaddingHorizontal = 16.0;
+  static const double floatingExpPaddingVertical = 8.0;
+  static const double floatingExpBorderWidth = 1.5;
+  static const double floatingExpShadowBlur = 8.0;
+  static const double fontSizeFloatingExp = 18.0;
 }
 
 /// Constants for games list dialog

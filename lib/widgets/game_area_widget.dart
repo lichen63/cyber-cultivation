@@ -5,6 +5,7 @@ import '../services/pomodoro_service.dart';
 import 'character_display.dart';
 import 'cultivation_formation.dart';
 import 'exp_display.dart';
+import 'floating_exp_indicator.dart';
 import 'keyboard_monitor.dart';
 import 'mouse_monitor.dart';
 import 'system_stats_panel.dart';
@@ -26,6 +27,7 @@ class GameAreaWidget extends StatelessWidget {
   final SystemStatsData systemStats;
   final PomodoroState pomodoroState;
   final AppThemeColors themeColors;
+  final GlobalKey<FloatingExpIndicatorManagerState>? floatingExpKey;
 
   const GameAreaWidget({
     super.key,
@@ -44,6 +46,7 @@ class GameAreaWidget extends StatelessWidget {
     required this.systemStats,
     required this.pomodoroState,
     required this.themeColors,
+    this.floatingExpKey,
   });
 
   @override
@@ -71,6 +74,17 @@ class GameAreaWidget extends StatelessWidget {
             ),
             if (isShowKeyboardTrack) _buildKeyboardMonitor(scale),
             if (isShowMouseTrack) _buildMouseMonitor(scale),
+            // Floating exp indicator manager - centered in the window
+            if (floatingExpKey != null)
+              Positioned.fill(
+                child: Align(
+                  alignment: Alignment.center,
+                  child: FloatingExpIndicatorManager(
+                    key: floatingExpKey,
+                    themeColors: themeColors,
+                  ),
+                ),
+              ),
           ],
         );
       },

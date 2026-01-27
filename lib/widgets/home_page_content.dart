@@ -6,6 +6,7 @@ import '../l10n/app_localizations.dart';
 import '../models/todo_item.dart';
 import '../services/pomodoro_service.dart';
 import 'action_buttons_row.dart';
+import 'floating_exp_indicator.dart';
 import 'game_area_widget.dart';
 import 'system_stats_panel.dart';
 
@@ -29,6 +30,7 @@ class HomePageContent extends StatelessWidget {
   final PomodoroState pomodoroState;
   final List<TodoItem> todos;
   final AppThemeColors themeColors;
+  final GlobalKey<FloatingExpIndicatorManagerState>? floatingExpKey;
   final VoidCallback onPomodoroPressed;
   final VoidCallback onStatsPressed;
   final VoidCallback onTodoPressed;
@@ -56,6 +58,7 @@ class HomePageContent extends StatelessWidget {
     required this.pomodoroState,
     required this.todos,
     required this.themeColors,
+    this.floatingExpKey,
     required this.onPomodoroPressed,
     required this.onStatsPressed,
     required this.onTodoPressed,
@@ -121,6 +124,7 @@ class HomePageContent extends StatelessWidget {
                   systemStats: systemStats,
                   pomodoroState: pomodoroState,
                   themeColors: themeColors,
+                  floatingExpKey: floatingExpKey,
                 ),
               ),
             ],
