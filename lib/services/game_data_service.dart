@@ -10,8 +10,16 @@ class GameDataService {
   static const String _fileName = 'game_save.json';
 
   Future<String> _getFilePath() async {
-    final directory = await getApplicationSupportDirectory();
-    return '${directory.path}/$_fileName';
+    if (kDebugMode) {
+      // In debug mode, save to current working directory for easier debugging
+      final currentDir = Directory.current.path;
+      debugPrint('Debug mode: Saving game data to: $currentDir/$_fileName');
+      return '$currentDir/$_fileName';
+    } else {
+      // In release/production mode, use Application Support directory
+      final directory = await getApplicationSupportDirectory();
+      return '${directory.path}/$_fileName';
+    }
   }
 
   Future<void> saveGameData(GameData data) async {
