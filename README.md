@@ -2,7 +2,7 @@
 
 [中文](README_ZH.md)
 
-A gamified desktop companion that turns your keyboard and mouse activity into a cultivation journey. Level up your character while you work!
+A gamified desktop companion that transforms your keyboard and mouse activity into an immersive cultivation journey. Level up your character while you work, stay focused with Pomodoro sessions, and track your productivity—all in a beautiful floating window.
 
 ![Flutter](https://img.shields.io/badge/Flutter-3.10+-blue?logo=flutter)
 ![Platform](https://img.shields.io/badge/Platform-macOS-lightgrey?logo=apple)
@@ -14,28 +14,46 @@ A gamified desktop companion that turns your keyboard and mouse activity into a 
   <img src="docs/images/image-1.png" width="45%">
 </p>
 
-## Features
+## ✨ Features
 
-- **Cultivation System** - Gain experience from keyboard/mouse activity, focus sessions, and games to level up
-- **Activity Tracking** - Monitor keyboard and mouse usage in real-time
-- **System Monitor** - CPU, GPU, memory, disk, and network usage display
-- **Always on Top** - Stay visible while you work
-- **Anti-Sleep** - Prevent screen sleep with periodic mouse movement
-- **Pomodoro Timer** - Built-in focus timer that also rewards experience
-- **Activity Stats** - Daily keyboard/mouse usage statistics with charts
-- **Todo List** - Manage daily tasks efficiently
-- **Mini Games** - Relax with built-in mini-games to earn extra experience
-- **Dark/Light Mode** - Comfortable viewing in any environment
-- **Bilingual** - English and Chinese support
-- **Launch at Login** - Start automatically with your system
+### 🎮 Gamification & Progression
+- **Cultivation System** — Gain EXP from keyboard/mouse activity, focus sessions, and mini-games to level up
+- **Visual Level-Up Effects** — Stunning glow and particle burst animations when you level up
+- **Floating EXP Indicators** — Real-time EXP gain notifications
 
-## Installation
+### ⏱️ Productivity Tools
+- **Pomodoro Timer** — Built-in focus timer with customizable work/relax durations and loops, featuring a beautiful cultivation formation animation
+- **Todo List** — Manage daily tasks with persistent storage
+- **Activity Statistics** — Daily/weekly keyboard and mouse usage charts
+
+### 🖥️ System Monitoring
+- **Real-time Stats** — CPU, GPU, RAM, disk usage, and network speed
+- **Menu Bar Integration** — Display selected stats (Pomodoro, level, system info, battery) directly in macOS menu bar
+- **Keyboard & Mouse Visualization** — Real-time input tracking with visual feedback
+
+### 🎯 Mini Games
+- **Snake** — Classic snake game with EXP rewards
+- **Flappy Bird** — Tap-to-fly arcade game
+- **Sudoku** — Brain-training puzzle with three difficulty levels
+
+### 🛠️ Desktop Features
+- **Always on Top** — Stay visible while you work
+- **Anti-Sleep Mode** — Prevent screen sleep with periodic mouse movement
+- **System Tray** — Quick access via tray icon with context menu
+- **Launch at Login** — Start automatically with your system
+
+### 🎨 Customization
+- **Dark/Light Theme** — Comfortable viewing in any environment
+- **Bilingual UI** — Full English and Chinese localization
+- **Configurable Display** — Show/hide keyboard tracker, mouse tracker, and system stats
+
+## 📦 Installation
 
 ### macOS
 
 Download the latest `.dmg` from [Releases](../../releases) and drag to Applications.
 
-> **Note**: On first launch, grant Accessibility permission when prompted (System Settings → Privacy & Security → Accessibility).
+> **Note**: On first launch, grant Accessibility permission when prompted (System Settings → Privacy & Security → Accessibility). This is required for keyboard and mouse monitoring.
 
 ### Build from Source
 
@@ -48,13 +66,16 @@ flutter run -d macos
 
 **Prerequisites**: Flutter SDK 3.10+, Xcode Command Line Tools
 
-## Usage
+## 🎯 Usage
 
-- **Drag** anywhere to move the window
-- **Right-click** for context menu
-- **System tray** icon for quick access
+| Action          | Description                                                |
+| --------------- | ---------------------------------------------------------- |
+| **Drag**        | Move the window anywhere on screen                         |
+| **Right-click** | Open context menu (settings, Pomodoro, stats, games, etc.) |
+| **Resize**      | Drag window edges (maintains 1:1 aspect ratio)             |
+| **Tray Icon**   | Click for quick access menu                                |
 
-## FAQ
+## ❓ FAQ
 
 ### App won't open / "damaged" warning
 
@@ -82,9 +103,15 @@ Then relaunch the app and grant permission again.
 
 Contributions welcome! See [Contributing Guidelines](docs/CONTRIBUTING.md).
 
-## License
+## 📄 License
 
 [PolyForm Noncommercial License 1.0.0](LICENSE)
 
 - ✅ Free for personal, educational, non-profit use
 - ❌ Commercial use requires separate license
+
+---
+
+<p align="center">
+  <i>Turn your daily computer activity into an epic cultivation journey! 🧘‍♂️⌨️</i>
+</p>
