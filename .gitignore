@@ -7,6 +7,7 @@
 .DS_Store
 .buildlog/
 .history
+game_save.json
 
 # Release artifacts
 dist/
