@@ -542,3 +542,23 @@ class TrayConstants {
   /// Icon size for macOS menu bar (standard size is 18-22 pixels)
   static const int macOSIconSize = 22;
 }
+
+/// Constants for level-up effect animation
+class LevelUpEffectConstants {
+  // Animation duration
+  static const Duration totalDuration = Duration(milliseconds: 2500);
+
+  // Glow effect - large spread for impressive effect
+  static const double glowSpread = 80.0;
+  static const double glowLayerCount = 6;
+  static const double glowLayerSpacing = 12.0;
+  static const double borderGlowWidth = 4.0;
+  static const double borderBlurRadius = 15.0;
+  static const double innerBorderWidth = 3.0;
+
+  // Particle burst settings
+  static const int particleCount = 24;
+  static const double particleMinSize = 2.0;
+  static const double particleMaxSize = 6.0;
+  static const double particleSpeed = 120.0;
+}
