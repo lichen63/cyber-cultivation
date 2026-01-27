@@ -26,8 +26,10 @@ import 'services/menu_bar_helper.dart';
 import 'services/menu_bar_info_service.dart';
 import 'services/pomodoro_service.dart';
 import 'widgets/accessibility_dialog.dart';
+import 'widgets/floating_exp_indicator.dart';
 import 'widgets/games_list_dialog.dart';
 import 'widgets/home_page_content.dart';
+import 'widgets/level_up_effect.dart';
 import 'widgets/menu_bar_popup.dart';
 import 'widgets/pomodoro_dialog.dart';
 import 'widgets/settings_dialog.dart';
@@ -552,6 +554,14 @@ class _MyHomePageState extends State<MyHomePage>
   Timer? _saveDebounce;
   Timer? _trayUpdateTimer;
 
+  // Floating exp indicator manager key
+  final GlobalKey<FloatingExpIndicatorManagerState> _floatingExpKey =
+      GlobalKey<FloatingExpIndicatorManagerState>();
+
+  // Level-up effect wrapper key
+  final GlobalKey<LevelUpEffectWrapperState> _levelUpEffectKey =
+      GlobalKey<LevelUpEffectWrapperState>();
+
   AppThemeColors get _themeColors => widget.themeColors;
 
   @override
@@ -788,6 +798,11 @@ class _MyHomePageState extends State<MyHomePage>
   void _gainExp(double amount) {
     if (_level >= AppConstants.maxLevel) return;
 
+    // Trigger floating exp indicator
+    _floatingExpKey.currentState?.addExpGain(amount);
+
+    final previousLevel = _level;
+
     setState(() {
       _currentExp += amount;
       while (_currentExp >= _maxExp && _level < AppConstants.maxLevel) {
@@ -801,6 +816,12 @@ class _MyHomePageState extends State<MyHomePage>
         _maxExp = double.infinity;
       }
     });
+
+    // Trigger level-up effect if level increased
+    if (_level > previousLevel) {
+      _levelUpEffectKey.currentState?.triggerLevelUp();
+    }
+
     widget.onLevelExpChanged?.call(_level, _currentExp, _maxExp);
     _saveGameData();
   }
@@ -1183,6 +1204,8 @@ class _MyHomePageState extends State<MyHomePage>
           pomodoroState: _pomodoroService.state,
           todos: _todos,
           themeColors: _themeColors,
+          floatingExpKey: _floatingExpKey,
+          levelUpEffectKey: _levelUpEffectKey,
           onPomodoroPressed: _showPomodoroDialog,
           onStatsPressed: _showStatsWindow,
           onTodoPressed: _showTodoDialog,

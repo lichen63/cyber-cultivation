@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:cyber_cultivation/l10n/app_localizations.dart';
@@ -412,8 +413,16 @@ class _SettingsDialogState extends State<SettingsDialog> {
 
   Future<void> _openSaveFolder() async {
     try {
-      final directory = await getApplicationSupportDirectory();
-      final path = directory.path;
+      String path;
+      if (kDebugMode) {
+        // In debug mode, open current working directory
+        path = Directory.current.path;
+      } else {
+        // In release mode, open Application Support directory
+        final directory = await getApplicationSupportDirectory();
+        path = directory.path;
+      }
+
       if (Platform.isMacOS) {
         await Process.run('open', [path]);
       } else if (Platform.isWindows) {
