@@ -6,7 +6,9 @@ import '../l10n/app_localizations.dart';
 import '../models/todo_item.dart';
 import '../services/pomodoro_service.dart';
 import 'action_buttons_row.dart';
+import 'floating_exp_indicator.dart';
 import 'game_area_widget.dart';
+import 'level_up_effect.dart';
 import 'system_stats_panel.dart';
 
 /// The main content widget for the home page
@@ -29,6 +31,8 @@ class HomePageContent extends StatelessWidget {
   final PomodoroState pomodoroState;
   final List<TodoItem> todos;
   final AppThemeColors themeColors;
+  final GlobalKey<FloatingExpIndicatorManagerState>? floatingExpKey;
+  final GlobalKey<LevelUpEffectWrapperState>? levelUpEffectKey;
   final VoidCallback onPomodoroPressed;
   final VoidCallback onStatsPressed;
   final VoidCallback onTodoPressed;
@@ -56,6 +60,8 @@ class HomePageContent extends StatelessWidget {
     required this.pomodoroState,
     required this.todos,
     required this.themeColors,
+    this.floatingExpKey,
+    this.levelUpEffectKey,
     required this.onPomodoroPressed,
     required this.onStatsPressed,
     required this.onTodoPressed,
@@ -121,6 +127,8 @@ class HomePageContent extends StatelessWidget {
                   systemStats: systemStats,
                   pomodoroState: pomodoroState,
                   themeColors: themeColors,
+                  floatingExpKey: floatingExpKey,
+                  levelUpEffectKey: levelUpEffectKey,
                 ),
               ),
             ],

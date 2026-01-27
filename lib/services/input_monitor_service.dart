@@ -62,6 +62,7 @@ class InputMonitorService extends ChangeNotifier {
   double? _lastAbsY;
   bool _moveToggle = false;
   bool _enableAntiSleep = false;
+  double _accumulatedMoveDistance = 0.0;
 
   /// Callbacks for exp and stats updates
   final void Function(double amount)? onExpGain;
@@ -160,6 +161,17 @@ class InputMonitorService extends ChangeNotifier {
         clickCount: 0,
         moveDistance: distance,
       );
+
+      // Accumulate distance and grant exp when threshold is reached
+      _accumulatedMoveDistance += distance;
+      if (_accumulatedMoveDistance >= AppConstants.mouseDistancePerExp) {
+        final expToGrant =
+            (_accumulatedMoveDistance / AppConstants.mouseDistancePerExp)
+                .floor();
+        _accumulatedMoveDistance %=
+            AppConstants.mouseDistancePerExp; // Keep remainder
+        onExpGain?.call(expToGrant * AppConstants.expGainPerMouse);
+      }
     }
     _lastAbsX = absX;
     _lastAbsY = absY;
@@ -172,7 +184,6 @@ class InputMonitorService extends ChangeNotifier {
       isClicking: _mouseData.isClicking,
     );
     notifyListeners();
-    onExpGain?.call(AppConstants.expGainPerMouse);
   }
 
   void _startIdleCheck() {
