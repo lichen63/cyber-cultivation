@@ -13,6 +13,7 @@ import '../../models/daily_stats.dart';
 import '../../models/game_data.dart';
 import '../../services/game_data_service.dart';
 import '../../services/system_process_helper.dart';
+import '../../services/window_pool_service.dart';
 import 'info_content.dart';
 import 'menu_bar_popup_constants.dart';
 import 'popup_styles.dart';
@@ -20,56 +21,99 @@ import 'popup_title_bar.dart';
 import 'popup_widgets.dart';
 import 'process_list_content.dart';
 
-/// A standalone window for the menu bar popup.
-/// This is used with desktop_multi_window package.
-class MenuBarPopupWindow extends StatefulWidget {
+/// A pre-warmed pooled window for menu bar popups.
+///
+/// Unlike [MenuBarPopupWindow], this window is created at app startup and
+/// stays hidden until needed. When a popup is requested, the window receives
+/// new content via method channel and shows itself, providing near-instant
+/// popup appearance.
+class PooledPopupWindow extends StatefulWidget {
   final WindowController windowController;
-  final Map<String, dynamic> args;
+  final Map<String, dynamic> initialArgs;
 
-  const MenuBarPopupWindow({
+  const PooledPopupWindow({
     super.key,
     required this.windowController,
-    required this.args,
+    required this.initialArgs,
   });
 
   @override
-  State<MenuBarPopupWindow> createState() => _MenuBarPopupWindowState();
+  State<PooledPopupWindow> createState() => _PooledPopupWindowState();
 }
 
-class _MenuBarPopupWindowState extends State<MenuBarPopupWindow>
+class _PooledPopupWindowState extends State<PooledPopupWindow>
     with WindowListener {
-  late final AppThemeColors _themeColors;
-  late final Brightness _brightness;
+  // Current display state
+  late Map<String, dynamic> _currentArgs;
+  late AppThemeColors _themeColors;
+  late Brightness _brightness;
+  bool _isVisible = false;
+  bool _isInitialized = false;
+
+  // Pool tracking
+  late final int _poolIndex;
 
   @override
   void initState() {
     super.initState();
-    _brightness = widget.args['brightness'] == 'dark'
+    _currentArgs = Map<String, dynamic>.from(widget.initialArgs);
+    _poolIndex = widget.initialArgs['poolIndex'] as int? ?? 0;
+
+    _updateTheme();
+    _setupMethodHandler();
+    _initWindow();
+  }
+
+  void _updateTheme() {
+    _brightness = _currentArgs['brightness'] == 'dark'
         ? Brightness.dark
         : Brightness.light;
     _themeColors = _brightness == Brightness.dark
         ? AppThemeColors.dark
         : AppThemeColors.light;
-    _initWindow();
   }
 
+  /// Set up method handler for receiving commands from the main window
+  void _setupMethodHandler() {
+    widget.windowController.setWindowMethodHandler((call) async {
+      switch (call.method) {
+        case 'updateContent':
+          await _handleUpdateContent(call.arguments as Map<dynamic, dynamic>);
+          return true;
+        case 'hideWindow':
+          await _hideWindow();
+          return true;
+        default:
+          return null;
+      }
+    });
+  }
+
+  /// Handle content update and show the window
+  Future<void> _handleUpdateContent(Map<dynamic, dynamic> args) async {
+    // Convert to proper type
+    final newArgs = <String, dynamic>{};
+    args.forEach((key, value) {
+      newArgs[key.toString()] = value;
+    });
+
+    // Update state
+    setState(() {
+      _currentArgs = newArgs;
+      _updateTheme();
+    });
+
+    // Show the window at the new position
+    await _showWindow();
+  }
+
+  /// Initialize window properties (called once at startup)
   Future<void> _initWindow() async {
     await windowManager.ensureInitialized();
     windowManager.addListener(this);
 
-    // Get position from args
-    final x = (widget.args['x'] as num?)?.toDouble() ?? 0;
-    final y = (widget.args['y'] as num?)?.toDouble() ?? 0;
-    final itemId = widget.args['itemId'] as String? ?? '';
-
-    // Calculate popup size based on item type
-    final popupHeight = _getPopupHeight(itemId);
-    final popupWidth = _getPopupWidth(itemId);
-
-    // Set window properties in parallel where possible to reduce startup time
-    // Group 1: Properties that can be set concurrently
+    // Set up window properties that don't change
     await Future.wait([
-      windowManager.setSize(Size(popupWidth, popupHeight)),
       windowManager.setBackgroundColor(Colors.transparent),
       windowManager.setSkipTaskbar(true),
       windowManager.setTitleBarStyle(
@@ -81,12 +125,55 @@ class _MenuBarPopupWindowState extends State<MenuBarPopupWindow>
       windowManager.setMovable(false),
     ]);
 
-    // Group 2: Position must be set after size for correct placement
+    _isInitialized = true;
+    debugPrint('[PooledWindow $_poolIndex] Initialized and ready');
+  }
+
+  /// Show the window with current content
+  Future<void> _showWindow() async {
+    if (!_isInitialized) {
+      await _initWindow();
+    }
+
+    final x = (_currentArgs['x'] as num?)?.toDouble() ?? 0;
+    final y = (_currentArgs['y'] as num?)?.toDouble() ?? 0;
+    final itemId = _currentArgs['itemId'] as String? ?? '';
+
+    final popupHeight = _getPopupHeight(itemId);
+    final popupWidth = _getPopupWidth(itemId);
+
+    // Update size and position
+    await windowManager.setSize(Size(popupWidth, popupHeight));
     await windowManager.setPosition(Offset(x, y));
 
-    // Group 3: Show and focus
+    // Show and focus
     await windowManager.show();
-    windowManager.focus(); // Don't await focus - it's not critical
+    windowManager.focus();
+
+    setState(() {
+      _isVisible = true;
+    });
+
+    debugPrint('[PooledWindow $_poolIndex] Shown at ($x, $y) for $itemId');
+  }
+
+  /// Hide the window and notify the pool
+  Future<void> _hideWindow() async {
+    if (!_isVisible) return;
+
+    await windowManager.hide();
+
+    setState(() {
+      _isVisible = false;
+      // Reset to empty state
+      _currentArgs = {
+        'itemId': '',
+        'brightness': _currentArgs['brightness'],
+        'locale': _currentArgs['locale'],
+      };
+    });
+
+    debugPrint('[PooledWindow $_poolIndex] Hidden');
   }
 
   /// Get popup width based on item type
@@ -137,15 +224,24 @@ class _MenuBarPopupWindowState extends State<MenuBarPopupWindow>
 
   @override
   void onWindowBlur() {
-    _closePopup();
+    // When window loses focus, hide it and notify pool
+    _onClosePopup();
   }
 
-  Future<void> _closePopup() async {
-    await windowManager.close();
+  Future<void> _onClosePopup() async {
+    if (!_isVisible) return;
+
+    await _hideWindow();
+
+    // Notify the pool that this window is available again
+    WindowPoolService.instance.onWindowHidden(_poolIndex);
   }
 
   @override
   Widget build(BuildContext context) {
+    final locale = _currentArgs['locale'] as String?;
+    final itemId = _currentArgs['itemId'] as String? ?? '';
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       localizationsDelegates: const [
@@ -155,9 +251,7 @@ class _MenuBarPopupWindowState extends State<MenuBarPopupWindow>
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: AppLocalizations.supportedLocales,
-      locale: widget.args['locale'] != null
-          ? Locale(widget.args['locale'] as String)
-          : null,
+      locale: locale != null ? Locale(locale) : null,
       theme: ThemeData(
         fontFamily: 'NotoSansSC',
         scaffoldBackgroundColor: Colors.transparent,
@@ -170,63 +264,58 @@ class _MenuBarPopupWindowState extends State<MenuBarPopupWindow>
       builder: (context, child) {
         return Container(color: Colors.transparent, child: child);
       },
-      home: _MenuBarPopupContent(
-        itemId: widget.args['itemId'] as String? ?? '',
-        themeColors: _themeColors,
-        onClose: _closePopup,
-        focusIsActive: widget.args['focusIsActive'] as bool? ?? false,
-        focusIsRelaxing: widget.args['focusIsRelaxing'] as bool? ?? false,
-        focusSecondsRemaining:
-            widget.args['focusSecondsRemaining'] as int? ?? 0,
-        focusCurrentLoop: widget.args['focusCurrentLoop'] as int? ?? 1,
-        focusTotalLoops: widget.args['focusTotalLoops'] as int? ?? 1,
-        level: widget.args['level'] as int? ?? 1,
-        currentExp: (widget.args['currentExp'] as num?)?.toDouble() ?? 0,
-        maxExp:
-            (widget.args['maxExp'] as num?)?.toDouble() ??
-            AppConstants.initialMaxExp,
-      ),
+      home: _isVisible && itemId.isNotEmpty
+          ? _PooledPopupContent(
+              key: ValueKey('$itemId-${DateTime.now().millisecondsSinceEpoch}'),
+              itemId: itemId,
+              args: _currentArgs,
+              themeColors: _themeColors,
+              onClose: _onClosePopup,
+            )
+          : const SizedBox.shrink(),
     );
   }
 }
 
-/// The actual content of the popup window
-class _MenuBarPopupContent extends StatefulWidget {
+/// The actual content of the pooled popup window
+class _PooledPopupContent extends StatefulWidget {
   final String itemId;
+  final Map<String, dynamic> args;
   final AppThemeColors themeColors;
   final VoidCallback onClose;
-  final bool focusIsActive;
-  final bool focusIsRelaxing;
-  final int focusSecondsRemaining;
-  final int focusCurrentLoop;
-  final int focusTotalLoops;
-  final int level;
-  final double currentExp;
-  final double maxExp;
 
-  const _MenuBarPopupContent({
+  const _PooledPopupContent({
+    super.key,
     required this.itemId,
+    required this.args,
     required this.themeColors,
     required this.onClose,
-    this.focusIsActive = false,
-    this.focusIsRelaxing = false,
-    this.focusSecondsRemaining = 0,
-    this.focusCurrentLoop = 1,
-    this.focusTotalLoops = 1,
-    this.level = 1,
-    this.currentExp = 0,
-    this.maxExp = AppConstants.initialMaxExp,
   });
 
   @override
-  State<_MenuBarPopupContent> createState() => _MenuBarPopupContentState();
+  State<_PooledPopupContent> createState() => _PooledPopupContentState();
 }
 
-class _MenuBarPopupContentState extends State<_MenuBarPopupContent> {
+class _PooledPopupContentState extends State<_PooledPopupContent> {
   List<Map<String, dynamic>>? _processes;
   bool _isLoading = false;
   GameData? _gameData;
   DailyStats? _todayStats;
+
+  // Focus state from args
+  bool get _focusIsActive => widget.args['focusIsActive'] as bool? ?? false;
+  bool get _focusIsRelaxing => widget.args['focusIsRelaxing'] as bool? ?? false;
+  int get _focusSecondsRemaining =>
+      widget.args['focusSecondsRemaining'] as int? ?? 0;
+  int get _focusCurrentLoop => widget.args['focusCurrentLoop'] as int? ?? 1;
+  int get _focusTotalLoops => widget.args['focusTotalLoops'] as int? ?? 1;
+
+  // Level/Exp state from args
+  int get _level => widget.args['level'] as int? ?? 1;
+  double get _currentExp =>
+      (widget.args['currentExp'] as num?)?.toDouble() ?? 0;
+  double get _maxExp =>
+      (widget.args['maxExp'] as num?)?.toDouble() ?? AppConstants.initialMaxExp;
 
   /// Get content width based on item type
   double _getContentWidth() {
@@ -467,11 +556,11 @@ class _MenuBarPopupContentState extends State<_MenuBarPopupContent> {
         );
       case 'focus':
         return FocusContent(
-          focusIsActive: widget.focusIsActive,
-          focusIsRelaxing: widget.focusIsRelaxing,
-          focusSecondsRemaining: widget.focusSecondsRemaining,
-          focusCurrentLoop: widget.focusCurrentLoop,
-          focusTotalLoops: widget.focusTotalLoops,
+          focusIsActive: _focusIsActive,
+          focusIsRelaxing: _focusIsRelaxing,
+          focusSecondsRemaining: _focusSecondsRemaining,
+          focusCurrentLoop: _focusCurrentLoop,
+          focusTotalLoops: _focusTotalLoops,
         );
       case 'todo':
         return TodoContent(
@@ -480,9 +569,9 @@ class _MenuBarPopupContentState extends State<_MenuBarPopupContent> {
         );
       case 'levelExp':
         return LevelExpContent(
-          level: widget.level,
-          currentExp: widget.currentExp,
-          maxExp: widget.maxExp,
+          level: _level,
+          currentExp: _currentExp,
+          maxExp: _maxExp,
         );
       case 'keyboard':
         return KeyboardContent(

@@ -25,12 +25,14 @@ import 'services/input_monitor_service.dart';
 import 'services/menu_bar_helper.dart';
 import 'services/menu_bar_info_service.dart';
 import 'services/pomodoro_service.dart';
+import 'services/window_pool_service.dart';
 import 'widgets/accessibility_dialog.dart';
 import 'widgets/floating_exp_indicator.dart';
 import 'widgets/games_list_dialog.dart';
 import 'widgets/home_page_content.dart';
 import 'widgets/level_up_effect.dart';
 import 'widgets/menu_bar_popup.dart';
+import 'widgets/menu_bar_popup/pooled_popup_window.dart';
 import 'widgets/pomodoro_dialog.dart';
 import 'widgets/settings_dialog.dart';
 import 'widgets/stats_window.dart';
@@ -47,12 +49,27 @@ void main(List<String> args) async {
   if (currentWindowController.arguments.isNotEmpty) {
     final argument =
         jsonDecode(currentWindowController.arguments) as Map<String, dynamic>;
-    runApp(
-      MenuBarPopupWindow(
-        windowController: currentWindowController,
-        args: argument,
-      ),
-    );
+
+    // Check if this is a pooled window
+    final isPooledWindow = argument['pooledWindow'] as bool? ?? false;
+
+    if (isPooledWindow) {
+      // Run as a pooled popup window (pre-warmed, reusable)
+      runApp(
+        PooledPopupWindow(
+          windowController: currentWindowController,
+          initialArgs: argument,
+        ),
+      );
+    } else {
+      // Run as a traditional popup window (fallback)
+      runApp(
+        MenuBarPopupWindow(
+          windowController: currentWindowController,
+          args: argument,
+        ),
+      );
+    }
     return;
   }
 
@@ -152,6 +169,17 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
     _initTray();
     _initMenuBarHelper();
     _setupWindowMethodHandler();
+    _initWindowPool();
+  }
+
+  /// Initialize the window pool for instant popups
+  void _initWindowPool() {
+    if (!WindowPoolConstants.enableWindowPool) return;
+
+    // Delay initialization to not block main window startup
+    Future.delayed(WindowPoolConstants.initializationDelay, () {
+      WindowPoolService.instance.initialize();
+    });
   }
 
   /// Set up handler for commands from popup window using WindowController
@@ -199,27 +227,48 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
     // In top-left coords, the top of popup should be just below the menu bar
     final popupY = screenHeight - screenRect.bottom;
 
-    // Create the popup window with position, theme and locale info
-    // The popup window will configure itself using window_manager
+    // Common popup arguments
+    final popupArgs = <String, dynamic>{
+      'itemId': itemId,
+      'x': popupX,
+      'y': popupY,
+      'brightness': _themeMode == AppThemeMode.dark ? 'dark' : 'light',
+      'locale': _locale?.languageCode,
+      // Focus state for popup
+      'focusIsActive': _pomodoroState.isActive,
+      'focusIsRelaxing': _pomodoroState.isRelaxing,
+      'focusSecondsRemaining': _pomodoroState.secondsRemaining,
+      'focusCurrentLoop': _pomodoroState.currentLoop,
+      'focusTotalLoops': _pomodoroState.totalLoops,
+      // Level/Exp state for popup
+      'level': _level,
+      'currentExp': _currentExp,
+      'maxExp': _maxExp,
+    };
+
+    // Try to use window pool for instant popup
+    if (WindowPoolConstants.enableWindowPool &&
+        WindowPoolService.instance.isReady) {
+      final success = await WindowPoolService.instance.showPopup(
+        itemId: itemId,
+        x: popupX,
+        y: popupY,
+        brightness: _themeMode == AppThemeMode.dark ? 'dark' : 'light',
+        locale: _locale?.languageCode,
+        extraArgs: popupArgs,
+      );
+
+      if (success) {
+        return; // Popup shown via pool
+      }
+      // Fall through to traditional method if pool failed
+    }
+
+    // Fallback: Create the popup window traditionally
+    // This is used when pool is not ready or disabled
     await WindowController.create(
       WindowConfiguration(
-        arguments: jsonEncode({
-          'itemId': itemId,
-          'x': popupX,
-          'y': popupY,
-          'brightness': _themeMode == AppThemeMode.dark ? 'dark' : 'light',
-          'locale': _locale?.languageCode,
-          // Focus state for popup
-          'focusIsActive': _pomodoroState.isActive,
-          'focusIsRelaxing': _pomodoroState.isRelaxing,
-          'focusSecondsRemaining': _pomodoroState.secondsRemaining,
-          'focusCurrentLoop': _pomodoroState.currentLoop,
-          'focusTotalLoops': _pomodoroState.totalLoops,
-          // Level/Exp state for popup
-          'level': _level,
-          'currentExp': _currentExp,
-          'maxExp': _maxExp,
-        }),
+        arguments: jsonEncode(popupArgs),
         hiddenAtLaunch: true,
       ),
     );
@@ -240,6 +289,7 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
   @override
   void dispose() {
     MenuBarHelper.dispose();
+    WindowPoolService.instance.dispose();
     windowManager.removeListener(this);
     trayManager.removeListener(this);
     super.dispose();
