@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../models/todo_item.dart';
+import '../../services/system_process_helper.dart';
 import 'menu_bar_popup_constants.dart';
 import 'popup_styles.dart';
 import 'popup_widgets.dart';
@@ -247,5 +248,312 @@ class MouseContent extends StatelessWidget {
       return '${meters.toStringAsFixed(1)} m';
     }
     return '${(meters * 100).toStringAsFixed(0)} cm';
+  }
+}
+
+/// Network basic info content widget
+class NetworkInfoContent extends StatefulWidget {
+  const NetworkInfoContent({super.key});
+
+  @override
+  State<NetworkInfoContent> createState() => _NetworkInfoContentState();
+}
+
+class _NetworkInfoContentState extends State<NetworkInfoContent> {
+  Map<String, String>? _networkInfo;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadNetworkInfo();
+  }
+
+  Future<void> _loadNetworkInfo() async {
+    final info = await SystemProcessHelper.getNetworkInfo();
+    if (mounted) {
+      setState(() {
+        _networkInfo = info;
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    if (_isLoading) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: MenuBarPopupConstants.popupPadding,
+          vertical: MenuBarPopupConstants.popupPadding / 2,
+        ),
+        child: Center(
+          child: SizedBox(
+            width: 14,
+            height: 14,
+            child: CircularProgressIndicator(strokeWidth: 1.5),
+          ),
+        ),
+      );
+    }
+
+    final info = _networkInfo ?? {};
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: MenuBarPopupConstants.popupPadding,
+        vertical: MenuBarPopupConstants.popupPadding / 2,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _buildInfoRow(
+            l10n.networkInfoInterface,
+            info['interfaceType'] ?? '-',
+          ),
+          _buildInfoRow(
+            l10n.networkInfoNetworkName,
+            info['networkName'] ?? '-',
+          ),
+          _buildInfoRow(l10n.networkInfoLocalIp, info['localIp'] ?? '-'),
+          _buildInfoRow(l10n.networkInfoPublicIp, info['publicIp'] ?? '-'),
+          _buildInfoRow(l10n.networkInfoMacAddress, info['macAddress'] ?? '-'),
+          _buildInfoRow(l10n.networkInfoGateway, info['gateway'] ?? '-'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value) {
+    return SizedBox(
+      height: MenuBarPopupConstants.networkInfoRowHeight,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: PopupTextStyles.labelText.copyWith(fontSize: 11)),
+          Flexible(
+            child: Text(
+              value,
+              style: PopupTextStyles.valueText.copyWith(fontSize: 11),
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.right,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Combined network content with info section and process list
+class NetworkContent extends StatelessWidget {
+  final List<Map<String, dynamic>>? processes;
+  final bool isLoading;
+  final VoidCallback onClose;
+
+  const NetworkContent({
+    super.key,
+    required this.processes,
+    required this.isLoading,
+    required this.onClose,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Network info section
+        const NetworkInfoContent(),
+        // Separator
+        Container(
+          height: 0.5,
+          margin: const EdgeInsets.symmetric(
+            horizontal: MenuBarPopupConstants.popupPadding,
+          ),
+          color: PopupColors.separator,
+        ),
+        const SizedBox(height: MenuBarPopupConstants.popupPadding / 2),
+        // Process list section
+        _NetworkProcessList(
+          processes: processes,
+          isLoading: isLoading,
+          onClose: onClose,
+        ),
+      ],
+    );
+  }
+}
+
+/// Network process list widget (reuses the network-specific styling)
+class _NetworkProcessList extends StatelessWidget {
+  final List<Map<String, dynamic>>? processes;
+  final bool isLoading;
+  final VoidCallback onClose;
+
+  const _NetworkProcessList({
+    required this.processes,
+    required this.isLoading,
+    required this.onClose,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    if (isLoading) {
+      return const Padding(
+        padding: EdgeInsets.all(MenuBarPopupConstants.popupPadding),
+        child: Center(
+          child: SizedBox(
+            width: 14,
+            height: 14,
+            child: CircularProgressIndicator(strokeWidth: 1.5),
+          ),
+        ),
+      );
+    }
+
+    final processList = processes ?? [];
+    if (processList.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.all(MenuBarPopupConstants.popupPadding),
+        child: Center(
+          child: Text(
+            'No active network processes',
+            style: PopupTextStyles.emptyText,
+          ),
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: MenuBarPopupConstants.popupPadding,
+        vertical: MenuBarPopupConstants.popupPadding / 2,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Column headers
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  l10n.cpuPopupHeaderProcess,
+                  style: PopupTextStyles.headerText,
+                ),
+              ),
+              const SizedBox(width: 8),
+              SizedBox(
+                width: MenuBarPopupConstants.pidColumnWidth,
+                child: Text(
+                  l10n.cpuPopupHeaderPid,
+                  textAlign: TextAlign.right,
+                  style: PopupTextStyles.headerText,
+                ),
+              ),
+              const SizedBox(width: 8),
+              SizedBox(
+                width: MenuBarPopupConstants.valueColumnWidth,
+                child: Text(
+                  l10n.networkPopupHeaderDownload,
+                  textAlign: TextAlign.right,
+                  style: PopupTextStyles.headerText,
+                ),
+              ),
+              const SizedBox(width: 8),
+              SizedBox(
+                width: MenuBarPopupConstants.valueColumnWidth,
+                child: Text(
+                  l10n.networkPopupHeaderUpload,
+                  textAlign: TextAlign.right,
+                  style: PopupTextStyles.headerText,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: MenuBarPopupConstants.headerBottomSpacing),
+          // Process rows
+          for (int i = 0; i < processList.length; i++) ...[
+            _buildProcessRow(processList[i]),
+            if (i < processList.length - 1) const SizedBox(height: 4),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProcessRow(Map<String, dynamic> process) {
+    final name = process['name'] as String? ?? 'Unknown';
+    final pid = process['pid'] as int? ?? 0;
+    final download = process['download'] as num? ?? 0;
+    final upload = process['upload'] as num? ?? 0;
+
+    return InkWell(
+      onTap: () {
+        SystemProcessHelper.openActivityMonitor();
+        onClose();
+      },
+      borderRadius: BorderRadius.circular(4),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 2),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                name,
+                style: PopupTextStyles.processNameText,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+            ),
+            const SizedBox(width: 8),
+            SizedBox(
+              width: MenuBarPopupConstants.pidColumnWidth,
+              child: Text(
+                pid > 0 ? pid.toString() : '-',
+                textAlign: TextAlign.right,
+                style: PopupTextStyles.processValueText,
+              ),
+            ),
+            const SizedBox(width: 8),
+            SizedBox(
+              width: MenuBarPopupConstants.valueColumnWidth,
+              child: Text(
+                _formatSpeed(download),
+                textAlign: TextAlign.right,
+                style: PopupTextStyles.processValueText,
+              ),
+            ),
+            const SizedBox(width: 8),
+            SizedBox(
+              width: MenuBarPopupConstants.valueColumnWidth,
+              child: Text(
+                _formatSpeed(upload),
+                textAlign: TextAlign.right,
+                style: PopupTextStyles.processValueText,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _formatSpeed(num bytesPerSec) {
+    if (bytesPerSec >= 1024 * 1024 * 1024) {
+      return '${(bytesPerSec / (1024 * 1024 * 1024)).toStringAsFixed(1)}G/s';
+    } else if (bytesPerSec >= 1024 * 1024) {
+      return '${(bytesPerSec / (1024 * 1024)).toStringAsFixed(1)}M/s';
+    } else if (bytesPerSec >= 1024) {
+      return '${(bytesPerSec / 1024).toStringAsFixed(1)}K/s';
+    }
+    return '${bytesPerSec.toInt()}B/s';
   }
 }

@@ -104,11 +104,12 @@ class _MenuBarPopupWindowState extends State<MenuBarPopupWindow>
   /// Get popup height based on item type
   double _getPopupHeight(String itemId) {
     switch (itemId) {
+      case 'network':
+        return MenuBarPopupConstants.networkPopupHeight;
       case 'cpu':
       case 'gpu':
       case 'ram':
       case 'disk':
-      case 'network':
       case 'battery':
       case 'todo':
         return MenuBarPopupConstants.cpuPopupHeight;
@@ -445,10 +446,15 @@ class _MenuBarPopupContentState extends State<_MenuBarPopupContent> {
       case 'gpu':
       case 'ram':
       case 'disk':
-      case 'network':
       case 'battery':
         return ProcessListContent(
           itemId: widget.itemId,
+          processes: _processes,
+          isLoading: _isLoading,
+          onClose: widget.onClose,
+        );
+      case 'network':
+        return NetworkContent(
           processes: _processes,
           isLoading: _isLoading,
           onClose: widget.onClose,

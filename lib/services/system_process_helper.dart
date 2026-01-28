@@ -536,4 +536,150 @@ class SystemProcessHelper {
       debugPrint('Failed to open Activity Monitor: $e');
     }
   }
+
+  /// Get basic network interface information
+  /// Returns info about the active network interface including:
+  /// - interfaceType: WiFi, Ethernet, or Unknown
+  /// - networkName: SSID for WiFi, or interface name for Ethernet
+  /// - localIp: Local IP address
+  /// - publicIp: Public IP address (fetched from external service)
+  /// - macAddress: MAC address of the interface
+  /// - gateway: Default gateway IP
+  static Future<Map<String, String>> getNetworkInfo() async {
+    final info = <String, String>{
+      'interfaceType': '-',
+      'networkName': '-',
+      'localIp': '-',
+      'publicIp': '-',
+      'macAddress': '-',
+      'gateway': '-',
+    };
+
+    try {
+      // Get the primary network interface and its info
+      // Use route -n get default to find the active interface more reliably
+      String? activeInterface;
+
+      final routeResult = await Process.run('/sbin/route', [
+        '-n',
+        'get',
+        'default',
+      ]);
+
+      if (routeResult.exitCode == 0) {
+        final output = routeResult.stdout as String;
+        // Parse interface name
+        final interfaceMatch = RegExp(r'interface:\s*(\S+)').firstMatch(output);
+        if (interfaceMatch != null) {
+          activeInterface = interfaceMatch.group(1);
+        }
+        // Parse gateway
+        final gatewayMatch = RegExp(r'gateway:\s*(\S+)').firstMatch(output);
+        if (gatewayMatch != null) {
+          info['gateway'] = gatewayMatch.group(1)!;
+        }
+      }
+
+      // Get local IP and MAC address using ifconfig first (works in VMs)
+      if (activeInterface != null) {
+        final ifconfigResult = await Process.run('/sbin/ifconfig', [
+          activeInterface,
+        ]);
+        if (ifconfigResult.exitCode == 0) {
+          final ifconfigOutput = ifconfigResult.stdout as String;
+
+          // Extract IPv4 address
+          final inetMatch = RegExp(
+            r'inet\s+(\d+\.\d+\.\d+\.\d+)',
+          ).firstMatch(ifconfigOutput);
+          if (inetMatch != null) {
+            info['localIp'] = inetMatch.group(1)!;
+          }
+
+          // Extract MAC address (ether or lladdr)
+          final etherMatch = RegExp(
+            r'(?:ether|lladdr)\s+([0-9a-fA-F:]+)',
+          ).firstMatch(ifconfigOutput);
+          if (etherMatch != null) {
+            info['macAddress'] = etherMatch.group(1)!.toUpperCase();
+          }
+        }
+
+        // Determine interface type
+        // Try to detect WiFi only on real hardware (airport exists)
+        bool isWifi = false;
+        if (activeInterface.startsWith('en')) {
+          // Check if airport command exists before running it
+          const airportPath =
+              '/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport';
+
+          // Check if the airport binary exists using File.exists()
+          final airportFile = File(airportPath);
+          if (await airportFile.exists()) {
+            try {
+              final wifiResult = await Process.run(airportPath, ['-I']);
+              if (wifiResult.exitCode == 0) {
+                final wifiOutput = wifiResult.stdout as String;
+                if (!wifiOutput.contains('AirPort: Off') &&
+                    wifiOutput.contains('SSID:')) {
+                  isWifi = true;
+                  info['interfaceType'] = 'WiFi';
+                  // Extract SSID
+                  final ssidMatch = RegExp(
+                    r'^\s*SSID:\s*(.+)$',
+                    multiLine: true,
+                  ).firstMatch(wifiOutput);
+                  if (ssidMatch != null) {
+                    info['networkName'] = ssidMatch.group(1)!.trim();
+                  }
+                }
+              }
+            } catch (e) {
+              // airport command failed (VM or no WiFi hardware)
+              // Continue without WiFi detection
+            }
+          }
+        }
+
+        // If not WiFi, treat as Ethernet/VM network
+        if (!isWifi) {
+          // Detect interface type based on name
+          if (activeInterface.startsWith('en')) {
+            info['interfaceType'] = 'Ethernet';
+          } else if (activeInterface.startsWith('bridge')) {
+            info['interfaceType'] = 'Bridge';
+          } else if (activeInterface.startsWith('vmnet')) {
+            info['interfaceType'] = 'VMware';
+          } else if (activeInterface.startsWith('vnic')) {
+            info['interfaceType'] = 'Virtual';
+          } else {
+            info['interfaceType'] = activeInterface;
+          }
+          info['networkName'] = activeInterface;
+        }
+      }
+
+      // Get public IP address (async, may take a moment)
+      try {
+        final publicIpResult = await Process.run('/usr/bin/curl', [
+          '-s',
+          '-m',
+          '2', // 2 second timeout
+          'https://api.ipify.org',
+        ]);
+        if (publicIpResult.exitCode == 0) {
+          final publicIp = (publicIpResult.stdout as String).trim();
+          if (RegExp(r'^\d+\.\d+\.\d+\.\d+$').hasMatch(publicIp)) {
+            info['publicIp'] = publicIp;
+          }
+        }
+      } catch (e) {
+        // Public IP fetch failed, keep as '-'
+      }
+    } catch (e) {
+      debugPrint('Failed to get network info: $e');
+    }
+
+    return info;
+  }
 }

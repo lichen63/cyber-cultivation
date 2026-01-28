@@ -388,4 +388,25 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get networkPopupHeaderUpload => '↑上传';
+
+  @override
+  String get networkInfoInterface => '接口';
+
+  @override
+  String get networkInfoNetworkName => '网络名';
+
+  @override
+  String get networkInfoLocalIp => '内网IP';
+
+  @override
+  String get networkInfoPublicIp => '公网IP';
+
+  @override
+  String get networkInfoMacAddress => 'MAC';
+
+  @override
+  String get networkInfoGateway => '网关';
+
+  @override
+  String get networkInfoProcesses => '进程列表';
 }
