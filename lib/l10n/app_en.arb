@@ -518,5 +518,33 @@
     "networkPopupHeaderUpload": "↑Up",
     "@networkPopupHeaderUpload": {
         "description": "Column header for network upload in popup"
+    },
+    "networkInfoInterface": "Interface",
+    "@networkInfoInterface": {
+        "description": "Label for network interface type"
+    },
+    "networkInfoNetworkName": "Network",
+    "@networkInfoNetworkName": {
+        "description": "Label for network name (SSID or interface)"
+    },
+    "networkInfoLocalIp": "Local IP",
+    "@networkInfoLocalIp": {
+        "description": "Label for local IP address"
+    },
+    "networkInfoPublicIp": "Public IP",
+    "@networkInfoPublicIp": {
+        "description": "Label for public IP address"
+    },
+    "networkInfoMacAddress": "MAC",
+    "@networkInfoMacAddress": {
+        "description": "Label for MAC address"
+    },
+    "networkInfoGateway": "Gateway",
+    "@networkInfoGateway": {
+        "description": "Label for gateway IP address"
+    },
+    "networkInfoProcesses": "Top Processes",
+    "@networkInfoProcesses": {
+        "description": "Header for top network processes section"
     }
 }

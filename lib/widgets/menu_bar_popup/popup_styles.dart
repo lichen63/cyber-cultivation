@@ -25,7 +25,7 @@ class PopupTextStyles {
 
   static const TextStyle labelText = TextStyle(
     fontSize: MenuBarPopupConstants.processNameFontSize,
-    color: Color(0xFF8E8E93),
+    color: Color(0xFF1D1D1F),
   );
 
   static const TextStyle valueText = TextStyle(

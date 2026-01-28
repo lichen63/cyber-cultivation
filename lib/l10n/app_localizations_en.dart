@@ -393,4 +393,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get networkPopupHeaderUpload => '↑Up';
+
+  @override
+  String get networkInfoInterface => 'Interface';
+
+  @override
+  String get networkInfoNetworkName => 'Network';
+
+  @override
+  String get networkInfoLocalIp => 'Local IP';
+
+  @override
+  String get networkInfoPublicIp => 'Public IP';
+
+  @override
+  String get networkInfoMacAddress => 'MAC';
+
+  @override
+  String get networkInfoGateway => 'Gateway';
+
+  @override
+  String get networkInfoProcesses => 'Top Processes';
 }

@@ -123,5 +123,12 @@
     "diskPopupHeaderRead": "读取",
     "diskPopupHeaderWrite": "写入",
     "networkPopupHeaderDownload": "↓下载",
-    "networkPopupHeaderUpload": "↑上传"
+    "networkPopupHeaderUpload": "↑上传",
+    "networkInfoInterface": "接口",
+    "networkInfoNetworkName": "网络名",
+    "networkInfoLocalIp": "内网IP",
+    "networkInfoPublicIp": "公网IP",
+    "networkInfoMacAddress": "MAC",
+    "networkInfoGateway": "网关",
+    "networkInfoProcesses": "进程列表"
 }

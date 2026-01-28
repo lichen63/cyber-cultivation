@@ -841,6 +841,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'↑Up'**
   String get networkPopupHeaderUpload;
+
+  /// Label for network interface type
+  ///
+  /// In en, this message translates to:
+  /// **'Interface'**
+  String get networkInfoInterface;
+
+  /// Label for network name (SSID or interface)
+  ///
+  /// In en, this message translates to:
+  /// **'Network'**
+  String get networkInfoNetworkName;
+
+  /// Label for local IP address
+  ///
+  /// In en, this message translates to:
+  /// **'Local IP'**
+  String get networkInfoLocalIp;
+
+  /// Label for public IP address
+  ///
+  /// In en, this message translates to:
+  /// **'Public IP'**
+  String get networkInfoPublicIp;
+
+  /// Label for MAC address
+  ///
+  /// In en, this message translates to:
+  /// **'MAC'**
+  String get networkInfoMacAddress;
+
+  /// Label for gateway IP address
+  ///
+  /// In en, this message translates to:
+  /// **'Gateway'**
+  String get networkInfoGateway;
+
+  /// Header for top network processes section
+  ///
+  /// In en, this message translates to:
+  /// **'Top Processes'**
+  String get networkInfoProcesses;
 }
 
 class _AppLocalizationsDelegate

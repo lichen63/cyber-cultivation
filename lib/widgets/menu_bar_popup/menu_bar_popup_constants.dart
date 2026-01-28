@@ -18,7 +18,7 @@ class MenuBarPopupConstants {
   static const double contentMinHeight = 80.0;
 
   // CPU processes
-  static const int topProcessesCount = 10;
+  static const int topProcessesCount = 5;
   static const double processNameFontSize = 11.0;
 
   /// Includes vertical padding from InkWell
@@ -52,5 +52,31 @@ class MenuBarPopupConstants {
         (popupPadding * 2) +
         40; // Extra padding for separator, borders, and rounding
     return titleBarHeight + contentHeight;
+  }
+
+  // Network info section
+  static const double networkInfoRowHeight = 18.0;
+  static const int networkInfoRowCount =
+      6; // Interface, Name, Local IP, Public IP, MAC, Gateway
+  static const double networkInfoSectionSpacing = 10.0;
+
+  /// Calculate popup height for network popup (includes both info and processes)
+  static double get networkPopupHeight {
+    // Network info section
+    final networkInfoHeight =
+        (networkInfoRowHeight * networkInfoRowCount) +
+        networkInfoSectionSpacing;
+    // Process list section (header + process rows)
+    final processListHeight =
+        headerFontSize +
+        headerBottomSpacing +
+        (processRowHeight * topProcessesCount) +
+        (processRowSpacing * (topProcessesCount - 1));
+    // Total with padding
+    return titleBarHeight +
+        networkInfoHeight +
+        processListHeight +
+        (popupPadding * 3) +
+        30; // Extra for separators and borders
   }
 }
