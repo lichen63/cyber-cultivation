@@ -545,6 +545,8 @@ class SystemProcessHelper {
   /// - publicIp: Public IP address (fetched from external service)
   /// - macAddress: MAC address of the interface
   /// - gateway: Default gateway IP
+  ///
+  /// Uses public macOS APIs (scutil, networksetup) instead of private frameworks
   static Future<Map<String, String>> getNetworkInfo() async {
     final info = <String, String>{
       'interfaceType': '-',
@@ -556,8 +558,7 @@ class SystemProcessHelper {
     };
 
     try {
-      // Get the primary network interface and its info
-      // Use route -n get default to find the active interface more reliably
+      // Get the primary network interface using scutil (public API)
       String? activeInterface;
 
       final routeResult = await Process.run('/sbin/route', [
@@ -580,7 +581,7 @@ class SystemProcessHelper {
         }
       }
 
-      // Get local IP and MAC address using ifconfig first (works in VMs)
+      // Get local IP and MAC address using ifconfig (public API)
       if (activeInterface != null) {
         final ifconfigResult = await Process.run('/sbin/ifconfig', [
           activeInterface,
@@ -605,39 +606,33 @@ class SystemProcessHelper {
           }
         }
 
-        // Determine interface type
-        // Try to detect WiFi only on real hardware (airport exists)
+        // Determine interface type and get WiFi SSID using networksetup (public API)
+        // This is the same approach used by Stats app
         bool isWifi = false;
         if (activeInterface.startsWith('en')) {
-          // Check if airport command exists before running it
-          const airportPath =
-              '/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport';
-
-          // Check if the airport binary exists using File.exists()
-          final airportFile = File(airportPath);
-          if (await airportFile.exists()) {
-            try {
-              final wifiResult = await Process.run(airportPath, ['-I']);
-              if (wifiResult.exitCode == 0) {
-                final wifiOutput = wifiResult.stdout as String;
-                if (!wifiOutput.contains('AirPort: Off') &&
-                    wifiOutput.contains('SSID:')) {
-                  isWifi = true;
-                  info['interfaceType'] = 'WiFi';
-                  // Extract SSID
-                  final ssidMatch = RegExp(
-                    r'^\s*SSID:\s*(.+)$',
-                    multiLine: true,
-                  ).firstMatch(wifiOutput);
-                  if (ssidMatch != null) {
-                    info['networkName'] = ssidMatch.group(1)!.trim();
-                  }
+          // Try to get WiFi network name using networksetup (public API, works on all Macs)
+          try {
+            final wifiResult = await Process.run('/usr/sbin/networksetup', [
+              '-getairportnetwork',
+              activeInterface,
+            ]);
+            if (wifiResult.exitCode == 0) {
+              final wifiOutput = wifiResult.stdout as String;
+              // Output format: "Current Wi-Fi Network: NetworkName" or
+              // "You are not associated with an AirPort network."
+              if (!wifiOutput.contains('not associated') &&
+                  wifiOutput.contains(':')) {
+                isWifi = true;
+                info['interfaceType'] = 'WiFi';
+                // Extract SSID after the colon
+                final ssidParts = wifiOutput.split(':');
+                if (ssidParts.length >= 2) {
+                  info['networkName'] = ssidParts.sublist(1).join(':').trim();
                 }
               }
-            } catch (e) {
-              // airport command failed (VM or no WiFi hardware)
-              // Continue without WiFi detection
             }
+          } catch (e) {
+            // networksetup command failed, continue without WiFi detection
           }
         }
 
@@ -659,7 +654,7 @@ class SystemProcessHelper {
         }
       }
 
-      // Get public IP address (async, may take a moment)
+      // Get public IP address using curl (same as Stats app)
       try {
         final publicIpResult = await Process.run('/usr/bin/curl', [
           '-s',
