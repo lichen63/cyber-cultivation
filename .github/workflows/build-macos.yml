@@ -1,0 +1,158 @@
+name: Build macOS DMG
+
+on:
+  # Manual trigger
+  workflow_dispatch:
+    inputs:
+      create_release:
+        description: 'Create a GitHub release'
+        type: boolean
+        default: true
+
+  # Trigger on version change in pubspec.yaml
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'pubspec.yaml'
+
+# Prevent concurrent builds for the same ref
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version_changed: ${{ steps.check.outputs.changed }}
+      version: ${{ steps.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Check if version changed
+        id: check
+        run: |
+          # Get current version from pubspec.yaml
+          CURRENT_VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //' | tr -d ' ')
+          echo "Current version: $CURRENT_VERSION"
+          echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+
+          # For manual trigger, always proceed
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "Manual trigger - proceeding with build"
+            echo "changed=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Check if this is the first commit or if version changed
+          if git rev-parse HEAD~1 >/dev/null 2>&1; then
+            PREVIOUS_VERSION=$(git show HEAD~1:pubspec.yaml 2>/dev/null | grep '^version:' | sed 's/version: //' | tr -d ' ' || echo "")
+            echo "Previous version: $PREVIOUS_VERSION"
+
+            if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
+              echo "Version changed from $PREVIOUS_VERSION to $CURRENT_VERSION"
+              echo "changed=true" >> $GITHUB_OUTPUT
+            else
+              echo "Version unchanged"
+              echo "changed=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "First commit - proceeding with build"
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+  build-macos:
+    needs: check-version
+    if: needs.check-version.outputs.version_changed == 'true'
+    runs-on: macos-latest
+    outputs:
+      dmg_name: ${{ steps.build_dmg.outputs.dmg_name }}
+      version: ${{ needs.check-version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build macOS app (Release)
+        run: flutter build macos --release
+
+      - name: Build DMG
+        id: build_dmg
+        run: |
+          chmod +x ./tools/build_macos_dmg.sh
+          ./tools/build_macos_dmg.sh --ci
+          
+          # Get DMG name for outputs
+          VERSION="${{ needs.check-version.outputs.version }}"
+          VERSION_NUMBER=$(echo "$VERSION" | cut -d'+' -f1)
+          DMG_NAME="CyberCultivation-${VERSION_NUMBER}-macos.dmg"
+          echo "dmg_name=$DMG_NAME" >> $GITHUB_OUTPUT
+          
+          # Move DMG to root for artifact upload
+          mv "dist/$DMG_NAME" "$DMG_NAME"
+
+      - name: Upload DMG artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-dmg
+          path: ${{ steps.build_dmg.outputs.dmg_name }}
+          retention-days: 30
+
+  release:
+    needs: [check-version, build-macos]
+    if: |
+      needs.check-version.outputs.version_changed == 'true' &&
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.create_release == 'true') ||
+      (github.event_name == 'push')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download DMG artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: macos-dmg
+
+      - name: Get version info
+        id: version_info
+        run: |
+          VERSION="${{ needs.check-version.outputs.version }}"
+          VERSION_NUMBER=$(echo "$VERSION" | cut -d'+' -f1)
+          echo "version_number=$VERSION_NUMBER" >> $GITHUB_OUTPUT
+          echo "tag=v$VERSION_NUMBER" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version_info.outputs.tag }}
+          name: Cyber Cultivation ${{ steps.version_info.outputs.version_number }}
+          body: |
+            ## Cyber Cultivation ${{ steps.version_info.outputs.version_number }}
+
+            ### Installation (macOS)
+
+            1. Download `${{ needs.build-macos.outputs.dmg_name }}`
+            2. Open the DMG file
+            3. Drag `CyberCultivation.app` to the Applications folder
+            4. **Important**: Since this app is not signed with an Apple Developer certificate:
+               - Right-click on the app and select "Open"
+               - Click "Open" in the dialog that appears
+               - You only need to do this once
+               - If the above doesn't work, run in Terminal: `xattr -d com.apple.quarantine /Applications/CyberCultivation.app`
+          files: ${{ needs.build-macos.outputs.dmg_name }}
+          draft: false
+          prerelease: false
+          generate_release_notes: false
