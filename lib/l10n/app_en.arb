@@ -1,0 +1,550 @@
+{
+    "@@locale": "en",
+    "appTitle": "Cyber Cultivation",
+    "@appTitle": {
+        "description": "The title of the application"
+    },
+    "defaultKeyText": "Key",
+    "@defaultKeyText": {
+        "description": "Label for the default key"
+    },
+    "forceForegroundText": "Force Foreground",
+    "@forceForegroundText": {
+        "description": "Option to force the window to the foreground"
+    },
+    "antiSleepText": "Anti-Sleep",
+    "@antiSleepText": {
+        "description": "Option to prevent the system from sleeping"
+    },
+    "hideWindowText": "Hide Window",
+    "@hideWindowText": {
+        "description": "Option to hide the game window"
+    },
+    "exitGameText": "Exit Game",
+    "@exitGameText": {
+        "description": "Option to exit the game"
+    },
+    "pomodoroDialogTitle": "Pomodoro Clock",
+    "@pomodoroDialogTitle": {
+        "description": "Title of the Pomodoro dialog"
+    },
+    "pomodoroDurationLabel": "Focus (min):",
+    "@pomodoroDurationLabel": {
+        "description": "Label for the focus duration input"
+    },
+    "pomodoroRelaxLabel": "Relax (min):",
+    "@pomodoroRelaxLabel": {
+        "description": "Label for the relax duration input"
+    },
+    "pomodoroLoopsLabel": "Loops:",
+    "@pomodoroLoopsLabel": {
+        "description": "Label for the loops input"
+    },
+    "pomodoroExpectedExpLabel": "Expected Exp: ",
+    "@pomodoroExpectedExpLabel": {
+        "description": "Label for expected experience points"
+    },
+    "pomodoroStartButtonText": "Start",
+    "@pomodoroStartButtonText": {
+        "description": "Text for the start button"
+    },
+    "pomodoroSaveAsDefaultButtonText": "Save as Default",
+    "@pomodoroSaveAsDefaultButtonText": {
+        "description": "Text for saving current pomodoro values as default"
+    },
+    "cancelButtonText": "Cancel",
+    "@cancelButtonText": {
+        "description": "Text for the cancel button"
+    },
+    "confirmStopTitle": "Stop Focus?",
+    "@confirmStopTitle": {
+        "description": "Title for the stop confirmation dialog"
+    },
+    "confirmStopContent": "Current focus progress will be lost.",
+    "@confirmStopContent": {
+        "description": "Content for the stop confirmation dialog"
+    },
+    "stopButtonText": "Stop",
+    "@stopButtonText": {
+        "description": "Text for the stop button"
+    },
+    "invalidInputErrorText": "Invalid",
+    "@invalidInputErrorText": {
+        "description": "Error text for invalid input"
+    },
+    "settingsTitle": "Settings",
+    "@settingsTitle": {
+        "description": "Title for the settings dialog"
+    },
+    "closeButtonText": "Close",
+    "@closeButtonText": {
+        "description": "Text for the close button"
+    },
+    "language": "Language",
+    "@language": {
+        "description": "Label for language selection"
+    },
+    "systemLanguage": "System",
+    "@systemLanguage": {
+        "description": "Label for system language option"
+    },
+    "focusState": "Focus",
+    "@focusState": {
+        "description": "Label for focus state"
+    },
+    "relaxState": "Relax",
+    "@relaxState": {
+        "description": "Label for relax state"
+    },
+    "idleState": "Idle",
+    "@idleState": {
+        "description": "Label for idle state"
+    },
+    "focusPopupStatus": "Status",
+    "@focusPopupStatus": {
+        "description": "Label for focus popup status"
+    },
+    "focusPopupTimeRemaining": "Time Remaining",
+    "@focusPopupTimeRemaining": {
+        "description": "Label for focus popup time remaining"
+    },
+    "alwaysShowActionsText": "Always Show Actions",
+    "@alwaysShowActionsText": {
+        "description": "Option to always show action buttons"
+    },
+    "statsTitle": "Stats",
+    "@statsTitle": {
+        "description": "Title for the stats button"
+    },
+    "statsHistoryTrends": "History Trends",
+    "@statsHistoryTrends": {
+        "description": "Section title for history trends"
+    },
+    "statsLast7Days": "Last 7 Days",
+    "@statsLast7Days": {
+        "description": "Button label for last 7 days stats"
+    },
+    "statsLast30Days": "Last 30 Days",
+    "@statsLast30Days": {
+        "description": "Button label for last 30 days stats"
+    },
+    "statsKeyboard": "Keyboard",
+    "@statsKeyboard": {
+        "description": "Label for keyboard stats"
+    },
+    "statsClicks": "Clicks",
+    "@statsClicks": {
+        "description": "Label for click stats"
+    },
+    "statsDistance": "Distance",
+    "@statsDistance": {
+        "description": "Label for mouse distance stats"
+    },
+    "statsTodaysActivity": "Today's Activity",
+    "@statsTodaysActivity": {
+        "description": "Section title for today's activity"
+    },
+    "noDataAvailable": "No data available",
+    "@noDataAvailable": {
+        "description": "Text shown when there is no data"
+    },
+    "statsClearData": "Clear Stats",
+    "@statsClearData": {
+        "description": "Tooltip for clear stats button"
+    },
+    "statsClearConfirmTitle": "Clear All Stats?",
+    "@statsClearConfirmTitle": {
+        "description": "Title for clear stats confirmation dialog"
+    },
+    "statsClearConfirmContent": "All saved activity data will be permanently deleted. This action cannot be undone.",
+    "@statsClearConfirmContent": {
+        "description": "Content for clear stats confirmation dialog"
+    },
+    "themeMode": "Theme",
+    "@themeMode": {
+        "description": "Label for theme mode selection"
+    },
+    "darkMode": "Dark",
+    "@darkMode": {
+        "description": "Label for dark theme mode"
+    },
+    "lightMode": "Light",
+    "@lightMode": {
+        "description": "Label for light theme mode"
+    },
+    "autoStartText": "Auto Start at Login",
+    "@autoStartText": {
+        "description": "Option to auto start the app at login"
+    },
+    "showSystemStatsText": "Show System Stats",
+    "@showSystemStatsText": {
+        "description": "Option to show system stats panel"
+    },
+    "showKeyboardTrackText": "Show Keyboard Track",
+    "@showKeyboardTrackText": {
+        "description": "Option to show keyboard track area"
+    },
+    "showMouseTrackText": "Show Mouse Track",
+    "@showMouseTrackText": {
+        "description": "Option to show mouse track area"
+    },
+    "systemStatsRefreshText": "Stats Refresh Interval",
+    "@systemStatsRefreshText": {
+        "description": "Label for system stats refresh interval setting"
+    },
+    "systemStatsRefreshSeconds": "{seconds}s",
+    "@systemStatsRefreshSeconds": {
+        "description": "Seconds format for refresh interval",
+        "placeholders": {
+            "seconds": {
+                "type": "int"
+            }
+        }
+    },
+    "accessibilityDialogTitle": "Accessibility Permission Required",
+    "@accessibilityDialogTitle": {
+        "description": "Title for the accessibility permission dialog"
+    },
+    "accessibilityDialogContent": "This app needs accessibility permission to monitor keyboard and mouse activity for the cultivation experience.",
+    "@accessibilityDialogContent": {
+        "description": "Content explaining why accessibility is needed"
+    },
+    "accessibilityDialogInstructions": "Please enable accessibility for this app in System Settings → Privacy & Security → Accessibility.",
+    "@accessibilityDialogInstructions": {
+        "description": "Instructions for granting accessibility permission"
+    },
+    "accessibilityDialogOpenSettings": "Open Settings",
+    "@accessibilityDialogOpenSettings": {
+        "description": "Button to open system settings"
+    },
+    "accessibilityDialogLater": "Later",
+    "@accessibilityDialogLater": {
+        "description": "Button to dismiss and do later"
+    },
+    "todoTitle": "Todo",
+    "@todoTitle": {
+        "description": "Title for todo button and dialog"
+    },
+    "todoStatusTodo": "Todo",
+    "@todoStatusTodo": {
+        "description": "Status label for todo items"
+    },
+    "todoStatusDoing": "Doing",
+    "@todoStatusDoing": {
+        "description": "Status label for in-progress items"
+    },
+    "todoStatusDone": "Done",
+    "@todoStatusDone": {
+        "description": "Status label for completed items"
+    },
+    "todoAddNew": "Add Todo",
+    "@todoAddNew": {
+        "description": "Button to add new todo"
+    },
+    "todoNewPlaceholder": "Enter new todo...",
+    "@todoNewPlaceholder": {
+        "description": "Placeholder for new todo input"
+    },
+    "todoEmpty": "No todos yet",
+    "@todoEmpty": {
+        "description": "Message when todo list is empty"
+    },
+    "todoDeleteConfirmTitle": "Delete Todo?",
+    "@todoDeleteConfirmTitle": {
+        "description": "Title for delete confirmation dialog"
+    },
+    "todoDeleteConfirmContent": "This todo will be permanently removed.",
+    "@todoDeleteConfirmContent": {
+        "description": "Content for delete confirmation dialog"
+    },
+    "deleteButtonText": "Delete",
+    "@deleteButtonText": {
+        "description": "Delete button text"
+    },
+    "gamesTitle": "Games",
+    "@gamesTitle": {
+        "description": "Title for games list"
+    },
+    "snakeGameTitle": "Snake",
+    "@snakeGameTitle": {
+        "description": "Title for snake game"
+    },
+    "snakeGameDescription": "Classic snake game. Eat food to grow!",
+    "@snakeGameDescription": {
+        "description": "Description for snake game"
+    },
+    "gameScore": "Score",
+    "@gameScore": {
+        "description": "Score label in games"
+    },
+    "gameOver": "Game Over",
+    "@gameOver": {
+        "description": "Game over text"
+    },
+    "gameExpGained": "EXP Gained: {exp}",
+    "@gameExpGained": {
+        "description": "EXP gained text",
+        "placeholders": {
+            "exp": {
+                "type": "int"
+            }
+        }
+    },
+    "gamePlayAgain": "Play Again",
+    "@gamePlayAgain": {
+        "description": "Play again button text"
+    },
+    "gamePressToStart": "Press SPACE or tap to start",
+    "@gamePressToStart": {
+        "description": "Press to start instruction"
+    },
+    "gameUseArrowKeys": "Use arrow keys or swipe to move",
+    "@gameUseArrowKeys": {
+        "description": "Control instructions"
+    },
+    "flappyBirdTitle": "Flappy Bird",
+    "@flappyBirdTitle": {
+        "description": "Title for flappy bird game"
+    },
+    "flappyBirdDescription": "Tap to fly through the pipes!",
+    "@flappyBirdDescription": {
+        "description": "Description for flappy bird game"
+    },
+    "flappyBirdTapToFlap": "Tap or press SPACE to flap",
+    "@flappyBirdTapToFlap": {
+        "description": "Control instructions for flappy bird"
+    },
+    "sudokuTitle": "Sudoku",
+    "@sudokuTitle": {
+        "description": "Title for sudoku game"
+    },
+    "sudokuDescription": "Classic number puzzle. Fill the grid!",
+    "@sudokuDescription": {
+        "description": "Description for sudoku game"
+    },
+    "sudokuSelectNumber": "Select a number below or use keys 1-9",
+    "@sudokuSelectNumber": {
+        "description": "Control instructions for sudoku"
+    },
+    "sudokuNewGame": "New Game",
+    "@sudokuNewGame": {
+        "description": "New game button text"
+    },
+    "sudokuEasy": "Easy",
+    "@sudokuEasy": {
+        "description": "Easy difficulty"
+    },
+    "sudokuMedium": "Medium",
+    "@sudokuMedium": {
+        "description": "Medium difficulty"
+    },
+    "sudokuHard": "Hard",
+    "@sudokuHard": {
+        "description": "Hard difficulty"
+    },
+    "sudokuMistakes": "Mistakes: {count}/{max}",
+    "@sudokuMistakes": {
+        "description": "Mistakes counter",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            },
+            "max": {
+                "type": "int"
+            }
+        }
+    },
+    "sudokuCompleted": "Puzzle Completed!",
+    "@sudokuCompleted": {
+        "description": "Puzzle completed text"
+    },
+    "sudokuTooManyMistakes": "Too Many Mistakes!",
+    "@sudokuTooManyMistakes": {
+        "description": "Too many mistakes text"
+    },
+    "sudokuTime": "Time: {time}",
+    "@sudokuTime": {
+        "description": "Time display",
+        "placeholders": {
+            "time": {
+                "type": "String"
+            }
+        }
+    },
+    "resetLevelExpText": "Reset Level & EXP",
+    "@resetLevelExpText": {
+        "description": "Button text to reset level and experience"
+    },
+    "resetLevelExpConfirmTitle": "Reset Progress?",
+    "@resetLevelExpConfirmTitle": {
+        "description": "Title for reset level confirmation dialog"
+    },
+    "resetLevelExpConfirmContent": "Your level and experience will be reset to the beginning. This action cannot be undone.",
+    "@resetLevelExpConfirmContent": {
+        "description": "Content for reset level confirmation dialog"
+    },
+    "resetButtonText": "Reset",
+    "@resetButtonText": {
+        "description": "Text for reset button"
+    },
+    "menuBarSettingsTitle": "Menu Bar Info",
+    "@menuBarSettingsTitle": {
+        "description": "Title for menu bar settings"
+    },
+    "menuBarSettingsDescription": "Configure what info to show in the menu bar",
+    "@menuBarSettingsDescription": {
+        "description": "Description for menu bar settings"
+    },
+    "menuBarShowTrayIcon": "Show Tray Icon",
+    "@menuBarShowTrayIcon": {
+        "description": "Option to show/hide tray icon"
+    },
+    "menuBarInfoFocus": "Focus Timer",
+    "@menuBarInfoFocus": {
+        "description": "Focus timer info option"
+    },
+    "menuBarInfoTodo": "Todo",
+    "@menuBarInfoTodo": {
+        "description": "Todo info option"
+    },
+    "menuBarInfoLevelExp": "Level & EXP",
+    "@menuBarInfoLevelExp": {
+        "description": "Level and EXP info option"
+    },
+    "menuBarInfoCpu": "CPU",
+    "@menuBarInfoCpu": {
+        "description": "CPU info option"
+    },
+    "menuBarInfoGpu": "GPU",
+    "@menuBarInfoGpu": {
+        "description": "GPU info option"
+    },
+    "menuBarInfoRam": "RAM",
+    "@menuBarInfoRam": {
+        "description": "RAM info option"
+    },
+    "menuBarInfoDisk": "Disk",
+    "@menuBarInfoDisk": {
+        "description": "Disk info option"
+    },
+    "menuBarInfoNetwork": "Network",
+    "@menuBarInfoNetwork": {
+        "description": "Network speed info option"
+    },
+    "menuBarInfoBattery": "Battery",
+    "@menuBarInfoBattery": {
+        "description": "Battery info option"
+    },
+    "menuBarInfoKeyboard": "Keyboard",
+    "@menuBarInfoKeyboard": {
+        "description": "Keyboard tracking info option"
+    },
+    "menuBarInfoMouse": "Mouse",
+    "@menuBarInfoMouse": {
+        "description": "Mouse tracking info option"
+    },
+    "menuBarInfoSystemTime": "Time",
+    "@menuBarInfoSystemTime": {
+        "description": "Time info option"
+    },
+    "menuBarSectionSystem": "System Stats",
+    "@menuBarSectionSystem": {
+        "description": "Section title for system stats"
+    },
+    "menuBarSectionTracking": "Input Tracking",
+    "@menuBarSectionTracking": {
+        "description": "Section title for input tracking"
+    },
+    "menuBarSectionApp": "App Info",
+    "@menuBarSectionApp": {
+        "description": "Section title for app info"
+    },
+    "menuBarFocusText": "Focus",
+    "@menuBarFocusText": {
+        "description": "Focus label in menu bar"
+    },
+    "menuBarKeyboardText": "Key",
+    "@menuBarKeyboardText": {
+        "description": "Keyboard label in menu bar"
+    },
+    "menuBarMouseText": "Mouse",
+    "@menuBarMouseText": {
+        "description": "Mouse label in menu bar"
+    },
+    "menuBarLevelText": "Lv.",
+    "@menuBarLevelText": {
+        "description": "Level label in menu bar"
+    },
+    "openSaveFolderText": "Save Data Location",
+    "@openSaveFolderText": {
+        "description": "Button to open the folder containing save data"
+    },
+    "menuBarShowWindow": "Show Window",
+    "@menuBarShowWindow": {
+        "description": "Menu bar popup item to show the main window"
+    },
+    "menuBarHideWindow": "Hide Window",
+    "@menuBarHideWindow": {
+        "description": "Menu bar popup item to hide the main window"
+    },
+    "menuBarExit": "Exit",
+    "@menuBarExit": {
+        "description": "Menu bar popup item to exit the application"
+    },
+    "cpuPopupHeaderProcess": "Process",
+    "@cpuPopupHeaderProcess": {
+        "description": "Column header for process name in CPU popup"
+    },
+    "cpuPopupHeaderPid": "PID",
+    "@cpuPopupHeaderPid": {
+        "description": "Column header for process ID in popup"
+    },
+    "cpuPopupHeaderUsage": "Usage",
+    "@cpuPopupHeaderUsage": {
+        "description": "Column header for CPU usage in CPU popup"
+    },
+    "diskPopupHeaderRead": "Read",
+    "@diskPopupHeaderRead": {
+        "description": "Column header for disk read in popup"
+    },
+    "diskPopupHeaderWrite": "Write",
+    "@diskPopupHeaderWrite": {
+        "description": "Column header for disk write in popup"
+    },
+    "networkPopupHeaderDownload": "↓Down",
+    "@networkPopupHeaderDownload": {
+        "description": "Column header for network download in popup"
+    },
+    "networkPopupHeaderUpload": "↑Up",
+    "@networkPopupHeaderUpload": {
+        "description": "Column header for network upload in popup"
+    },
+    "networkInfoInterface": "Interface",
+    "@networkInfoInterface": {
+        "description": "Label for network interface type"
+    },
+    "networkInfoNetworkName": "Network",
+    "@networkInfoNetworkName": {
+        "description": "Label for network name (SSID or interface)"
+    },
+    "networkInfoLocalIp": "Local IP",
+    "@networkInfoLocalIp": {
+        "description": "Label for local IP address"
+    },
+    "networkInfoPublicIp": "Public IP",
+    "@networkInfoPublicIp": {
+        "description": "Label for public IP address"
+    },
+    "networkInfoMacAddress": "MAC",
+    "@networkInfoMacAddress": {
+        "description": "Label for MAC address"
+    },
+    "networkInfoGateway": "Gateway",
+    "@networkInfoGateway": {
+        "description": "Label for gateway IP address"
+    },
+    "networkInfoProcesses": "Top Processes",
+    "@networkInfoProcesses": {
+        "description": "Header for top network processes section"
+    }
+}
