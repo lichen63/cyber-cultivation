@@ -482,7 +482,8 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
       case 'hide_window':
         windowManager.hide();
       case 'exit_app':
-        windowManager.close();
+        // Use the native method to properly exit the application
+        MenuBarHelper.exitApp();
     }
   }
 
