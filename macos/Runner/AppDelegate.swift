@@ -391,6 +391,9 @@ class AppDelegate: FlutterAppDelegate {
       return
     }
     
+    // Notify Flutter to hide any open popup window before showing native popover
+    methodChannel?.invokeMethod("onNativePopupShowing", arguments: nil)
+    
     // Create popover if needed
     if calendarPopover == nil {
       calendarPopover = NSPopover()

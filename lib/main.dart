@@ -205,7 +205,15 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
   }
 
   void _initMenuBarHelper() {
-    MenuBarHelper.initialize(onItemClicked: _onMenuBarItemClicked);
+    MenuBarHelper.initialize(
+      onItemClicked: _onMenuBarItemClicked,
+      onNativePopupShowing: _hidePopupWindow,
+    );
+  }
+
+  /// Hide any open popup window (used when native popup or tray menu is shown).
+  void _hidePopupWindow() {
+    WindowPoolService.instance.hideActivePopup();
   }
 
   Future<void> _onMenuBarItemClicked(
@@ -454,10 +462,16 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
   }
 
   @override
-  void onTrayIconMouseDown() => trayManager.popUpContextMenu();
+  void onTrayIconMouseDown() {
+    _hidePopupWindow();
+    trayManager.popUpContextMenu();
+  }
 
   @override
-  void onTrayIconRightMouseDown() => trayManager.popUpContextMenu();
+  void onTrayIconRightMouseDown() {
+    _hidePopupWindow();
+    trayManager.popUpContextMenu();
+  }
 
   @override
   void onTrayMenuItemClick(MenuItem menuItem) {
