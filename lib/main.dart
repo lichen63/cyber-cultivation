@@ -205,7 +205,15 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
   }
 
   void _initMenuBarHelper() {
-    MenuBarHelper.initialize(onItemClicked: _onMenuBarItemClicked);
+    MenuBarHelper.initialize(
+      onItemClicked: _onMenuBarItemClicked,
+      onNativePopupShowing: _hidePopupWindow,
+    );
+  }
+
+  /// Hide any open popup window (used when native popup or tray menu is shown).
+  void _hidePopupWindow() {
+    WindowPoolService.instance.hideActivePopup();
   }
 
   Future<void> _onMenuBarItemClicked(
@@ -283,6 +291,10 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
       }
       _themeMode = data.themeMode;
       _menuBarSettings = data.menuBarSettings;
+    }
+    // Set initial theme for native UI components
+    if (Platform.isMacOS) {
+      MenuBarHelper.setTheme(isDark: _themeMode == AppThemeMode.dark);
     }
   }
 
@@ -450,10 +462,16 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
   }
 
   @override
-  void onTrayIconMouseDown() => trayManager.popUpContextMenu();
+  void onTrayIconMouseDown() {
+    _hidePopupWindow();
+    trayManager.popUpContextMenu();
+  }
 
   @override
-  void onTrayIconRightMouseDown() => trayManager.popUpContextMenu();
+  void onTrayIconRightMouseDown() {
+    _hidePopupWindow();
+    trayManager.popUpContextMenu();
+  }
 
   @override
   void onTrayMenuItemClick(MenuItem menuItem) {
@@ -464,7 +482,8 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
       case 'hide_window':
         windowManager.hide();
       case 'exit_app':
-        windowManager.close();
+        // Use the native method to properly exit the application
+        MenuBarHelper.exitApp();
     }
   }
 
@@ -508,6 +527,10 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
         },
         onThemeModeChanged: (mode) {
           setState(() => _themeMode = mode);
+          // Update native UI theme (calendar popup, etc.)
+          if (Platform.isMacOS) {
+            MenuBarHelper.setTheme(isDark: mode == AppThemeMode.dark);
+          }
         },
         onMenuBarSettingsChanged: _onMenuBarSettingsChanged,
         onTrayTitleChanged: _updateTrayTitle,

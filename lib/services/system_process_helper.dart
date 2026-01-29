@@ -606,33 +606,67 @@ class SystemProcessHelper {
           }
         }
 
-        // Determine interface type and get WiFi SSID using networksetup (public API)
-        // This is the same approach used by Stats app
+        // Determine interface type and get WiFi SSID
+        // Use multiple methods as networksetup is unreliable on newer macOS
         bool isWifi = false;
         if (activeInterface.startsWith('en')) {
-          // Try to get WiFi network name using networksetup (public API, works on all Macs)
+          // Method 1: Try system_profiler SPAirPortDataType (most reliable, public API)
           try {
-            final wifiResult = await Process.run('/usr/sbin/networksetup', [
-              '-getairportnetwork',
-              activeInterface,
-            ]);
-            if (wifiResult.exitCode == 0) {
-              final wifiOutput = wifiResult.stdout as String;
-              // Output format: "Current Wi-Fi Network: NetworkName" or
-              // "You are not associated with an AirPort network."
-              if (!wifiOutput.contains('not associated') &&
-                  wifiOutput.contains(':')) {
-                isWifi = true;
-                info['interfaceType'] = 'WiFi';
-                // Extract SSID after the colon
-                final ssidParts = wifiOutput.split(':');
-                if (ssidParts.length >= 2) {
-                  info['networkName'] = ssidParts.sublist(1).join(':').trim();
+            final profilerResult = await Process.run(
+              '/usr/sbin/system_profiler',
+              ['SPAirPortDataType', '-json'],
+            );
+            if (profilerResult.exitCode == 0) {
+              final jsonOutput = profilerResult.stdout as String;
+              // Check if we're connected to WiFi by looking for current network info
+              // The JSON contains "spairport_current_network_information" with "_name" when connected
+              if (jsonOutput.contains(
+                'spairport_current_network_information',
+              )) {
+                // Extract SSID using regex from JSON
+                // Format: "_name" : "NetworkName" inside spairport_current_network_information
+                final ssidMatch = RegExp(
+                  r'spairport_current_network_information[^}]*"_name"\s*:\s*"([^"]+)"',
+                ).firstMatch(jsonOutput);
+                if (ssidMatch != null) {
+                  isWifi = true;
+                  info['interfaceType'] = 'WiFi';
+                  final ssid = ssidMatch.group(1)!;
+                  // macOS may redact SSID for privacy, show "Connected" instead
+                  if (ssid == '<redacted>' || ssid.isEmpty) {
+                    info['networkName'] = 'Connected';
+                  } else {
+                    info['networkName'] = ssid;
+                  }
                 }
               }
             }
           } catch (e) {
-            // networksetup command failed, continue without WiFi detection
+            // system_profiler failed, try next method
+          }
+
+          // Method 2: Fallback to networksetup (works on some older macOS)
+          if (!isWifi) {
+            try {
+              final wifiResult = await Process.run('/usr/sbin/networksetup', [
+                '-getairportnetwork',
+                activeInterface,
+              ]);
+              if (wifiResult.exitCode == 0) {
+                final wifiOutput = wifiResult.stdout as String;
+                if (wifiOutput.contains('Current Wi-Fi Network:') ||
+                    wifiOutput.contains('Current Airport Network:')) {
+                  isWifi = true;
+                  info['interfaceType'] = 'WiFi';
+                  final ssidParts = wifiOutput.split(':');
+                  if (ssidParts.length >= 2) {
+                    info['networkName'] = ssidParts.sublist(1).join(':').trim();
+                  }
+                }
+              }
+            } catch (e) {
+              // networksetup command failed
+            }
           }
         }
 

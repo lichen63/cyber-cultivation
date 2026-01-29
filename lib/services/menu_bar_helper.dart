@@ -5,21 +5,30 @@ import 'package:flutter/services.dart';
 typedef MenuBarItemClickCallback =
     void Function(String itemId, Rect screenRect, double screenHeight);
 
+/// Callback type for when a native popup (like calendar) is about to show.
+typedef NativePopupShowingCallback = void Function();
+
 /// Helper class to set menu bar title with custom font size on macOS.
 /// Uses native code to support NSAttributedString with custom font.
 class MenuBarHelper {
   static const MethodChannel _channel = MethodChannel('menu_bar_helper');
   static MenuBarItemClickCallback? _onItemClicked;
+  static NativePopupShowingCallback? _onNativePopupShowing;
 
   /// Initialize the helper and set up method call handlers.
-  static void initialize({MenuBarItemClickCallback? onItemClicked}) {
+  static void initialize({
+    MenuBarItemClickCallback? onItemClicked,
+    NativePopupShowingCallback? onNativePopupShowing,
+  }) {
     _onItemClicked = onItemClicked;
+    _onNativePopupShowing = onNativePopupShowing;
     _channel.setMethodCallHandler(_handleMethodCall);
   }
 
   /// Dispose of the helper and clean up.
   static void dispose() {
     _onItemClicked = null;
+    _onNativePopupShowing = null;
     _channel.setMethodCallHandler(null);
   }
 
@@ -40,6 +49,10 @@ class MenuBarHelper {
           Rect.fromLTWH(x, y, width, height),
           screenHeight,
         );
+        return true;
+      case 'onNativePopupShowing':
+        // Native popup (like calendar) is about to show, hide any Flutter popup
+        _onNativePopupShowing?.call();
         return true;
       default:
         return null;
@@ -125,6 +138,20 @@ class MenuBarHelper {
   static Future<bool> exitApp() async {
     try {
       final result = await _channel.invokeMethod('exitApp');
+      return result == true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Set the theme for native UI components (like calendar popup).
+  ///
+  /// [isDark] - true for dark theme, false for light theme
+  static Future<bool> setTheme({required bool isDark}) async {
+    try {
+      final result = await _channel.invokeMethod('setTheme', {
+        'brightness': isDark ? 'dark' : 'light',
+      });
       return result == true;
     } catch (e) {
       return false;

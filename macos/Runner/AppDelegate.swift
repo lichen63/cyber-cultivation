@@ -8,6 +8,7 @@ class AppDelegate: FlutterAppDelegate {
   var calendarPopover: NSPopover?
   private var calendarViewController: CalendarViewController?
   private var popoverEventMonitor: Any?
+  private var isDarkMode: Bool = true
   
   override func applicationDidFinishLaunching(_ notification: Notification) {
     let controller = mainFlutterWindow?.contentViewController as! FlutterViewController
@@ -33,6 +34,8 @@ class AppDelegate: FlutterAppDelegate {
       case "exitApp":
         self?.exitClicked()
         result(true)
+      case "setTheme":
+        self?.setTheme(call, result: result)
       default:
         result(FlutterMethodNotImplemented)
       }
@@ -368,6 +371,19 @@ class AppDelegate: FlutterAppDelegate {
     }
   }
   
+  private func setTheme(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    guard let args = call.arguments as? [String: Any],
+          let brightness = args["brightness"] as? String else {
+      result(FlutterError(code: "INVALID_ARGS", message: "Invalid arguments", details: nil))
+      return
+    }
+    
+    isDarkMode = brightness == "dark"
+    // Update calendar view controller if it exists
+    calendarViewController?.isDarkMode = isDarkMode
+    result(true)
+  }
+  
   private func showCalendarPopover(from sender: NSStatusBarButton) {
     // Close if already open
     if let popover = calendarPopover, popover.isShown {
@@ -375,14 +391,21 @@ class AppDelegate: FlutterAppDelegate {
       return
     }
     
+    // Notify Flutter to hide any open popup window before showing native popover
+    methodChannel?.invokeMethod("onNativePopupShowing", arguments: nil)
+    
     // Create popover if needed
     if calendarPopover == nil {
       calendarPopover = NSPopover()
       calendarViewController = CalendarViewController()
+      calendarViewController?.isDarkMode = isDarkMode
       calendarPopover?.contentViewController = calendarViewController
       calendarPopover?.behavior = .transient
       calendarPopover?.animates = true
     }
+    
+    // Update theme in case it changed
+    calendarViewController?.isDarkMode = isDarkMode
     
     // Update calendar to current date
     calendarViewController?.updateToCurrentDate()
