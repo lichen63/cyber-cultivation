@@ -14,16 +14,103 @@ class CalendarViewController: NSViewController {
   
   private let itemSize: CGSize = CGSize(width: 36, height: 28)
   
+  // Theme mode: true = dark, false = light
+  var isDarkMode: Bool = true {
+    didSet {
+      if isViewLoaded {
+        updateAppearance()
+      }
+    }
+  }
+  
+  // Colors based on theme mode
+  private var borderColor: NSColor {
+    isDarkMode
+      ? NSColor(white: 0.3, alpha: 1.0)
+      : NSColor(white: 0.75, alpha: 1.0)
+  }
+  
+  private var calendarBackgroundColor: NSColor {
+    isDarkMode
+      ? NSColor(white: 0.15, alpha: 1.0)
+      : NSColor(white: 0.97, alpha: 1.0)
+  }
+  
+  private var titleBarBackgroundColor: NSColor {
+    isDarkMode
+      ? NSColor(white: 0.12, alpha: 1.0)
+      : NSColor(white: 0.92, alpha: 1.0)
+  }
+  
+  private var timeContainerBackgroundColor: NSColor {
+    isDarkMode
+      ? NSColor(white: 0.1, alpha: 1.0)
+      : NSColor(white: 0.95, alpha: 1.0)
+  }
+  
+  private var primaryTextColor: NSColor {
+    isDarkMode ? .white : .black
+  }
+  
+  private var secondaryTextColor: NSColor {
+    isDarkMode
+      ? NSColor(white: 0.6, alpha: 1.0)
+      : NSColor(white: 0.4, alpha: 1.0)
+  }
+  
+  private var dimmedTextColor: NSColor {
+    isDarkMode
+      ? NSColor(white: 0.4, alpha: 1.0)
+      : NSColor(white: 0.65, alpha: 1.0)
+  }
+  
+  private var iconTintColor: NSColor {
+    isDarkMode
+      ? NSColor(white: 0.6, alpha: 1.0)
+      : NSColor(white: 0.4, alpha: 1.0)
+  }
+  
+  // View references for theme updates
+  private var mainContainer: NSView!
+  private var titleBar: NSView!
+  private var titleLabel: NSTextField!
+  private var calendarButton: NSButton!
+  private var calendarContainer: NSStackView!
+  private var timeContainer: NSView!
+  private var prevButton: NSButton!
+  private var nextButton: NSButton!
+  private var todayButton: NSButton!
+  
   deinit {
     timeTimer?.invalidate()
   }
   
+  private func updateAppearance() {
+    // Update container backgrounds
+    mainContainer?.layer?.borderColor = borderColor.cgColor
+    titleBar?.layer?.backgroundColor = titleBarBackgroundColor.cgColor
+    calendarContainer?.layer?.backgroundColor = calendarBackgroundColor.cgColor
+    timeContainer?.layer?.backgroundColor = timeContainerBackgroundColor.cgColor
+    
+    // Update text colors
+    titleLabel?.textColor = primaryTextColor
+    calendarButton?.contentTintColor = iconTintColor
+    monthLabel?.textColor = primaryTextColor
+    timeLabel?.textColor = primaryTextColor
+    prevButton?.contentTintColor = primaryTextColor
+    nextButton?.contentTintColor = primaryTextColor
+    todayButton?.contentTintColor = primaryTextColor
+    
+    // Refresh calendar to update day cell colors
+    updateCalendarDisplay()
+  }
+  
   override func loadView() {
     // Main container with border
-    let mainContainer = NSView()
+    mainContainer = NSView()
     mainContainer.wantsLayer = true
     mainContainer.layer?.cornerRadius = 10
-    mainContainer.layer?.borderColor = NSColor(white: 0.3, alpha: 1.0).cgColor
+    mainContainer.layer?.borderColor = borderColor.cgColor
     mainContainer.layer?.borderWidth = 1
     mainContainer.layer?.masksToBounds = true
     mainContainer.translatesAutoresizingMaskIntoConstraints = false
@@ -42,15 +129,15 @@ class CalendarViewController: NSViewController {
     ])
     
     // Title bar with calendar icon and "Clock" title
-    let titleBar = createTitleBar()
+    titleBar = createTitleBar()
     mainStack.addArrangedSubview(titleBar)
     
     // Calendar section
-    let calendarContainer = NSStackView()
+    calendarContainer = NSStackView()
     calendarContainer.orientation = .vertical
     calendarContainer.spacing = 8
     calendarContainer.wantsLayer = true
-    calendarContainer.layer?.backgroundColor = NSColor(white: 0.15, alpha: 1.0).cgColor
+    calendarContainer.layer?.backgroundColor = calendarBackgroundColor.cgColor
     calendarContainer.edgeInsets = NSEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
     
     // Navigation header
@@ -67,15 +154,15 @@ class CalendarViewController: NSViewController {
     mainStack.addArrangedSubview(calendarContainer)
     
     // Time section
-    let timeContainer = NSView()
+    timeContainer = NSView()
     timeContainer.wantsLayer = true
-    timeContainer.layer?.backgroundColor = NSColor(white: 0.1, alpha: 1.0).cgColor
+    timeContainer.layer?.backgroundColor = timeContainerBackgroundColor.cgColor
     timeContainer.translatesAutoresizingMaskIntoConstraints = false
     
     timeLabel = NSTextField(labelWithString: "")
     timeLabel.font = NSFont.monospacedDigitSystemFont(ofSize: 18, weight: .light)
     timeLabel.alignment = .center
-    timeLabel.textColor = .white
+    timeLabel.textColor = primaryTextColor
     timeLabel.translatesAutoresizingMaskIntoConstraints = false
     timeContainer.addSubview(timeLabel)
     
@@ -107,16 +194,16 @@ class CalendarViewController: NSViewController {
     monthLabel = NSTextField(labelWithString: "")
     monthLabel.font = NSFont.systemFont(ofSize: 16, weight: .medium)
     monthLabel.alignment = .left
-    monthLabel.textColor = .white
+    monthLabel.textColor = primaryTextColor
     
     // Buttons container
     let buttons = NSStackView()
     buttons.orientation = .horizontal
     buttons.spacing = 4
     
-    let prevButton = createNavButton(title: "◀", action: #selector(previousMonth))
-    let nextButton = createNavButton(title: "▶", action: #selector(nextMonth))
-    let todayButton = createNavButton(title: "Today", action: #selector(goToToday))
+    prevButton = createNavButton(title: "◀", action: #selector(previousMonth))
+    nextButton = createNavButton(title: "▶", action: #selector(nextMonth))
+    todayButton = createNavButton(title: "Today", action: #selector(goToToday))
     todayButton.font = NSFont.systemFont(ofSize: 12)
     
     buttons.addArrangedSubview(prevButton)
@@ -133,13 +220,13 @@ class CalendarViewController: NSViewController {
   }
   
   private func createTitleBar() -> NSView {
-    let titleBar = NSView()
-    titleBar.wantsLayer = true
-    titleBar.layer?.backgroundColor = NSColor(white: 0.12, alpha: 1.0).cgColor
-    titleBar.translatesAutoresizingMaskIntoConstraints = false
+    let bar = NSView()
+    bar.wantsLayer = true
+    bar.layer?.backgroundColor = titleBarBackgroundColor.cgColor
+    bar.translatesAutoresizingMaskIntoConstraints = false
     
     // Calendar icon button on left edge
-    let calendarButton = NSButton()
+    calendarButton = NSButton()
     calendarButton.bezelStyle = .inline
     calendarButton.isBordered = false
     calendarButton.target = self
@@ -156,33 +243,33 @@ class CalendarViewController: NSViewController {
     } else {
       calendarButton.title = "📅"
     }
-    calendarButton.contentTintColor = NSColor(white: 0.6, alpha: 1.0)
+    calendarButton.contentTintColor = iconTintColor
     
     // Centered title
-    let titleLabel = NSTextField(labelWithString: "Clock")
+    titleLabel = NSTextField(labelWithString: "Clock")
     titleLabel.font = NSFont.systemFont(ofSize: 18, weight: .semibold)
     titleLabel.alignment = .center
-    titleLabel.textColor = .white
+    titleLabel.textColor = primaryTextColor
     titleLabel.backgroundColor = .clear
     titleLabel.drawsBackground = false
     titleLabel.translatesAutoresizingMaskIntoConstraints = false
     
-    titleBar.addSubview(calendarButton)
-    titleBar.addSubview(titleLabel)
+    bar.addSubview(calendarButton)
+    bar.addSubview(titleLabel)
     
     NSLayoutConstraint.activate([
-      titleBar.heightAnchor.constraint(equalToConstant: 32),
+      bar.heightAnchor.constraint(equalToConstant: 32),
       
       // Calendar button on left edge
-      calendarButton.leadingAnchor.constraint(equalTo: titleBar.leadingAnchor, constant: 8),
-      calendarButton.centerYAnchor.constraint(equalTo: titleBar.centerYAnchor),
+      calendarButton.leadingAnchor.constraint(equalTo: bar.leadingAnchor, constant: 8),
+      calendarButton.centerYAnchor.constraint(equalTo: bar.centerYAnchor),
       
       // Title centered in the title bar
-      titleLabel.centerXAnchor.constraint(equalTo: titleBar.centerXAnchor),
-      titleLabel.centerYAnchor.constraint(equalTo: titleBar.centerYAnchor)
+      titleLabel.centerXAnchor.constraint(equalTo: bar.centerXAnchor),
+      titleLabel.centerYAnchor.constraint(equalTo: bar.centerYAnchor)
     ])
     
-    return titleBar
+    return bar
   }
   
   @objc private func openCalendarApp() {
@@ -203,7 +290,7 @@ class CalendarViewController: NSViewController {
     button.bezelStyle = .inline
     button.isBordered = false
     button.font = NSFont.systemFont(ofSize: 14)
-    button.contentTintColor = .white
+    button.contentTintColor = primaryTextColor
     return button
   }
   
@@ -315,7 +402,7 @@ class CalendarViewController: NSViewController {
     
     let field = NSTextField(labelWithString: text)
     field.font = NSFont.systemFont(ofSize: 11, weight: .medium)
-    field.textColor = NSColor(white: 0.6, alpha: 1.0)
+    field.textColor = secondaryTextColor
     field.alignment = .center
     field.translatesAutoresizingMaskIntoConstraints = false
     container.addSubview(field)
@@ -353,9 +440,9 @@ class CalendarViewController: NSViewController {
     if isToday {
       field.textColor = .white
     } else if !isCurrentMonth {
-      field.textColor = NSColor(white: 0.4, alpha: 1.0)
+      field.textColor = dimmedTextColor
     } else {
-      field.textColor = .white
+      field.textColor = primaryTextColor
     }
     
     field.translatesAutoresizingMaskIntoConstraints = false

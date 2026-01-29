@@ -130,6 +130,20 @@ class MenuBarHelper {
       return false;
     }
   }
+
+  /// Set the theme for native UI components (like calendar popup).
+  ///
+  /// [isDark] - true for dark theme, false for light theme
+  static Future<bool> setTheme({required bool isDark}) async {
+    try {
+      final result = await _channel.invokeMethod('setTheme', {
+        'brightness': isDark ? 'dark' : 'light',
+      });
+      return result == true;
+    } catch (e) {
+      return false;
+    }
+  }
 }
 
 /// Represents a single menu bar item with top and bottom text.

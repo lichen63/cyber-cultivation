@@ -284,6 +284,10 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
       _themeMode = data.themeMode;
       _menuBarSettings = data.menuBarSettings;
     }
+    // Set initial theme for native UI components
+    if (Platform.isMacOS) {
+      MenuBarHelper.setTheme(isDark: _themeMode == AppThemeMode.dark);
+    }
   }
 
   @override
@@ -508,6 +512,10 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
         },
         onThemeModeChanged: (mode) {
           setState(() => _themeMode = mode);
+          // Update native UI theme (calendar popup, etc.)
+          if (Platform.isMacOS) {
+            MenuBarHelper.setTheme(isDark: mode == AppThemeMode.dark);
+          }
         },
         onMenuBarSettingsChanged: _onMenuBarSettingsChanged,
         onTrayTitleChanged: _updateTrayTitle,
