@@ -232,9 +232,9 @@ struct PopoverContentView: View {
         case "levelExp":
             LevelExpContentView(data: data, isDarkMode: isDarkMode)
         case "keyboard":
-            KeyboardContentView(keyCount: data["keyCount"] as? Int ?? 0, isDarkMode: isDarkMode)
+            KeyboardContentView(keyCount: data["keyCount"] as? Int ?? 0, isDarkMode: isDarkMode, locale: data["locale"] as? String ?? "en")
         case "mouse":
-            MouseContentView(distance: data["distance"] as? Int ?? 0, isDarkMode: isDarkMode)
+            MouseContentView(distance: data["distance"] as? Int ?? 0, isDarkMode: isDarkMode, locale: data["locale"] as? String ?? "en")
         default:
             Text("Content placeholder")
                 .foregroundColor(.secondary)
@@ -860,11 +860,12 @@ struct LevelExpContentView: View {
 struct KeyboardContentView: View {
     let keyCount: Int
     let isDarkMode: Bool
+    let locale: String
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             InfoRow(
-                label: "Today Key Events",
+                label: locale == "zh" ? "今日按键" : "Today Key Events",
                 value: formatNumber(keyCount),
                 isDarkMode: isDarkMode
             )
@@ -887,11 +888,12 @@ struct KeyboardContentView: View {
 struct MouseContentView: View {
     let distance: Int
     let isDarkMode: Bool
+    let locale: String
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             InfoRow(
-                label: "Today Mouse Distance",
+                label: locale == "zh" ? "今日鼠标距离" : "Today Mouse Distance",
                 value: formatDistance(distance),
                 isDarkMode: isDarkMode
             )

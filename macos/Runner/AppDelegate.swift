@@ -474,7 +474,8 @@ class AppDelegate: FlutterAppDelegate {
     let initialData: [String: Any] = [
       "itemId": itemId,
       "brightness": isDarkMode ? "dark" : "light",
-      "isLoading": true
+      "isLoading": true,
+      "locale": currentLocale
     ]
     
     menuBarPopoverViewController?.configure(
