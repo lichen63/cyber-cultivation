@@ -103,13 +103,6 @@ tccutil reset Accessibility com.lichen.cyberCultivation
 
 欢迎贡献！请查看 [贡献指南](docs/CONTRIBUTING.md)。
 
-## 📄 许可证
-
-[PolyForm 非商业许可证 1.0.0](LICENSE)
-
-- ✅ 个人、教育、非营利用途免费
-- ❌ 商业使用需获得单独许可
-
 ---
 
 <p align="center">
