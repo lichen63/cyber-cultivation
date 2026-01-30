@@ -4,10 +4,10 @@ Thank you for your interest in contributing to Cyber Cultivation! We welcome con
 
 ## License and Copyright
 
-By contributing to this project, you agree that your contributions will be licensed under the project's [PolyForm Noncommercial License 1.0.0](../LICENSE).
+By contributing to this project, you agree that your contributions will be licensed under the project's [GNU General Public License v3.0](../LICENSE).
 
 **Important Note:**
-This project is free for non-commercial use (personal, educational, non-profit), but commercial use requires explicit permission from the copyright holder, Lichen Liu.
+This project is licensed under the GPL v3.0, which means you are free to use, modify, and distribute it, as long as any derivative works are also released under the GPL v3.0.
 
 ## How to Contribute
 
