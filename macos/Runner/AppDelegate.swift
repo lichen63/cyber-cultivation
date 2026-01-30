@@ -17,6 +17,7 @@ class AppDelegate: FlutterAppDelegate {
   private var menuBarPopoverPanel: BorderlessPopoverPanel?
   private var menuBarPopoverViewController: MenuBarPopoverViewController?
   private var menuBarPopoverEventMonitor: Any?
+  private var menuBarPopoverLocalEventMonitor: Any?
   private var currentPopoverItemId: String?
   
   override func applicationDidFinishLaunching(_ notification: Notification) {
@@ -519,7 +520,7 @@ class AppDelegate: FlutterAppDelegate {
     // Show the panel with animation
     menuBarPopoverPanel?.showWithAnimation()
     
-    // Add global event monitor to close popover when clicking outside
+    // Add global event monitor to close popover when clicking outside the app
     menuBarPopoverEventMonitor = NSEvent.addGlobalMonitorForEvents(
       matching: [.leftMouseDown, .rightMouseDown]
     ) { [weak self] event in
@@ -530,6 +531,20 @@ class AppDelegate: FlutterAppDelegate {
           self?.closeMenuBarPopover()
         }
       }
+    }
+    
+    // Add local event monitor to close popover when clicking inside the app (e.g., main window)
+    menuBarPopoverLocalEventMonitor = NSEvent.addLocalMonitorForEvents(
+      matching: [.leftMouseDown, .rightMouseDown]
+    ) { [weak self] event in
+      if let panel = self?.menuBarPopoverPanel,
+         panel.isVisible {
+        // Check if the click is inside the popover panel
+        if let eventWindow = event.window, eventWindow != panel {
+          self?.closeMenuBarPopover()
+        }
+      }
+      return event
     }
   }
   
@@ -690,7 +705,7 @@ class AppDelegate: FlutterAppDelegate {
       // Show the panel with animation
       self.menuBarPopoverPanel?.showWithAnimation()
       
-      // Add global event monitor to close popover when clicking outside
+      // Add global event monitor to close popover when clicking outside the app
       self.menuBarPopoverEventMonitor = NSEvent.addGlobalMonitorForEvents(
         matching: [.leftMouseDown, .rightMouseDown]
       ) { [weak self] event in
@@ -701,6 +716,20 @@ class AppDelegate: FlutterAppDelegate {
             self?.closeMenuBarPopover()
           }
         }
+      }
+      
+      // Add local event monitor to close popover when clicking inside the app (e.g., main window)
+      self.menuBarPopoverLocalEventMonitor = NSEvent.addLocalMonitorForEvents(
+        matching: [.leftMouseDown, .rightMouseDown]
+      ) { [weak self] event in
+        if let panel = self?.menuBarPopoverPanel,
+           panel.isVisible {
+          // Check if the click is inside the popover panel
+          if let eventWindow = event.window, eventWindow != panel {
+            self?.closeMenuBarPopover()
+          }
+        }
+        return event
       }
       
       result(true)
@@ -734,6 +763,10 @@ class AppDelegate: FlutterAppDelegate {
     if let monitor = menuBarPopoverEventMonitor {
       NSEvent.removeMonitor(monitor)
       menuBarPopoverEventMonitor = nil
+    }
+    if let localMonitor = menuBarPopoverLocalEventMonitor {
+      NSEvent.removeMonitor(localMonitor)
+      menuBarPopoverLocalEventMonitor = nil
     }
     currentPopoverItemId = nil
     
