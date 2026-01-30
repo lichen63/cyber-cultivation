@@ -3,6 +3,6 @@
         "flutter": true,
         "dart": true
     },
-    "editor.fontSize": 15,
+    "editor.fontSize": 18,
     "editor.renderWhitespace": "all"
 }
