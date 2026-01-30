@@ -546,5 +546,33 @@
     "networkInfoProcesses": "Top Processes",
     "@networkInfoProcesses": {
         "description": "Header for top network processes section"
+    },
+    "debugMenu": "Debug",
+    "@debugMenu": {
+        "description": "Debug menu item label"
+    },
+    "debugSetLevelExp": "Set Level & EXP",
+    "@debugSetLevelExp": {
+        "description": "Debug menu item to set level and exp"
+    },
+    "debugSetLevelExpTitle": "Set Level & EXP",
+    "@debugSetLevelExpTitle": {
+        "description": "Title for debug set level/exp dialog"
+    },
+    "debugLevelLabel": "Level",
+    "@debugLevelLabel": {
+        "description": "Label for level input"
+    },
+    "debugExpLabel": "Current EXP",
+    "@debugExpLabel": {
+        "description": "Label for current exp input"
+    },
+    "debugMaxExpLabel": "Max EXP to level up",
+    "@debugMaxExpLabel": {
+        "description": "Label showing max exp needed for next level"
+    },
+    "debugApplyButton": "Apply",
+    "@debugApplyButton": {
+        "description": "Button to apply debug changes"
     }
 }

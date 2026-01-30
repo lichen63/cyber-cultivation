@@ -130,5 +130,12 @@
     "networkInfoPublicIp": "公网IP",
     "networkInfoMacAddress": "MAC",
     "networkInfoGateway": "网关",
-    "networkInfoProcesses": "进程列表"
+    "networkInfoProcesses": "进程列表",
+    "debugMenu": "调试",
+    "debugSetLevelExp": "设置等级和经验",
+    "debugSetLevelExpTitle": "设置等级和经验",
+    "debugLevelLabel": "等级",
+    "debugExpLabel": "当前经验",
+    "debugMaxExpLabel": "升级所需经验",
+    "debugApplyButton": "应用"
 }

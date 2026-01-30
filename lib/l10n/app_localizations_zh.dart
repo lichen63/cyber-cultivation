@@ -409,4 +409,25 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get networkInfoProcesses => '进程列表';
+
+  @override
+  String get debugMenu => '调试';
+
+  @override
+  String get debugSetLevelExp => '设置等级和经验';
+
+  @override
+  String get debugSetLevelExpTitle => '设置等级和经验';
+
+  @override
+  String get debugLevelLabel => '等级';
+
+  @override
+  String get debugExpLabel => '当前经验';
+
+  @override
+  String get debugMaxExpLabel => '升级所需经验';
+
+  @override
+  String get debugApplyButton => '应用';
 }

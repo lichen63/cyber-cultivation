@@ -159,6 +159,10 @@ class AppConstants {
   static const String exitGameText = 'Exit Game';
   static const String exitGameValue = 'exit_game';
 
+  // Debug Menu
+  static const String debugMenuValue = 'debug_menu';
+  static const String debugSetLevelExpValue = 'debug_set_level_exp';
+
   // Pomodoro Strings
   static const String pomodoroDialogTitle = 'Pomodoro Clock';
   static const String pomodoroDurationLabel = 'Focus (min):';

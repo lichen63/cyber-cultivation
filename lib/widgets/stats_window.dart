@@ -33,7 +33,11 @@ class _StatsWindowState extends State<StatsWindow> {
     // Round to avoid floating point precision issues (e.g., 495.00000001)
     final roundedValue = (value * 100).round() / 100;
 
-    if (roundedValue >= 1000000000000) {
+    if (roundedValue >= 1e18) {
+      return '${(roundedValue / 1e18).toStringAsFixed(1)}Qi';
+    } else if (roundedValue >= 1e15) {
+      return '${(roundedValue / 1e15).toStringAsFixed(1)}Q';
+    } else if (roundedValue >= 1000000000000) {
       return '${(roundedValue / 1000000000000).toStringAsFixed(1)}T';
     } else if (roundedValue >= 1000000000) {
       return '${(roundedValue / 1000000000).toStringAsFixed(1)}B';

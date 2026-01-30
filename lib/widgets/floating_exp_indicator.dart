@@ -176,7 +176,11 @@ class _FloatingExpIndicatorState extends State<_FloatingExpIndicator>
 
   /// Formats exp amount for display
   String _formatExpAmount(double value) {
-    if (value >= 1e12) {
+    if (value >= 1e18) {
+      return '${(value / 1e18).toStringAsFixed(1)}Qi';
+    } else if (value >= 1e15) {
+      return '${(value / 1e15).toStringAsFixed(1)}Q';
+    } else if (value >= 1e12) {
       return '${(value / 1e12).toStringAsFixed(1)}T';
     } else if (value >= 1e9) {
       return '${(value / 1e9).toStringAsFixed(1)}B';
