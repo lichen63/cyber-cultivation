@@ -8,8 +8,13 @@ import '../constants.dart';
 /// with throttling queue to prevent overwhelming the UI
 class FloatingExpIndicatorManager extends StatefulWidget {
   final AppThemeColors themeColors;
+  final double scale;
 
-  const FloatingExpIndicatorManager({super.key, required this.themeColors});
+  const FloatingExpIndicatorManager({
+    super.key,
+    required this.themeColors,
+    this.scale = 1.0,
+  });
 
   @override
   State<FloatingExpIndicatorManager> createState() =>
@@ -66,7 +71,11 @@ class FloatingExpIndicatorManagerState
   void _showIndicator(double amount) {
     final id = _nextId++;
     setState(() {
-      _visibleIndicators[id] = _IndicatorData(id: id, amount: amount);
+      _visibleIndicators[id] = _IndicatorData(
+        id: id,
+        amount: amount,
+        scale: widget.scale,
+      );
     });
   }
 
@@ -99,6 +108,7 @@ class FloatingExpIndicatorManagerState
             indicatorId: indicator.id,
             expAmount: indicator.amount,
             themeColors: widget.themeColors,
+            scale: indicator.scale,
             onComplete: _removeIndicator,
           ),
       ],
@@ -111,6 +121,7 @@ class _FloatingExpIndicator extends StatefulWidget {
   final int indicatorId;
   final double expAmount;
   final AppThemeColors themeColors;
+  final double scale;
   final void Function(int id) onComplete;
 
   const _FloatingExpIndicator({
@@ -118,6 +129,7 @@ class _FloatingExpIndicator extends StatefulWidget {
     required this.indicatorId,
     required this.expAmount,
     required this.themeColors,
+    this.scale = 1.0,
     required this.onComplete,
   });
 
@@ -141,9 +153,10 @@ class _FloatingExpIndicatorState extends State<_FloatingExpIndicator>
     );
 
     // Move from bottom (0) to top (distance) with easing
+    // Scale the distance based on window size
     _positionAnimation = Tween<double>(
       begin: 0.0,
-      end: AppConstants.floatingExpDistance,
+      end: AppConstants.floatingExpDistance * widget.scale,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
     // Start fully visible, fade out towards the end
@@ -205,15 +218,16 @@ class _FloatingExpIndicatorState extends State<_FloatingExpIndicator>
           // Start lower (positive Y offset) then move upward (negative Y)
           offset: Offset(
             0,
-            AppConstants.floatingExpStartOffset - _positionAnimation.value,
+            AppConstants.floatingExpStartOffset * widget.scale -
+                _positionAnimation.value,
           ),
           child: Opacity(opacity: _fadeAnimation.value, child: child),
         );
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppConstants.floatingExpPaddingHorizontal,
-          vertical: AppConstants.floatingExpPaddingVertical,
+        padding: EdgeInsets.symmetric(
+          horizontal: AppConstants.floatingExpPaddingHorizontal * widget.scale,
+          vertical: AppConstants.floatingExpPaddingVertical * widget.scale,
         ),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -221,21 +235,21 @@ class _FloatingExpIndicatorState extends State<_FloatingExpIndicator>
           borderRadius: BorderRadius.circular(100),
           border: Border.all(
             color: Colors.grey.shade300,
-            width: AppConstants.floatingExpBorderWidth,
+            width: AppConstants.floatingExpBorderWidth * widget.scale,
           ),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.2),
-              blurRadius: AppConstants.floatingExpShadowBlur,
-              offset: const Offset(0, 2),
+              blurRadius: AppConstants.floatingExpShadowBlur * widget.scale,
+              offset: Offset(0, 2 * widget.scale),
             ),
           ],
         ),
         child: Text(
           '+${_formatExpAmount(widget.expAmount)} EXP',
-          style: const TextStyle(
+          style: TextStyle(
             color: Colors.black,
-            fontSize: AppConstants.fontSizeFloatingExp,
+            fontSize: AppConstants.fontSizeFloatingExp * widget.scale,
             fontWeight: FontWeight.bold,
             height: 1.0,
           ),
@@ -249,6 +263,7 @@ class _FloatingExpIndicatorState extends State<_FloatingExpIndicator>
 class _IndicatorData {
   final int id;
   final double amount;
+  final double scale;
 
-  _IndicatorData({required this.id, required this.amount});
+  _IndicatorData({required this.id, required this.amount, required this.scale});
 }

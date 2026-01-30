@@ -82,6 +82,7 @@ class GameAreaWidget extends StatelessWidget {
                   child: FloatingExpIndicatorManager(
                     key: floatingExpKey,
                     themeColors: themeColors,
+                    scale: scale,
                   ),
                 ),
               ),
