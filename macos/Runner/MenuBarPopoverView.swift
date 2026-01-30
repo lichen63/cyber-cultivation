@@ -123,7 +123,7 @@ struct PopoverContentView: View {
             // Content area
             contentArea
         }
-        .background(isDarkMode ? Color(NSColor.windowBackgroundColor).opacity(0.95) : Color(white: 0.97))
+        .background(isDarkMode ? Color(white: 0.15) : Color(white: 0.97))
         .clipShape(RoundedRectangle(cornerRadius: 10))
         .overlay(
             RoundedRectangle(cornerRadius: 10)
@@ -136,7 +136,7 @@ struct PopoverContentView: View {
             // Center: Title (in ZStack for true centering)
             Text(getTitle())
                 .font(.system(size: 13, weight: .semibold))
-                .foregroundColor(Color.black)
+                .foregroundColor(isDarkMode ? Color.white : Color.black)
             
             // Left and Right buttons
             HStack {
@@ -145,11 +145,13 @@ struct PopoverContentView: View {
                     IconButton(
                         icon: "eye",
                         tooltip: "Show Window",
+                        isDarkMode: isDarkMode,
                         action: onShowWindow
                     )
                     IconButton(
                         icon: "eye.slash",
                         tooltip: "Hide Window",
+                        isDarkMode: isDarkMode,
                         action: onHideWindow
                     )
                 }
@@ -161,6 +163,7 @@ struct PopoverContentView: View {
                     icon: "power",
                     tooltip: "Exit App",
                     isDestructive: true,
+                    isDarkMode: isDarkMode,
                     action: onExitApp
                 )
             }
@@ -202,33 +205,36 @@ struct PopoverContentView: View {
     private var contentArea: some View {
         switch itemId {
         case "focus":
-            FocusContentView(data: data)
+            FocusContentView(data: data, isDarkMode: isDarkMode)
         case "cpu", "gpu", "ram", "battery":
             ProcessListView(
                 itemId: itemId,
                 processes: data["processes"] as? [[String: Any]] ?? [],
                 isLoading: data["isLoading"] as? Bool ?? false,
+                isDarkMode: isDarkMode,
                 onTap: onActivityMonitorTap
             )
         case "disk":
             DiskProcessListView(
                 processes: data["processes"] as? [[String: Any]] ?? [],
                 isLoading: data["isLoading"] as? Bool ?? false,
+                isDarkMode: isDarkMode,
                 onTap: onActivityMonitorTap
             )
         case "network":
             NetworkContentView(
                 data: data,
+                isDarkMode: isDarkMode,
                 onTap: onActivityMonitorTap
             )
         case "todo":
-            TodoContentView(todos: data["todos"] as? [[String: Any]] ?? [])
+            TodoContentView(todos: data["todos"] as? [[String: Any]] ?? [], isDarkMode: isDarkMode)
         case "levelExp":
-            LevelExpContentView(data: data)
+            LevelExpContentView(data: data, isDarkMode: isDarkMode)
         case "keyboard":
-            KeyboardContentView(keyCount: data["keyCount"] as? Int ?? 0)
+            KeyboardContentView(keyCount: data["keyCount"] as? Int ?? 0, isDarkMode: isDarkMode)
         case "mouse":
-            MouseContentView(distance: data["distance"] as? Int ?? 0)
+            MouseContentView(distance: data["distance"] as? Int ?? 0, isDarkMode: isDarkMode)
         default:
             Text("Content placeholder")
                 .foregroundColor(.secondary)
@@ -243,15 +249,24 @@ struct IconButton: View {
     let icon: String
     let tooltip: String
     var isDestructive: Bool = false
+    var isDarkMode: Bool = false
     let action: () -> Void
     
     @State private var isHovered = false
+    
+    private var normalColor: Color {
+        isDarkMode ? Color(white: 0.6) : Color(white: 0.4)
+    }
+    
+    private var hoverColor: Color {
+        isDarkMode ? Color.white : Color.black
+    }
     
     var body: some View {
         Button(action: action) {
             Image(systemName: icon)
                 .font(.system(size: 12))
-                .foregroundColor(isDestructive ? .red : (isHovered ? .primary : .secondary))
+                .foregroundColor(isDestructive ? .red : (isHovered ? hoverColor : normalColor))
         }
         .buttonStyle(.plain)
         .help(tooltip)
@@ -265,6 +280,7 @@ struct IconButton: View {
 
 struct FocusContentView: View {
     let data: [String: Any]
+    let isDarkMode: Bool
     
     private var isActive: Bool { data["focusIsActive"] as? Bool ?? false }
     private var isRelaxing: Bool { data["focusIsRelaxing"] as? Bool ?? false }
@@ -277,15 +293,18 @@ struct FocusContentView: View {
         VStack(alignment: .leading, spacing: 8) {
             InfoRow(
                 label: locale == "zh" ? "状态" : "Status",
-                value: stateLabel
+                value: stateLabel,
+                isDarkMode: isDarkMode
             )
             InfoRow(
                 label: locale == "zh" ? "剩余时间" : "Time Remaining",
-                value: timeString
+                value: timeString,
+                isDarkMode: isDarkMode
             )
             InfoRow(
                 label: locale == "zh" ? "循环" : "Loops",
-                value: "\(currentLoop)/\(totalLoops)"
+                value: "\(currentLoop)/\(totalLoops)",
+                isDarkMode: isDarkMode
             )
         }
         .padding(8)
@@ -313,7 +332,16 @@ struct ProcessListView: View {
     let itemId: String
     let processes: [[String: Any]]
     let isLoading: Bool
+    let isDarkMode: Bool
     let onTap: () -> Void
+    
+    private var primaryTextColor: Color {
+        isDarkMode ? Color.white : Color.black
+    }
+    
+    private var secondaryTextColor: Color {
+        isDarkMode ? Color(white: 0.6) : Color(white: 0.4)
+    }
     
     var body: some View {
         if isLoading {
@@ -337,14 +365,14 @@ struct ProcessListView: View {
                         .frame(width: 70, alignment: .trailing)
                 }
                 .font(.system(size: 11, weight: .medium))
-                .foregroundColor(Color(NSColor.secondaryLabelColor))
+                .foregroundColor(secondaryTextColor)
                 
                 Divider()
                     .opacity(0.5)
                 
                 // Process rows
                 ForEach(Array(processes.enumerated()), id: \.offset) { _, process in
-                    ProcessRow(process: process, itemId: itemId, onTap: onTap)
+                    ProcessRow(process: process, itemId: itemId, isDarkMode: isDarkMode, onTap: onTap)
                 }
             }
             .padding(8)
@@ -355,6 +383,7 @@ struct ProcessListView: View {
 struct ProcessRow: View {
     let process: [String: Any]
     let itemId: String
+    let isDarkMode: Bool
     let onTap: () -> Void
     
     @State private var isHovered = false
@@ -380,6 +409,15 @@ struct ProcessRow: View {
         }
     }
     
+    private var textColor: Color {
+        let baseColor = isDarkMode ? Color.white : Color.black
+        return isHovered ? baseColor : baseColor.opacity(0.9)
+    }
+    
+    private var hoverBackground: Color {
+        isDarkMode ? Color.white.opacity(0.1) : Color.gray.opacity(0.1)
+    }
+    
     var body: some View {
         HStack {
             Text(name)
@@ -392,9 +430,9 @@ struct ProcessRow: View {
                 .frame(width: 70, alignment: .trailing)
         }
         .font(.system(size: 12))
-        .foregroundColor(isHovered ? Color.black : Color.black.opacity(0.9))
+        .foregroundColor(textColor)
         .padding(.vertical, 2)
-        .background(isHovered ? Color.gray.opacity(0.1) : Color.clear)
+        .background(isHovered ? hoverBackground : Color.clear)
         .cornerRadius(4)
         .onHover { hovering in isHovered = hovering }
         .onTapGesture { onTap() }
@@ -417,7 +455,12 @@ struct ProcessRow: View {
 struct DiskProcessListView: View {
     let processes: [[String: Any]]
     let isLoading: Bool
+    let isDarkMode: Bool
     let onTap: () -> Void
+    
+    private var secondaryTextColor: Color {
+        isDarkMode ? Color(white: 0.6) : Color(white: 0.4)
+    }
     
     var body: some View {
         if isLoading {
@@ -443,14 +486,14 @@ struct DiskProcessListView: View {
                         .frame(width: 70, alignment: .trailing)
                 }
                 .font(.system(size: 11, weight: .medium))
-                .foregroundColor(Color(NSColor.secondaryLabelColor))
+                .foregroundColor(secondaryTextColor)
                 
                 Divider()
                     .opacity(0.5)
                 
                 // Process rows
                 ForEach(Array(processes.enumerated()), id: \.offset) { _, process in
-                    DiskProcessRow(process: process, onTap: onTap)
+                    DiskProcessRow(process: process, isDarkMode: isDarkMode, onTap: onTap)
                 }
             }
             .padding(8)
@@ -460,6 +503,7 @@ struct DiskProcessListView: View {
 
 struct DiskProcessRow: View {
     let process: [String: Any]
+    let isDarkMode: Bool
     let onTap: () -> Void
     
     @State private var isHovered = false
@@ -468,6 +512,15 @@ struct DiskProcessRow: View {
     private var pid: Int { process["pid"] as? Int ?? 0 }
     private var readBytes: Int { process["bytesRead"] as? Int ?? 0 }
     private var writeBytes: Int { process["bytesWritten"] as? Int ?? 0 }
+    
+    private var textColor: Color {
+        let baseColor = isDarkMode ? Color.white : Color.black
+        return isHovered ? baseColor : baseColor.opacity(0.9)
+    }
+    
+    private var hoverBackground: Color {
+        isDarkMode ? Color.white.opacity(0.1) : Color.gray.opacity(0.1)
+    }
     
     var body: some View {
         HStack {
@@ -483,9 +536,9 @@ struct DiskProcessRow: View {
                 .frame(width: 70, alignment: .trailing)
         }
         .font(.system(size: 12))
-        .foregroundColor(isHovered ? Color.black : Color.black.opacity(0.9))
+        .foregroundColor(textColor)
         .padding(.vertical, 2)
-        .background(isHovered ? Color.gray.opacity(0.1) : Color.clear)
+        .background(isHovered ? hoverBackground : Color.clear)
         .cornerRadius(4)
         .onHover { hovering in isHovered = hovering }
         .onTapGesture { onTap() }
@@ -507,6 +560,7 @@ struct DiskProcessRow: View {
 
 struct NetworkContentView: View {
     let data: [String: Any]
+    let isDarkMode: Bool
     let onTap: () -> Void
     
     private var networkInfo: [String: String] {
@@ -528,27 +582,33 @@ struct NetworkContentView: View {
             VStack(alignment: .leading, spacing: 2) {
                 NetworkInfoRow(
                     label: locale == "zh" ? "接口" : "Interface",
-                    value: networkInfo["interfaceType"] ?? "-"
+                    value: networkInfo["interfaceType"] ?? "-",
+                    isDarkMode: isDarkMode
                 )
                 NetworkInfoRow(
                     label: locale == "zh" ? "网络名称" : "Network",
-                    value: networkInfo["networkName"] ?? "-"
+                    value: networkInfo["networkName"] ?? "-",
+                    isDarkMode: isDarkMode
                 )
                 NetworkInfoRow(
                     label: locale == "zh" ? "本地 IP" : "Local IP",
-                    value: networkInfo["localIp"] ?? "-"
+                    value: networkInfo["localIp"] ?? "-",
+                    isDarkMode: isDarkMode
                 )
                 NetworkInfoRow(
                     label: locale == "zh" ? "公网 IP" : "Public IP",
-                    value: networkInfo["publicIp"] ?? "-"
+                    value: networkInfo["publicIp"] ?? "-",
+                    isDarkMode: isDarkMode
                 )
                 NetworkInfoRow(
                     label: "MAC",
-                    value: networkInfo["macAddress"] ?? "-"
+                    value: networkInfo["macAddress"] ?? "-",
+                    isDarkMode: isDarkMode
                 )
                 NetworkInfoRow(
                     label: locale == "zh" ? "网关" : "Gateway",
-                    value: networkInfo["gateway"] ?? "-"
+                    value: networkInfo["gateway"] ?? "-",
+                    isDarkMode: isDarkMode
                 )
             }
             .padding(8)
@@ -557,7 +617,7 @@ struct NetworkContentView: View {
                 .opacity(0.3)
             
             // Process list
-            NetworkProcessListView(processes: processes, isLoading: isLoading, onTap: onTap)
+            NetworkProcessListView(processes: processes, isLoading: isLoading, isDarkMode: isDarkMode, onTap: onTap)
         }
     }
 }
@@ -565,14 +625,23 @@ struct NetworkContentView: View {
 struct NetworkInfoRow: View {
     let label: String
     let value: String
+    let isDarkMode: Bool
+    
+    private var labelColor: Color {
+        isDarkMode ? Color(white: 0.6) : Color.black.opacity(0.6)
+    }
+    
+    private var valueColor: Color {
+        isDarkMode ? Color.white : Color.black
+    }
     
     var body: some View {
         HStack {
             Text(label)
-                .foregroundColor(Color.black.opacity(1.0))
+                .foregroundColor(labelColor)
             Spacer()
             Text(value)
-                .foregroundColor(Color.black)
+                .foregroundColor(valueColor)
                 .lineLimit(1)
                 .truncationMode(.middle)
         }
@@ -584,7 +653,12 @@ struct NetworkInfoRow: View {
 struct NetworkProcessListView: View {
     let processes: [[String: Any]]
     let isLoading: Bool
+    let isDarkMode: Bool
     let onTap: () -> Void
+    
+    private var secondaryTextColor: Color {
+        isDarkMode ? Color(white: 0.6) : Color(white: 0.4)
+    }
     
     var body: some View {
         if isLoading {
@@ -610,13 +684,13 @@ struct NetworkProcessListView: View {
                         .frame(width: 70, alignment: .trailing)
                 }
                 .font(.system(size: 11, weight: .medium))
-                .foregroundColor(Color(NSColor.secondaryLabelColor))
+                .foregroundColor(secondaryTextColor)
                 
                 Divider()
                     .opacity(0.5)
                 
                 ForEach(Array(processes.enumerated()), id: \.offset) { _, process in
-                    NetworkProcessRow(process: process, onTap: onTap)
+                    NetworkProcessRow(process: process, isDarkMode: isDarkMode, onTap: onTap)
                 }
             }
             .padding(8)
@@ -626,6 +700,7 @@ struct NetworkProcessListView: View {
 
 struct NetworkProcessRow: View {
     let process: [String: Any]
+    let isDarkMode: Bool
     let onTap: () -> Void
     
     @State private var isHovered = false
@@ -634,6 +709,15 @@ struct NetworkProcessRow: View {
     private var pid: Int { process["pid"] as? Int ?? 0 }
     private var download: Int { (process["download"] as? NSNumber)?.intValue ?? 0 }
     private var upload: Int { (process["upload"] as? NSNumber)?.intValue ?? 0 }
+    
+    private var textColor: Color {
+        let baseColor = isDarkMode ? Color.white : Color.black
+        return isHovered ? baseColor : baseColor.opacity(0.9)
+    }
+    
+    private var hoverBackground: Color {
+        isDarkMode ? Color.white.opacity(0.1) : Color.gray.opacity(0.1)
+    }
     
     var body: some View {
         HStack {
@@ -649,9 +733,9 @@ struct NetworkProcessRow: View {
                 .frame(width: 70, alignment: .trailing)
         }
         .font(.system(size: 12))
-        .foregroundColor(isHovered ? Color.black : Color.black.opacity(0.9))
+        .foregroundColor(textColor)
         .padding(.vertical, 2)
-        .background(isHovered ? Color.gray.opacity(0.1) : Color.clear)
+        .background(isHovered ? hoverBackground : Color.clear)
         .cornerRadius(4)
         .onHover { hovering in isHovered = hovering }
         .onTapGesture { onTap() }
@@ -673,6 +757,7 @@ struct NetworkProcessRow: View {
 
 struct TodoContentView: View {
     let todos: [[String: Any]]
+    let isDarkMode: Bool
     
     var body: some View {
         if todos.isEmpty {
@@ -683,7 +768,7 @@ struct TodoContentView: View {
         } else {
             VStack(alignment: .leading, spacing: 6) {
                 ForEach(Array(todos.prefix(10).enumerated()), id: \.offset) { _, todo in
-                    TodoRow(todo: todo)
+                    TodoRow(todo: todo, isDarkMode: isDarkMode)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -694,6 +779,7 @@ struct TodoContentView: View {
 
 struct TodoRow: View {
     let todo: [String: Any]
+    let isDarkMode: Bool
     
     private var title: String { todo["title"] as? String ?? "" }
     private var status: String { todo["status"] as? String ?? "todo" }
@@ -714,6 +800,13 @@ struct TodoRow: View {
         }
     }
     
+    private var textColor: Color {
+        if status == "done" {
+            return isDarkMode ? Color(white: 0.5) : Color.gray
+        }
+        return isDarkMode ? Color.white : Color.black
+    }
+    
     var body: some View {
         HStack(spacing: 8) {
             Image(systemName: icon)
@@ -722,7 +815,7 @@ struct TodoRow: View {
             
             Text(title)
                 .strikethrough(status == "done")
-                .foregroundColor(status == "done" ? Color.gray : Color.black)
+                .foregroundColor(textColor)
                 .lineLimit(1)
         }
         .font(.system(size: 12))
@@ -733,6 +826,7 @@ struct TodoRow: View {
 
 struct LevelExpContentView: View {
     let data: [String: Any]
+    let isDarkMode: Bool
     
     private var level: Int { data["level"] as? Int ?? 1 }
     private var currentExp: Double { (data["currentExp"] as? NSNumber)?.doubleValue ?? 0 }
@@ -743,15 +837,18 @@ struct LevelExpContentView: View {
         VStack(alignment: .leading, spacing: 8) {
             InfoRow(
                 label: locale == "zh" ? "等级" : "Level",
-                value: "\(level)"
+                value: "\(level)",
+                isDarkMode: isDarkMode
             )
             InfoRow(
                 label: locale == "zh" ? "当前经验" : "Current EXP",
-                value: "\(Int(currentExp))"
+                value: "\(Int(currentExp))",
+                isDarkMode: isDarkMode
             )
             InfoRow(
                 label: locale == "zh" ? "升级经验" : "Max EXP",
-                value: "\(Int(maxExp))"
+                value: "\(Int(maxExp))",
+                isDarkMode: isDarkMode
             )
         }
         .padding(8)
@@ -762,12 +859,14 @@ struct LevelExpContentView: View {
 
 struct KeyboardContentView: View {
     let keyCount: Int
+    let isDarkMode: Bool
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             InfoRow(
                 label: "Today Key Events",
-                value: formatNumber(keyCount)
+                value: formatNumber(keyCount),
+                isDarkMode: isDarkMode
             )
         }
         .padding(8)
@@ -787,12 +886,14 @@ struct KeyboardContentView: View {
 
 struct MouseContentView: View {
     let distance: Int
+    let isDarkMode: Bool
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             InfoRow(
                 label: "Today Mouse Distance",
-                value: formatDistance(distance)
+                value: formatDistance(distance),
+                isDarkMode: isDarkMode
             )
         }
         .padding(8)
@@ -815,15 +916,20 @@ struct MouseContentView: View {
 struct InfoRow: View {
     let label: String
     let value: String
+    let isDarkMode: Bool
+    
+    private var textColor: Color {
+        isDarkMode ? Color.white : Color.black
+    }
     
     var body: some View {
         HStack {
             Text(label)
-                .foregroundColor(Color.black)
+                .foregroundColor(textColor)
             Spacer()
             Text(value)
                 .fontWeight(.medium)
-                .foregroundColor(Color.black)
+                .foregroundColor(textColor)
         }
         .font(.system(size: 12))
     }

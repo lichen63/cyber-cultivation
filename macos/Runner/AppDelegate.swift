@@ -467,8 +467,8 @@ class AppDelegate: FlutterAppDelegate {
       menuBarPopoverPanel?.setFrame(NSRect(x: panelX, y: panelY, width: panelSize.width, height: panelSize.height), display: true)
     }
     
-    // Show the panel
-    menuBarPopoverPanel?.orderFront(nil)
+    // Show the panel with animation
+    menuBarPopoverPanel?.showWithAnimation()
     
     // Add global event monitor to close popover when clicking outside
     menuBarPopoverEventMonitor = NSEvent.addGlobalMonitorForEvents(
@@ -634,8 +634,8 @@ class AppDelegate: FlutterAppDelegate {
         self.menuBarPopoverPanel?.setFrame(NSRect(x: panelX, y: panelY, width: panelSize.width, height: panelSize.height), display: true)
       }
       
-      // Show the panel
-      self.menuBarPopoverPanel?.orderFront(nil)
+      // Show the panel with animation
+      self.menuBarPopoverPanel?.showWithAnimation()
       
       // Add global event monitor to close popover when clicking outside
       self.menuBarPopoverEventMonitor = NSEvent.addGlobalMonitorForEvents(
@@ -668,19 +668,25 @@ class AppDelegate: FlutterAppDelegate {
     }
     
     DispatchQueue.main.async { [weak self] in
-      self?.menuBarPopoverViewController?.updateData(args)
+      // Only update if the item ID matches the current popover (prevents race condition)
+      if let updateItemId = args["itemId"] as? String,
+         updateItemId == self?.currentPopoverItemId {
+        self?.menuBarPopoverViewController?.updateData(args)
+      }
       result(true)
     }
   }
   
   private func closeMenuBarPopover() {
-    menuBarPopoverPanel?.orderOut(nil)
     if let monitor = menuBarPopoverEventMonitor {
       NSEvent.removeMonitor(monitor)
       menuBarPopoverEventMonitor = nil
     }
     currentPopoverItemId = nil
-    popoverChannel?.invokeMethod("onPopoverClosed", arguments: nil)
+    
+    menuBarPopoverPanel?.hideWithAnimation {
+      self.popoverChannel?.invokeMethod("onPopoverClosed", arguments: nil)
+    }
   }
   
   private func openActivityMonitor() {
@@ -788,9 +794,36 @@ class BorderlessPopoverPanel: NSPanel {
     self.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
     self.isMovableByWindowBackground = false
     self.hidesOnDeactivate = false
+    
+    // Start with alpha 0 for animation
+    self.alphaValue = 0
   }
   
   override var canBecomeKey: Bool {
     return true
+  }
+  
+  /// Show the panel with fade-in animation
+  func showWithAnimation() {
+    self.alphaValue = 0
+    self.orderFront(nil)
+    
+    NSAnimationContext.runAnimationGroup { context in
+      context.duration = 0.15
+      context.timingFunction = CAMediaTimingFunction(name: .easeOut)
+      self.animator().alphaValue = 1
+    }
+  }
+  
+  /// Hide the panel with fade-out animation
+  func hideWithAnimation(completion: (() -> Void)? = nil) {
+    NSAnimationContext.runAnimationGroup({ context in
+      context.duration = 0.12
+      context.timingFunction = CAMediaTimingFunction(name: .easeIn)
+      self.animator().alphaValue = 0
+    }, completionHandler: {
+      self.orderOut(nil)
+      completion?()
+    })
   }
 }
