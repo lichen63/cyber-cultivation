@@ -125,6 +125,9 @@ class _DebugLevelExpDialogState extends State<DebugLevelExpDialog> {
         _level = newLevel;
         _maxExp = _calculateMaxExp(newLevel);
       });
+    } else {
+      // Still trigger rebuild to update button state
+      setState(() {});
     }
   }
 
