@@ -103,13 +103,6 @@ Then relaunch the app and grant permission again.
 
 Contributions welcome! See [Contributing Guidelines](docs/CONTRIBUTING.md).
 
-## 📄 License
-
-[PolyForm Noncommercial License 1.0.0](LICENSE)
-
-- ✅ Free for personal, educational, non-profit use
-- ❌ Commercial use requires separate license
-
 ---
 
 <p align="center">
