@@ -1,9 +1,7 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -25,14 +23,13 @@ import 'services/input_monitor_service.dart';
 import 'services/menu_bar_helper.dart';
 import 'services/menu_bar_info_service.dart';
 import 'services/pomodoro_service.dart';
-import 'services/window_pool_service.dart';
+import 'services/popover_service.dart';
+import 'services/system_process_helper.dart';
 import 'widgets/accessibility_dialog.dart';
 import 'widgets/floating_exp_indicator.dart';
 import 'widgets/games_list_dialog.dart';
 import 'widgets/home_page_content.dart';
 import 'widgets/level_up_effect.dart';
-import 'widgets/menu_bar_popup.dart';
-import 'widgets/menu_bar_popup/pooled_popup_window.dart';
 import 'widgets/pomodoro_dialog.dart';
 import 'widgets/settings_dialog.dart';
 import 'widgets/stats_window.dart';
@@ -41,37 +38,6 @@ import 'widgets/todo_dialog.dart';
 
 void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Get the current window controller to check if this is a sub-window
-  final currentWindowController = await WindowController.fromCurrentEngine();
-
-  // If there are arguments, this is a sub-window (popup window)
-  if (currentWindowController.arguments.isNotEmpty) {
-    final argument =
-        jsonDecode(currentWindowController.arguments) as Map<String, dynamic>;
-
-    // Check if this is a pooled window
-    final isPooledWindow = argument['pooledWindow'] as bool? ?? false;
-
-    if (isPooledWindow) {
-      // Run as a pooled popup window (pre-warmed, reusable)
-      runApp(
-        PooledPopupWindow(
-          windowController: currentWindowController,
-          initialArgs: argument,
-        ),
-      );
-    } else {
-      // Run as a traditional popup window (fallback)
-      runApp(
-        MenuBarPopupWindow(
-          windowController: currentWindowController,
-          args: argument,
-        ),
-      );
-    }
-    return;
-  }
 
   // Main window initialization
   await windowManager.ensureInitialized();
@@ -168,40 +134,12 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
     _initializeFromGameData();
     _initTray();
     _initMenuBarHelper();
-    _setupWindowMethodHandler();
-    _initWindowPool();
+    _initPopoverService();
   }
 
-  /// Initialize the window pool for instant popups
-  void _initWindowPool() {
-    if (!WindowPoolConstants.enableWindowPool) return;
-
-    // Delay initialization to not block main window startup
-    Future.delayed(WindowPoolConstants.initializationDelay, () {
-      WindowPoolService.instance.initialize();
-    });
-  }
-
-  /// Set up handler for commands from popup window using WindowController
-  Future<void> _setupWindowMethodHandler() async {
-    final controller = await WindowController.fromCurrentEngine();
-    await controller.setWindowMethodHandler((call) async {
-      switch (call.method) {
-        case 'showWindow':
-          await windowManager.show();
-          await windowManager.focus();
-          return true;
-        case 'hideWindow':
-          await windowManager.hide();
-          return true;
-        case 'exitApp':
-          // Use the native method to properly exit
-          MenuBarHelper.exitApp();
-          return true;
-        default:
-          return null;
-      }
-    });
+  /// Initialize the native popover service
+  void _initPopoverService() {
+    PopoverService.instance.initialize();
   }
 
   void _initMenuBarHelper() {
@@ -213,74 +151,121 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
 
   /// Hide any open popup window (used when native popup or tray menu is shown).
   void _hidePopupWindow() {
-    WindowPoolService.instance.hideActivePopup();
+    PopoverService.instance.hidePopover();
   }
 
-  Future<void> _onMenuBarItemClicked(
-    String itemId,
-    Rect screenRect,
-    double screenHeight,
-  ) async {
-    // Calculate popup position - below the menu bar item
-    // screenRect is in macOS coordinates (origin at bottom-left)
-    // screenRect.top is origin.y (bottom of button), screenRect.bottom is top of button
-    const popupWidth = MenuBarPopupConstants.popupWidth;
+  /// Handle menu bar item click - update popover with data
+  /// Note: Native side shows popover immediately, this just updates the content
+  Future<void> _onMenuBarItemClicked(String itemId) async {
+    // Gather data for the popover based on itemId
+    final popoverData = await _gatherPopoverData(itemId);
 
-    // Position popup below the clicked item, centered horizontally
-    final popupX = screenRect.left + (screenRect.width - popupWidth) / 2;
+    // Update the already-visible native popover with the data
+    await PopoverService.instance.updatePopoverContent(popoverData);
+  }
 
-    // Convert macOS coordinates (bottom-left origin) to window_manager coordinates (top-left origin)
-    // In macOS: screenRect.top is the bottom of the button (origin.y)
-    // The top of the button in macOS coords is screenRect.bottom
-    // In top-left coords, the top of popup should be just below the menu bar
-    final popupY = screenHeight - screenRect.bottom;
-
-    // Common popup arguments
-    final popupArgs = <String, dynamic>{
+  /// Gather data for popover content based on item type
+  Future<Map<String, dynamic>> _gatherPopoverData(String itemId) async {
+    final baseData = <String, dynamic>{
       'itemId': itemId,
-      'x': popupX,
-      'y': popupY,
       'brightness': _themeMode == AppThemeMode.dark ? 'dark' : 'light',
-      'locale': _locale?.languageCode,
-      // Focus state for popup
-      'focusIsActive': _pomodoroState.isActive,
-      'focusIsRelaxing': _pomodoroState.isRelaxing,
-      'focusSecondsRemaining': _pomodoroState.secondsRemaining,
-      'focusCurrentLoop': _pomodoroState.currentLoop,
-      'focusTotalLoops': _pomodoroState.totalLoops,
-      // Level/Exp state for popup
-      'level': _level,
-      'currentExp': _currentExp,
-      'maxExp': _maxExp,
+      'locale': _locale?.languageCode ?? 'en',
     };
 
-    // Try to use window pool for instant popup
-    if (WindowPoolConstants.enableWindowPool &&
-        WindowPoolService.instance.isReady) {
-      final success = await WindowPoolService.instance.showPopup(
-        itemId: itemId,
-        x: popupX,
-        y: popupY,
-        brightness: _themeMode == AppThemeMode.dark ? 'dark' : 'light',
-        locale: _locale?.languageCode,
-        extraArgs: popupArgs,
-      );
+    switch (itemId) {
+      case 'focus':
+        return {
+          ...baseData,
+          'focusIsActive': _pomodoroState.isActive,
+          'focusIsRelaxing': _pomodoroState.isRelaxing,
+          'focusSecondsRemaining': _pomodoroState.secondsRemaining,
+          'focusCurrentLoop': _pomodoroState.currentLoop,
+          'focusTotalLoops': _pomodoroState.totalLoops,
+        };
 
-      if (success) {
-        return; // Popup shown via pool
-      }
-      // Fall through to traditional method if pool failed
+      case 'levelExp':
+        return {
+          ...baseData,
+          'level': _level,
+          'currentExp': _currentExp,
+          'maxExp': _maxExp,
+        };
+
+      case 'cpu':
+      case 'gpu':
+      case 'ram':
+      case 'disk':
+      case 'battery':
+        final processes = await _loadProcesses(itemId);
+        return {...baseData, 'processes': processes, 'isLoading': false};
+
+      case 'network':
+        final processes = await SystemProcessHelper.getTopNetworkProcesses(
+          limit: MenuBarConstants.topProcessesCount,
+        );
+        final networkInfo = await SystemProcessHelper.getNetworkInfo();
+        return {
+          ...baseData,
+          'processes': processes,
+          'networkInfo': networkInfo,
+          'isLoading': false,
+        };
+
+      case 'todo':
+        final gameDataService = GameDataService();
+        final gameData = await gameDataService.loadGameData();
+        final todos =
+            gameData?.todos
+                .map((t) => {'title': t.title, 'status': t.status.name})
+                .toList() ??
+            [];
+        return {...baseData, 'todos': todos};
+
+      case 'keyboard':
+        final gameDataService = GameDataService();
+        final gameData = await gameDataService.loadGameData();
+        final todayKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
+        final todayStats = gameData?.dailyStats[todayKey];
+        return {...baseData, 'keyCount': todayStats?.keyboardCount ?? 0};
+
+      case 'mouse':
+        final gameDataService = GameDataService();
+        final gameData = await gameDataService.loadGameData();
+        final todayKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
+        final todayStats = gameData?.dailyStats[todayKey];
+        return {...baseData, 'distance': todayStats?.mouseMoveDistance ?? 0};
+
+      default:
+        return baseData;
     }
+  }
 
-    // Fallback: Create the popup window traditionally
-    // This is used when pool is not ready or disabled
-    await WindowController.create(
-      WindowConfiguration(
-        arguments: jsonEncode(popupArgs),
-        hiddenAtLaunch: true,
-      ),
-    );
-    // We don't need to store the controller - the popup will close itself
+  /// Load processes for system stats popover
+  Future<List<Map<String, dynamic>>> _loadProcesses(String itemId) async {
+    switch (itemId) {
+      case 'cpu':
+        return SystemProcessHelper.getTopCpuProcesses(
+          limit: MenuBarConstants.topProcessesCount,
+        );
+      case 'gpu':
+        return SystemProcessHelper.getTopGpuProcesses(
+          limit: MenuBarConstants.topProcessesCount,
+        );
+      case 'ram':
+        return SystemProcessHelper.getTopRamProcesses(
+          limit: MenuBarConstants.topProcessesCount,
+        );
+      case 'disk':
+        return SystemProcessHelper.getTopDiskProcesses(
+          limit: MenuBarConstants.topProcessesCount,
+        );
+      case 'battery':
+        return SystemProcessHelper.getTopBatteryProcesses(
+          limit: MenuBarConstants.topProcessesCount,
+        );
+      default:
+        return [];
+    }
   }
 
   void _initializeFromGameData() {
@@ -301,7 +286,7 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
   @override
   void dispose() {
     MenuBarHelper.dispose();
-    WindowPoolService.instance.dispose();
+    PopoverService.instance.dispose();
     windowManager.removeListener(this);
     trayManager.removeListener(this);
     super.dispose();

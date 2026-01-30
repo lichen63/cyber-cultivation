@@ -530,6 +530,9 @@ class MenuBarConstants {
   static const double upperLineFontSize = 10.0;
   static const double lowerLineFontSize = 9.0;
 
+  // Menu bar popup - top processes count
+  static const int topProcessesCount = 5;
+
   // Colors (used in tray title)
   static const String focusColorHex = '#FF5252'; // Red for focus
   static const String relaxColorHex = '#69F0AE'; // Green for relax
@@ -544,22 +547,6 @@ class TrayConstants {
 
   /// Icon size for macOS menu bar (standard size is 18-22 pixels)
   static const int macOSIconSize = 22;
-}
-
-/// Constants for window pool (pre-warmed popup windows)
-class WindowPoolConstants {
-  /// Number of windows to pre-warm at startup.
-  /// More windows = higher memory usage but better responsiveness
-  /// when rapidly switching between popups.
-  static const int poolSize = 2;
-
-  /// Delay before initializing the window pool (after main window is shown).
-  /// This prevents the pool initialization from blocking the main window startup.
-  static const Duration initializationDelay = Duration(milliseconds: 500);
-
-  /// Whether to enable the window pool feature.
-  /// Set to false to use the traditional window creation method.
-  static const bool enableWindowPool = true;
 }
 
 /// Constants for level-up effect animation

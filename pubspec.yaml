@@ -40,7 +40,6 @@ dependencies:
   crypto: ^3.0.7
   tray_manager: ^0.5.2
   path: ^1.9.1
-  desktop_multi_window: ^0.3.0
   flutter_localizations:
     sdk: flutter
   intl: ^0.20.2

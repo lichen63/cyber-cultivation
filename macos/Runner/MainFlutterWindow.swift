@@ -3,7 +3,6 @@ import FlutterMacOS
 import QuartzCore
 import ApplicationServices
 import ServiceManagement
-import desktop_multi_window
 
 class MainFlutterWindow: NSWindow {
   private var layerObserver: NSKeyValueObservation?
@@ -15,50 +14,6 @@ class MainFlutterWindow: NSWindow {
     self.setFrame(windowFrame, display: false)
 
     RegisterGeneratedPlugins(registry: flutterViewController)
-    
-    // Register callback for desktop_multi_window sub-windows
-    FlutterMultiWindowPlugin.setOnWindowCreatedCallback { controller in
-      // Register plugins for the new window
-      RegisterGeneratedPlugins(registry: controller)
-      
-      // Register menu_bar_helper channel for sub-windows to control main window
-      let subWindowChannel = FlutterMethodChannel(
-        name: "menu_bar_helper",
-        binaryMessenger: controller.engine.binaryMessenger
-      )
-      subWindowChannel.setMethodCallHandler { (call, result) in
-        switch call.method {
-        case "showWindow":
-          // Show the main window
-          if let appDelegate = NSApp.delegate as? AppDelegate {
-            appDelegate.mainFlutterWindow?.makeKeyAndOrderFront(nil)
-            NSApp.activate(ignoringOtherApps: true)
-          }
-          result(true)
-        case "hideWindow":
-          // Hide the main window
-          if let appDelegate = NSApp.delegate as? AppDelegate {
-            appDelegate.mainFlutterWindow?.orderOut(nil)
-          }
-          result(true)
-        case "exitApp":
-          // Exit the application
-          NSApp.terminate(nil)
-          result(true)
-        default:
-          result(FlutterMethodNotImplemented)
-        }
-      }
-      
-      // Configure sub-window for transparency (needed for popup windows)
-      // Use multiple delayed attempts like main window to catch Metal layer
-      let delays: [TimeInterval] = [0.01, 0.05, 0.1, 0.2, 0.3]
-      delays.forEach { delay in
-        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-          MainFlutterWindow.configureSubWindowTransparency(controller: controller)
-        }
-      }
-    }
 
     let keyEventChannel = FlutterEventChannel(name: "com.lichen63.cyber_cultivation/key_events", binaryMessenger: flutterViewController.engine.binaryMessenger)
     keyEventChannel.setStreamHandler(KeyMonitorStreamHandler())
@@ -239,50 +194,5 @@ class MainFlutterWindow: NSWindow {
     
     // Process all sublayers recursively
     layer.sublayers?.forEach { configureSublayers($0) }
-  }
-  
-  /// Configure transparency for sub-windows created by desktop_multi_window
-  static func configureSubWindowTransparency(controller: FlutterViewController) {
-    guard let window = controller.view.window else { return }
-    
-    // Configure window
-    window.isOpaque = false
-    window.backgroundColor = .clear
-    window.hasShadow = true
-    
-    // Configure content view
-    if let contentView = window.contentView {
-      contentView.wantsLayer = true
-      contentView.layer?.backgroundColor = .clear
-      contentView.layer?.isOpaque = false
-    }
-    
-    // Configure Flutter view
-    let flutterView = controller.view
-    flutterView.wantsLayer = true
-    
-    guard let layer = flutterView.layer else { return }
-    
-    // Configure the main layer
-    layer.backgroundColor = .clear
-    layer.isOpaque = false
-    
-    // Recursively configure all sublayers (including Metal layers)
-    configureSubWindowSublayers(layer)
-  }
-  
-  private static func configureSubWindowSublayers(_ layer: CALayer) {
-    layer.backgroundColor = .clear
-    layer.isOpaque = false
-    
-    // Special handling for Metal layers
-    if let metalLayer = layer as? CAMetalLayer {
-      metalLayer.isOpaque = false
-      metalLayer.backgroundColor = .clear
-      metalLayer.framebufferOnly = false
-    }
-    
-    // Process all sublayers recursively
-    layer.sublayers?.forEach { configureSubWindowSublayers($0) }
   }
 }
