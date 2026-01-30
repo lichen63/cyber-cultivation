@@ -547,6 +547,7 @@ class SystemProcessHelper {
   /// - gateway: Default gateway IP
   ///
   /// Uses public macOS APIs (scutil, networksetup) instead of private frameworks
+  /// Prioritizes physical interfaces (WiFi/Ethernet) over VPN tunnels
   static Future<Map<String, String>> getNetworkInfo() async {
     final info = <String, String>{
       'interfaceType': '-',
@@ -558,8 +559,9 @@ class SystemProcessHelper {
     };
 
     try {
-      // Get the primary network interface using scutil (public API)
+      // Get the primary network interface using route (public API)
       String? activeInterface;
+      String? defaultRouteInterface;
 
       final routeResult = await Process.run('/sbin/route', [
         '-n',
@@ -572,12 +574,26 @@ class SystemProcessHelper {
         // Parse interface name
         final interfaceMatch = RegExp(r'interface:\s*(\S+)').firstMatch(output);
         if (interfaceMatch != null) {
-          activeInterface = interfaceMatch.group(1);
+          defaultRouteInterface = interfaceMatch.group(1);
+          activeInterface = defaultRouteInterface;
         }
         // Parse gateway
         final gatewayMatch = RegExp(r'gateway:\s*(\S+)').firstMatch(output);
         if (gatewayMatch != null) {
           info['gateway'] = gatewayMatch.group(1)!;
+        }
+      }
+
+      // If the default route is a VPN/tunnel interface, find the physical interface
+      // VPN interfaces include: utun*, ipsec*, ppp*, tun*, tap*
+      final isVpnActive =
+          activeInterface != null && _isVpnInterface(activeInterface);
+      if (isVpnActive) {
+        final physicalInterface = await _findPhysicalInterface();
+        if (physicalInterface != null) {
+          activeInterface = physicalInterface;
+          // Clear the VPN gateway since we're showing physical interface info
+          info['gateway'] = '-';
         }
       }
 
@@ -603,6 +619,15 @@ class SystemProcessHelper {
           ).firstMatch(ifconfigOutput);
           if (etherMatch != null) {
             info['macAddress'] = etherMatch.group(1)!.toUpperCase();
+          }
+        }
+
+        // Get gateway for the physical interface when VPN is active
+        // The default route gateway is the VPN's, so we need to find WiFi's gateway
+        if (isVpnActive) {
+          final gateway = await _getGatewayForInterface(activeInterface);
+          if (gateway != null) {
+            info['gateway'] = gateway;
           }
         }
 
@@ -710,5 +735,143 @@ class SystemProcessHelper {
     }
 
     return info;
+  }
+
+  /// Check if an interface is a VPN/tunnel interface
+  static bool _isVpnInterface(String interfaceName) {
+    // Common VPN/tunnel interface prefixes on macOS
+    final vpnPrefixes = ['utun', 'ipsec', 'ppp', 'tun', 'tap', 'gif', 'stf'];
+    final lowerName = interfaceName.toLowerCase();
+    return vpnPrefixes.any((prefix) => lowerName.startsWith(prefix));
+  }
+
+  /// Find the primary physical network interface (WiFi or Ethernet)
+  /// Returns the first active physical interface with an IP address
+  static Future<String?> _findPhysicalInterface() async {
+    try {
+      // Use networksetup to get the ordered list of network services
+      final servicesResult = await Process.run('/usr/sbin/networksetup', [
+        '-listnetworkserviceorder',
+      ]);
+
+      if (servicesResult.exitCode != 0) {
+        return null;
+      }
+
+      final output = servicesResult.stdout as String;
+
+      // Parse the output to find interfaces in priority order
+      // Format: "(Hardware Port: Wi-Fi, Device: en0)"
+      final interfaceMatches = RegExp(
+        r'\(Hardware Port:\s*[^,]+,\s*Device:\s*(\w+)\)',
+      ).allMatches(output);
+
+      for (final match in interfaceMatches) {
+        final device = match.group(1)?.trim() ?? '';
+
+        // Skip VPN interfaces and check only physical ones
+        if (device.isEmpty || _isVpnInterface(device)) {
+          continue;
+        }
+
+        // Prioritize WiFi and Ethernet interfaces (en*)
+        if (device.startsWith('en')) {
+          // Check if this interface is active (has an IP address)
+          final ifconfigResult = await Process.run('/sbin/ifconfig', [device]);
+          if (ifconfigResult.exitCode == 0) {
+            final ifconfigOutput = ifconfigResult.stdout as String;
+            // Check for IPv4 address and interface is UP
+            if (ifconfigOutput.contains('inet ') &&
+                ifconfigOutput.contains('status: active')) {
+              return device;
+            }
+          }
+        }
+      }
+
+      // Fallback: scan en0-en9 for any active interface
+      for (var i = 0; i <= 9; i++) {
+        final device = 'en$i';
+        try {
+          final ifconfigResult = await Process.run('/sbin/ifconfig', [device]);
+          if (ifconfigResult.exitCode == 0) {
+            final ifconfigOutput = ifconfigResult.stdout as String;
+            if (ifconfigOutput.contains('inet ') &&
+                ifconfigOutput.contains('status: active')) {
+              return device;
+            }
+          }
+        } catch (e) {
+          // Interface doesn't exist, continue
+        }
+      }
+
+      return null;
+    } catch (e) {
+      debugPrint('Failed to find physical interface: $e');
+      return null;
+    }
+  }
+
+  /// Get the gateway IP for a specific network interface
+  /// Uses networksetup to find the router for WiFi/Ethernet services
+  static Future<String?> _getGatewayForInterface(String interfaceName) async {
+    try {
+      // First, find the network service name for this interface
+      final servicesResult = await Process.run('/usr/sbin/networksetup', [
+        '-listnetworkserviceorder',
+      ]);
+
+      if (servicesResult.exitCode != 0) {
+        return null;
+      }
+
+      final output = servicesResult.stdout as String;
+
+      // Find the service name for this interface
+      // Format: "(1) Wi-Fi\n(Hardware Port: Wi-Fi, Device: en0)"
+      final servicePattern = RegExp(
+        r'\(\d+\)\s+([^\n]+)\n\(Hardware Port:[^,]+,\s*Device:\s*' +
+            RegExp.escape(interfaceName) +
+            r'\)',
+      );
+      final serviceMatch = servicePattern.firstMatch(output);
+
+      if (serviceMatch == null) {
+        return null;
+      }
+
+      final serviceName = serviceMatch.group(1)?.trim();
+      if (serviceName == null || serviceName.isEmpty) {
+        return null;
+      }
+
+      // Get network info for this service (includes router/gateway)
+      final infoResult = await Process.run('/usr/sbin/networksetup', [
+        '-getinfo',
+        serviceName,
+      ]);
+
+      if (infoResult.exitCode != 0) {
+        return null;
+      }
+
+      final infoOutput = infoResult.stdout as String;
+
+      // Parse router (gateway) from output
+      // Format: "Router: 192.168.50.1"
+      final routerMatch = RegExp(
+        r'Router:\s*(\d+\.\d+\.\d+\.\d+)',
+      ).firstMatch(infoOutput);
+
+      if (routerMatch != null) {
+        return routerMatch.group(1);
+      }
+
+      return null;
+    } catch (e) {
+      debugPrint('Failed to get gateway for interface $interfaceName: $e');
+      return null;
+    }
   }
 }
