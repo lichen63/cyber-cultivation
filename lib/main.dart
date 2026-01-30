@@ -24,7 +24,6 @@ import 'services/menu_bar_helper.dart';
 import 'services/menu_bar_info_service.dart';
 import 'services/pomodoro_service.dart';
 import 'services/popover_service.dart';
-import 'services/system_process_helper.dart';
 import 'widgets/accessibility_dialog.dart';
 import 'widgets/floating_exp_indicator.dart';
 import 'widgets/games_list_dialog.dart';
@@ -191,25 +190,8 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
           'maxExp': _maxExp,
         };
 
-      case 'cpu':
-      case 'gpu':
-      case 'ram':
-      case 'disk':
-      case 'battery':
-        final processes = await _loadProcesses(itemId);
-        return {...baseData, 'processes': processes, 'isLoading': false};
-
-      case 'network':
-        final processes = await SystemProcessHelper.getTopNetworkProcesses(
-          limit: MenuBarConstants.topProcessesCount,
-        );
-        final networkInfo = await SystemProcessHelper.getNetworkInfo();
-        return {
-          ...baseData,
-          'processes': processes,
-          'networkInfo': networkInfo,
-          'isLoading': false,
-        };
+      // System stats items (cpu, gpu, ram, disk, network, battery) are now
+      // handled directly by native Swift - see AppDelegate.loadSystemStatsNatively()
 
       case 'todo':
         final gameDataService = GameDataService();
@@ -240,34 +222,6 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
     }
   }
 
-  /// Load processes for system stats popover
-  Future<List<Map<String, dynamic>>> _loadProcesses(String itemId) async {
-    switch (itemId) {
-      case 'cpu':
-        return SystemProcessHelper.getTopCpuProcesses(
-          limit: MenuBarConstants.topProcessesCount,
-        );
-      case 'gpu':
-        return SystemProcessHelper.getTopGpuProcesses(
-          limit: MenuBarConstants.topProcessesCount,
-        );
-      case 'ram':
-        return SystemProcessHelper.getTopRamProcesses(
-          limit: MenuBarConstants.topProcessesCount,
-        );
-      case 'disk':
-        return SystemProcessHelper.getTopDiskProcesses(
-          limit: MenuBarConstants.topProcessesCount,
-        );
-      case 'battery':
-        return SystemProcessHelper.getTopBatteryProcesses(
-          limit: MenuBarConstants.topProcessesCount,
-        );
-      default:
-        return [];
-    }
-  }
-
   void _initializeFromGameData() {
     final data = widget.initialGameData;
     if (data != null) {
@@ -279,7 +233,10 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
     }
     // Set initial theme for native UI components
     if (Platform.isMacOS) {
-      MenuBarHelper.setTheme(isDark: _themeMode == AppThemeMode.dark);
+      MenuBarHelper.setTheme(
+        isDark: _themeMode == AppThemeMode.dark,
+        locale: _locale?.languageCode,
+      );
     }
   }
 
@@ -509,12 +466,22 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
         menuBarSettings: _menuBarSettings,
         onLanguageChanged: (lang) {
           setState(() => _locale = lang != null ? Locale(lang) : null);
+          // Update native UI locale
+          if (Platform.isMacOS) {
+            MenuBarHelper.setTheme(
+              isDark: _themeMode == AppThemeMode.dark,
+              locale: lang,
+            );
+          }
         },
         onThemeModeChanged: (mode) {
           setState(() => _themeMode = mode);
           // Update native UI theme (calendar popup, etc.)
           if (Platform.isMacOS) {
-            MenuBarHelper.setTheme(isDark: mode == AppThemeMode.dark);
+            MenuBarHelper.setTheme(
+              isDark: mode == AppThemeMode.dark,
+              locale: _locale?.languageCode,
+            );
           }
         },
         onMenuBarSettingsChanged: _onMenuBarSettingsChanged,

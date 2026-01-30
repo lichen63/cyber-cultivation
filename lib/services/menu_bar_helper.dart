@@ -136,10 +136,12 @@ class MenuBarHelper {
   /// Set the theme for native UI components (like calendar popup).
   ///
   /// [isDark] - true for dark theme, false for light theme
-  static Future<bool> setTheme({required bool isDark}) async {
+  /// [locale] - locale code (e.g., 'en', 'zh')
+  static Future<bool> setTheme({required bool isDark, String? locale}) async {
     try {
       final result = await _channel.invokeMethod('setTheme', {
         'brightness': isDark ? 'dark' : 'light',
+        if (locale != null) 'locale': locale,
       });
       return result == true;
     } catch (e) {

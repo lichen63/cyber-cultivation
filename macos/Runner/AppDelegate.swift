@@ -11,6 +11,7 @@ class AppDelegate: FlutterAppDelegate {
   private var calendarViewController: CalendarViewController?
   private var popoverEventMonitor: Any?
   private var isDarkMode: Bool = true
+  private var currentLocale: String = "en"
   
   // Native menu bar popover (using custom panel for no arrow)
   private var menuBarPopoverPanel: BorderlessPopoverPanel?
@@ -386,10 +387,57 @@ class AppDelegate: FlutterAppDelegate {
       let itemId = sender.identifier?.rawValue ?? ""
       showMenuBarPopoverImmediately(itemId: itemId, from: sender)
       
-      // Request popover data from Flutter (will update the already-visible popover)
-      methodChannel?.invokeMethod("onMenuBarItemClicked", arguments: [
-        "itemId": itemId
-      ])
+      // Check if this is a system stats item that can be loaded natively
+      let systemStatsItems = ["cpu", "gpu", "ram", "disk", "network", "battery"]
+      if systemStatsItems.contains(itemId) {
+        // Load data natively in Swift (no Flutter round-trip needed)
+        loadSystemStatsNatively(itemId: itemId)
+      } else {
+        // Request popover data from Flutter for non-system items (todo, levelExp, focus, keyboard, mouse)
+        methodChannel?.invokeMethod("onMenuBarItemClicked", arguments: [
+          "itemId": itemId
+        ])
+      }
+    }
+  }
+  
+  /// Load system stats data natively in Swift
+  private func loadSystemStatsNatively(itemId: String) {
+    DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+      guard let self = self else { return }
+      
+      let helper = SystemProcessHelper.shared
+      var data: [String: Any] = [
+        "itemId": itemId,
+        "brightness": self.isDarkMode ? "dark" : "light",
+        "isLoading": false,
+        "locale": self.currentLocale
+      ]
+      
+      switch itemId {
+      case "cpu":
+        data["processes"] = helper.getTopCpuProcesses(limit: 5)
+      case "gpu":
+        data["processes"] = helper.getTopGpuProcesses(limit: 5)
+      case "ram":
+        data["processes"] = helper.getTopRamProcesses(limit: 5)
+      case "disk":
+        data["processes"] = helper.getTopDiskProcesses(limit: 5)
+      case "battery":
+        data["processes"] = helper.getTopBatteryProcesses(limit: 5)
+      case "network":
+        data["processes"] = helper.getTopNetworkProcesses(limit: 5)
+        data["networkInfo"] = helper.getNetworkInfo()
+      default:
+        break
+      }
+      
+      DispatchQueue.main.async {
+        // Only update if this is still the current popover item
+        if self.currentPopoverItemId == itemId {
+          self.menuBarPopoverViewController?.updateData(data)
+        }
+      }
     }
   }
   
@@ -492,6 +540,10 @@ class AppDelegate: FlutterAppDelegate {
     }
     
     isDarkMode = brightness == "dark"
+    // Update locale if provided
+    if let locale = args["locale"] as? String {
+      currentLocale = locale
+    }
     // Update calendar view controller if it exists
     calendarViewController?.isDarkMode = isDarkMode
     result(true)
