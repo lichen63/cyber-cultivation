@@ -95,43 +95,47 @@ class HomePageContent extends StatelessWidget {
 
   Widget _buildMainArea(double windowScale) {
     return DragToMoveArea(
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: themeColors.border,
-            width: AppConstants.borderWidth * windowScale,
+      child: LevelUpEffectWrapper(
+        key: levelUpEffectKey,
+        themeColors: themeColors,
+        scale: windowScale,
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: themeColors.border,
+              width: AppConstants.borderWidth * windowScale,
+            ),
+            borderRadius: BorderRadius.circular(
+              AppConstants.borderRadius * windowScale,
+            ),
           ),
-          borderRadius: BorderRadius.circular(
-            AppConstants.borderRadius * windowScale,
-          ),
-        ),
-        child: Padding(
-          padding: EdgeInsets.all(AppConstants.defaultPadding * windowScale),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Expanded(
-                child: GameAreaWidget(
-                  level: level,
-                  currentExp: currentExp,
-                  maxExp: maxExp,
-                  currentKey: currentKey,
-                  mouseX: mouseX,
-                  mouseY: mouseY,
-                  screenWidth: screenWidth,
-                  screenHeight: screenHeight,
-                  isMouseClicking: isMouseClicking,
-                  isShowSystemStats: isShowSystemStats,
-                  isShowKeyboardTrack: isShowKeyboardTrack,
-                  isShowMouseTrack: isShowMouseTrack,
-                  systemStats: systemStats,
-                  pomodoroState: pomodoroState,
-                  themeColors: themeColors,
-                  floatingExpKey: floatingExpKey,
-                  levelUpEffectKey: levelUpEffectKey,
+          child: Padding(
+            padding: EdgeInsets.all(AppConstants.defaultPadding * windowScale),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: GameAreaWidget(
+                    level: level,
+                    currentExp: currentExp,
+                    maxExp: maxExp,
+                    currentKey: currentKey,
+                    mouseX: mouseX,
+                    mouseY: mouseY,
+                    screenWidth: screenWidth,
+                    screenHeight: screenHeight,
+                    isMouseClicking: isMouseClicking,
+                    isShowSystemStats: isShowSystemStats,
+                    isShowKeyboardTrack: isShowKeyboardTrack,
+                    isShowMouseTrack: isShowMouseTrack,
+                    systemStats: systemStats,
+                    pomodoroState: pomodoroState,
+                    themeColors: themeColors,
+                    floatingExpKey: floatingExpKey,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

@@ -563,8 +563,8 @@ class LevelUpEffectConstants {
   static const double innerBorderWidth = 3.0;
 
   // Particle burst settings
-  static const int particleCount = 24;
-  static const double particleMinSize = 2.0;
-  static const double particleMaxSize = 6.0;
-  static const double particleSpeed = 120.0;
+  static const int particleCount = 32;
+  static const double particleMinSize = 3.0;
+  static const double particleMaxSize = 8.0;
+  static const double particleSpeed = 250.0;
 }

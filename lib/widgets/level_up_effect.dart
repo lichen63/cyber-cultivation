@@ -176,15 +176,10 @@ class _LevelUpEffectPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
 
-    // Calculate the inner rect dimensions (matching ExpDisplay)
-    final innerWidth =
-        (AppConstants.expBarPaddingHorizontal * 2 +
-                AppConstants.fontSizeLevel * 3) *
-            scale +
-        AppConstants.expBarSpacing * scale +
-        AppConstants.expBarWidth * scale;
-    final innerHeight = AppConstants.expBarHeight * scale;
-    final borderRadius = AppConstants.expBarBorderRadius * scale;
+    // Use the full canvas size for the effect (the game border dimensions)
+    final innerWidth = size.width;
+    final innerHeight = size.height;
+    final borderRadius = AppConstants.borderRadius * scale;
 
     // Animation phases
     final glowIntensity = _calculateGlowIntensity(progress);
@@ -239,9 +234,21 @@ class _LevelUpEffectPainter extends CustomPainter {
   }
 
   double _calculateParticleProgress(double p) {
+    // Play particle burst 3 times during the animation
+    // Each burst takes ~30% of the total animation time
+    final cycleCount = 3;
+    final cycleDuration =
+        0.9 / cycleCount; // 0.3 each cycle, leaving 0.1 at start
+
     if (p < 0.1) return 0.0;
-    if (p > 0.7) return 1.0;
-    return Curves.easeOutCubic.transform((p - 0.1) / 0.6);
+
+    final adjustedP = p - 0.1;
+    final cycleIndex = (adjustedP / cycleDuration).floor();
+
+    if (cycleIndex >= cycleCount) return 1.0;
+
+    final cycleProgress = (adjustedP % cycleDuration) / cycleDuration;
+    return Curves.easeOutCubic.transform(cycleProgress);
   }
 
   double _calculateRingProgress(double p) {
