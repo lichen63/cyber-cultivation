@@ -29,31 +29,6 @@ class _StatsWindowState extends State<StatsWindow> {
 
   AppThemeColors get _colors => widget.themeColors;
 
-  String _formatNumber(num value) {
-    // Round to avoid floating point precision issues (e.g., 495.00000001)
-    final roundedValue = (value * 100).round() / 100;
-
-    if (roundedValue >= 1e18) {
-      return '${(roundedValue / 1e18).toStringAsFixed(1)}Qi';
-    } else if (roundedValue >= 1e15) {
-      return '${(roundedValue / 1e15).toStringAsFixed(1)}Q';
-    } else if (roundedValue >= 1000000000000) {
-      return '${(roundedValue / 1000000000000).toStringAsFixed(1)}T';
-    } else if (roundedValue >= 1000000000) {
-      return '${(roundedValue / 1000000000).toStringAsFixed(1)}B';
-    } else if (roundedValue >= 1000000) {
-      return '${(roundedValue / 1000000).toStringAsFixed(1)}M';
-    } else if (roundedValue >= 1000) {
-      return '${(roundedValue / 1000).toStringAsFixed(1)}K';
-    } else {
-      // Check if value is effectively an integer (no fractional part)
-      if (roundedValue % 1 == 0) {
-        return roundedValue.toInt().toString();
-      }
-      return roundedValue.toStringAsFixed(2);
-    }
-  }
-
   double _pixelsToMeters(double pixels) {
     // Approx 96 DPI: 1 inch = 96 px = 0.0254 m
     // 1 px = 0.0254 / 96 m ≈ 0.0002645833 m
@@ -220,7 +195,7 @@ class _StatsWindowState extends State<StatsWindow> {
           Expanded(
             child: _buildStatCard(
               AppLocalizations.of(context)!.statsKeyboard,
-              _formatNumber(widget.todayStats.keyboardCount),
+              NumberFormatter.format(widget.todayStats.keyboardCount),
               Icons.keyboard,
             ),
           ),
@@ -228,7 +203,7 @@ class _StatsWindowState extends State<StatsWindow> {
           Expanded(
             child: _buildStatCard(
               AppLocalizations.of(context)!.statsClicks,
-              _formatNumber(widget.todayStats.mouseClickCount),
+              NumberFormatter.format(widget.todayStats.mouseClickCount),
               Icons.mouse,
             ),
           ),
@@ -236,7 +211,7 @@ class _StatsWindowState extends State<StatsWindow> {
           Expanded(
             child: _buildStatCard(
               AppLocalizations.of(context)!.statsDistance,
-              "${_formatNumber(_pixelsToMeters(widget.todayStats.mouseMoveDistance.toDouble()))} m",
+              "${NumberFormatter.format(_pixelsToMeters(widget.todayStats.mouseMoveDistance.toDouble()))} m",
               Icons.show_chart,
             ),
           ),
@@ -458,9 +433,9 @@ class _StatsWindowState extends State<StatsWindow> {
                     // For keyboard/click, show integers; for distance, show with suffix
                     String label;
                     if (metric == 'move') {
-                      label = '${_formatNumber(value)} m';
+                      label = '${NumberFormatter.format(value)} m';
                     } else {
-                      label = _formatNumber(value.round());
+                      label = NumberFormatter.format(value.round());
                     }
                     return SideTitleWidget(
                       meta: meta,

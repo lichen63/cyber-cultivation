@@ -187,28 +187,6 @@ class _FloatingExpIndicatorState extends State<_FloatingExpIndicator>
     super.dispose();
   }
 
-  /// Formats exp amount for display
-  String _formatExpAmount(double value) {
-    if (value >= 1e18) {
-      return '${(value / 1e18).toStringAsFixed(1)}Qi';
-    } else if (value >= 1e15) {
-      return '${(value / 1e15).toStringAsFixed(1)}Q';
-    } else if (value >= 1e12) {
-      return '${(value / 1e12).toStringAsFixed(1)}T';
-    } else if (value >= 1e9) {
-      return '${(value / 1e9).toStringAsFixed(1)}B';
-    } else if (value >= 1e6) {
-      return '${(value / 1e6).toStringAsFixed(1)}M';
-    } else if (value >= 1e3) {
-      return '${(value / 1e3).toStringAsFixed(1)}K';
-    } else if (value == value.truncateToDouble()) {
-      // Whole number - show without decimal
-      return value.toInt().toString();
-    } else {
-      return value.toStringAsFixed(1);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -246,7 +224,7 @@ class _FloatingExpIndicatorState extends State<_FloatingExpIndicator>
           ],
         ),
         child: Text(
-          '+${_formatExpAmount(widget.expAmount)} EXP',
+          '+${NumberFormatter.format(widget.expAmount)} EXP',
           style: TextStyle(
             color: Colors.black,
             fontSize: AppConstants.fontSizeFloatingExp * widget.scale,

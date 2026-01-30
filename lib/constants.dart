@@ -572,3 +572,39 @@ class LevelUpEffectConstants {
   static const double particleMaxSize = 8.0;
   static const double particleSpeed = 250.0;
 }
+
+/// Utility class for formatting numbers with K/M/B/T/Q/Qi suffixes
+class NumberFormatter {
+  /// Formats a large number with K/M/B/T/Q/Qi suffixes for readability.
+  ///
+  /// - Numbers >= 1e18 display as "Qi" (Quintillion)
+  /// - Numbers >= 1e15 display as "Q" (Quadrillion)
+  /// - Numbers >= 1e12 display as "T" (Trillion)
+  /// - Numbers >= 1e9 display as "B" (Billion)
+  /// - Numbers >= 1e6 display as "M" (Million)
+  /// - Numbers >= 1e3 display as "K" (Thousand)
+  /// - Smaller numbers display as integers or with decimals as needed
+  static String format(num value) {
+    // Round to avoid floating point precision issues (e.g., 495.00000001)
+    final roundedValue = (value * 100).round() / 100;
+
+    if (roundedValue >= 1e18) {
+      return '${(roundedValue / 1e18).toStringAsFixed(1)}Qi';
+    } else if (roundedValue >= 1e15) {
+      return '${(roundedValue / 1e15).toStringAsFixed(1)}Q';
+    } else if (roundedValue >= 1e12) {
+      return '${(roundedValue / 1e12).toStringAsFixed(1)}T';
+    } else if (roundedValue >= 1e9) {
+      return '${(roundedValue / 1e9).toStringAsFixed(1)}B';
+    } else if (roundedValue >= 1e6) {
+      return '${(roundedValue / 1e6).toStringAsFixed(1)}M';
+    } else if (roundedValue >= 1e3) {
+      return '${(roundedValue / 1e3).toStringAsFixed(1)}K';
+    } else if (roundedValue % 1 == 0) {
+      // Integer value - show without decimal
+      return roundedValue.toInt().toString();
+    } else {
+      return roundedValue.toStringAsFixed(1);
+    }
+  }
+}
