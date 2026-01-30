@@ -1,19 +1,35 @@
 import Cocoa
 import FlutterMacOS
+import SwiftUI
 
 @main
 class AppDelegate: FlutterAppDelegate {
   private var methodChannel: FlutterMethodChannel?
+  private var popoverChannel: FlutterMethodChannel?
   private var statusItems: [String: NSStatusItem] = [:]
   var calendarPopover: NSPopover?
   private var calendarViewController: CalendarViewController?
   private var popoverEventMonitor: Any?
   private var isDarkMode: Bool = true
+  private var currentLocale: String = "en"
+  
+  // Native menu bar popover (using custom panel for no arrow)
+  private var menuBarPopoverPanel: BorderlessPopoverPanel?
+  private var menuBarPopoverViewController: MenuBarPopoverViewController?
+  private var menuBarPopoverEventMonitor: Any?
+  private var menuBarPopoverLocalEventMonitor: Any?
+  private var currentPopoverItemId: String?
   
   override func applicationDidFinishLaunching(_ notification: Notification) {
     let controller = mainFlutterWindow?.contentViewController as! FlutterViewController
     methodChannel = FlutterMethodChannel(
       name: "menu_bar_helper",
+      binaryMessenger: controller.engine.binaryMessenger
+    )
+    
+    // Set up popover method channel
+    popoverChannel = FlutterMethodChannel(
+      name: "menu_bar_popover",
       binaryMessenger: controller.engine.binaryMessenger
     )
     
@@ -36,6 +52,19 @@ class AppDelegate: FlutterAppDelegate {
         result(true)
       case "setTheme":
         self?.setTheme(call, result: result)
+      default:
+        result(FlutterMethodNotImplemented)
+      }
+    }
+    
+    popoverChannel?.setMethodCallHandler { [weak self] (call, result) in
+      switch call.method {
+      case "showPopover":
+        self?.showMenuBarPopover(call, result: result)
+      case "hidePopover":
+        self?.hideMenuBarPopover(result: result)
+      case "updatePopoverContent":
+        self?.updateMenuBarPopoverContent(call, result: result)
       default:
         result(FlutterMethodNotImplemented)
       }
@@ -355,19 +384,167 @@ class AppDelegate: FlutterAppDelegate {
         closeCalendarPopover()
       }
       
-      // Send click event to Dart with the item id and position
-      // The popup window is a separate window, so we don't need to show the main window
+      // Show native popover immediately for this menu bar item
       let itemId = sender.identifier?.rawValue ?? ""
-      let screenFrame = sender.window?.convertToScreen(sender.frame) ?? NSRect.zero
-      let screenHeight = NSScreen.main?.frame.height ?? 0
-      methodChannel?.invokeMethod("onMenuBarItemClicked", arguments: [
+      showMenuBarPopoverImmediately(itemId: itemId, from: sender)
+      
+      // Check if this is a system stats item that can be loaded natively
+      let systemStatsItems = ["cpu", "gpu", "ram", "disk", "network", "battery"]
+      if systemStatsItems.contains(itemId) {
+        // Load data natively in Swift (no Flutter round-trip needed)
+        loadSystemStatsNatively(itemId: itemId)
+      } else {
+        // Request popover data from Flutter for non-system items (todo, levelExp, focus, keyboard, mouse)
+        methodChannel?.invokeMethod("onMenuBarItemClicked", arguments: [
+          "itemId": itemId
+        ])
+      }
+    }
+  }
+  
+  /// Load system stats data natively in Swift
+  private func loadSystemStatsNatively(itemId: String) {
+    DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+      guard let self = self else { return }
+      
+      let helper = SystemProcessHelper.shared
+      var data: [String: Any] = [
         "itemId": itemId,
-        "x": screenFrame.origin.x,
-        "y": screenFrame.origin.y,
-        "width": screenFrame.size.width,
-        "height": screenFrame.size.height,
-        "screenHeight": screenHeight
-      ])
+        "brightness": self.isDarkMode ? "dark" : "light",
+        "isLoading": false,
+        "locale": self.currentLocale
+      ]
+      
+      switch itemId {
+      case "cpu":
+        data["processes"] = helper.getTopCpuProcesses(limit: 5)
+      case "gpu":
+        data["processes"] = helper.getTopGpuProcesses(limit: 5)
+      case "ram":
+        data["processes"] = helper.getTopRamProcesses(limit: 5)
+      case "disk":
+        data["processes"] = helper.getTopDiskProcesses(limit: 5)
+      case "battery":
+        data["processes"] = helper.getTopBatteryProcesses(limit: 5)
+      case "network":
+        data["processes"] = helper.getTopNetworkProcesses(limit: 5)
+        data["networkInfo"] = helper.getNetworkInfo()
+      default:
+        break
+      }
+      
+      DispatchQueue.main.async {
+        // Only update if this is still the current popover item
+        if self.currentPopoverItemId == itemId {
+          self.menuBarPopoverViewController?.updateData(data)
+        }
+      }
+    }
+  }
+  
+  /// Show popover immediately with loading state, before Flutter provides data
+  private func showMenuBarPopoverImmediately(itemId: String, from sender: NSStatusBarButton) {
+    // Close existing popover if different item
+    if menuBarPopoverPanel?.isVisible == true && currentPopoverItemId != itemId {
+      closeMenuBarPopover()
+    }
+    
+    // If same item and popover is shown, close it (toggle behavior)
+    if menuBarPopoverPanel?.isVisible == true && currentPopoverItemId == itemId {
+      closeMenuBarPopover()
+      return
+    }
+    
+    // Create view controller if needed
+    if menuBarPopoverViewController == nil {
+      menuBarPopoverViewController = MenuBarPopoverViewController()
+    }
+    
+    // Create panel if needed
+    if menuBarPopoverPanel == nil {
+      menuBarPopoverPanel = BorderlessPopoverPanel(
+        contentRect: NSRect(x: 0, y: 0, width: 280, height: 200),
+        styleMask: [.borderless, .nonactivatingPanel],
+        backing: .buffered,
+        defer: false
+      )
+      menuBarPopoverPanel?.contentViewController = menuBarPopoverViewController
+    }
+    
+    // Configure with basic data (loading state)
+    let initialData: [String: Any] = [
+      "itemId": itemId,
+      "brightness": isDarkMode ? "dark" : "light",
+      "isLoading": true,
+      "locale": currentLocale
+    ]
+    
+    menuBarPopoverViewController?.configure(
+      itemId: itemId,
+      data: initialData,
+      isDarkMode: isDarkMode,
+      onShowWindow: { [weak self] in
+        self?.showWindowClicked()
+        self?.closeMenuBarPopover()
+      },
+      onHideWindow: { [weak self] in
+        self?.hideWindowClicked()
+        self?.closeMenuBarPopover()
+      },
+      onExitApp: { [weak self] in
+        self?.exitClicked()
+      },
+      onActivityMonitorTap: { [weak self] in
+        self?.openActivityMonitor()
+        self?.closeMenuBarPopover()
+      }
+    )
+    
+    currentPopoverItemId = itemId
+    
+    // Position panel below the status bar button
+    if let buttonWindow = sender.window {
+      let buttonFrame = sender.convert(sender.bounds, to: nil)
+      let screenFrame = buttonWindow.convertToScreen(buttonFrame)
+      
+      // Get panel size from view controller
+      let panelSize = menuBarPopoverViewController?.view.fittingSize ?? NSSize(width: 280, height: 200)
+      
+      // Position below button, centered
+      let panelX = screenFrame.midX - panelSize.width / 2
+      let panelY = screenFrame.minY - panelSize.height - 4  // 4pt gap below menu bar
+      
+      menuBarPopoverPanel?.setFrame(NSRect(x: panelX, y: panelY, width: panelSize.width, height: panelSize.height), display: true)
+    }
+    
+    // Show the panel with animation
+    menuBarPopoverPanel?.showWithAnimation()
+    
+    // Add global event monitor to close popover when clicking outside the app
+    menuBarPopoverEventMonitor = NSEvent.addGlobalMonitorForEvents(
+      matching: [.leftMouseDown, .rightMouseDown]
+    ) { [weak self] event in
+      if let panel = self?.menuBarPopoverPanel,
+         panel.isVisible {
+        let mouseLocation = NSEvent.mouseLocation
+        if !panel.frame.contains(mouseLocation) {
+          self?.closeMenuBarPopover()
+        }
+      }
+    }
+    
+    // Add local event monitor to close popover when clicking inside the app (e.g., main window)
+    menuBarPopoverLocalEventMonitor = NSEvent.addLocalMonitorForEvents(
+      matching: [.leftMouseDown, .rightMouseDown]
+    ) { [weak self] event in
+      if let panel = self?.menuBarPopoverPanel,
+         panel.isVisible {
+        // Check if the click is inside the popover panel
+        if let eventWindow = event.window, eventWindow != panel {
+          self?.closeMenuBarPopover()
+        }
+      }
+      return event
     }
   }
   
@@ -379,6 +556,10 @@ class AppDelegate: FlutterAppDelegate {
     }
     
     isDarkMode = brightness == "dark"
+    // Update locale if provided
+    if let locale = args["locale"] as? String {
+      currentLocale = locale
+    }
     // Update calendar view controller if it exists
     calendarViewController?.isDarkMode = isDarkMode
     result(true)
@@ -424,6 +605,179 @@ class AppDelegate: FlutterAppDelegate {
     if let monitor = popoverEventMonitor {
       NSEvent.removeMonitor(monitor)
       popoverEventMonitor = nil
+    }
+  }
+  
+  // MARK: - Menu Bar Popover (Native)
+  
+  private func showMenuBarPopover(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    guard let args = call.arguments as? [String: Any],
+          let itemId = args["itemId"] as? String else {
+      result(FlutterError(code: "INVALID_ARGS", message: "itemId is required", details: nil))
+      return
+    }
+    
+    DispatchQueue.main.async { [weak self] in
+      guard let self = self else {
+        result(false)
+        return
+      }
+      
+      // Close calendar popover if open
+      if let popover = self.calendarPopover, popover.isShown {
+        self.closeCalendarPopover()
+      }
+      
+      // Get the status item button for positioning
+      guard let statusItem = self.statusItems[itemId],
+            let button = statusItem.button else {
+        result(false)
+        return
+      }
+      
+      // Close existing popover if different item
+      if self.menuBarPopoverPanel?.isVisible == true && self.currentPopoverItemId != itemId {
+        self.closeMenuBarPopover()
+      }
+      
+      // If same item and popover is shown, close it (toggle behavior)
+      if self.menuBarPopoverPanel?.isVisible == true && self.currentPopoverItemId == itemId {
+        self.closeMenuBarPopover()
+        result(true)
+        return
+      }
+      
+      // Create view controller if needed
+      if self.menuBarPopoverViewController == nil {
+        self.menuBarPopoverViewController = MenuBarPopoverViewController()
+      }
+      
+      // Create panel if needed
+      if self.menuBarPopoverPanel == nil {
+        self.menuBarPopoverPanel = BorderlessPopoverPanel(
+          contentRect: NSRect(x: 0, y: 0, width: 280, height: 200),
+          styleMask: [.borderless, .nonactivatingPanel],
+          backing: .buffered,
+          defer: false
+        )
+        self.menuBarPopoverPanel?.contentViewController = self.menuBarPopoverViewController
+      }
+      
+      // Configure the view controller with data
+      self.menuBarPopoverViewController?.configure(
+        itemId: itemId,
+        data: args,
+        isDarkMode: self.isDarkMode,
+        onShowWindow: { [weak self] in
+          self?.showWindowClicked()
+          self?.closeMenuBarPopover()
+        },
+        onHideWindow: { [weak self] in
+          self?.hideWindowClicked()
+          self?.closeMenuBarPopover()
+        },
+        onExitApp: { [weak self] in
+          self?.exitClicked()
+        },
+        onActivityMonitorTap: { [weak self] in
+          self?.openActivityMonitor()
+          self?.closeMenuBarPopover()
+        }
+      )
+      
+      self.currentPopoverItemId = itemId
+      
+      // Position panel below the status bar button
+      if let buttonWindow = button.window {
+        let buttonFrame = button.convert(button.bounds, to: nil)
+        let screenFrame = buttonWindow.convertToScreen(buttonFrame)
+        
+        // Get panel size from view controller
+        let panelSize = self.menuBarPopoverViewController?.view.fittingSize ?? NSSize(width: 280, height: 200)
+        
+        // Position below button, centered
+        let panelX = screenFrame.midX - panelSize.width / 2
+        let panelY = screenFrame.minY - panelSize.height - 4  // 4pt gap below menu bar
+        
+        self.menuBarPopoverPanel?.setFrame(NSRect(x: panelX, y: panelY, width: panelSize.width, height: panelSize.height), display: true)
+      }
+      
+      // Show the panel with animation
+      self.menuBarPopoverPanel?.showWithAnimation()
+      
+      // Add global event monitor to close popover when clicking outside the app
+      self.menuBarPopoverEventMonitor = NSEvent.addGlobalMonitorForEvents(
+        matching: [.leftMouseDown, .rightMouseDown]
+      ) { [weak self] event in
+        if let panel = self?.menuBarPopoverPanel,
+           panel.isVisible {
+          let mouseLocation = NSEvent.mouseLocation
+          if !panel.frame.contains(mouseLocation) {
+            self?.closeMenuBarPopover()
+          }
+        }
+      }
+      
+      // Add local event monitor to close popover when clicking inside the app (e.g., main window)
+      self.menuBarPopoverLocalEventMonitor = NSEvent.addLocalMonitorForEvents(
+        matching: [.leftMouseDown, .rightMouseDown]
+      ) { [weak self] event in
+        if let panel = self?.menuBarPopoverPanel,
+           panel.isVisible {
+          // Check if the click is inside the popover panel
+          if let eventWindow = event.window, eventWindow != panel {
+            self?.closeMenuBarPopover()
+          }
+        }
+        return event
+      }
+      
+      result(true)
+    }
+  }
+  
+  private func hideMenuBarPopover(result: @escaping FlutterResult) {
+    DispatchQueue.main.async { [weak self] in
+      self?.closeMenuBarPopover()
+      result(true)
+    }
+  }
+  
+  private func updateMenuBarPopoverContent(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    guard let args = call.arguments as? [String: Any] else {
+      result(FlutterError(code: "INVALID_ARGS", message: "Invalid arguments", details: nil))
+      return
+    }
+    
+    DispatchQueue.main.async { [weak self] in
+      // Only update if the item ID matches the current popover (prevents race condition)
+      if let updateItemId = args["itemId"] as? String,
+         updateItemId == self?.currentPopoverItemId {
+        self?.menuBarPopoverViewController?.updateData(args)
+      }
+      result(true)
+    }
+  }
+  
+  private func closeMenuBarPopover() {
+    if let monitor = menuBarPopoverEventMonitor {
+      NSEvent.removeMonitor(monitor)
+      menuBarPopoverEventMonitor = nil
+    }
+    if let localMonitor = menuBarPopoverLocalEventMonitor {
+      NSEvent.removeMonitor(localMonitor)
+      menuBarPopoverLocalEventMonitor = nil
+    }
+    currentPopoverItemId = nil
+    
+    menuBarPopoverPanel?.hideWithAnimation {
+      self.popoverChannel?.invokeMethod("onPopoverClosed", arguments: nil)
+    }
+  }
+  
+  private func openActivityMonitor() {
+    if let activityMonitorURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: "com.apple.ActivityMonitor") {
+      NSWorkspace.shared.openApplication(at: activityMonitorURL, configuration: NSWorkspace.OpenConfiguration())
     }
   }
   
@@ -510,5 +864,52 @@ class AppDelegate: FlutterAppDelegate {
 
   override func applicationSupportsSecureRestorableState(_ app: NSApplication) -> Bool {
     return true
+  }
+}
+
+/// A borderless panel for displaying popovers without the arrow
+class BorderlessPopoverPanel: NSPanel {
+  override init(contentRect: NSRect, styleMask style: NSWindow.StyleMask, backing backingStoreType: NSWindow.BackingStoreType, defer flag: Bool) {
+    super.init(contentRect: contentRect, styleMask: style, backing: backingStoreType, defer: flag)
+    
+    // Configure panel appearance
+    self.isOpaque = false
+    self.backgroundColor = .clear
+    self.hasShadow = true
+    self.level = .popUpMenu
+    self.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+    self.isMovableByWindowBackground = false
+    self.hidesOnDeactivate = false
+    
+    // Start with alpha 0 for animation
+    self.alphaValue = 0
+  }
+  
+  override var canBecomeKey: Bool {
+    return true
+  }
+  
+  /// Show the panel with fade-in animation
+  func showWithAnimation() {
+    self.alphaValue = 0
+    self.orderFront(nil)
+    
+    NSAnimationContext.runAnimationGroup { context in
+      context.duration = 0.15
+      context.timingFunction = CAMediaTimingFunction(name: .easeOut)
+      self.animator().alphaValue = 1
+    }
+  }
+  
+  /// Hide the panel with fade-out animation
+  func hideWithAnimation(completion: (() -> Void)? = nil) {
+    NSAnimationContext.runAnimationGroup({ context in
+      context.duration = 0.12
+      context.timingFunction = CAMediaTimingFunction(name: .easeIn)
+      self.animator().alphaValue = 0
+    }, completionHandler: {
+      self.orderOut(nil)
+      completion?()
+    })
   }
 }

@@ -6,7 +6,7 @@ A gamified desktop companion that transforms your keyboard and mouse activity in
 
 ![Flutter](https://img.shields.io/badge/Flutter-3.10+-blue?logo=flutter)
 ![Platform](https://img.shields.io/badge/Platform-macOS-lightgrey?logo=apple)
-![License](https://img.shields.io/badge/License-PolyForm%20NC-green)
+![License](https://img.shields.io/badge/License-GPLv3-blue)
 
 ## Screenshots
 

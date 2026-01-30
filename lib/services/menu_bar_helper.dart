@@ -1,9 +1,8 @@
 import 'package:flutter/services.dart';
 
 /// Callback type for menu bar item clicks.
-/// Provides itemId, the screen position of the clicked item, and screen height.
-typedef MenuBarItemClickCallback =
-    void Function(String itemId, Rect screenRect, double screenHeight);
+/// Provides only the itemId - native popover handles positioning.
+typedef MenuBarItemClickCallback = void Function(String itemId);
 
 /// Callback type for when a native popup (like calendar) is about to show.
 typedef NativePopupShowingCallback = void Function();
@@ -37,18 +36,8 @@ class MenuBarHelper {
       case 'onMenuBarItemClicked':
         final args = call.arguments as Map<dynamic, dynamic>;
         final itemId = args['itemId'] as String;
-        final x = (args['x'] as num).toDouble();
-        final y = (args['y'] as num).toDouble();
-        final width = (args['width'] as num).toDouble();
-        final height = (args['height'] as num).toDouble();
-        final screenHeight = (args['screenHeight'] as num).toDouble();
-        // Store screenHeight in the Rect's unused property by encoding it
-        // We pass it as a 5-element list in a custom way
-        _onItemClicked?.call(
-          itemId,
-          Rect.fromLTWH(x, y, width, height),
-          screenHeight,
-        );
+        // Native side handles positioning, we just need the itemId
+        _onItemClicked?.call(itemId);
         return true;
       case 'onNativePopupShowing':
         // Native popup (like calendar) is about to show, hide any Flutter popup
@@ -147,10 +136,12 @@ class MenuBarHelper {
   /// Set the theme for native UI components (like calendar popup).
   ///
   /// [isDark] - true for dark theme, false for light theme
-  static Future<bool> setTheme({required bool isDark}) async {
+  /// [locale] - locale code (e.g., 'en', 'zh')
+  static Future<bool> setTheme({required bool isDark, String? locale}) async {
     try {
       final result = await _channel.invokeMethod('setTheme', {
         'brightness': isDark ? 'dark' : 'light',
+        if (locale != null) 'locale': locale,
       });
       return result == true;
     } catch (e) {

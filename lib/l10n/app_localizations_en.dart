@@ -414,4 +414,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get networkInfoProcesses => 'Top Processes';
+
+  @override
+  String get debugMenu => 'Debug';
+
+  @override
+  String get debugSetLevelExp => 'Set Level & EXP';
+
+  @override
+  String get debugSetLevelExpTitle => 'Set Level & EXP';
+
+  @override
+  String get debugLevelLabel => 'Level';
+
+  @override
+  String get debugExpLabel => 'Current EXP';
+
+  @override
+  String get debugMaxExpLabel => 'Max EXP to level up';
+
+  @override
+  String get debugApplyButton => 'Apply';
 }

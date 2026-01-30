@@ -1,9 +1,8 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:desktop_multi_window/desktop_multi_window.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -25,14 +24,13 @@ import 'services/input_monitor_service.dart';
 import 'services/menu_bar_helper.dart';
 import 'services/menu_bar_info_service.dart';
 import 'services/pomodoro_service.dart';
-import 'services/window_pool_service.dart';
+import 'services/popover_service.dart';
 import 'widgets/accessibility_dialog.dart';
+import 'widgets/debug_level_exp_dialog.dart';
 import 'widgets/floating_exp_indicator.dart';
 import 'widgets/games_list_dialog.dart';
 import 'widgets/home_page_content.dart';
 import 'widgets/level_up_effect.dart';
-import 'widgets/menu_bar_popup.dart';
-import 'widgets/menu_bar_popup/pooled_popup_window.dart';
 import 'widgets/pomodoro_dialog.dart';
 import 'widgets/settings_dialog.dart';
 import 'widgets/stats_window.dart';
@@ -41,37 +39,6 @@ import 'widgets/todo_dialog.dart';
 
 void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Get the current window controller to check if this is a sub-window
-  final currentWindowController = await WindowController.fromCurrentEngine();
-
-  // If there are arguments, this is a sub-window (popup window)
-  if (currentWindowController.arguments.isNotEmpty) {
-    final argument =
-        jsonDecode(currentWindowController.arguments) as Map<String, dynamic>;
-
-    // Check if this is a pooled window
-    final isPooledWindow = argument['pooledWindow'] as bool? ?? false;
-
-    if (isPooledWindow) {
-      // Run as a pooled popup window (pre-warmed, reusable)
-      runApp(
-        PooledPopupWindow(
-          windowController: currentWindowController,
-          initialArgs: argument,
-        ),
-      );
-    } else {
-      // Run as a traditional popup window (fallback)
-      runApp(
-        MenuBarPopupWindow(
-          windowController: currentWindowController,
-          args: argument,
-        ),
-      );
-    }
-    return;
-  }
 
   // Main window initialization
   await windowManager.ensureInitialized();
@@ -168,40 +135,12 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
     _initializeFromGameData();
     _initTray();
     _initMenuBarHelper();
-    _setupWindowMethodHandler();
-    _initWindowPool();
+    _initPopoverService();
   }
 
-  /// Initialize the window pool for instant popups
-  void _initWindowPool() {
-    if (!WindowPoolConstants.enableWindowPool) return;
-
-    // Delay initialization to not block main window startup
-    Future.delayed(WindowPoolConstants.initializationDelay, () {
-      WindowPoolService.instance.initialize();
-    });
-  }
-
-  /// Set up handler for commands from popup window using WindowController
-  Future<void> _setupWindowMethodHandler() async {
-    final controller = await WindowController.fromCurrentEngine();
-    await controller.setWindowMethodHandler((call) async {
-      switch (call.method) {
-        case 'showWindow':
-          await windowManager.show();
-          await windowManager.focus();
-          return true;
-        case 'hideWindow':
-          await windowManager.hide();
-          return true;
-        case 'exitApp':
-          // Use the native method to properly exit
-          MenuBarHelper.exitApp();
-          return true;
-        default:
-          return null;
-      }
-    });
+  /// Initialize the native popover service
+  void _initPopoverService() {
+    PopoverService.instance.initialize();
   }
 
   void _initMenuBarHelper() {
@@ -213,74 +152,76 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
 
   /// Hide any open popup window (used when native popup or tray menu is shown).
   void _hidePopupWindow() {
-    WindowPoolService.instance.hideActivePopup();
+    PopoverService.instance.hidePopover();
   }
 
-  Future<void> _onMenuBarItemClicked(
-    String itemId,
-    Rect screenRect,
-    double screenHeight,
-  ) async {
-    // Calculate popup position - below the menu bar item
-    // screenRect is in macOS coordinates (origin at bottom-left)
-    // screenRect.top is origin.y (bottom of button), screenRect.bottom is top of button
-    const popupWidth = MenuBarPopupConstants.popupWidth;
+  /// Handle menu bar item click - update popover with data
+  /// Note: Native side shows popover immediately, this just updates the content
+  Future<void> _onMenuBarItemClicked(String itemId) async {
+    // Gather data for the popover based on itemId
+    final popoverData = await _gatherPopoverData(itemId);
 
-    // Position popup below the clicked item, centered horizontally
-    final popupX = screenRect.left + (screenRect.width - popupWidth) / 2;
+    // Update the already-visible native popover with the data
+    await PopoverService.instance.updatePopoverContent(popoverData);
+  }
 
-    // Convert macOS coordinates (bottom-left origin) to window_manager coordinates (top-left origin)
-    // In macOS: screenRect.top is the bottom of the button (origin.y)
-    // The top of the button in macOS coords is screenRect.bottom
-    // In top-left coords, the top of popup should be just below the menu bar
-    final popupY = screenHeight - screenRect.bottom;
-
-    // Common popup arguments
-    final popupArgs = <String, dynamic>{
+  /// Gather data for popover content based on item type
+  Future<Map<String, dynamic>> _gatherPopoverData(String itemId) async {
+    final baseData = <String, dynamic>{
       'itemId': itemId,
-      'x': popupX,
-      'y': popupY,
       'brightness': _themeMode == AppThemeMode.dark ? 'dark' : 'light',
-      'locale': _locale?.languageCode,
-      // Focus state for popup
-      'focusIsActive': _pomodoroState.isActive,
-      'focusIsRelaxing': _pomodoroState.isRelaxing,
-      'focusSecondsRemaining': _pomodoroState.secondsRemaining,
-      'focusCurrentLoop': _pomodoroState.currentLoop,
-      'focusTotalLoops': _pomodoroState.totalLoops,
-      // Level/Exp state for popup
-      'level': _level,
-      'currentExp': _currentExp,
-      'maxExp': _maxExp,
+      'locale': _locale?.languageCode ?? 'en',
     };
 
-    // Try to use window pool for instant popup
-    if (WindowPoolConstants.enableWindowPool &&
-        WindowPoolService.instance.isReady) {
-      final success = await WindowPoolService.instance.showPopup(
-        itemId: itemId,
-        x: popupX,
-        y: popupY,
-        brightness: _themeMode == AppThemeMode.dark ? 'dark' : 'light',
-        locale: _locale?.languageCode,
-        extraArgs: popupArgs,
-      );
+    switch (itemId) {
+      case 'focus':
+        return {
+          ...baseData,
+          'focusIsActive': _pomodoroState.isActive,
+          'focusIsRelaxing': _pomodoroState.isRelaxing,
+          'focusSecondsRemaining': _pomodoroState.secondsRemaining,
+          'focusCurrentLoop': _pomodoroState.currentLoop,
+          'focusTotalLoops': _pomodoroState.totalLoops,
+        };
 
-      if (success) {
-        return; // Popup shown via pool
-      }
-      // Fall through to traditional method if pool failed
+      case 'levelExp':
+        return {
+          ...baseData,
+          'level': _level,
+          'currentExp': _currentExp,
+          'maxExp': _maxExp,
+        };
+
+      // System stats items (cpu, gpu, ram, disk, network, battery) are now
+      // handled directly by native Swift - see AppDelegate.loadSystemStatsNatively()
+
+      case 'todo':
+        final gameDataService = GameDataService();
+        final gameData = await gameDataService.loadGameData();
+        final todos =
+            gameData?.todos
+                .map((t) => {'title': t.title, 'status': t.status.name})
+                .toList() ??
+            [];
+        return {...baseData, 'todos': todos};
+
+      case 'keyboard':
+        final gameDataService = GameDataService();
+        final gameData = await gameDataService.loadGameData();
+        final todayKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
+        final todayStats = gameData?.dailyStats[todayKey];
+        return {...baseData, 'keyCount': todayStats?.keyboardCount ?? 0};
+
+      case 'mouse':
+        final gameDataService = GameDataService();
+        final gameData = await gameDataService.loadGameData();
+        final todayKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
+        final todayStats = gameData?.dailyStats[todayKey];
+        return {...baseData, 'distance': todayStats?.mouseMoveDistance ?? 0};
+
+      default:
+        return baseData;
     }
-
-    // Fallback: Create the popup window traditionally
-    // This is used when pool is not ready or disabled
-    await WindowController.create(
-      WindowConfiguration(
-        arguments: jsonEncode(popupArgs),
-        hiddenAtLaunch: true,
-      ),
-    );
-    // We don't need to store the controller - the popup will close itself
   }
 
   void _initializeFromGameData() {
@@ -294,14 +235,17 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
     }
     // Set initial theme for native UI components
     if (Platform.isMacOS) {
-      MenuBarHelper.setTheme(isDark: _themeMode == AppThemeMode.dark);
+      MenuBarHelper.setTheme(
+        isDark: _themeMode == AppThemeMode.dark,
+        locale: _locale?.languageCode,
+      );
     }
   }
 
   @override
   void dispose() {
     MenuBarHelper.dispose();
-    WindowPoolService.instance.dispose();
+    PopoverService.instance.dispose();
     windowManager.removeListener(this);
     trayManager.removeListener(this);
     super.dispose();
@@ -524,12 +468,22 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
         menuBarSettings: _menuBarSettings,
         onLanguageChanged: (lang) {
           setState(() => _locale = lang != null ? Locale(lang) : null);
+          // Update native UI locale
+          if (Platform.isMacOS) {
+            MenuBarHelper.setTheme(
+              isDark: _themeMode == AppThemeMode.dark,
+              locale: lang,
+            );
+          }
         },
         onThemeModeChanged: (mode) {
           setState(() => _themeMode = mode);
           // Update native UI theme (calendar popup, etc.)
           if (Platform.isMacOS) {
-            MenuBarHelper.setTheme(isDark: mode == AppThemeMode.dark);
+            MenuBarHelper.setTheme(
+              isDark: mode == AppThemeMode.dark,
+              locale: _locale?.languageCode,
+            );
           }
         },
         onMenuBarSettingsChanged: _onMenuBarSettingsChanged,
@@ -1151,6 +1105,38 @@ class _MyHomePageState extends State<MyHomePage>
     setState(() => _isMenuOpen = true);
     final l10n = AppLocalizations.of(context)!;
 
+    final items = <PopupMenuEntry<String>>[
+      _buildMenuItem(
+        value: AppConstants.toggleAlwaysOnTopValue,
+        label: l10n.forceForegroundText,
+        isChecked: _isAlwaysOnTop,
+      ),
+      _buildMenuItem(
+        value: AppConstants.toggleAntiSleepValue,
+        label: l10n.antiSleepText,
+        isChecked: _inputMonitorService.enableAntiSleep,
+      ),
+      _buildMenuItem(
+        value: AppConstants.hideWindowValue,
+        label: l10n.hideWindowText,
+      ),
+      // Debug menu inserted here in debug mode (before exit)
+      if (kDebugMode)
+        _DebugSubmenuItem(
+          themeColors: _themeColors,
+          l10n: l10n,
+          onSelected: (value) {
+            Navigator.of(context).pop();
+            _handleMenuResult(value);
+          },
+        ),
+      _buildMenuItem(
+        value: AppConstants.exitGameValue,
+        label: l10n.exitGameText,
+        isDestructive: true,
+      ),
+    ];
+
     final result = await showMenu(
       context: context,
       color: _themeColors.overlay,
@@ -1164,27 +1150,7 @@ class _MyHomePageState extends State<MyHomePage>
         position.dx,
         position.dy,
       ),
-      items: [
-        _buildMenuItem(
-          value: AppConstants.toggleAlwaysOnTopValue,
-          label: l10n.forceForegroundText,
-          isChecked: _isAlwaysOnTop,
-        ),
-        _buildMenuItem(
-          value: AppConstants.toggleAntiSleepValue,
-          label: l10n.antiSleepText,
-          isChecked: _inputMonitorService.enableAntiSleep,
-        ),
-        _buildMenuItem(
-          value: AppConstants.hideWindowValue,
-          label: l10n.hideWindowText,
-        ),
-        _buildMenuItem(
-          value: AppConstants.exitGameValue,
-          label: l10n.exitGameText,
-          isDestructive: true,
-        ),
-      ],
+      items: items,
     );
 
     if (mounted) setState(() => _isMenuOpen = false);
@@ -1238,7 +1204,35 @@ class _MyHomePageState extends State<MyHomePage>
       case AppConstants.exitGameValue:
         // Use native method to properly exit the app
         MenuBarHelper.exitApp();
+      case AppConstants.debugSetLevelExpValue:
+        _showDebugLevelExpDialog();
     }
+  }
+
+  void _showDebugLevelExpDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => DebugLevelExpDialog(
+        currentLevel: _level,
+        currentExp: _currentExp,
+        themeColors: _themeColors,
+        onApply: (level, exp) {
+          setState(() {
+            _level = level;
+            _currentExp = exp;
+            _maxExp =
+                AppConstants.initialMaxExp *
+                pow(AppConstants.expGrowthFactor, level - 1);
+            if (_level >= AppConstants.maxLevel) {
+              _currentExp = double.infinity;
+              _maxExp = double.infinity;
+            }
+          });
+          widget.onLevelExpChanged?.call(_level, _currentExp, _maxExp);
+          _saveGameData(immediate: true);
+        },
+      ),
+    );
   }
 
   @override
@@ -1305,5 +1299,174 @@ class _MyHomePageState extends State<MyHomePage>
         Navigator.of(context).pop();
       }
     }
+  }
+}
+
+/// A custom PopupMenuEntry that shows a submenu on hover.
+/// Used for the debug menu in debug mode.
+class _DebugSubmenuItem extends PopupMenuEntry<String> {
+  final AppThemeColors themeColors;
+  final AppLocalizations l10n;
+  final ValueChanged<String> onSelected;
+
+  const _DebugSubmenuItem({
+    required this.themeColors,
+    required this.l10n,
+    required this.onSelected,
+  });
+
+  @override
+  double get height => kMinInteractiveDimension;
+
+  @override
+  bool represents(String? value) => false;
+
+  @override
+  State<_DebugSubmenuItem> createState() => _DebugSubmenuItemState();
+}
+
+class _DebugSubmenuItemState extends State<_DebugSubmenuItem> {
+  OverlayEntry? _overlayEntry;
+  bool _isHovering = false;
+  bool _isSubmenuHovering = false;
+  final LayerLink _layerLink = LayerLink();
+
+  @override
+  void dispose() {
+    _removeOverlay();
+    super.dispose();
+  }
+
+  void _removeOverlay() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+  }
+
+  void _showSubmenu() {
+    if (_overlayEntry != null) return;
+
+    _overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        width: 180,
+        child: CompositedTransformFollower(
+          link: _layerLink,
+          targetAnchor: Alignment.topRight,
+          followerAnchor: Alignment.topLeft,
+          offset: const Offset(4, 0),
+          child: MouseRegion(
+            onEnter: (_) {
+              _isSubmenuHovering = true;
+            },
+            onExit: (_) {
+              _isSubmenuHovering = false;
+              Future.delayed(const Duration(milliseconds: 100), () {
+                if (!_isHovering && !_isSubmenuHovering) {
+                  _removeOverlay();
+                }
+              });
+            },
+            child: Material(
+              color: widget.themeColors.overlay,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(
+                  AppConstants.smallBorderRadius,
+                ),
+                side: BorderSide(color: widget.themeColors.border, width: 2),
+              ),
+              elevation: 8,
+              child: InkWell(
+                onTap: () {
+                  _removeOverlay();
+                  widget.onSelected(AppConstants.debugSetLevelExpValue);
+                },
+                borderRadius: BorderRadius.circular(
+                  AppConstants.smallBorderRadius,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  child: Row(
+                    children: [
+                      const SizedBox(width: 24),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          widget.l10n.debugSetLevelExp,
+                          style: TextStyle(
+                            color: widget.themeColors.primaryText,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    Overlay.of(context).insert(_overlayEntry!);
+  }
+
+  void _onHoverChanged(bool hovering) {
+    _isHovering = hovering;
+    if (hovering) {
+      _showSubmenu();
+    } else {
+      Future.delayed(const Duration(milliseconds: 100), () {
+        if (!_isHovering && !_isSubmenuHovering) {
+          _removeOverlay();
+        }
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CompositedTransformTarget(
+      link: _layerLink,
+      child: MouseRegion(
+        onEnter: (_) => _onHoverChanged(true),
+        onExit: (_) => _onHoverChanged(false),
+        child: InkWell(
+          onTap: () {
+            // Also show submenu on tap
+            _showSubmenu();
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.bug_report,
+                  color: widget.themeColors.accent,
+                  size: 18,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    widget.l10n.debugMenu,
+                    style: TextStyle(
+                      color: widget.themeColors.accent,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                Icon(
+                  Icons.arrow_right,
+                  color: widget.themeColors.secondaryText,
+                  size: 18,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

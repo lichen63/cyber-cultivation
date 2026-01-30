@@ -883,6 +883,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Top Processes'**
   String get networkInfoProcesses;
+
+  /// Debug menu item label
+  ///
+  /// In en, this message translates to:
+  /// **'Debug'**
+  String get debugMenu;
+
+  /// Debug menu item to set level and exp
+  ///
+  /// In en, this message translates to:
+  /// **'Set Level & EXP'**
+  String get debugSetLevelExp;
+
+  /// Title for debug set level/exp dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Set Level & EXP'**
+  String get debugSetLevelExpTitle;
+
+  /// Label for level input
+  ///
+  /// In en, this message translates to:
+  /// **'Level'**
+  String get debugLevelLabel;
+
+  /// Label for current exp input
+  ///
+  /// In en, this message translates to:
+  /// **'Current EXP'**
+  String get debugExpLabel;
+
+  /// Label showing max exp needed for next level
+  ///
+  /// In en, this message translates to:
+  /// **'Max EXP to level up'**
+  String get debugMaxExpLabel;
+
+  /// Button to apply debug changes
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get debugApplyButton;
 }
 
 class _AppLocalizationsDelegate

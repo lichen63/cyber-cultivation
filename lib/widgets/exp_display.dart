@@ -17,21 +17,6 @@ class ExpDisplay extends StatelessWidget {
     required this.themeColors,
   });
 
-  /// Formats a large number with K/M/B/T suffixes for readability.
-  String _formatNumber(double value) {
-    if (value >= 1e12) {
-      return '${(value / 1e12).toStringAsFixed(1)}T';
-    } else if (value >= 1e9) {
-      return '${(value / 1e9).toStringAsFixed(1)}B';
-    } else if (value >= 1e6) {
-      return '${(value / 1e6).toStringAsFixed(1)}M';
-    } else if (value >= 1e4) {
-      return '${(value / 1e3).toStringAsFixed(1)}K';
-    } else {
-      return value.toInt().toString();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final double progress = maxExp.isInfinite
@@ -39,7 +24,7 @@ class ExpDisplay extends StatelessWidget {
         : (currentExp / maxExp).clamp(0.0, 1.0);
     final String expText = maxExp.isInfinite
         ? '∞ / ∞'
-        : '${_formatNumber(currentExp)} / ${_formatNumber(maxExp)}';
+        : '${NumberFormatter.format(currentExp)} / ${NumberFormatter.format(maxExp)}';
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -47,11 +32,15 @@ class ExpDisplay extends StatelessWidget {
       children: [
         Container(
           height: AppConstants.expBarHeight * scale,
-          padding: EdgeInsets.symmetric(horizontal: AppConstants.expBarPaddingHorizontal * scale),
+          padding: EdgeInsets.symmetric(
+            horizontal: AppConstants.expBarPaddingHorizontal * scale,
+          ),
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: themeColors.expBarBackground,
-            borderRadius: BorderRadius.circular(AppConstants.expBarBorderRadius * scale),
+            borderRadius: BorderRadius.circular(
+              AppConstants.expBarBorderRadius * scale,
+            ),
             border: Border.all(color: themeColors.border, width: 1),
           ),
           child: Text(
@@ -70,13 +59,17 @@ class ExpDisplay extends StatelessWidget {
           height: AppConstants.expBarHeight * scale,
           decoration: BoxDecoration(
             border: Border.all(color: themeColors.border, width: 1),
-            borderRadius: BorderRadius.circular(AppConstants.expBarBorderRadius * scale),
+            borderRadius: BorderRadius.circular(
+              AppConstants.expBarBorderRadius * scale,
+            ),
             color: themeColors.expBarBackground,
           ),
           child: Stack(
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.circular((AppConstants.expBarBorderRadius - 1) * scale),
+                borderRadius: BorderRadius.circular(
+                  (AppConstants.expBarBorderRadius - 1) * scale,
+                ),
                 child: LinearProgressIndicator(
                   value: progress,
                   backgroundColor: Colors.transparent,

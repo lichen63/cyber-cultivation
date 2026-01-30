@@ -7,7 +7,6 @@ import 'cultivation_formation.dart';
 import 'exp_display.dart';
 import 'floating_exp_indicator.dart';
 import 'keyboard_monitor.dart';
-import 'level_up_effect.dart';
 import 'mouse_monitor.dart';
 import 'system_stats_panel.dart';
 
@@ -29,7 +28,6 @@ class GameAreaWidget extends StatelessWidget {
   final PomodoroState pomodoroState;
   final AppThemeColors themeColors;
   final GlobalKey<FloatingExpIndicatorManagerState>? floatingExpKey;
-  final GlobalKey<LevelUpEffectWrapperState>? levelUpEffectKey;
 
   const GameAreaWidget({
     super.key,
@@ -49,7 +47,6 @@ class GameAreaWidget extends StatelessWidget {
     required this.pomodoroState,
     required this.themeColors,
     this.floatingExpKey,
-    this.levelUpEffectKey,
   });
 
   @override
@@ -64,17 +61,12 @@ class GameAreaWidget extends StatelessWidget {
             Column(
               children: [
                 SizedBox(height: 30 * scale),
-                LevelUpEffectWrapper(
-                  key: levelUpEffectKey,
-                  themeColors: themeColors,
+                ExpDisplay(
+                  level: level,
+                  currentExp: currentExp,
+                  maxExp: maxExp,
                   scale: scale,
-                  child: ExpDisplay(
-                    level: level,
-                    currentExp: currentExp,
-                    maxExp: maxExp,
-                    scale: scale,
-                    themeColors: themeColors,
-                  ),
+                  themeColors: themeColors,
                 ),
                 SizedBox(height: 10 * scale),
                 Expanded(child: _buildCharacterArea(scale)),
@@ -90,6 +82,7 @@ class GameAreaWidget extends StatelessWidget {
                   child: FloatingExpIndicatorManager(
                     key: floatingExpKey,
                     themeColors: themeColors,
+                    scale: scale,
                   ),
                 ),
               ),
