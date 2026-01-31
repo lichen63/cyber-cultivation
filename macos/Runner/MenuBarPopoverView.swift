@@ -276,6 +276,35 @@ struct IconButton: View {
     }
 }
 
+// MARK: - Custom Loading Spinner
+
+/// A custom loading spinner that works well in both light and dark modes
+struct LoadingSpinner: View {
+    let isDarkMode: Bool
+    var scale: CGFloat = 0.7
+    
+    @State private var isAnimating = false
+    
+    private var spinnerColor: Color {
+        isDarkMode ? Color.white.opacity(0.8) : Color.black.opacity(0.6)
+    }
+    
+    var body: some View {
+        Circle()
+            .trim(from: 0, to: 0.7)
+            .stroke(spinnerColor, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+            .frame(width: 20 * scale, height: 20 * scale)
+            .rotationEffect(Angle(degrees: isAnimating ? 360 : 0))
+            .animation(
+                Animation.linear(duration: 0.8).repeatForever(autoreverses: false),
+                value: isAnimating
+            )
+            .onAppear {
+                isAnimating = true
+            }
+    }
+}
+
 // MARK: - Focus Content
 
 struct FocusContentView: View {
@@ -345,8 +374,7 @@ struct ProcessListView: View {
     
     var body: some View {
         if isLoading {
-            ProgressView()
-                .scaleEffect(0.7)
+            LoadingSpinner(isDarkMode: isDarkMode)
                 .frame(maxWidth: .infinity, minHeight: 80)
         } else if processes.isEmpty {
             Text("No processes found")
@@ -464,8 +492,7 @@ struct DiskProcessListView: View {
     
     var body: some View {
         if isLoading {
-            ProgressView()
-                .scaleEffect(0.7)
+            LoadingSpinner(isDarkMode: isDarkMode)
                 .frame(maxWidth: .infinity, minHeight: 80)
         } else if processes.isEmpty {
             Text("No disk activity")
@@ -662,8 +689,7 @@ struct NetworkProcessListView: View {
     
     var body: some View {
         if isLoading {
-            ProgressView()
-                .scaleEffect(0.7)
+            LoadingSpinner(isDarkMode: isDarkMode)
                 .frame(maxWidth: .infinity, minHeight: 60)
         } else if processes.isEmpty {
             Text("No active connections")

@@ -207,17 +207,42 @@ struct TrayPopupContentView: View {
                 } else {
                     // Loading placeholder
                     VStack(spacing: 8) {
-                        ProgressView()
-                            .scaleEffect(0.8)
+                        TrayLoadingSpinner(isDarkMode: isDarkMode)
                         Text(locale == "zh" ? "加载中..." : "Loading...")
                             .font(.system(size: 11))
-                            .foregroundColor(.secondary)
+                            .foregroundColor(isDarkMode ? Color.white.opacity(0.6) : .secondary)
                     }
                 }
             }
             .frame(width: geometry.size.width, height: geometry.size.height)
         }
         .padding(4)
+    }
+}
+
+/// A custom loading spinner that works well in both light and dark modes
+struct TrayLoadingSpinner: View {
+    let isDarkMode: Bool
+    
+    @State private var isAnimating = false
+    
+    private var spinnerColor: Color {
+        isDarkMode ? Color.white.opacity(0.8) : Color.black.opacity(0.6)
+    }
+    
+    var body: some View {
+        Circle()
+            .trim(from: 0, to: 0.7)
+            .stroke(spinnerColor, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+            .frame(width: 16, height: 16)
+            .rotationEffect(Angle(degrees: isAnimating ? 360 : 0))
+            .animation(
+                Animation.linear(duration: 0.8).repeatForever(autoreverses: false),
+                value: isAnimating
+            )
+            .onAppear {
+                isAnimating = true
+            }
     }
 }
 
