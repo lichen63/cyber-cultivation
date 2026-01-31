@@ -25,6 +25,7 @@ import 'services/menu_bar_helper.dart';
 import 'services/menu_bar_info_service.dart';
 import 'services/pomodoro_service.dart';
 import 'services/popover_service.dart';
+import 'services/window_capture_service.dart';
 import 'widgets/accessibility_dialog.dart';
 import 'widgets/debug_level_exp_dialog.dart';
 import 'widgets/floating_exp_indicator.dart';
@@ -408,13 +409,32 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
   @override
   void onTrayIconMouseDown() {
     _hidePopupWindow();
-    trayManager.popUpContextMenu();
+    // Show tray popup with window preview instead of context menu
+    _showTrayPopup();
   }
 
   @override
   void onTrayIconRightMouseDown() {
     _hidePopupWindow();
+    // Right-click shows the traditional context menu
     trayManager.popUpContextMenu();
+  }
+
+  /// Show the tray popup window with live preview
+  Future<void> _showTrayPopup() async {
+    if (!Platform.isMacOS) return;
+    try {
+      await PopoverService.instance.showTrayPopup(
+        isDarkMode: _themeMode == AppThemeMode.dark,
+        locale: _locale?.languageCode ?? 'en',
+        popupWidth: TrayPopupConstants.popupWidth,
+        popupHeight: TrayPopupConstants.popupHeight,
+        titleBarHeight: TrayPopupConstants.titleBarHeight,
+      );
+    } catch (e) {
+      // Fallback to context menu if popup fails
+      trayManager.popUpContextMenu();
+    }
   }
 
   @override
@@ -589,6 +609,9 @@ class _MyHomePageState extends State<MyHomePage>
   final GlobalKey<LevelUpEffectWrapperState> _levelUpEffectKey =
       GlobalKey<LevelUpEffectWrapperState>();
 
+  // Window capture key for tray popup preview
+  final GlobalKey _captureKey = GlobalKey();
+
   AppThemeColors get _themeColors => widget.themeColors;
 
   @override
@@ -629,6 +652,10 @@ class _MyHomePageState extends State<MyHomePage>
     _menuBarInfoService.updateSettings(_menuBarSettings);
     _menuBarInfoService.initialize(refreshSeconds: _systemStatsRefreshSeconds);
     _menuBarInfoService.addListener(_onMenuBarInfoChanged);
+
+    // Initialize window capture service for tray popup preview
+    WindowCaptureService.instance.initialize();
+    WindowCaptureService.instance.setBoundaryKey(_captureKey);
 
     // Update tray/menu bar items periodically
     _trayUpdateTimer = Timer.periodic(
@@ -680,6 +707,7 @@ class _MyHomePageState extends State<MyHomePage>
     _inputMonitorService.dispose();
     _menuBarInfoService.removeListener(_onMenuBarInfoChanged);
     _menuBarInfoService.dispose();
+    WindowCaptureService.instance.dispose();
     _trayUpdateTimer?.cancel();
     _saveGameData(immediate: true);
     WidgetsBinding.instance.removeObserver(this);
@@ -1273,6 +1301,7 @@ class _MyHomePageState extends State<MyHomePage>
           themeColors: _themeColors,
           floatingExpKey: _floatingExpKey,
           levelUpEffectKey: _levelUpEffectKey,
+          captureKey: _captureKey,
           onPomodoroPressed: _showPomodoroDialog,
           onStatsPressed: _showStatsWindow,
           onTodoPressed: _showTodoDialog,

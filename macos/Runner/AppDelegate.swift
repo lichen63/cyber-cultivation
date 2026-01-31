@@ -6,6 +6,7 @@ import SwiftUI
 class AppDelegate: FlutterAppDelegate {
   private var methodChannel: FlutterMethodChannel?
   private var popoverChannel: FlutterMethodChannel?
+  private var windowCaptureChannel: FlutterMethodChannel?
   private var statusItems: [String: NSStatusItem] = [:]
   var calendarPopover: NSPopover?
   private var calendarViewController: CalendarViewController?
@@ -20,6 +21,13 @@ class AppDelegate: FlutterAppDelegate {
   private var menuBarPopoverLocalEventMonitor: Any?
   private var currentPopoverItemId: String?
   
+  // Tray popup for window preview
+  private var trayPopupPanel: BorderlessPopoverPanel?
+  private var trayPopupViewController: TrayPopupViewController?
+  private var trayPopupEventMonitor: Any?
+  private var trayPopupLocalEventMonitor: Any?
+  private var isTrayPopupVisible: Bool = false
+  
   override func applicationDidFinishLaunching(_ notification: Notification) {
     let controller = mainFlutterWindow?.contentViewController as! FlutterViewController
     methodChannel = FlutterMethodChannel(
@@ -30,6 +38,12 @@ class AppDelegate: FlutterAppDelegate {
     // Set up popover method channel
     popoverChannel = FlutterMethodChannel(
       name: "menu_bar_popover",
+      binaryMessenger: controller.engine.binaryMessenger
+    )
+    
+    // Set up window capture channel for tray popup preview
+    windowCaptureChannel = FlutterMethodChannel(
+      name: "window_capture",
       binaryMessenger: controller.engine.binaryMessenger
     )
     
@@ -65,6 +79,19 @@ class AppDelegate: FlutterAppDelegate {
         self?.hideMenuBarPopover(result: result)
       case "updatePopoverContent":
         self?.updateMenuBarPopoverContent(call, result: result)
+      case "showTrayPopup":
+        self?.showTrayPopup(call, result: result)
+      case "hideTrayPopup":
+        self?.hideTrayPopup(result: result)
+      default:
+        result(FlutterMethodNotImplemented)
+      }
+    }
+    
+    windowCaptureChannel?.setMethodCallHandler { [weak self] (call, result) in
+      switch call.method {
+      case "updateFrame":
+        self?.updateTrayPopupFrame(call, result: result)
       default:
         result(FlutterMethodNotImplemented)
       }
@@ -772,6 +799,180 @@ class AppDelegate: FlutterAppDelegate {
     
     menuBarPopoverPanel?.hideWithAnimation {
       self.popoverChannel?.invokeMethod("onPopoverClosed", arguments: nil)
+    }
+  }
+  
+  // MARK: - Tray Popup (Window Preview)
+  
+  private func showTrayPopup(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    guard let args = call.arguments as? [String: Any] else {
+      result(FlutterError(code: "INVALID_ARGS", message: "Invalid arguments", details: nil))
+      return
+    }
+    
+    let isDark = args["isDarkMode"] as? Bool ?? true
+    let locale = args["locale"] as? String ?? "en"
+    // Get dimensions from Dart constants (with fallback defaults)
+    let popupWidth = args["popupWidth"] as? Double ?? 360.0
+    let popupHeight = args["popupHeight"] as? Double ?? 280.0
+    let titleBarHeight = args["titleBarHeight"] as? Double ?? 28.0
+    
+    DispatchQueue.main.async { [weak self] in
+      guard let self = self else {
+        result(false)
+        return
+      }
+      
+      // Close any existing menu bar popover
+      self.closeMenuBarPopover()
+      
+      // Toggle behavior: if popup is visible, close it
+      if self.isTrayPopupVisible {
+        self.closeTrayPopup()
+        result(true)
+        return
+      }
+      
+      // Create view controller if needed
+      if self.trayPopupViewController == nil {
+        self.trayPopupViewController = TrayPopupViewController()
+      }
+      
+      // Create panel if needed
+      if self.trayPopupPanel == nil {
+        self.trayPopupPanel = BorderlessPopoverPanel(
+          contentRect: NSRect(x: 0, y: 0, width: popupWidth, height: popupHeight),
+          styleMask: [.borderless, .nonactivatingPanel],
+          backing: .buffered,
+          defer: false
+        )
+        self.trayPopupPanel?.contentViewController = self.trayPopupViewController
+      }
+      
+      // Configure the view controller with dimensions from Dart
+      self.trayPopupViewController?.configure(
+        isDarkMode: isDark,
+        locale: locale,
+        popupWidth: CGFloat(popupWidth),
+        popupHeight: CGFloat(popupHeight),
+        titleBarHeight: CGFloat(titleBarHeight),
+        onShowWindow: { [weak self] in
+          self?.showWindowClicked()
+          self?.closeTrayPopup()
+        },
+        onHideWindow: { [weak self] in
+          self?.hideWindowClicked()
+          self?.closeTrayPopup()
+        },
+        onExitApp: { [weak self] in
+          self?.exitClicked()
+        }
+      )
+      
+      // Position popup below the tray icon (using mouse position as reference)
+      // The user just clicked on the tray icon, so mouse position indicates where the icon is
+      if let screen = NSScreen.main {
+        let screenFrame = screen.frame
+        let visibleFrame = screen.visibleFrame
+        let menuBarHeight = screenFrame.height - visibleFrame.height - visibleFrame.origin.y
+        
+        let panelSize = NSSize(width: popupWidth, height: popupHeight)
+        
+        // Get the mouse location (where user clicked on tray icon)
+        let mouseLocation = NSEvent.mouseLocation
+        
+        // Position panel centered below the tray icon click position
+        var panelX = mouseLocation.x - panelSize.width / 2
+        let panelY = screenFrame.maxY - menuBarHeight - panelSize.height - 4
+        
+        // Make sure panel doesn't go off screen edges
+        panelX = max(screenFrame.minX + 10, min(panelX, screenFrame.maxX - panelSize.width - 10))
+        
+        self.trayPopupPanel?.setFrame(
+          NSRect(x: panelX, y: panelY, width: panelSize.width, height: panelSize.height),
+          display: true
+        )
+      }
+      
+      // Show the panel
+      self.trayPopupPanel?.showWithAnimation()
+      self.isTrayPopupVisible = true
+      
+      // Start frame streaming from Flutter
+      self.windowCaptureChannel?.invokeMethod("startStreaming", arguments: nil)
+      
+      // Add global event monitor to close popup when clicking outside
+      self.trayPopupEventMonitor = NSEvent.addGlobalMonitorForEvents(
+        matching: [.leftMouseDown, .rightMouseDown]
+      ) { [weak self] event in
+        if let panel = self?.trayPopupPanel, panel.isVisible {
+          let mouseLocation = NSEvent.mouseLocation
+          if !panel.frame.contains(mouseLocation) {
+            self?.closeTrayPopup()
+          }
+        }
+      }
+      
+      // Add local event monitor to close when clicking inside the app
+      self.trayPopupLocalEventMonitor = NSEvent.addLocalMonitorForEvents(
+        matching: [.leftMouseDown, .rightMouseDown]
+      ) { [weak self] event in
+        if let panel = self?.trayPopupPanel, panel.isVisible {
+          if let eventWindow = event.window, eventWindow != panel {
+            self?.closeTrayPopup()
+          }
+        }
+        return event
+      }
+      
+      result(true)
+    }
+  }
+  
+  private func hideTrayPopup(result: @escaping FlutterResult) {
+    DispatchQueue.main.async { [weak self] in
+      self?.closeTrayPopup()
+      result(true)
+    }
+  }
+  
+  private func closeTrayPopup() {
+    // Stop streaming
+    windowCaptureChannel?.invokeMethod("stopStreaming", arguments: nil)
+    
+    // Remove event monitors
+    if let monitor = trayPopupEventMonitor {
+      NSEvent.removeMonitor(monitor)
+      trayPopupEventMonitor = nil
+    }
+    if let localMonitor = trayPopupLocalEventMonitor {
+      NSEvent.removeMonitor(localMonitor)
+      trayPopupLocalEventMonitor = nil
+    }
+    
+    isTrayPopupVisible = false
+    
+    trayPopupPanel?.hideWithAnimation {
+      self.popoverChannel?.invokeMethod("onTrayPopupClosed", arguments: nil)
+    }
+  }
+  
+  private func updateTrayPopupFrame(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    guard let args = call.arguments as? [String: Any],
+          let imageData = args["imageData"] as? FlutterStandardTypedData,
+          let width = args["width"] as? Int,
+          let height = args["height"] as? Int else {
+      result(FlutterError(code: "INVALID_ARGS", message: "Invalid arguments", details: nil))
+      return
+    }
+    
+    DispatchQueue.main.async { [weak self] in
+      self?.trayPopupViewController?.updateFrame(
+        imageData: imageData.data,
+        width: width,
+        height: height
+      )
+      result(true)
     }
   }
   
