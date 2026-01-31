@@ -27,6 +27,7 @@ class AppDelegate: FlutterAppDelegate {
   private var trayPopupEventMonitor: Any?
   private var trayPopupLocalEventMonitor: Any?
   private var isTrayPopupVisible: Bool = false
+  private var isTrayPopupPinned: Bool = false
   
   override func applicationDidFinishLaunching(_ notification: Notification) {
     let controller = mainFlutterWindow?.contentViewController as! FlutterViewController
@@ -856,16 +857,26 @@ class AppDelegate: FlutterAppDelegate {
         popupWidth: CGFloat(popupWidth),
         popupHeight: CGFloat(popupHeight),
         titleBarHeight: CGFloat(titleBarHeight),
+        isPinned: self.isTrayPopupPinned,
         onShowWindow: { [weak self] in
           self?.showWindowClicked()
-          self?.closeTrayPopup()
+          // Only close popup if not pinned
+          if !(self?.isTrayPopupPinned ?? false) {
+            self?.closeTrayPopup()
+          }
         },
         onHideWindow: { [weak self] in
           self?.hideWindowClicked()
-          self?.closeTrayPopup()
+          // Only close popup if not pinned
+          if !(self?.isTrayPopupPinned ?? false) {
+            self?.closeTrayPopup()
+          }
         },
         onExitApp: { [weak self] in
           self?.exitClicked()
+        },
+        onPinToggle: { [weak self] in
+          self?.toggleTrayPopupPin()
         }
       )
       
@@ -901,25 +912,33 @@ class AppDelegate: FlutterAppDelegate {
       // Start frame streaming from Flutter
       self.windowCaptureChannel?.invokeMethod("startStreaming", arguments: nil)
       
-      // Add global event monitor to close popup when clicking outside
+      // Add global event monitor to close popup when clicking outside (unless pinned)
       self.trayPopupEventMonitor = NSEvent.addGlobalMonitorForEvents(
         matching: [.leftMouseDown, .rightMouseDown]
       ) { [weak self] event in
-        if let panel = self?.trayPopupPanel, panel.isVisible {
+        guard let self = self else { return }
+        // Don't close if pinned
+        if self.isTrayPopupPinned { return }
+        
+        if let panel = self.trayPopupPanel, panel.isVisible {
           let mouseLocation = NSEvent.mouseLocation
           if !panel.frame.contains(mouseLocation) {
-            self?.closeTrayPopup()
+            self.closeTrayPopup()
           }
         }
       }
       
-      // Add local event monitor to close when clicking inside the app
+      // Add local event monitor to close when clicking inside the app (unless pinned)
       self.trayPopupLocalEventMonitor = NSEvent.addLocalMonitorForEvents(
         matching: [.leftMouseDown, .rightMouseDown]
       ) { [weak self] event in
-        if let panel = self?.trayPopupPanel, panel.isVisible {
+        guard let self = self else { return event }
+        // Don't close if pinned
+        if self.isTrayPopupPinned { return event }
+        
+        if let panel = self.trayPopupPanel, panel.isVisible {
           if let eventWindow = event.window, eventWindow != panel {
-            self?.closeTrayPopup()
+            self.closeTrayPopup()
           }
         }
         return event
@@ -934,6 +953,11 @@ class AppDelegate: FlutterAppDelegate {
       self?.closeTrayPopup()
       result(true)
     }
+  }
+  
+  private func toggleTrayPopupPin() {
+    isTrayPopupPinned.toggle()
+    trayPopupViewController?.updatePinState(isTrayPopupPinned)
   }
   
   private func closeTrayPopup() {
@@ -951,6 +975,7 @@ class AppDelegate: FlutterAppDelegate {
     }
     
     isTrayPopupVisible = false
+    isTrayPopupPinned = false  // Reset pin state when closing
     
     trayPopupPanel?.hideWithAnimation {
       self.popoverChannel?.invokeMethod("onTrayPopupClosed", arguments: nil)

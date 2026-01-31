@@ -12,10 +12,14 @@ class TrayPopupViewController: NSViewController {
     private var onShowWindow: (() -> Void)?
     private var onHideWindow: (() -> Void)?
     private var onExitApp: (() -> Void)?
+    private var onPinToggle: (() -> Void)?
     
     // Popup size - initialized from Dart constants via configure()
     private var popupSize: NSSize = .zero
     private var titleBarHeight: CGFloat = 0
+    
+    // Pin state - observable for SwiftUI updates
+    private let pinState = PinState()
     
     // Observable object to trigger SwiftUI updates
     private let imageState = ImageState()
@@ -31,19 +35,27 @@ class TrayPopupViewController: NSViewController {
         popupWidth: CGFloat,
         popupHeight: CGFloat,
         titleBarHeight: CGFloat,
+        isPinned: Bool,
         onShowWindow: @escaping () -> Void,
         onHideWindow: @escaping () -> Void,
-        onExitApp: @escaping () -> Void
+        onExitApp: @escaping () -> Void,
+        onPinToggle: @escaping () -> Void
     ) {
         self.isDarkMode = isDarkMode
         self.locale = locale
         self.popupSize = NSSize(width: popupWidth, height: popupHeight)
         self.titleBarHeight = titleBarHeight
+        self.pinState.isPinned = isPinned
         self.onShowWindow = onShowWindow
         self.onHideWindow = onHideWindow
         self.onExitApp = onExitApp
+        self.onPinToggle = onPinToggle
         
         updateContent()
+    }
+    
+    func updatePinState(_ isPinned: Bool) {
+        pinState.isPinned = isPinned
     }
     
     func updateFrame(imageData: Data, width: Int, height: Int) {
@@ -56,12 +68,14 @@ class TrayPopupViewController: NSViewController {
     private func updateContent() {
         let contentView = TrayPopupContentView(
             imageState: imageState,
+            pinState: pinState,
             isDarkMode: isDarkMode,
             locale: locale,
             titleBarHeight: titleBarHeight,
             onShowWindow: { [weak self] in self?.onShowWindow?() },
             onHideWindow: { [weak self] in self?.onHideWindow?() },
-            onExitApp: { [weak self] in self?.onExitApp?() }
+            onExitApp: { [weak self] in self?.onExitApp?() },
+            onPinToggle: { [weak self] in self?.onPinToggle?() }
         )
         
         if hostingView == nil {
@@ -89,15 +103,22 @@ class ImageState: ObservableObject {
     @Published var image: NSImage?
 }
 
+/// Observable object to hold the pin state
+class PinState: ObservableObject {
+    @Published var isPinned: Bool = false
+}
+
 /// SwiftUI view for the tray popup content
 struct TrayPopupContentView: View {
     @ObservedObject var imageState: ImageState
+    @ObservedObject var pinState: PinState
     let isDarkMode: Bool
     let locale: String
     let titleBarHeight: CGFloat
     let onShowWindow: () -> Void
     let onHideWindow: () -> Void
     let onExitApp: () -> Void
+    let onPinToggle: () -> Void
     
     private var title: String {
         locale == "zh" ? "赛博修仙" : "Cyber Cultivation"
@@ -132,7 +153,7 @@ struct TrayPopupContentView: View {
             // Left and Right buttons
             HStack {
                 // Left: Show/Hide buttons
-                HStack(spacing: 4) {
+                HStack(spacing: 12) {
                     TrayIconButton(
                         icon: "eye",
                         tooltip: locale == "zh" ? "显示窗口" : "Show Window",
@@ -149,14 +170,23 @@ struct TrayPopupContentView: View {
                 
                 Spacer()
                 
-                // Right: Exit button
-                TrayIconButton(
-                    icon: "power",
-                    tooltip: locale == "zh" ? "退出游戏" : "Exit Game",
-                    isDestructive: true,
-                    isDarkMode: isDarkMode,
-                    action: onExitApp
-                )
+                // Right: Pin button and Exit button
+                HStack(spacing: 12) {
+                    TrayIconButton(
+                        icon: pinState.isPinned ? "pin.fill" : "pin",
+                        tooltip: locale == "zh" ? (pinState.isPinned ? "取消固定" : "固定窗口") : (pinState.isPinned ? "Unpin" : "Pin Window"),
+                        isActive: pinState.isPinned,
+                        isDarkMode: isDarkMode,
+                        action: onPinToggle
+                    )
+                    TrayIconButton(
+                        icon: "power",
+                        tooltip: locale == "zh" ? "退出游戏" : "Exit Game",
+                        isDestructive: true,
+                        isDarkMode: isDarkMode,
+                        action: onExitApp
+                    )
+                }
             }
         }
         .padding(.horizontal, 8)
@@ -196,6 +226,7 @@ struct TrayIconButton: View {
     let icon: String
     let tooltip: String
     var isDestructive: Bool = false
+    var isActive: Bool = false
     var isDarkMode: Bool = false
     let action: () -> Void
     
@@ -209,16 +240,31 @@ struct TrayIconButton: View {
         isDarkMode ? Color.white : Color.black
     }
     
+    private var activeColor: Color {
+        Color.accentColor
+    }
+    
     var body: some View {
         Button(action: action) {
             Image(systemName: icon)
                 .font(.system(size: 12))
-                .foregroundColor(isDestructive ? .red : (isHovered ? hoverColor : normalColor))
+                .foregroundColor(buttonColor)
         }
         .buttonStyle(.plain)
         .help(tooltip)
         .onHover { hovering in
             isHovered = hovering
         }
+    }
+    
+    private var buttonColor: Color {
+        if isDestructive {
+            return .red
+        } else if isActive {
+            return activeColor
+        } else if isHovered {
+            return hoverColor
+        } else {
+            return normalColor        }
     }
 }

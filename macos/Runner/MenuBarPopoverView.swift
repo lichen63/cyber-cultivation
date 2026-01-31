@@ -141,7 +141,7 @@ struct PopoverContentView: View {
             // Left and Right buttons
             HStack {
                 // Left: Show/Hide buttons
-                HStack(spacing: 4) {
+                HStack(spacing: 12) {
                     IconButton(
                         icon: "eye",
                         tooltip: "Show Window",
