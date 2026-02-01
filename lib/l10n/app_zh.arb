@@ -5,6 +5,7 @@
     "forceForegroundText": "窗口置顶",
     "antiSleepText": "防休眠",
     "hideWindowText": "隐藏窗口",
+    "compactModeText": "迷你模式",
     "exitGameText": "退出游戏",
     "pomodoroDialogTitle": "番茄钟",
     "pomodoroDurationLabel": "专注 (分):",

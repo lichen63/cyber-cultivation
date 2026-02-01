@@ -566,6 +566,14 @@ class _MyHomePageState extends State<MyHomePage>
   bool _isShowSystemStats = true;
   bool _isShowKeyboardTrack = true;
   bool _isShowMouseTrack = true;
+  bool _isCompactModeEnabled = false;
+  bool _isInCompactView = false;
+  bool _isAnimatingWindow = false;
+  // Store the original window size before entering compact mode
+  double _originalWindowWidth = AppConstants.defaultWindowWidth;
+  double _originalWindowHeight = AppConstants.defaultWindowHeight;
+  // Debounce timer for compact mode transitions
+  Timer? _compactModeDebounce;
   int _systemStatsRefreshSeconds =
       AppConstants.defaultSystemStatsRefreshSeconds;
   late AppThemeMode _themeMode;
@@ -709,6 +717,7 @@ class _MyHomePageState extends State<MyHomePage>
     _menuBarInfoService.dispose();
     WindowCaptureService.instance.dispose();
     _trayUpdateTimer?.cancel();
+    _compactModeDebounce?.cancel();
     _saveGameData(immediate: true);
     WidgetsBinding.instance.removeObserver(this);
     windowManager.removeListener(this);
@@ -736,6 +745,9 @@ class _MyHomePageState extends State<MyHomePage>
 
   @override
   void onWindowResize() {
+    // Don't update window size while in compact view or animating
+    if (_isInCompactView || _isAnimatingWindow) return;
+
     windowManager.getSize().then((size) {
       windowManager.setAspectRatio(AppConstants.windowAspectRatio);
       if (mounted) {
@@ -762,6 +774,7 @@ class _MyHomePageState extends State<MyHomePage>
       _isShowSystemStats = data.isShowSystemStats;
       _isShowKeyboardTrack = data.isShowKeyboardTrack;
       _isShowMouseTrack = data.isShowMouseTrack;
+      _isCompactModeEnabled = data.isCompactModeEnabled;
       _systemStatsRefreshSeconds = data.systemStatsRefreshSeconds;
       _userId = data.userId;
       _language = data.language;
@@ -827,6 +840,7 @@ class _MyHomePageState extends State<MyHomePage>
           isShowSystemStats: _isShowSystemStats,
           isShowKeyboardTrack: _isShowKeyboardTrack,
           isShowMouseTrack: _isShowMouseTrack,
+          isCompactModeEnabled: _isCompactModeEnabled,
           systemStatsRefreshSeconds: _systemStatsRefreshSeconds,
           windowWidth: _windowWidth,
           windowHeight: _windowHeight,
@@ -1129,6 +1143,169 @@ class _MyHomePageState extends State<MyHomePage>
     _saveGameData();
   }
 
+  /// Toggle compact mode on/off
+  void _toggleCompactMode(bool enabled) {
+    setState(() => _isCompactModeEnabled = enabled);
+    if (enabled) {
+      // When enabling, shrink to compact view
+      _animateToCompactView();
+    } else {
+      // When disabling, restore to normal view if currently in compact
+      if (_isInCompactView) {
+        _animateToNormalView();
+      }
+    }
+    _saveGameData();
+  }
+
+  /// Close all dialogs and popups before shrinking to compact mode
+  void _closeAllDialogs() {
+    // Pop all routes until we reach the main page (MaterialApp's home)
+    // This closes all dialogs, bottom sheets, and other modal routes
+    if (mounted && Navigator.of(context).canPop()) {
+      Navigator.of(context).popUntil((route) => route.isFirst);
+    }
+  }
+
+  /// Animate window to compact circular view (small circle with character)
+  Future<void> _animateToCompactView() async {
+    if (_isAnimatingWindow || _isInCompactView) return;
+
+    // Close all dialogs and popups before shrinking to compact mode
+    _closeAllDialogs();
+
+    _isAnimatingWindow = true;
+    setState(() {});
+
+    try {
+      final compactSize = AppConstants.compactModeSize;
+
+      // Get current window bounds
+      final currentBounds = await windowManager.getBounds();
+
+      // Only save original size if current window is larger than compact
+      // This prevents overwriting when re-shrinking after hover
+      if (currentBounds.width > compactSize * 1.5) {
+        _originalWindowWidth = currentBounds.width;
+        _originalWindowHeight = currentBounds.height;
+      }
+
+      // Remove all constraints first
+      await windowManager.setResizable(true);
+      await windowManager.setMinimumSize(const Size(1, 1));
+      await windowManager.setMaximumSize(const Size(10000, 10000));
+
+      // Animate in steps for smoother transition
+      const int steps = 15;
+      const int delayMs = 16; // ~60fps
+      final startWidth = currentBounds.width;
+      final startHeight = currentBounds.height;
+      final startLeft = currentBounds.left;
+      final startTop = currentBounds.top;
+
+      final centerX = startLeft + startWidth / 2;
+      final centerY = startTop + startHeight / 2;
+      final endLeft = centerX - compactSize / 2;
+      final endTop = centerY - compactSize / 2;
+
+      for (int i = 1; i <= steps; i++) {
+        final t = i / steps;
+        // Ease-out curve for smoother deceleration
+        final easeT = 1 - pow(1 - t, 3);
+
+        final currentWidth = startWidth + (compactSize - startWidth) * easeT;
+        final currentHeight = startHeight + (compactSize - startHeight) * easeT;
+        final currentLeft = startLeft + (endLeft - startLeft) * easeT;
+        final currentTop = startTop + (endTop - startTop) * easeT;
+
+        await windowManager.setBounds(
+          Rect.fromLTWH(currentLeft, currentTop, currentWidth, currentHeight),
+        );
+        await Future.delayed(const Duration(milliseconds: delayMs));
+      }
+
+      // Lock the window size
+      await windowManager.setMinimumSize(Size(compactSize, compactSize));
+      await windowManager.setMaximumSize(Size(compactSize, compactSize));
+      await windowManager.setResizable(false);
+
+      _isInCompactView = true;
+    } finally {
+      _isAnimatingWindow = false;
+      if (mounted) setState(() {});
+    }
+  }
+
+  /// Animate window back to normal rectangular view
+  Future<void> _animateToNormalView() async {
+    if (_isAnimatingWindow || !_isInCompactView) return;
+
+    _isAnimatingWindow = true;
+    setState(() {});
+
+    try {
+      // Use the saved original window size, with fallback to defaults
+      final targetWidth = _originalWindowWidth >= AppConstants.minWindowWidth
+          ? _originalWindowWidth
+          : AppConstants.defaultWindowWidth;
+      final targetHeight = _originalWindowHeight >= AppConstants.minWindowHeight
+          ? _originalWindowHeight
+          : AppConstants.defaultWindowHeight;
+
+      // Unlock resizing first
+      await windowManager.setResizable(true);
+      await windowManager.setMinimumSize(const Size(1, 1));
+      await windowManager.setMaximumSize(const Size(10000, 10000));
+
+      // Get current position
+      final currentBounds = await windowManager.getBounds();
+
+      // Animate in steps for smoother transition
+      const int steps = 15;
+      const int delayMs = 16; // ~60fps
+      final startWidth = currentBounds.width;
+      final startHeight = currentBounds.height;
+      final startLeft = currentBounds.left;
+      final startTop = currentBounds.top;
+
+      final centerX = startLeft + startWidth / 2;
+      final centerY = startTop + startHeight / 2;
+      final endLeft = centerX - targetWidth / 2;
+      final endTop = centerY - targetHeight / 2;
+
+      for (int i = 1; i <= steps; i++) {
+        final t = i / steps;
+        // Ease-out curve for smoother deceleration
+        final easeT = 1 - pow(1 - t, 3);
+
+        final currentWidth = startWidth + (targetWidth - startWidth) * easeT;
+        final currentHeight =
+            startHeight + (targetHeight - startHeight) * easeT;
+        final currentLeft = startLeft + (endLeft - startLeft) * easeT;
+        final currentTop = startTop + (endTop - startTop) * easeT;
+
+        await windowManager.setBounds(
+          Rect.fromLTWH(currentLeft, currentTop, currentWidth, currentHeight),
+        );
+        await Future.delayed(const Duration(milliseconds: delayMs));
+      }
+
+      // Restore normal constraints
+      await windowManager.setMinimumSize(
+        const Size(AppConstants.minWindowWidth, AppConstants.minWindowHeight),
+      );
+      await windowManager.setMaximumSize(
+        const Size(AppConstants.maxWindowWidth, AppConstants.maxWindowHeight),
+      );
+      await windowManager.setAspectRatio(AppConstants.windowAspectRatio);
+
+      _isInCompactView = false;
+    } finally {
+      _isAnimatingWindow = false;
+      if (mounted) setState(() {});
+    }
+  }
+
   void _showContextMenu(Offset position) async {
     setState(() => _isMenuOpen = true);
     final l10n = AppLocalizations.of(context)!;
@@ -1143,6 +1320,11 @@ class _MyHomePageState extends State<MyHomePage>
         value: AppConstants.toggleAntiSleepValue,
         label: l10n.antiSleepText,
         isChecked: _inputMonitorService.enableAntiSleep,
+      ),
+      _buildMenuItem(
+        value: AppConstants.toggleCompactModeValue,
+        label: l10n.compactModeText,
+        isChecked: _isCompactModeEnabled,
       ),
       _buildMenuItem(
         value: AppConstants.hideWindowValue,
@@ -1203,13 +1385,16 @@ class _MyHomePageState extends State<MyHomePage>
                 : null,
           ),
           const SizedBox(width: 8),
-          Text(
-            label,
-            style: TextStyle(
-              color: isDestructive
-                  ? _themeColors.error
-                  : _themeColors.primaryText,
-              fontWeight: FontWeight.bold,
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: isDestructive
+                    ? _themeColors.error
+                    : _themeColors.primaryText,
+                fontWeight: FontWeight.bold,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
@@ -1227,6 +1412,8 @@ class _MyHomePageState extends State<MyHomePage>
               !_inputMonitorService.enableAntiSleep;
         });
         _saveGameData();
+      case AppConstants.toggleCompactModeValue:
+        _toggleCompactMode(!_isCompactModeEnabled);
       case AppConstants.hideWindowValue:
         windowManager.hide();
       case AppConstants.exitGameValue:
@@ -1263,68 +1450,135 @@ class _MyHomePageState extends State<MyHomePage>
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final mouseData = _inputMonitorService.mouseData;
-    final menuBarData = _menuBarInfoService.data;
-
-    return Scaffold(
-      backgroundColor: AppConstants.transparentColor,
-      body: MouseRegion(
-        onEnter: (_) => setState(() => _isHovering = true),
-        onExit: (event) => _handleMouseExit(event),
-        child: HomePageContent(
-          level: _level,
-          currentExp: _currentExp,
-          maxExp: _maxExp,
-          currentKey: _inputMonitorService.currentKey,
-          mouseX: mouseData.mouseX,
-          mouseY: mouseData.mouseY,
-          screenWidth: mouseData.screenWidth,
-          screenHeight: mouseData.screenHeight,
-          isMouseClicking: mouseData.isClicking,
-          isHovering: _isHovering,
-          isAlwaysShowActionButtons: _isAlwaysShowActionButtons,
-          isShowSystemStats: _isShowSystemStats,
-          isShowKeyboardTrack: _isShowKeyboardTrack,
-          isShowMouseTrack: _isShowMouseTrack,
-          systemStats: SystemStatsData(
-            cpuUsage: menuBarData.cpuUsage,
-            gpuUsage: menuBarData.gpuUsage,
-            ramUsage: menuBarData.ramUsage,
-            diskUsage: menuBarData.diskUsage,
-            networkUpload: menuBarData.networkUpload,
-            networkDownload: menuBarData.networkDownload,
+  /// Build the compact circular view showing only the character image
+  Widget _buildCompactView() {
+    return GestureDetector(
+      onTap: () {
+        // Click to expand from compact view to normal view
+        if (_isCompactModeEnabled && _isInCompactView && !_isAnimatingWindow) {
+          _animateToNormalView();
+        }
+      },
+      child: DragToMoveArea(
+        child: Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: _themeColors.border, width: 3.0),
+            color: _themeColors.overlay,
           ),
-          pomodoroState: _pomodoroService.state,
-          todos: _todos,
-          themeColors: _themeColors,
-          floatingExpKey: _floatingExpKey,
-          levelUpEffectKey: _levelUpEffectKey,
-          captureKey: _captureKey,
-          onPomodoroPressed: _showPomodoroDialog,
-          onStatsPressed: _showStatsWindow,
-          onTodoPressed: _showTodoDialog,
-          onSettingsPressed: _showSettingsDialog,
-          onGamesPressed: _showGamesDialog,
-          onContextMenu: _showContextMenu,
+          child: ClipOval(
+            child: Image.asset(
+              AppConstants.characterImagePath,
+              fit: BoxFit.cover,
+            ),
+          ),
         ),
       ),
     );
   }
 
+  @override
+  Widget build(BuildContext context) {
+    final mouseData = _inputMonitorService.mouseData;
+    final menuBarData = _menuBarInfoService.data;
+
+    // Build the normal content widget (used for both display and capture)
+    final normalContent = HomePageContent(
+      level: _level,
+      currentExp: _currentExp,
+      maxExp: _maxExp,
+      currentKey: _inputMonitorService.currentKey,
+      mouseX: mouseData.mouseX,
+      mouseY: mouseData.mouseY,
+      screenWidth: mouseData.screenWidth,
+      screenHeight: mouseData.screenHeight,
+      isMouseClicking: mouseData.isClicking,
+      isHovering: _isHovering,
+      isAlwaysShowActionButtons: _isAlwaysShowActionButtons,
+      isShowSystemStats: _isShowSystemStats,
+      isShowKeyboardTrack: _isShowKeyboardTrack,
+      isShowMouseTrack: _isShowMouseTrack,
+      systemStats: SystemStatsData(
+        cpuUsage: menuBarData.cpuUsage,
+        gpuUsage: menuBarData.gpuUsage,
+        ramUsage: menuBarData.ramUsage,
+        diskUsage: menuBarData.diskUsage,
+        networkUpload: menuBarData.networkUpload,
+        networkDownload: menuBarData.networkDownload,
+      ),
+      pomodoroState: _pomodoroService.state,
+      todos: _todos,
+      themeColors: _themeColors,
+      floatingExpKey: _floatingExpKey,
+      levelUpEffectKey: _levelUpEffectKey,
+      captureKey: _captureKey,
+      onPomodoroPressed: _showPomodoroDialog,
+      onStatsPressed: _showStatsWindow,
+      onTodoPressed: _showTodoDialog,
+      onSettingsPressed: _showSettingsDialog,
+      onGamesPressed: _showGamesDialog,
+      onContextMenu: _showContextMenu,
+    );
+
+    return Scaffold(
+      backgroundColor: AppConstants.transparentColor,
+      body: MouseRegion(
+        onEnter: (_) => _handleMouseEnter(),
+        onExit: (event) => _handleMouseExit(event),
+        child: Stack(
+          children: [
+            // Hidden offscreen widget for capture when in compact view
+            // This ensures tray popup always shows normal window preview
+            if (_isInCompactView)
+              Positioned(
+                left: -10000,
+                top: -10000,
+                width: _originalWindowWidth,
+                height: _originalWindowHeight,
+                child: normalContent,
+              ),
+            // Visible content
+            _isInCompactView ? _buildCompactView() : normalContent,
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _handleMouseEnter() {
+    setState(() => _isHovering = true);
+    _compactModeDebounce?.cancel();
+  }
+
   void _handleMouseExit(PointerExitEvent event) {
     setState(() => _isHovering = false);
+
+    // Check if mouse is truly outside the window bounds
+    final windowSize = MediaQuery.of(context).size;
+    final windowRect = Rect.fromLTWH(0, 0, windowSize.width, windowSize.height);
+    final safeRect = windowRect.inflate(10.0);
+    final isOutsideWindow = !safeRect.contains(event.position);
+
+    // When leaving window in compact mode, shrink back to compact view after a delay
+    // Only shrink if mouse is truly outside the window (not just moved to a dialog overlay)
+    if (_isCompactModeEnabled &&
+        !_isInCompactView &&
+        !_isMenuOpen &&
+        isOutsideWindow) {
+      _compactModeDebounce?.cancel();
+      _compactModeDebounce = Timer(const Duration(milliseconds: 300), () {
+        if (_isCompactModeEnabled &&
+            !_isInCompactView &&
+            !_isMenuOpen &&
+            !_isAnimatingWindow &&
+            !_isHovering) {
+          _animateToCompactView();
+        }
+      });
+    }
+
     if (_isMenuOpen) {
-      final windowSize = MediaQuery.of(context).size;
-      final windowRect = Rect.fromLTWH(
-        0,
-        0,
-        windowSize.width,
-        windowSize.height,
-      );
-      final safeRect = windowRect.inflate(10.0);
-      if (!safeRect.contains(event.position)) {
+      if (isOutsideWindow) {
         Navigator.of(context).pop();
       }
     }

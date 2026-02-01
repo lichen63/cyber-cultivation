@@ -24,6 +24,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hideWindowText => 'Hide Window';
 
   @override
+  String get compactModeText => 'Compact Mode';
+
+  @override
   String get exitGameText => 'Exit Game';
 
   @override

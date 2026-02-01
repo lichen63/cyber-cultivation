@@ -132,6 +132,12 @@ class AppConstants {
   static const double maxWindowHeight = 1600.0;
   static const double windowAspectRatio = 1.0;
 
+  // Compact Mode Configuration
+  static const double compactModeSize = 120.0;
+  static const Duration compactModeAnimationDuration = Duration(
+    milliseconds: 300,
+  );
+
   // System Stats
   static const int defaultSystemStatsRefreshSeconds = 2;
   static const int minSystemStatsRefreshSeconds = 1;
@@ -162,6 +168,9 @@ class AppConstants {
   // Debug Menu
   static const String debugMenuValue = 'debug_menu';
   static const String debugSetLevelExpValue = 'debug_set_level_exp';
+
+  // Compact Mode Menu
+  static const String toggleCompactModeValue = 'toggle_compact_mode';
 
   // Pomodoro Strings
   static const String pomodoroDialogTitle = 'Pomodoro Clock';
