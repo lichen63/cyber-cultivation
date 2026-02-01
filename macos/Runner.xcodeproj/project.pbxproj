@@ -36,6 +36,7 @@
 		A1B2C3D401000005 /* IOServiceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000005 /* IOServiceHelper.swift */; };
 		A1B2C3D401000006 /* MenuBarPopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000006 /* MenuBarPopoverView.swift */; };
 		A1B2C3D401000007 /* SystemProcessHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000007 /* SystemProcessHelper.swift */; };
+		A1B2C3D401000008 /* TrayPopupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000008 /* TrayPopupView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -88,6 +89,7 @@
 		A1B2C3D400000005 /* IOServiceHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IOServiceHelper.swift; sourceTree = "<group>"; };
 		A1B2C3D400000006 /* MenuBarPopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarPopoverView.swift; sourceTree = "<group>"; };
 		A1B2C3D400000007 /* SystemProcessHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemProcessHelper.swift; sourceTree = "<group>"; };
+		A1B2C3D400000008 /* TrayPopupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrayPopupView.swift; sourceTree = "<group>"; };
 		33CEB47222A05771004F2AC0 /* Flutter-Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Flutter-Debug.xcconfig"; sourceTree = "<group>"; };
 		33CEB47422A05771004F2AC0 /* Flutter-Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Flutter-Release.xcconfig"; sourceTree = "<group>"; };
 		33CEB47722A0578A004F2AC0 /* Flutter-Generated.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = "Flutter-Generated.xcconfig"; path = "ephemeral/Flutter-Generated.xcconfig"; sourceTree = "<group>"; };
@@ -198,6 +200,7 @@
 				A1B2C3D400000005 /* IOServiceHelper.swift */,
 				A1B2C3D400000006 /* MenuBarPopoverView.swift */,
 				A1B2C3D400000007 /* SystemProcessHelper.swift */,
+				A1B2C3D400000008 /* TrayPopupView.swift */,
 				33E51913231747F40026EE4D /* DebugProfile.entitlements */,
 				33E51914231749380026EE4D /* Release.entitlements */,
 				33CC11242044D66E0003C045 /* Resources */,
@@ -468,6 +471,7 @@
 				A1B2C3D401000005 /* IOServiceHelper.swift in Sources */,
 				A1B2C3D401000006 /* MenuBarPopoverView.swift in Sources */,
 				A1B2C3D401000007 /* SystemProcessHelper.swift in Sources */,
+				A1B2C3D401000008 /* TrayPopupView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

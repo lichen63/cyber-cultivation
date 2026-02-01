@@ -33,6 +33,7 @@ class HomePageContent extends StatelessWidget {
   final AppThemeColors themeColors;
   final GlobalKey<FloatingExpIndicatorManagerState>? floatingExpKey;
   final GlobalKey<LevelUpEffectWrapperState>? levelUpEffectKey;
+  final GlobalKey? captureKey;
   final VoidCallback onPomodoroPressed;
   final VoidCallback onStatsPressed;
   final VoidCallback onTodoPressed;
@@ -62,6 +63,7 @@ class HomePageContent extends StatelessWidget {
     required this.themeColors,
     this.floatingExpKey,
     this.levelUpEffectKey,
+    this.captureKey,
     required this.onPomodoroPressed,
     required this.onStatsPressed,
     required this.onTodoPressed,
@@ -72,7 +74,7 @@ class HomePageContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    Widget content = GestureDetector(
       onSecondaryTapUp: (details) => onContextMenu(details.globalPosition),
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -91,6 +93,13 @@ class HomePageContent extends StatelessWidget {
         },
       ),
     );
+
+    // Wrap in RepaintBoundary for tray popup capture if key is provided
+    if (captureKey != null) {
+      content = RepaintBoundary(key: captureKey, child: content);
+    }
+
+    return content;
   }
 
   Widget _buildMainArea(double windowScale) {

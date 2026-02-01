@@ -20,6 +20,10 @@
     "@hideWindowText": {
         "description": "Option to hide the game window"
     },
+    "compactModeText": "Compact Mode",
+    "@compactModeText": {
+        "description": "Option to enable compact mode where the window shrinks to a small circle"
+    },
     "exitGameText": "Exit Game",
     "@exitGameText": {
         "description": "Option to exit the game"

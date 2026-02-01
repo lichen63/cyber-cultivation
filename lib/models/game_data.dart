@@ -13,6 +13,7 @@ class GameData {
   final bool isShowSystemStats;
   final bool isShowKeyboardTrack;
   final bool isShowMouseTrack;
+  final bool isCompactModeEnabled;
   final int systemStatsRefreshSeconds;
   final double? windowWidth;
   final double? windowHeight;
@@ -36,6 +37,7 @@ class GameData {
     this.isShowSystemStats = true,
     this.isShowKeyboardTrack = true,
     this.isShowMouseTrack = true,
+    this.isCompactModeEnabled = false,
     this.systemStatsRefreshSeconds =
         AppConstants.defaultSystemStatsRefreshSeconds,
     this.windowWidth,
@@ -65,6 +67,7 @@ class GameData {
       'isShowSystemStats': isShowSystemStats,
       'isShowKeyboardTrack': isShowKeyboardTrack,
       'isShowMouseTrack': isShowMouseTrack,
+      'isCompactModeEnabled': isCompactModeEnabled,
       'systemStatsRefreshSeconds': systemStatsRefreshSeconds,
       'windowWidth': windowWidth,
       'windowHeight': windowHeight,
@@ -93,6 +96,7 @@ class GameData {
       isShowSystemStats: json['isShowSystemStats'] as bool? ?? true,
       isShowKeyboardTrack: json['isShowKeyboardTrack'] as bool? ?? true,
       isShowMouseTrack: json['isShowMouseTrack'] as bool? ?? true,
+      isCompactModeEnabled: json['isCompactModeEnabled'] as bool? ?? false,
       systemStatsRefreshSeconds:
           json['systemStatsRefreshSeconds'] as int? ??
           AppConstants.defaultSystemStatsRefreshSeconds,
@@ -141,6 +145,7 @@ class GameData {
     bool? isShowSystemStats,
     bool? isShowKeyboardTrack,
     bool? isShowMouseTrack,
+    bool? isCompactModeEnabled,
     int? systemStatsRefreshSeconds,
     double? windowWidth,
     double? windowHeight,
@@ -165,6 +170,7 @@ class GameData {
       isShowSystemStats: isShowSystemStats ?? this.isShowSystemStats,
       isShowKeyboardTrack: isShowKeyboardTrack ?? this.isShowKeyboardTrack,
       isShowMouseTrack: isShowMouseTrack ?? this.isShowMouseTrack,
+      isCompactModeEnabled: isCompactModeEnabled ?? this.isCompactModeEnabled,
       systemStatsRefreshSeconds:
           systemStatsRefreshSeconds ?? this.systemStatsRefreshSeconds,
       windowWidth: windowWidth ?? this.windowWidth,

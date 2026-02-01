@@ -132,6 +132,12 @@ class AppConstants {
   static const double maxWindowHeight = 1600.0;
   static const double windowAspectRatio = 1.0;
 
+  // Compact Mode Configuration
+  static const double compactModeSize = 120.0;
+  static const Duration compactModeAnimationDuration = Duration(
+    milliseconds: 300,
+  );
+
   // System Stats
   static const int defaultSystemStatsRefreshSeconds = 2;
   static const int minSystemStatsRefreshSeconds = 1;
@@ -162,6 +168,9 @@ class AppConstants {
   // Debug Menu
   static const String debugMenuValue = 'debug_menu';
   static const String debugSetLevelExpValue = 'debug_set_level_exp';
+
+  // Compact Mode Menu
+  static const String toggleCompactModeValue = 'toggle_compact_mode';
 
   // Pomodoro Strings
   static const String pomodoroDialogTitle = 'Pomodoro Clock';
@@ -551,6 +560,35 @@ class TrayConstants {
 
   /// Icon size for macOS menu bar (standard size is 18-22 pixels)
   static const int macOSIconSize = 22;
+}
+
+/// Constants for tray popup window preview
+class TrayPopupConstants {
+  /// Popup window dimensions
+  static const double popupWidth = 360.0;
+  static const double popupHeight = 280.0;
+
+  /// Title bar height
+  static const double titleBarHeight = 28.0;
+
+  /// Content area dimensions (popup size minus title bar)
+  static const double contentWidth = 360.0;
+  static const double contentHeight = 252.0;
+
+  /// Capture settings
+  /// Pixel ratio for capturing (lower = smaller images, better performance)
+  static const double capturePixelRatio = 0.5;
+
+  /// Target FPS for streaming (10-15 FPS is good for preview)
+  static const int targetFps = 12;
+
+  /// Capture interval derived from FPS
+  static const Duration captureInterval = Duration(
+    milliseconds: 1000 ~/ targetFps,
+  );
+
+  /// JPEG compression quality (0-100)
+  static const int jpegQuality = 75;
 }
 
 /// Constants for level-up effect animation
