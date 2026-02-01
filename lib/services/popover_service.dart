@@ -33,6 +33,9 @@ class PopoverService {
     switch (call.method) {
       case 'onPopoverClosed':
         return true;
+      case 'onTrayPopupClosed':
+        // Tray popup was closed, stop streaming
+        return true;
       default:
         return null;
     }
@@ -57,6 +60,43 @@ class PopoverService {
 
     try {
       final result = await _channel.invokeMethod('updatePopoverContent', data);
+      return result == true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Show the tray popup with window preview.
+  /// This triggers native side to show the popup and start frame streaming.
+  Future<bool> showTrayPopup({
+    required bool isDarkMode,
+    required String locale,
+    required double popupWidth,
+    required double popupHeight,
+    required double titleBarHeight,
+  }) async {
+    if (!Platform.isMacOS) return false;
+
+    try {
+      final result = await _channel.invokeMethod('showTrayPopup', {
+        'isDarkMode': isDarkMode,
+        'locale': locale,
+        'popupWidth': popupWidth,
+        'popupHeight': popupHeight,
+        'titleBarHeight': titleBarHeight,
+      });
+      return result == true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Hide the tray popup.
+  Future<bool> hideTrayPopup() async {
+    if (!Platform.isMacOS) return false;
+
+    try {
+      final result = await _channel.invokeMethod('hideTrayPopup');
       return result == true;
     } catch (e) {
       return false;

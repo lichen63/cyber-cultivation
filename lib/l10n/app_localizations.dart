@@ -128,6 +128,12 @@ abstract class AppLocalizations {
   /// **'Hide Window'**
   String get hideWindowText;
 
+  /// Option to enable compact mode where the window shrinks to a small circle
+  ///
+  /// In en, this message translates to:
+  /// **'Compact Mode'**
+  String get compactModeText;
+
   /// Option to exit the game
   ///
   /// In en, this message translates to:
