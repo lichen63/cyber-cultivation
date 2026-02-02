@@ -87,6 +87,8 @@ Future<void> showExploreWindow({
     await window.setTitle('Explore');
     await window.center();
     await window.show();
+    // Set non-resizable after showing (must be called after window is visible)
+    await window.resizable(false);
   } catch (e) {
     debugPrint('Failed to create explore window: $e');
     ExploreWindowManager.clearWindow();
@@ -205,6 +207,30 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
     _transformationController.value = _clampMatrix(matrix);
   }
 
+  void _centerOnPlayer() {
+    final cellSize = ExploreConstants.cellSize;
+    final playerCenterX = _map.playerX * cellSize + cellSize / 2;
+    final playerCenterY = _map.playerY * cellSize + cellSize / 2;
+
+    // Get window size for center calculation
+    final size = MediaQuery.of(context).size;
+    final viewportCenterX = size.width / 2;
+    final viewportCenterY = (size.height - ExploreConstants.headerHeight) / 2;
+
+    // Keep current scale
+    final currentScale = _transformationController.value.storage[0];
+
+    final matrix = Matrix4.identity();
+    matrix.storage[0] = currentScale; // scaleX
+    matrix.storage[5] = currentScale; // scaleY
+    matrix.storage[10] = 1.0; // scaleZ
+    matrix.storage[12] = viewportCenterX - playerCenterX * currentScale;
+    matrix.storage[13] = viewportCenterY - playerCenterY * currentScale;
+    matrix.storage[15] = 1.0;
+
+    _transformationController.value = _clampMatrix(matrix);
+  }
+
   /// Clamp the transformation matrix so the grid always fills the viewport
   /// (no blank space beyond grid boundaries)
   Matrix4 _clampMatrix(Matrix4 matrix) {
@@ -259,7 +285,8 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
   }
 
   void _handleKeyEvent(KeyEvent event) {
-    if (event is! KeyDownEvent) return;
+    // Handle both KeyDownEvent and KeyRepeatEvent for continuous movement
+    if (event is! KeyDownEvent && event is! KeyRepeatEvent) return;
 
     final key = event.logicalKey;
     bool moved = false;
@@ -437,46 +464,71 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
         padding: const EdgeInsets.symmetric(
           horizontal: ExploreConstants.headerPaddingH,
         ),
-        child: Row(
-          children: [
-            Icon(Icons.explore, color: _colors.accent, size: 20),
-            const SizedBox(width: 8),
-            Text(
-              l10n.exploreTitle,
-              style: TextStyle(
-                color: _colors.primaryText,
-                fontSize: ExploreConstants.headerFontSize,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(width: 16),
-            // Legend
-            _buildLegend(l10n),
-            const Spacer(),
-            // Position display
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(
-                color: _colors.overlay,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                '(${_map.playerX}, ${_map.playerY})',
-                style: TextStyle(
-                  color: _colors.secondaryText,
-                  fontSize: 12,
-                  fontFamily: 'monospace',
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            // Hide legend when width is too small (less than 500px)
+            final showLegend = constraints.maxWidth >= 500;
+
+            return Row(
+              children: [
+                Icon(Icons.explore, color: _colors.accent, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  l10n.exploreTitle,
+                  style: TextStyle(
+                    color: _colors.primaryText,
+                    fontSize: ExploreConstants.headerFontSize,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            // Close button
-            IconButton(
-              onPressed: _confirmClose,
-              icon: Icon(Icons.close, color: _colors.secondaryText),
-              tooltip: l10n.closeButtonText,
-            ),
-          ],
+                if (showLegend) ...[
+                  const SizedBox(width: 16),
+                  // Legend
+                  _buildLegend(l10n),
+                ],
+                const Spacer(),
+                // Position display
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: _colors.overlay,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '(${_map.playerX}, ${_map.playerY})',
+                    style: TextStyle(
+                      color: _colors.secondaryText,
+                      fontSize: 12,
+                      fontFamily: 'monospace',
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                // Locate player button
+                IconButton(
+                  onPressed: _centerOnPlayer,
+                  icon: Icon(
+                    Icons.my_location,
+                    color: _colors.accent,
+                    size: 15,
+                  ),
+                  tooltip: l10n.exploreLocatePlayer,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+                const SizedBox(width: 8),
+                // Close button
+                IconButton(
+                  onPressed: _confirmClose,
+                  icon: Icon(Icons.close, color: _colors.secondaryText),
+                  tooltip: l10n.closeButtonText,
+                ),
+              ],
+            );
+          },
         ),
       ),
     );

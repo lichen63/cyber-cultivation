@@ -616,15 +616,15 @@ class ExploreConstants {
   // Window configuration
   static const double defaultWindowWidth = 1000.0;
   static const double defaultWindowHeight = 1000.0;
-  static const double minWindowWidth = 400.0;
+  static const double minWindowWidth = 650.0; // Enough for header content
   static const double minWindowHeight = 400.0;
   static const double maxWindowWidth = 2000.0;
   static const double maxWindowHeight = 2000.0;
   static const double windowAspectRatio = 1.0;
 
   // Grid configuration
-  static const int gridSize = 50;
-  static const int totalCells = gridSize * gridSize; // 2500 cells
+  static const int gridSize = 150;
+  static const int totalCells = gridSize * gridSize; // 22500 cells
 
   // Cell rendering
   static const double cellSize = 18.0; // Each cell is 18x18 pixels

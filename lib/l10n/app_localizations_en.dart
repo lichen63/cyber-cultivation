@@ -472,4 +472,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get exploreLegendNpc => 'NPC';
+
+  @override
+  String get exploreLocatePlayer => 'Locate Player';
 }

@@ -622,5 +622,9 @@
     "exploreLegendNpc": "NPC",
     "@exploreLegendNpc": {
         "description": "Legend label for NPC cells"
+    },
+    "exploreLocatePlayer": "Locate Player",
+    "@exploreLocatePlayer": {
+        "description": "Tooltip for button to center view on player"
     }
 }

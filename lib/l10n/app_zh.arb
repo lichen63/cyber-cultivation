@@ -149,5 +149,6 @@
     "exploreLegendHouse": "屋",
     "exploreLegendMonster": "怪",
     "exploreLegendBoss": "Boss",
-    "exploreLegendNpc": "NPC"
+    "exploreLegendNpc": "NPC",
+    "exploreLocatePlayer": "定位玩家"
 }

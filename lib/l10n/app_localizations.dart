@@ -997,6 +997,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'NPC'**
   String get exploreLegendNpc;
+
+  /// Tooltip for button to center view on player
+  ///
+  /// In en, this message translates to:
+  /// **'Locate Player'**
+  String get exploreLocatePlayer;
 }
 
 class _AppLocalizationsDelegate
