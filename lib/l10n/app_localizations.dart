@@ -998,6 +998,12 @@ abstract class AppLocalizations {
   /// **'NPC'**
   String get exploreLegendNpc;
 
+  /// Legend label for player cell
+  ///
+  /// In en, this message translates to:
+  /// **'Player'**
+  String get exploreLegendPlayer;
+
   /// Tooltip for button to center view on player
   ///
   /// In en, this message translates to:

@@ -539,6 +539,11 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildLegendItem(
+          ExploreConstants.playerColor,
+          l10n.exploreLegendPlayer,
+        ),
+        const SizedBox(width: 12),
+        _buildLegendItem(
           ExploreConstants.mountainColor,
           l10n.exploreLegendMountain,
         ),

@@ -669,6 +669,7 @@ class ExploreConstants {
   static const Color monsterColor = Color(0xFF4AD94A);
   static const Color bossColor = Color(0xFF1A1A2A);
   static const Color npcColor = Color(0xFFD94AD9);
+  static const Color playerColor = Color(0xFF00FFFF); // Cyan for player
   static const Color gridLineColor = Color(0xFF3A3A4A);
   static const Color playerBorderColor = Color(0xFFFFD700);
 }

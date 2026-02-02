@@ -468,5 +468,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get exploreLegendNpc => 'NPC';
 
   @override
+  String get exploreLegendPlayer => '玩家';
+
+  @override
   String get exploreLocatePlayer => '定位玩家';
 }

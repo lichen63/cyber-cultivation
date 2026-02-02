@@ -150,5 +150,6 @@
     "exploreLegendMonster": "怪",
     "exploreLegendBoss": "Boss",
     "exploreLegendNpc": "NPC",
+    "exploreLegendPlayer": "玩家",
     "exploreLocatePlayer": "定位玩家"
 }
