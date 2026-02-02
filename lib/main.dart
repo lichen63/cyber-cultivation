@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
@@ -28,6 +29,7 @@ import 'services/popover_service.dart';
 import 'services/window_capture_service.dart';
 import 'widgets/accessibility_dialog.dart';
 import 'widgets/debug_level_exp_dialog.dart';
+import 'widgets/explore_window.dart';
 import 'widgets/floating_exp_indicator.dart';
 import 'widgets/games_list_dialog.dart';
 import 'widgets/home_page_content.dart';
@@ -41,8 +43,25 @@ import 'widgets/todo_dialog.dart';
 void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Check if this is a sub-window (explore window)
+  if (args.firstOrNull == 'multi_window') {
+    final windowId = int.parse(args[1]);
+    final argument = args[2].isEmpty
+        ? const <String, dynamic>{}
+        : jsonDecode(args[2]) as Map<String, dynamic>;
+
+    // Note: Don't set window ID here - it's in sub-window's memory space
+    // The main window tracks it separately
+
+    runApp(ExploreWindowApp(args: argument, windowId: windowId));
+    return;
+  }
+
   // Main window initialization
   await windowManager.ensureInitialized();
+
+  // Setup method handler to receive messages from sub-windows
+  ExploreWindowManager.setupMethodHandler();
 
   launchAtStartup.setup(
     appName: AppConstants.appTitle,
@@ -1036,6 +1055,10 @@ class _MyHomePageState extends State<MyHomePage>
     );
   }
 
+  void _showExploreWindow() {
+    showExploreWindow(context: context, themeColors: _themeColors);
+  }
+
   void _showTodoDialog() {
     showDialog(
       context: context,
@@ -1517,6 +1540,7 @@ class _MyHomePageState extends State<MyHomePage>
       onTodoPressed: _showTodoDialog,
       onSettingsPressed: _showSettingsDialog,
       onGamesPressed: _showGamesDialog,
+      onExplorePressed: _showExploreWindow,
       onContextMenu: _showContextMenu,
     );
 

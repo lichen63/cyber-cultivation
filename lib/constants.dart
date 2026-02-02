@@ -611,6 +611,68 @@ class LevelUpEffectConstants {
   static const double particleSpeed = 250.0;
 }
 
+/// Constants for Explore map window
+class ExploreConstants {
+  // Window configuration
+  static const double defaultWindowWidth = 1000.0;
+  static const double defaultWindowHeight = 1000.0;
+  static const double minWindowWidth = 400.0;
+  static const double minWindowHeight = 400.0;
+  static const double maxWindowWidth = 2000.0;
+  static const double maxWindowHeight = 2000.0;
+  static const double windowAspectRatio = 1.0;
+
+  // Grid configuration
+  static const int gridSize = 50;
+  static const int totalCells = gridSize * gridSize; // 2500 cells
+
+  // Cell rendering
+  static const double cellSize = 18.0; // Each cell is 18x18 pixels
+  static const double gridLineWidth = 0.5;
+  static const double playerCellScale = 1.2; // Player slightly larger than cell
+
+  // Map generation - actor distribution weights (higher = more common)
+  static const int weightBlank = 100;
+  static const int weightMountain = 15;
+  static const int weightRiver = 15;
+  static const int weightMonster = 8;
+  static const int weightBoss = 3;
+  static const int weightNpc = 4;
+  static const int weightHouse = 2;
+
+  // Cellular automata settings for terrain generation
+  static const int mountainSeedCount = 8; // Initial mountain cluster seeds
+  static const int riverSeedCount = 3; // Number of river sources
+  static const int cellularAutomataIterations = 4;
+  static const int mountainGrowthThreshold =
+      3; // Neighbors needed to become mountain
+  static const int riverMinLength = 15; // Minimum river length
+  static const int riverMaxLength = 40; // Maximum river length
+
+  // InteractiveViewer settings
+  static const double minScale = 0.5;
+  static const double maxScale = 3.0;
+  static const double initialScale = 1.0;
+
+  // Dialog styling
+  static const double dialogBorderRadius = 16.0;
+  static const double dialogBorderWidth = 2.0;
+  static const double headerHeight = 48.0;
+  static const double headerPaddingH = 16.0;
+  static const double headerFontSize = 16.0;
+
+  // Cell colors
+  static const Color blankColor = Color(0xFF2A2A3A);
+  static const Color mountainColor = Color(0xFF6B6B7B);
+  static const Color riverColor = Color(0xFF4A90D9);
+  static const Color houseColor = Color(0xFFD94A4A);
+  static const Color monsterColor = Color(0xFF4AD94A);
+  static const Color bossColor = Color(0xFF1A1A2A);
+  static const Color npcColor = Color(0xFFD94AD9);
+  static const Color gridLineColor = Color(0xFF3A3A4A);
+  static const Color playerBorderColor = Color(0xFFFFD700);
+}
+
 /// Utility class for formatting numbers with K/M/B/T/Q/Qi suffixes
 class NumberFormatter {
   /// Formats a large number with K/M/B/T/Q/Qi suffixes for readability.

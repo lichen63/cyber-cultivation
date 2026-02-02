@@ -433,4 +433,37 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get debugApplyButton => '应用';
+
+  @override
+  String get exploreTitle => '探索';
+
+  @override
+  String get exploreControlsHint => 'WASD移动 • 滚轮缩放';
+
+  @override
+  String get exploreExitConfirmTitle => '离开探索？';
+
+  @override
+  String get exploreExitConfirmContent => '当前的探索进度将丢失。';
+
+  @override
+  String get exploreExitButton => '离开';
+
+  @override
+  String get exploreLegendMountain => '山';
+
+  @override
+  String get exploreLegendRiver => '河';
+
+  @override
+  String get exploreLegendHouse => '屋';
+
+  @override
+  String get exploreLegendMonster => '怪';
+
+  @override
+  String get exploreLegendBoss => 'Boss';
+
+  @override
+  String get exploreLegendNpc => 'NPC';
 }

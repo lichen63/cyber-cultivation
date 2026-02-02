@@ -578,5 +578,49 @@
     "debugApplyButton": "Apply",
     "@debugApplyButton": {
         "description": "Button to apply debug changes"
+    },
+    "exploreTitle": "Explore",
+    "@exploreTitle": {
+        "description": "Title for the explore window"
+    },
+    "exploreControlsHint": "WASD to move • Scroll to zoom",
+    "@exploreControlsHint": {
+        "description": "Control hints for explore window"
+    },
+    "exploreExitConfirmTitle": "Leave Exploration?",
+    "@exploreExitConfirmTitle": {
+        "description": "Title for explore exit confirmation dialog"
+    },
+    "exploreExitConfirmContent": "Your exploration progress will be lost.",
+    "@exploreExitConfirmContent": {
+        "description": "Content for explore exit confirmation dialog"
+    },
+    "exploreExitButton": "Leave",
+    "@exploreExitButton": {
+        "description": "Button to confirm leaving explore window"
+    },
+    "exploreLegendMountain": "Mountain",
+    "@exploreLegendMountain": {
+        "description": "Legend label for mountain cells"
+    },
+    "exploreLegendRiver": "River",
+    "@exploreLegendRiver": {
+        "description": "Legend label for river cells"
+    },
+    "exploreLegendHouse": "House",
+    "@exploreLegendHouse": {
+        "description": "Legend label for house cells"
+    },
+    "exploreLegendMonster": "Monster",
+    "@exploreLegendMonster": {
+        "description": "Legend label for monster cells"
+    },
+    "exploreLegendBoss": "Boss",
+    "@exploreLegendBoss": {
+        "description": "Legend label for boss cells"
+    },
+    "exploreLegendNpc": "NPC",
+    "@exploreLegendNpc": {
+        "description": "Legend label for NPC cells"
     }
 }

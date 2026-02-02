@@ -138,5 +138,16 @@
     "debugLevelLabel": "等级",
     "debugExpLabel": "当前经验",
     "debugMaxExpLabel": "升级所需经验",
-    "debugApplyButton": "应用"
+    "debugApplyButton": "应用",
+    "exploreTitle": "探索",
+    "exploreControlsHint": "WASD移动 • 滚轮缩放",
+    "exploreExitConfirmTitle": "离开探索？",
+    "exploreExitConfirmContent": "当前的探索进度将丢失。",
+    "exploreExitButton": "离开",
+    "exploreLegendMountain": "山",
+    "exploreLegendRiver": "河",
+    "exploreLegendHouse": "屋",
+    "exploreLegendMonster": "怪",
+    "exploreLegendBoss": "Boss",
+    "exploreLegendNpc": "NPC"
 }

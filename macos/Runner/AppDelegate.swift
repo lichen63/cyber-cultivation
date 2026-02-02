@@ -1,6 +1,7 @@
 import Cocoa
 import FlutterMacOS
 import SwiftUI
+import desktop_multi_window
 
 @main
 class AppDelegate: FlutterAppDelegate {
@@ -30,6 +31,16 @@ class AppDelegate: FlutterAppDelegate {
   private var isTrayPopupPinned: Bool = false
   
   override func applicationDidFinishLaunching(_ notification: Notification) {
+    // Set up callback to customize sub-windows (hide traffic lights)
+    FlutterMultiWindowPlugin.setOnWindowCreatedCallback { flutterViewController in
+      if let window = flutterViewController.view.window {
+        // Hide the traffic light buttons
+        window.standardWindowButton(.closeButton)?.isHidden = true
+        window.standardWindowButton(.miniaturizeButton)?.isHidden = true
+        window.standardWindowButton(.zoomButton)?.isHidden = true
+      }
+    }
+    
     let controller = mainFlutterWindow?.contentViewController as! FlutterViewController
     methodChannel = FlutterMethodChannel(
       name: "menu_bar_helper",

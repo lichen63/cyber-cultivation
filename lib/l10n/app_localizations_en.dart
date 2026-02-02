@@ -438,4 +438,38 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get debugApplyButton => 'Apply';
+
+  @override
+  String get exploreTitle => 'Explore';
+
+  @override
+  String get exploreControlsHint => 'WASD to move • Scroll to zoom';
+
+  @override
+  String get exploreExitConfirmTitle => 'Leave Exploration?';
+
+  @override
+  String get exploreExitConfirmContent =>
+      'Your exploration progress will be lost.';
+
+  @override
+  String get exploreExitButton => 'Leave';
+
+  @override
+  String get exploreLegendMountain => 'Mountain';
+
+  @override
+  String get exploreLegendRiver => 'River';
+
+  @override
+  String get exploreLegendHouse => 'House';
+
+  @override
+  String get exploreLegendMonster => 'Monster';
+
+  @override
+  String get exploreLegendBoss => 'Boss';
+
+  @override
+  String get exploreLegendNpc => 'NPC';
 }

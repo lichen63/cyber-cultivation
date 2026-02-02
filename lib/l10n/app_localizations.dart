@@ -931,6 +931,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Apply'**
   String get debugApplyButton;
+
+  /// Title for the explore window
+  ///
+  /// In en, this message translates to:
+  /// **'Explore'**
+  String get exploreTitle;
+
+  /// Control hints for explore window
+  ///
+  /// In en, this message translates to:
+  /// **'WASD to move • Scroll to zoom'**
+  String get exploreControlsHint;
+
+  /// Title for explore exit confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Leave Exploration?'**
+  String get exploreExitConfirmTitle;
+
+  /// Content for explore exit confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Your exploration progress will be lost.'**
+  String get exploreExitConfirmContent;
+
+  /// Button to confirm leaving explore window
+  ///
+  /// In en, this message translates to:
+  /// **'Leave'**
+  String get exploreExitButton;
+
+  /// Legend label for mountain cells
+  ///
+  /// In en, this message translates to:
+  /// **'Mountain'**
+  String get exploreLegendMountain;
+
+  /// Legend label for river cells
+  ///
+  /// In en, this message translates to:
+  /// **'River'**
+  String get exploreLegendRiver;
+
+  /// Legend label for house cells
+  ///
+  /// In en, this message translates to:
+  /// **'House'**
+  String get exploreLegendHouse;
+
+  /// Legend label for monster cells
+  ///
+  /// In en, this message translates to:
+  /// **'Monster'**
+  String get exploreLegendMonster;
+
+  /// Legend label for boss cells
+  ///
+  /// In en, this message translates to:
+  /// **'Boss'**
+  String get exploreLegendBoss;
+
+  /// Legend label for NPC cells
+  ///
+  /// In en, this message translates to:
+  /// **'NPC'**
+  String get exploreLegendNpc;
 }
 
 class _AppLocalizationsDelegate
