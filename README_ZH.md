@@ -99,6 +99,15 @@ tccutil reset Accessibility com.lichen.cyberCultivation
 
 然后重新启动应用并再次授予权限。
 
+## 🙏 致谢
+
+本项目受到以下开源项目的启发，并参考了部分代码和设计思路：
+
+- [Stats](https://github.com/exelban/stats) — macOS 菜单栏系统监控工具
+- [vue-xiuxiangame](https://github.com/setube/vue-xiuxiangame) — 基于 Vue 的修仙放置游戏
+
+感谢这些优秀的开源项目！
+
 ## 贡献
 
 欢迎贡献！请查看 [贡献指南](docs/CONTRIBUTING.md)。

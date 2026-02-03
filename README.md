@@ -99,6 +99,15 @@ tccutil reset Accessibility com.lichen.cyberCultivation
 
 Then relaunch the app and grant permission again.
 
+## 🙏 Acknowledgments
+
+This project was inspired by and references code/insights from:
+
+- [Stats](https://github.com/exelban/stats) — macOS system monitor in the menu bar
+- [vue-xiuxiangame](https://github.com/setube/vue-xiuxiangame) — Vue-based cultivation idle game
+
+Thanks to these amazing open-source projects!
+
 ## Contributing
 
 Contributions welcome! See [Contributing Guidelines](docs/CONTRIBUTING.md).
