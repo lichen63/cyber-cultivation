@@ -91,10 +91,13 @@ void main(List<String> args) async {
   final windowWidth = gameData.windowWidth ?? AppConstants.defaultWindowWidth;
   final windowHeight =
       gameData.windowHeight ?? AppConstants.defaultWindowHeight;
+  final windowX = gameData.windowX;
+  final windowY = gameData.windowY;
+  final hasStoredPosition = windowX != null && windowY != null;
 
   final windowOptions = WindowOptions(
     size: Size(windowWidth, windowHeight),
-    center: true,
+    center: !hasStoredPosition,
     backgroundColor: AppConstants.transparentColor,
     skipTaskbar: true,
     titleBarStyle: TitleBarStyle.hidden,
@@ -112,6 +115,10 @@ void main(List<String> args) async {
     await windowManager.setAspectRatio(AppConstants.windowAspectRatio);
     await windowManager.setOpacity(1.0);
     await windowManager.show();
+    // Restore saved position after showing (must be after show to take effect)
+    if (hasStoredPosition) {
+      await windowManager.setPosition(Offset(windowX, windowY));
+    }
     await windowManager.focus();
   });
 
@@ -605,6 +612,8 @@ class _MyHomePageState extends State<MyHomePage>
   String? _userId;
   double _windowWidth = AppConstants.defaultWindowWidth;
   double _windowHeight = AppConstants.defaultWindowHeight;
+  double? _windowX;
+  double? _windowY;
   String? _language;
 
   // Todos
@@ -777,6 +786,20 @@ class _MyHomePageState extends State<MyHomePage>
     });
   }
 
+  @override
+  void onWindowMove() {
+    // Don't update window position while animating
+    if (_isAnimatingWindow) return;
+
+    windowManager.getPosition().then((position) {
+      if (mounted) {
+        _windowX = position.dx;
+        _windowY = position.dy;
+        _scheduleSave();
+      }
+    });
+  }
+
   void _scheduleSave() {
     _saveDebounce?.cancel();
     _saveDebounce = Timer(const Duration(seconds: 1), () => _saveGameData());
@@ -801,6 +824,8 @@ class _MyHomePageState extends State<MyHomePage>
       _menuBarSettings = data.menuBarSettings;
       _windowWidth = data.windowWidth ?? AppConstants.defaultWindowWidth;
       _windowHeight = data.windowHeight ?? AppConstants.defaultWindowHeight;
+      _windowX = data.windowX;
+      _windowY = data.windowY;
       _todos = List.from(data.todos);
 
       _dailyStatsMap = Map.of(data.dailyStats);
@@ -863,6 +888,8 @@ class _MyHomePageState extends State<MyHomePage>
           systemStatsRefreshSeconds: _systemStatsRefreshSeconds,
           windowWidth: _windowWidth,
           windowHeight: _windowHeight,
+          windowX: _windowX,
+          windowY: _windowY,
           userId: _userId,
           language: _language,
           themeMode: _themeMode,

@@ -17,6 +17,8 @@ class GameData {
   final int systemStatsRefreshSeconds;
   final double? windowWidth;
   final double? windowHeight;
+  final double? windowX;
+  final double? windowY;
   final String? userId;
   final String? language;
   final AppThemeMode themeMode;
@@ -42,6 +44,8 @@ class GameData {
         AppConstants.defaultSystemStatsRefreshSeconds,
     this.windowWidth,
     this.windowHeight,
+    this.windowX,
+    this.windowY,
     this.userId,
     this.language,
     this.themeMode = AppThemeMode.dark,
@@ -71,6 +75,8 @@ class GameData {
       'systemStatsRefreshSeconds': systemStatsRefreshSeconds,
       'windowWidth': windowWidth,
       'windowHeight': windowHeight,
+      'windowX': windowX,
+      'windowY': windowY,
       'userId': userId,
       'language': language,
       'themeMode': themeMode.name,
@@ -102,6 +108,8 @@ class GameData {
           AppConstants.defaultSystemStatsRefreshSeconds,
       windowWidth: (json['windowWidth'] as num?)?.toDouble(),
       windowHeight: (json['windowHeight'] as num?)?.toDouble(),
+      windowX: (json['windowX'] as num?)?.toDouble(),
+      windowY: (json['windowY'] as num?)?.toDouble(),
       userId: json['userId'] as String?,
       language: json['language'] as String?,
       themeMode: _parseThemeMode(json['themeMode'] as String?),
@@ -149,6 +157,8 @@ class GameData {
     int? systemStatsRefreshSeconds,
     double? windowWidth,
     double? windowHeight,
+    double? windowX,
+    double? windowY,
     String? userId,
     String? language,
     AppThemeMode? themeMode,
@@ -175,6 +185,8 @@ class GameData {
           systemStatsRefreshSeconds ?? this.systemStatsRefreshSeconds,
       windowWidth: windowWidth ?? this.windowWidth,
       windowHeight: windowHeight ?? this.windowHeight,
+      windowX: windowX ?? this.windowX,
+      windowY: windowY ?? this.windowY,
       userId: userId ?? this.userId,
       language: language ?? this.language,
       themeMode: themeMode ?? this.themeMode,
