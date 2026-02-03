@@ -635,17 +635,24 @@ class ExploreMapPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final cellSize = ExploreConstants.cellSize;
+    final isDark = themeColors.brightness == Brightness.dark;
 
-    // Draw grid background
-    final backgroundPaint = Paint()..color = ExploreConstants.blankColor;
+    // Draw grid background (theme-aware)
+    final blankColor = isDark
+        ? ExploreConstants.blankColorDark
+        : ExploreConstants.blankColorLight;
+    final backgroundPaint = Paint()..color = blankColor;
     canvas.drawRect(
       Rect.fromLTWH(0, 0, size.width, size.height),
       backgroundPaint,
     );
 
-    // Draw grid lines
+    // Draw grid lines (theme-aware)
+    final gridLineColor = isDark
+        ? ExploreConstants.gridLineColorDark
+        : ExploreConstants.gridLineColorLight;
     final gridLinePaint = Paint()
-      ..color = ExploreConstants.gridLineColor
+      ..color = gridLineColor
       ..strokeWidth = ExploreConstants.gridLineWidth;
 
     for (int i = 0; i <= ExploreConstants.gridSize; i++) {
@@ -667,7 +674,7 @@ class ExploreMapPainter extends CustomPainter {
           cellSize - 2,
         );
 
-        final paint = Paint()..color = _getCellColor(cell.type);
+        final paint = Paint()..color = _getCellColor(cell.type, isDark);
         canvas.drawRect(cellRect, paint);
       }
     }
@@ -676,10 +683,12 @@ class ExploreMapPainter extends CustomPainter {
     _drawPlayer(canvas, map.playerX, map.playerY, cellSize);
   }
 
-  Color _getCellColor(ExploreCellType type) {
+  Color _getCellColor(ExploreCellType type, bool isDark) {
     switch (type) {
       case ExploreCellType.blank:
-        return ExploreConstants.blankColor;
+        return isDark
+            ? ExploreConstants.blankColorDark
+            : ExploreConstants.blankColorLight;
       case ExploreCellType.mountain:
         return ExploreConstants.mountainColor;
       case ExploreCellType.river:
@@ -708,7 +717,7 @@ class ExploreMapPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.0;
 
-    final playerPaint = Paint()..color = themeColors.accent;
+    final playerPaint = Paint()..color = ExploreConstants.playerColor;
 
     canvas.drawRect(playerRect.inflate(-1), playerPaint);
     canvas.drawRect(playerRect, borderPaint);

@@ -94,7 +94,7 @@ class ExploreMapGenerator {
     // Step 3: Place other actors on blank cells
     _placeActors(grid, width, height);
 
-    // Step 4: Find valid player spawn position
+    // Step 4: Find valid player spawn position (only on blank cells)
     final spawnPos = _findValidSpawnPosition(grid, width, height);
 
     // Step 5: Ensure houses are accessible from player spawn
@@ -210,23 +210,10 @@ class ExploreMapGenerator {
 
   /// Carve a single river path
   void _carveRiver(List<List<ExploreCell>> grid, int width, int height) {
-    // Start from an edge
-    int x, y;
-    final edge = _random.nextInt(4);
-    switch (edge) {
-      case 0: // Top
-        x = _random.nextInt(width);
-        y = 0;
-      case 1: // Bottom
-        x = _random.nextInt(width);
-        y = height - 1;
-      case 2: // Left
-        x = 0;
-        y = _random.nextInt(height);
-      default: // Right
-        x = width - 1;
-        y = _random.nextInt(height);
-    }
+    // Start from a random position inside the map (not on edges)
+    final margin = width ~/ 6; // Keep away from edges
+    int x = margin + _random.nextInt(width - 2 * margin);
+    int y = margin + _random.nextInt(height - 2 * margin);
 
     final length =
         ExploreConstants.riverMinLength +
@@ -235,36 +222,38 @@ class ExploreMapGenerator {
         );
 
     // Direction tendencies for more natural flow
-    final primaryDx = _random.nextBool() ? 1 : -1;
-    final primaryDy = _random.nextBool() ? 1 : -1;
+    int primaryDx = _random.nextBool() ? 1 : -1;
+    int primaryDy = _random.nextBool() ? 1 : -1;
 
     for (int step = 0; step < length; step++) {
-      if (x < 0 || x >= width || y < 0 || y >= height) break;
+      if (x < 1 || x >= width - 1 || y < 1 || y >= height - 1) break;
 
       // Only place river on non-mountain cells
       if (grid[y][x].type != ExploreCellType.mountain) {
         grid[y][x] = ExploreCell(type: ExploreCellType.river, x: x, y: y);
       }
 
-      // Choose next direction with bias toward primary direction
+      // Choose next direction with meandering behavior
       final r = _random.nextDouble();
-      if (r < 0.4) {
+      if (r < 0.5) {
+        // Continue in primary X direction
         x += primaryDx;
-      } else if (r < 0.8) {
+      } else if (r < 0.85) {
+        // Continue in primary Y direction
         y += primaryDy;
-      } else if (r < 0.9) {
-        x -= primaryDx;
+      } else if (r < 0.92) {
+        // Reverse X occasionally for meandering
+        primaryDx = -primaryDx;
+        x += primaryDx;
       } else {
-        y -= primaryDy;
+        // Reverse Y occasionally for meandering
+        primaryDy = -primaryDy;
+        y += primaryDy;
       }
-
-      // Clamp to bounds
-      x = x.clamp(0, width - 1);
-      y = y.clamp(0, height - 1);
     }
   }
 
-  /// Place actors on blank cells based on distribution weights
+  /// Place actors on blank cells based on target percentages and fixed counts
   void _placeActors(List<List<ExploreCell>> grid, int width, int height) {
     final blankCells = <(int, int)>[];
 
@@ -280,53 +269,147 @@ class ExploreMapGenerator {
     // Shuffle for random placement
     blankCells.shuffle(_random);
 
-    // Calculate actor counts based on weights
-    final totalWeight =
-        ExploreConstants.weightMonster +
-        ExploreConstants.weightBoss +
-        ExploreConstants.weightNpc +
-        ExploreConstants.weightHouse;
+    final totalCells = width * height;
 
-    final actorCellCount = (blankCells.length * 0.15)
-        .round(); // 15% of blank cells get actors
+    // Calculate actor counts based on target percentages
+    int monstersToPlace = (totalCells * ExploreConstants.monsterTargetPercent)
+        .round();
+    int bossesToPlace = (totalCells * ExploreConstants.bossTargetPercent)
+        .round();
 
-    int monstersToPlace =
-        (actorCellCount * ExploreConstants.weightMonster / totalWeight).round();
-    int bossesToPlace =
-        (actorCellCount * ExploreConstants.weightBoss / totalWeight).round();
-    int npcsToPlace =
-        (actorCellCount * ExploreConstants.weightNpc / totalWeight).round();
-    int housesToPlace =
-        (actorCellCount * ExploreConstants.weightHouse / totalWeight).round();
+    // Fixed counts for NPCs and houses
+    int npcsToPlace = ExploreConstants.npcFixedCount;
+    int housesToPlace = ExploreConstants.houseFixedCount;
+
+    // Ensure we don't exceed available blank cells
+    final totalActors =
+        monstersToPlace + bossesToPlace + npcsToPlace + housesToPlace;
+    if (totalActors > blankCells.length) {
+      // Scale down proportionally if needed
+      final scale = blankCells.length / totalActors;
+      monstersToPlace = (monstersToPlace * scale).round();
+      bossesToPlace = (bossesToPlace * scale).round();
+      // Keep NPCs and houses at fixed counts if possible
+      npcsToPlace = min(npcsToPlace, blankCells.length ~/ 4);
+      housesToPlace = min(housesToPlace, blankCells.length ~/ 4);
+    }
 
     int index = 0;
 
+    // Place NPCs spread across different areas (grid divided into regions)
+    _placeSpreadActors(
+      grid,
+      blankCells,
+      ExploreCellType.npc,
+      npcsToPlace,
+      width,
+      height,
+    );
+
+    // Place houses spread across different areas
+    _placeSpreadActors(
+      grid,
+      blankCells,
+      ExploreCellType.house,
+      housesToPlace,
+      width,
+      height,
+    );
+
+    // Recollect remaining blank cells after placing spread actors
+    final remainingBlankCells = <(int, int)>[];
+    for (int y = 0; y < height; y++) {
+      for (int x = 0; x < width; x++) {
+        if (grid[y][x].type == ExploreCellType.blank) {
+          remainingBlankCells.add((x, y));
+        }
+      }
+    }
+    remainingBlankCells.shuffle(_random);
+
     // Place monsters
-    for (int i = 0; i < monstersToPlace && index < blankCells.length; i++) {
-      final (x, y) = blankCells[index++];
+    for (
+      int i = 0;
+      i < monstersToPlace && index < remainingBlankCells.length;
+      i++
+    ) {
+      final (x, y) = remainingBlankCells[index++];
       grid[y][x] = ExploreCell(type: ExploreCellType.monster, x: x, y: y);
     }
 
     // Place bosses
-    for (int i = 0; i < bossesToPlace && index < blankCells.length; i++) {
-      final (x, y) = blankCells[index++];
+    for (
+      int i = 0;
+      i < bossesToPlace && index < remainingBlankCells.length;
+      i++
+    ) {
+      final (x, y) = remainingBlankCells[index++];
       grid[y][x] = ExploreCell(type: ExploreCellType.boss, x: x, y: y);
-    }
-
-    // Place NPCs
-    for (int i = 0; i < npcsToPlace && index < blankCells.length; i++) {
-      final (x, y) = blankCells[index++];
-      grid[y][x] = ExploreCell(type: ExploreCellType.npc, x: x, y: y);
-    }
-
-    // Place houses
-    for (int i = 0; i < housesToPlace && index < blankCells.length; i++) {
-      final (x, y) = blankCells[index++];
-      grid[y][x] = ExploreCell(type: ExploreCellType.house, x: x, y: y);
     }
   }
 
-  /// Find a valid spawn position for the player (blank cell)
+  /// Place actors spread across different areas of the map
+  void _placeSpreadActors(
+    List<List<ExploreCell>> grid,
+    List<(int, int)> blankCells,
+    ExploreCellType type,
+    int count,
+    int width,
+    int height,
+  ) {
+    if (count <= 0) return;
+
+    // Divide map into regions based on count
+    final regionsPerSide = sqrt(count).ceil();
+    final regionWidth = width / regionsPerSide;
+    final regionHeight = height / regionsPerSide;
+
+    int placed = 0;
+
+    // Try to place one actor per region
+    for (int ry = 0; ry < regionsPerSide && placed < count; ry++) {
+      for (int rx = 0; rx < regionsPerSide && placed < count; rx++) {
+        final minX = (rx * regionWidth).round();
+        final maxX = ((rx + 1) * regionWidth).round();
+        final minY = (ry * regionHeight).round();
+        final maxY = ((ry + 1) * regionHeight).round();
+
+        // Find blank cells in this region
+        final regionCells = blankCells.where((cell) {
+          final (x, y) = cell;
+          return x >= minX &&
+              x < maxX &&
+              y >= minY &&
+              y < maxY &&
+              grid[y][x].type == ExploreCellType.blank;
+        }).toList();
+
+        if (regionCells.isNotEmpty) {
+          final cell = regionCells[_random.nextInt(regionCells.length)];
+          final (x, y) = cell;
+          grid[y][x] = ExploreCell(type: type, x: x, y: y);
+          placed++;
+        }
+      }
+    }
+
+    // If not all placed (some regions had no blank cells), place remaining randomly
+    if (placed < count) {
+      final remaining = blankCells.where((cell) {
+        final (x, y) = cell;
+        return grid[y][x].type == ExploreCellType.blank;
+      }).toList();
+      remaining.shuffle(_random);
+
+      for (int i = 0; i < remaining.length && placed < count; i++) {
+        final (x, y) = remaining[i];
+        grid[y][x] = ExploreCell(type: type, x: x, y: y);
+        placed++;
+      }
+    }
+  }
+
+  /// Find a valid spawn position for the player (must be blank cell)
   (int, int) _findValidSpawnPosition(
     List<List<ExploreCell>> grid,
     int width,
@@ -344,7 +427,8 @@ class ExploreMapGenerator {
           final x = centerX + dx;
           final y = centerY + dy;
           if (x >= 0 && x < width && y >= 0 && y < height) {
-            if (grid[y][x].isWalkable) {
+            // Only spawn on blank cells to avoid reducing actor counts
+            if (grid[y][x].type == ExploreCellType.blank) {
               return (x, y);
             }
           }
@@ -352,7 +436,16 @@ class ExploreMapGenerator {
       }
     }
 
-    // Fallback: find any walkable cell
+    // Fallback: find any blank cell
+    for (int y = 0; y < height; y++) {
+      for (int x = 0; x < width; x++) {
+        if (grid[y][x].type == ExploreCellType.blank) {
+          return (x, y);
+        }
+      }
+    }
+
+    // Last resort: find any walkable cell (may overlap with actor)
     for (int y = 0; y < height; y++) {
       for (int x = 0; x < width; x++) {
         if (grid[y][x].isWalkable) {

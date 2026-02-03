@@ -631,23 +631,24 @@ class ExploreConstants {
   static const double gridLineWidth = 0.5;
   static const double playerCellScale = 1.2; // Player slightly larger than cell
 
-  // Map generation - actor distribution weights (higher = more common)
-  static const int weightBlank = 100;
-  static const int weightMountain = 15;
-  static const int weightRiver = 15;
-  static const int weightMonster = 8;
-  static const int weightBoss = 3;
-  static const int weightNpc = 4;
-  static const int weightHouse = 2;
+  // Map generation - target percentages (of total cells)
+  static const double mountainTargetPercent = 0.25; // 20% mountains
+  static const double riverTargetPercent = 0.10; // 5% rivers
+  static const double monsterTargetPercent = 0.10; // 10% monsters
+  static const double bossTargetPercent = 0.01; // 1% bosses
+
+  // Fixed actor counts (spread across different areas)
+  static const int npcFixedCount = 20; // Exactly 20 NPCs
+  static const int houseFixedCount = 5; // Exactly 5 houses
 
   // Cellular automata settings for terrain generation
-  static const int mountainSeedCount = 8; // Initial mountain cluster seeds
-  static const int riverSeedCount = 3; // Number of river sources
+  static const int mountainSeedCount = 20; // Initial mountain cluster seeds
+  static const int riverSeedCount = 30; // Number of river sources
   static const int cellularAutomataIterations = 4;
   static const int mountainGrowthThreshold =
       3; // Neighbors needed to become mountain
-  static const int riverMinLength = 15; // Minimum river length
-  static const int riverMaxLength = 40; // Maximum river length
+  static const int riverMinLength = 10; // Minimum river length
+  static const int riverMaxLength = 25; // Maximum river length
 
   // InteractiveViewer settings
   static const double minScale = 0.5;
@@ -661,16 +662,22 @@ class ExploreConstants {
   static const double headerPaddingH = 16.0;
   static const double headerFontSize = 16.0;
 
-  // Cell colors
-  static const Color blankColor = Color(0xFF2A2A3A);
-  static const Color mountainColor = Color(0xFF6B6B7B);
+  // Cell colors (dark mode)
+  static const Color blankColorDark = Color.fromARGB(255, 120, 120, 126);
+  static const Color gridLineColorDark = Color(0xFF3A3A4A);
+
+  // Cell colors (light mode)
+  static const Color blankColorLight = Color(0xFFFFFFFF);
+  static const Color gridLineColorLight = Color(0xFFE0E0E0);
+
+  // Shared cell colors
+  static const Color mountainColor = Color(0xFF1A1A1A); // Black
   static const Color riverColor = Color(0xFF4A90D9);
-  static const Color houseColor = Color(0xFFD94A4A);
+  static const Color houseColor = Color(0xFFFFD700); // Yellow
   static const Color monsterColor = Color(0xFF4AD94A);
-  static const Color bossColor = Color(0xFF1A1A2A);
+  static const Color bossColor = Color(0xFFD94A4A); // Red
   static const Color npcColor = Color(0xFFD94AD9);
   static const Color playerColor = Color(0xFF00FFFF); // Cyan for player
-  static const Color gridLineColor = Color(0xFF3A3A4A);
   static const Color playerBorderColor = Color(0xFFFFD700);
 }
 
