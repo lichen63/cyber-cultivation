@@ -603,8 +603,8 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
     if (!mounted) return;
 
     if (!fleeSuccess) {
-      // Flee failed - forced to fight with auto-lose
-      final outcome = BattleOutcome.defeat;
+      // Flee failed - forced to fight normally (no escape)
+      final outcome = _battleService.judgeBattle(playerFC, enemyFC);
       final expChange = _battleService.calculateExpChange(
         outcome,
         enemyCell.type,
