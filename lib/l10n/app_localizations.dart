@@ -1015,6 +1015,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Locate Player'**
   String get exploreLocatePlayer;
+
+  /// Title for battle encounter dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Battle!'**
+  String get battleEncounterTitle;
+
+  /// Subtitle when encountering a monster
+  ///
+  /// In en, this message translates to:
+  /// **'A monster blocks your path!'**
+  String get battleEncounterMonster;
+
+  /// Subtitle when encountering a boss
+  ///
+  /// In en, this message translates to:
+  /// **'A powerful boss appears!'**
+  String get battleEncounterBoss;
+
+  /// Label for player's fighting capacity
+  ///
+  /// In en, this message translates to:
+  /// **'Your Power'**
+  String get battleYourPower;
+
+  /// Label for enemy's fighting capacity
+  ///
+  /// In en, this message translates to:
+  /// **'Enemy Power'**
+  String get battleEnemyPower;
+
+  /// Button to start the battle
+  ///
+  /// In en, this message translates to:
+  /// **'Fight!'**
+  String get battleFightButton;
+
+  /// Button to attempt fleeing
+  ///
+  /// In en, this message translates to:
+  /// **'Flee'**
+  String get battleFleeButton;
+
+  /// Message when flee succeeds
+  ///
+  /// In en, this message translates to:
+  /// **'You escaped safely!'**
+  String get battleFleeSuccess;
+
+  /// Message when flee fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to escape! The enemy attacks!'**
+  String get battleFleeFailed;
+
+  /// Title when player wins the battle
+  ///
+  /// In en, this message translates to:
+  /// **'Victory!'**
+  String get battleResultVictory;
+
+  /// Title when player loses the battle
+  ///
+  /// In en, this message translates to:
+  /// **'Defeat!'**
+  String get battleResultDefeat;
+
+  /// EXP gained message
+  ///
+  /// In en, this message translates to:
+  /// **'+{exp} EXP'**
+  String battleExpGained(String exp);
+
+  /// EXP lost message
+  ///
+  /// In en, this message translates to:
+  /// **'-{exp} EXP'**
+  String battleExpLost(String exp);
+
+  /// OK button in battle dialogs
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get battleOkButton;
 }
 
 class _AppLocalizationsDelegate

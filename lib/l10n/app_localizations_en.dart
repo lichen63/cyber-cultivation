@@ -481,4 +481,50 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get exploreLocatePlayer => 'Locate Player';
+
+  @override
+  String get battleEncounterTitle => 'Battle!';
+
+  @override
+  String get battleEncounterMonster => 'A monster blocks your path!';
+
+  @override
+  String get battleEncounterBoss => 'A powerful boss appears!';
+
+  @override
+  String get battleYourPower => 'Your Power';
+
+  @override
+  String get battleEnemyPower => 'Enemy Power';
+
+  @override
+  String get battleFightButton => 'Fight!';
+
+  @override
+  String get battleFleeButton => 'Flee';
+
+  @override
+  String get battleFleeSuccess => 'You escaped safely!';
+
+  @override
+  String get battleFleeFailed => 'Failed to escape! The enemy attacks!';
+
+  @override
+  String get battleResultVictory => 'Victory!';
+
+  @override
+  String get battleResultDefeat => 'Defeat!';
+
+  @override
+  String battleExpGained(String exp) {
+    return '+$exp EXP';
+  }
+
+  @override
+  String battleExpLost(String exp) {
+    return '-$exp EXP';
+  }
+
+  @override
+  String get battleOkButton => 'OK';
 }

@@ -41,12 +41,22 @@ class ExploreMap {
   int playerX;
   int playerY;
 
+  /// The player's level when this map was generated
+  /// Used for calculating enemy fighting capacity
+  final int generatedAtLevel;
+
+  /// The player's exp when this map was generated
+  /// Stored for potential future use
+  final double generatedAtExp;
+
   ExploreMap({
     required this.grid,
     required this.width,
     required this.height,
     required this.playerX,
     required this.playerY,
+    required this.generatedAtLevel,
+    required this.generatedAtExp,
   });
 
   /// Convert to JSON for serialization
@@ -55,6 +65,8 @@ class ExploreMap {
     'height': height,
     'playerX': playerX,
     'playerY': playerY,
+    'generatedAtLevel': generatedAtLevel,
+    'generatedAtExp': generatedAtExp,
     'grid': grid
         .map((row) => row.map((cell) => cell.toJson()).toList())
         .toList(),
@@ -77,6 +89,9 @@ class ExploreMap {
       height: height,
       playerX: json['playerX'] as int,
       playerY: json['playerY'] as int,
+      // Default to level 1 and exp 0 for backward compatibility with old saves
+      generatedAtLevel: json['generatedAtLevel'] as int? ?? 1,
+      generatedAtExp: (json['generatedAtExp'] as num?)?.toDouble() ?? 0.0,
     );
   }
 
@@ -113,7 +128,8 @@ class ExploreMapGenerator {
     : _random = Random(seed ?? DateTime.now().millisecondsSinceEpoch);
 
   /// Generate a new explore map
-  ExploreMap generate() {
+  /// [playerLevel] and [playerExp] are stored in the map for enemy FC calculation
+  ExploreMap generate({required int playerLevel, required double playerExp}) {
     final width = ExploreConstants.gridSize;
     final height = ExploreConstants.gridSize;
 
@@ -147,6 +163,8 @@ class ExploreMapGenerator {
       height: height,
       playerX: spawnPos.$1,
       playerY: spawnPos.$2,
+      generatedAtLevel: playerLevel,
+      generatedAtExp: playerExp,
     );
   }
 

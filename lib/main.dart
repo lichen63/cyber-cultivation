@@ -659,6 +659,7 @@ class _MyHomePageState extends State<MyHomePage>
     _menuBarSettings = widget.menuBarSettings;
 
     _initializeServices();
+    _setupExploreWindowCallback();
 
     if (widget.initialGameData != null) {
       _applyGameData(widget.initialGameData!);
@@ -667,6 +668,26 @@ class _MyHomePageState extends State<MyHomePage>
     }
 
     _checkAccessibilityPermission();
+  }
+
+  /// Setup callback to receive EXP changes from explore window
+  void _setupExploreWindowCallback() {
+    ExploreWindowManager.setExpChangeCallback((newExp) {
+      if (!mounted) return;
+      // Calculate the difference and apply it
+      final expDiff = newExp - _currentExp;
+      if (expDiff > 0) {
+        // Gained EXP - use _gainExp to handle level ups
+        // Note: _gainExp already calls setState internally
+        _gainExp(expDiff);
+      } else if (expDiff < 0) {
+        // Lost EXP - directly update (no level down)
+        setState(() {
+          _currentExp = newExp.clamp(0.0, double.infinity);
+        });
+        _saveGameData();
+      }
+    });
   }
 
   void _initializeServices() {
@@ -737,6 +758,7 @@ class _MyHomePageState extends State<MyHomePage>
 
   @override
   void dispose() {
+    ExploreWindowManager.setExpChangeCallback(null);
     _pomodoroService.removeListener(_onPomodoroStateChanged);
     _pomodoroService.dispose();
     _inputMonitorService.removeListener(_onInputMonitorChanged);

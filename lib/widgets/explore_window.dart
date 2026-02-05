@@ -9,7 +9,12 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 import '../constants.dart';
 import '../l10n/app_localizations.dart';
+import '../models/battle_result.dart';
 import '../models/explore_map.dart';
+import 'battle_dialog.dart';
+
+/// Callback type for EXP changes from explore window
+typedef ExpChangeCallback = void Function(double newExp);
 
 /// Singleton to track if explore window is open (main window only)
 /// Note: Each window has its own Flutter engine with separate memory,
@@ -17,6 +22,7 @@ import '../models/explore_map.dart';
 class ExploreWindowManager {
   static int? _windowId;
   static Map<String, dynamic>? _savedMapData;
+  static ExpChangeCallback? _onExpChanged;
 
   static bool get isWindowOpen => _windowId != null;
 
@@ -39,24 +45,60 @@ class ExploreWindowManager {
     _windowId = null;
   }
 
+  /// Register a callback to be notified when EXP changes in explore window
+  static void setExpChangeCallback(ExpChangeCallback? callback) {
+    _onExpChanged = callback;
+  }
+
   /// Setup method handler to receive messages from sub-windows (main window only)
   static void setupMethodHandler() {
     DesktopMultiWindow.setMethodHandler((call, fromWindowId) async {
-      if (call.method == 'exploreWindowClosed') {
-        // User left without saving - clear any previously saved map data
-        clearSavedMapData();
-        // Close the sub-window from main window to avoid race conditions
-        await _closeSubWindow(fromWindowId);
-        return 'ok';
-      } else if (call.method == 'exploreMapSaved') {
-        // Save map data from sub-window
-        final mapDataJson = call.arguments as String?;
-        if (mapDataJson != null && mapDataJson.isNotEmpty) {
-          _savedMapData = jsonDecode(mapDataJson) as Map<String, dynamic>;
+      try {
+        if (call.method == 'expUpdated') {
+          // Immediate EXP sync after battle
+          final dataJson = call.arguments as String?;
+          if (dataJson != null && dataJson.isNotEmpty) {
+            final data = jsonDecode(dataJson) as Map<String, dynamic>;
+            final currentExp = (data['currentExp'] as num?)?.toDouble();
+            if (currentExp != null && _onExpChanged != null) {
+              _onExpChanged!(currentExp);
+            }
+          }
+          return 'ok';
+        } else if (call.method == 'exploreWindowClosed') {
+          // User left without saving - check if there's EXP change to apply
+          final dataJson = call.arguments as String?;
+          if (dataJson != null && dataJson.isNotEmpty) {
+            final data = jsonDecode(dataJson) as Map<String, dynamic>;
+            final currentExp = (data['currentExp'] as num?)?.toDouble();
+            if (currentExp != null && _onExpChanged != null) {
+              _onExpChanged!(currentExp);
+            }
+          }
+          // Clear any previously saved map data
+          clearSavedMapData();
+          // Close the sub-window from main window to avoid race conditions
+          await _closeSubWindow(fromWindowId);
+          return 'ok';
+        } else if (call.method == 'exploreMapSaved') {
+          // Save map data and apply EXP change from sub-window
+          final dataJson = call.arguments as String?;
+          if (dataJson != null && dataJson.isNotEmpty) {
+            final data = jsonDecode(dataJson) as Map<String, dynamic>;
+            // Extract and apply current EXP
+            final currentExp = (data['currentExp'] as num?)?.toDouble();
+            if (currentExp != null && _onExpChanged != null) {
+              _onExpChanged!(currentExp);
+            }
+            // Store map data (without currentExp, it's in the map's own data)
+            _savedMapData = data['mapData'] as Map<String, dynamic>?;
+          }
+          // Close the sub-window from main window to avoid race conditions
+          await _closeSubWindow(fromWindowId);
+          return 'ok';
         }
-        // Close the sub-window from main window to avoid race conditions
-        await _closeSubWindow(fromWindowId);
-        return 'ok';
+      } catch (e) {
+        debugPrint('ExploreWindowManager method handler error: $e');
       }
       return null;
     });
@@ -226,12 +268,20 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
   final FocusNode _focusNode = FocusNode();
   bool _isLoading = true;
   bool _isClosing = false;
+  bool _isBattleInProgress = false;
+
+  // Mutable state for exp changes during battles
+  late double _currentExp;
+
+  // Battle service
+  final BattleService _battleService = BattleService();
 
   AppThemeColors get _colors => widget.themeColors;
 
   @override
   void initState() {
     super.initState();
+    _currentExp = widget.currentExp;
     _transformationController = TransformationController();
     _generateMap();
   }
@@ -261,7 +311,10 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
         // If restoration fails, generate new map
         debugPrint('Failed to restore map: $e');
         final generator = ExploreMapGenerator();
-        _map = generator.generate();
+        _map = generator.generate(
+          playerLevel: widget.level,
+          playerExp: widget.currentExp,
+        );
         WidgetsBinding.instance.addPostFrameCallback((_) {
           _centerOnGrid();
         });
@@ -269,7 +322,10 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
     } else {
       // Generate new map
       final generator = ExploreMapGenerator();
-      _map = generator.generate();
+      _map = generator.generate(
+        playerLevel: widget.level,
+        playerExp: widget.currentExp,
+      );
       // Center the view on grid center initially
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _centerOnGrid();
@@ -392,29 +448,231 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
     // Handle both KeyDownEvent and KeyRepeatEvent for continuous movement
     if (event is! KeyDownEvent && event is! KeyRepeatEvent) return;
 
+    // Ignore input during battle
+    if (_isBattleInProgress) return;
+
     final key = event.logicalKey;
-    bool moved = false;
 
     // WASD movement
     if (key == LogicalKeyboardKey.keyW || key == LogicalKeyboardKey.arrowUp) {
-      moved = _map.movePlayer(0, -1);
+      _tryMove(0, -1);
     } else if (key == LogicalKeyboardKey.keyS ||
         key == LogicalKeyboardKey.arrowDown) {
-      moved = _map.movePlayer(0, 1);
+      _tryMove(0, 1);
     } else if (key == LogicalKeyboardKey.keyA ||
         key == LogicalKeyboardKey.arrowLeft) {
-      moved = _map.movePlayer(-1, 0);
+      _tryMove(-1, 0);
     } else if (key == LogicalKeyboardKey.keyD ||
         key == LogicalKeyboardKey.arrowRight) {
-      moved = _map.movePlayer(1, 0);
+      _tryMove(1, 0);
     } else if (key == LogicalKeyboardKey.escape) {
       _confirmClose();
       return;
     }
+  }
 
-    if (moved) {
+  /// Try to move player in direction, handling enemy encounters
+  void _tryMove(int dx, int dy) {
+    final newX = _map.playerX + dx;
+    final newY = _map.playerY + dy;
+    final targetCell = _map.getCell(newX, newY);
+
+    if (targetCell == null || !targetCell.isWalkable) return;
+
+    // Check for enemy encounters
+    if (targetCell.type == ExploreCellType.monster ||
+        targetCell.type == ExploreCellType.boss) {
+      _initiateBattle(targetCell, dx, dy);
+      return;
+    }
+
+    // Normal move
+    if (_map.movePlayer(dx, dy)) {
       setState(() {});
       _panToKeepPlayerVisible();
+    }
+  }
+
+  /// Initiate a battle with an enemy
+  Future<void> _initiateBattle(ExploreCell enemyCell, int dx, int dy) async {
+    if (_isBattleInProgress) return;
+    setState(() => _isBattleInProgress = true);
+
+    final l10n = AppLocalizations.of(context)!;
+    final playerFC = _calculateFightingCapacity();
+
+    // Calculate enemy FC using the level when the map was generated
+    // This ensures consistent difficulty within a map session
+    final enemyFC = _battleService.calculateEnemyFC(
+      _map.generatedAtLevel,
+      widget.maxExp,
+      enemyCell.type,
+    );
+
+    // Show encounter dialog
+    final shouldFight = await showBattleEncounterDialog(
+      context: context,
+      enemyType: enemyCell.type,
+      playerFC: playerFC,
+      enemyFC: enemyFC,
+      colors: _colors,
+      l10n: l10n,
+    );
+
+    if (!mounted) {
+      return;
+    }
+
+    if (shouldFight == true) {
+      // Player chose to fight - use the same enemyFC we showed
+      await _performBattle(enemyCell, playerFC, enemyFC, dx, dy);
+    } else if (shouldFight == false) {
+      // Player chose to flee
+      await _handleFlee(enemyCell, playerFC, enemyFC, dx, dy);
+    }
+
+    if (!mounted) return;
+    setState(() => _isBattleInProgress = false);
+  }
+
+  /// Perform the actual battle
+  Future<void> _performBattle(
+    ExploreCell enemyCell,
+    double playerFC,
+    double enemyFC,
+    int dx,
+    int dy,
+  ) async {
+    final l10n = AppLocalizations.of(context)!;
+
+    // Judge battle outcome
+    final outcome = _battleService.judgeBattle(playerFC, enemyFC);
+
+    // Calculate EXP change
+    final expChange = _battleService.calculateExpChange(
+      outcome,
+      enemyCell.type,
+      _currentExp,
+      widget.maxExp,
+    );
+
+    final result = BattleResult(
+      enemyType: enemyCell.type,
+      playerFC: playerFC,
+      enemyFC: enemyFC,
+      outcome: outcome,
+      expChange: expChange,
+    );
+
+    // Apply EXP change and sync to main window BEFORE showing dialog
+    // This way the main window updates immediately when result is shown
+    _applyBattleExpChange(result.expChange);
+
+    // Show result dialog
+    await showBattleResultDialog(
+      context: context,
+      result: result,
+      colors: _colors,
+      l10n: l10n,
+    );
+
+    // Apply map changes (cell update, player move) after dialog
+    if (!mounted) return;
+    _applyBattleMapChanges(result, enemyCell, dx, dy);
+  }
+
+  /// Handle flee attempt
+  Future<void> _handleFlee(
+    ExploreCell enemyCell,
+    double playerFC,
+    double enemyFC,
+    int dx,
+    int dy,
+  ) async {
+    final l10n = AppLocalizations.of(context)!;
+    final fleeSuccess = _battleService.attemptFlee();
+
+    // Show flee result
+    await showFleeResultDialog(
+      context: context,
+      success: fleeSuccess,
+      colors: _colors,
+      l10n: l10n,
+    );
+
+    if (!mounted) return;
+
+    if (!fleeSuccess) {
+      // Flee failed - forced to fight with auto-lose
+      final outcome = BattleOutcome.defeat;
+      final expChange = _battleService.calculateExpChange(
+        outcome,
+        enemyCell.type,
+        _currentExp,
+        widget.maxExp,
+      );
+
+      final result = BattleResult(
+        enemyType: enemyCell.type,
+        playerFC: playerFC,
+        enemyFC: enemyFC,
+        outcome: outcome,
+        expChange: expChange,
+      );
+
+      // Apply EXP change and sync BEFORE showing dialog
+      _applyBattleExpChange(result.expChange);
+
+      // Show defeat result
+      await showBattleResultDialog(
+        context: context,
+        result: result,
+        colors: _colors,
+        l10n: l10n,
+      );
+
+      // Apply map changes after dialog
+      if (!mounted) return;
+      _applyBattleMapChanges(result, enemyCell, dx, dy);
+    }
+    // If flee succeeded, just return to exploration (enemy stays)
+  }
+
+  /// Apply EXP change from battle and sync to main window immediately
+  void _applyBattleExpChange(double expChange) {
+    setState(() {
+      _currentExp = (_currentExp + expChange).clamp(0.0, double.infinity);
+    });
+    // Sync to main window immediately
+    _syncExpToMainWindow();
+  }
+
+  /// Apply map changes after battle (cell update, player movement)
+  void _applyBattleMapChanges(
+    BattleResult result,
+    ExploreCell enemyCell,
+    int dx,
+    int dy,
+  ) {
+    if (result.isVictory) {
+      setState(() {
+        _map.grid[enemyCell.y][enemyCell.x] = enemyCell.copyWith(
+          type: ExploreCellType.blank,
+        );
+        _map.movePlayer(dx, dy);
+        _panToKeepPlayerVisible();
+      });
+    }
+    // If defeat, player stays in place (enemy remains)
+  }
+
+  /// Send current EXP to main window immediately
+  Future<void> _syncExpToMainWindow() async {
+    try {
+      final expData = jsonEncode({'currentExp': _currentExp});
+      await DesktopMultiWindow.invokeMethod(0, 'expUpdated', expData);
+    } catch (e) {
+      debugPrint('Failed to sync EXP to main window: $e');
     }
   }
 
@@ -542,17 +800,19 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
     // Step 4: Notify main window and request close
     try {
       if (saveProgress) {
-        final mapDataJson = jsonEncode(_map.toJson());
-        await DesktopMultiWindow.invokeMethod(
-          0,
-          'exploreMapSaved',
-          mapDataJson,
-        );
+        // Send both map data and current EXP
+        final saveData = jsonEncode({
+          'mapData': _map.toJson(),
+          'currentExp': _currentExp,
+        });
+        await DesktopMultiWindow.invokeMethod(0, 'exploreMapSaved', saveData);
       } else {
+        // Even when not saving map, send current EXP so battles count
+        final closeData = jsonEncode({'currentExp': _currentExp});
         await DesktopMultiWindow.invokeMethod(
           0,
           'exploreWindowClosed',
-          windowId,
+          closeData,
         );
       }
       // Main window will close this window
@@ -736,7 +996,6 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
   /// Calculate fighting capacity based on level and EXP progress
   double _calculateFightingCapacity() {
     final level = widget.level;
-    final currentExp = widget.currentExp;
     final maxExp = widget.maxExp;
 
     // Base power: exponential growth with level
@@ -744,10 +1003,10 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
         ExploreConstants.initialBasePower *
         pow(ExploreConstants.levelGrowthFactor, level - 1);
 
-    // EXP contribution: partial progress toward next level
+    // EXP contribution: partial progress toward next level (use local _currentExp)
     final expProgress = maxExp <= 0
         ? 1.0
-        : (currentExp / maxExp).clamp(0.0, 1.0);
+        : (_currentExp / maxExp).clamp(0.0, 1.0);
     final expBonus =
         basePower * ExploreConstants.expProgressMultiplier * expProgress;
 

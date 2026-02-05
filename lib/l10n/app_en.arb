@@ -634,5 +634,71 @@
     "exploreLocatePlayer": "Locate Player",
     "@exploreLocatePlayer": {
         "description": "Tooltip for button to center view on player"
+    },
+    "battleEncounterTitle": "Battle!",
+    "@battleEncounterTitle": {
+        "description": "Title for battle encounter dialog"
+    },
+    "battleEncounterMonster": "A monster blocks your path!",
+    "@battleEncounterMonster": {
+        "description": "Subtitle when encountering a monster"
+    },
+    "battleEncounterBoss": "A powerful boss appears!",
+    "@battleEncounterBoss": {
+        "description": "Subtitle when encountering a boss"
+    },
+    "battleYourPower": "Your Power",
+    "@battleYourPower": {
+        "description": "Label for player's fighting capacity"
+    },
+    "battleEnemyPower": "Enemy Power",
+    "@battleEnemyPower": {
+        "description": "Label for enemy's fighting capacity"
+    },
+    "battleFightButton": "Fight!",
+    "@battleFightButton": {
+        "description": "Button to start the battle"
+    },
+    "battleFleeButton": "Flee",
+    "@battleFleeButton": {
+        "description": "Button to attempt fleeing"
+    },
+    "battleFleeSuccess": "You escaped safely!",
+    "@battleFleeSuccess": {
+        "description": "Message when flee succeeds"
+    },
+    "battleFleeFailed": "Failed to escape! The enemy attacks!",
+    "@battleFleeFailed": {
+        "description": "Message when flee fails"
+    },
+    "battleResultVictory": "Victory!",
+    "@battleResultVictory": {
+        "description": "Title when player wins the battle"
+    },
+    "battleResultDefeat": "Defeat!",
+    "@battleResultDefeat": {
+        "description": "Title when player loses the battle"
+    },
+    "battleExpGained": "+{exp} EXP",
+    "@battleExpGained": {
+        "description": "EXP gained message",
+        "placeholders": {
+            "exp": {
+                "type": "String"
+            }
+        }
+    },
+    "battleExpLost": "-{exp} EXP",
+    "@battleExpLost": {
+        "description": "EXP lost message",
+        "placeholders": {
+            "exp": {
+                "type": "String"
+            }
+        }
+    },
+    "battleOkButton": "OK",
+    "@battleOkButton": {
+        "description": "OK button in battle dialogs"
     }
 }

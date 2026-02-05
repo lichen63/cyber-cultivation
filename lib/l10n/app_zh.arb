@@ -152,5 +152,19 @@
     "exploreLegendBoss": "Boss",
     "exploreLegendNpc": "NPC",
     "exploreLegendPlayer": "玩家",
-    "exploreLocatePlayer": "定位玩家"
+    "exploreLocatePlayer": "定位玩家",
+    "battleEncounterTitle": "战斗！",
+    "battleEncounterMonster": "一只怪物挡住了去路！",
+    "battleEncounterBoss": "强大的Boss出现了！",
+    "battleYourPower": "你的战力",
+    "battleEnemyPower": "敌方战力",
+    "battleFightButton": "战斗！",
+    "battleFleeButton": "逃跑",
+    "battleFleeSuccess": "成功逃脱！",
+    "battleFleeFailed": "逃跑失败！敌人发动攻击！",
+    "battleResultVictory": "胜利！",
+    "battleResultDefeat": "失败！",
+    "battleExpGained": "+{exp} 经验",
+    "battleExpLost": "-{exp} 经验",
+    "battleOkButton": "确定"
 }

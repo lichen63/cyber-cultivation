@@ -692,6 +692,38 @@ class ExploreConstants {
   static const double expProgressMultiplier = 0.3;
   static const double realmBaseBonus = 50.0;
   static const double realmGrowthFactor = 2.0;
+
+  // Battle system - Monster FC ratios (relative to enemy base FC)
+  static const double monsterMinFCRatio = 0.5;
+  static const double monsterMaxFCRatio = 1.2;
+  static const double monsterFCVariance = 0.2;
+
+  // Battle system - Boss FC ratios (relative to enemy base FC)
+  static const double bossMinFCRatio = 1.5;
+  static const double bossMaxFCRatio = 3.0;
+  static const double bossFCVariance = 0.3;
+
+  // Battle judgment thresholds
+  static const double battleAutoWinRatio = 1.1;
+  static const double battleAutoLoseRatio = 0.9;
+
+  // Battle rewards & penalties
+  static const double monsterExpRewardRatio = 0.1; // 10% of maxExp
+  static const double bossExpRewardRatio = 0.5; // 50% of maxExp
+  static const double expLossOnDefeatRatio = 0.05; // Lose 5% of current exp
+
+  // Flee mechanic
+  static const double fleeBaseSuccessRate = 0.7; // 70% base flee chance
+
+  // Battle dialog styling
+  static const double battleDialogWidth = 320.0;
+  static const double battleDialogPadding = 24.0;
+  static const double battleDialogBorderRadius = 16.0;
+  static const double battleDialogIconSize = 48.0;
+  static const double battleDialogTitleFontSize = 20.0;
+  static const double battleDialogSubtitleFontSize = 14.0;
+  static const double battleDialogFCFontSize = 24.0;
+  static const double battleDialogButtonSpacing = 12.0;
 }
 
 /// Utility class for formatting numbers with K/M/B/T/Q/Qi suffixes

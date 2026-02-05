@@ -475,4 +475,50 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get exploreLocatePlayer => '定位玩家';
+
+  @override
+  String get battleEncounterTitle => '战斗！';
+
+  @override
+  String get battleEncounterMonster => '一只怪物挡住了去路！';
+
+  @override
+  String get battleEncounterBoss => '强大的Boss出现了！';
+
+  @override
+  String get battleYourPower => '你的战力';
+
+  @override
+  String get battleEnemyPower => '敌方战力';
+
+  @override
+  String get battleFightButton => '战斗！';
+
+  @override
+  String get battleFleeButton => '逃跑';
+
+  @override
+  String get battleFleeSuccess => '成功逃脱！';
+
+  @override
+  String get battleFleeFailed => '逃跑失败！敌人发动攻击！';
+
+  @override
+  String get battleResultVictory => '胜利！';
+
+  @override
+  String get battleResultDefeat => '失败！';
+
+  @override
+  String battleExpGained(String exp) {
+    return '+$exp 经验';
+  }
+
+  @override
+  String battleExpLost(String exp) {
+    return '-$exp 经验';
+  }
+
+  @override
+  String get battleOkButton => '确定';
 }
