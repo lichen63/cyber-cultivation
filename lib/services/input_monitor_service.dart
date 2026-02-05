@@ -191,7 +191,7 @@ class InputMonitorService extends ChangeNotifier {
       if (!_enableAntiSleep) return;
 
       final diff = DateTime.now().difference(_lastMouseMoveTime);
-      if (diff.inSeconds >= 10) {
+      if (diff.inSeconds >= AppConstants.antiSleepIdleIntervalSeconds) {
         _performMouseMove();
       }
     });

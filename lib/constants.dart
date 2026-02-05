@@ -161,6 +161,7 @@ class AppConstants {
   static const String toggleAlwaysOnTopValue = 'toggleAlwaysOnTop';
   static const String antiSleepText = 'Anti-Sleep';
   static const String toggleAntiSleepValue = 'toggle_anti_sleep';
+  static const int antiSleepIdleIntervalSeconds = 55;
   static const String hideWindowValue = 'hide_window';
   static const String exitGameText = 'Exit Game';
   static const String exitGameValue = 'exit_game';
