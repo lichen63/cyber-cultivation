@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -43,7 +44,8 @@ class ExploreWindowManager {
       if (call.method == 'exploreWindowClosed') {
         // User left without saving - clear any previously saved map data
         clearSavedMapData();
-        clearWindow();
+        // Close the sub-window from main window to avoid race conditions
+        await _closeSubWindow(fromWindowId);
         return 'ok';
       } else if (call.method == 'exploreMapSaved') {
         // Save map data from sub-window
@@ -51,11 +53,27 @@ class ExploreWindowManager {
         if (mapDataJson != null && mapDataJson.isNotEmpty) {
           _savedMapData = jsonDecode(mapDataJson) as Map<String, dynamic>;
         }
-        clearWindow();
+        // Close the sub-window from main window to avoid race conditions
+        await _closeSubWindow(fromWindowId);
         return 'ok';
       }
       return null;
     });
+  }
+
+  /// Close a sub-window from the main window to avoid vsync race conditions
+  static Future<void> _closeSubWindow(int windowId) async {
+    clearWindow();
+    // Wait a bit to ensure the sub-window's Flutter engine has fully settled
+    // after hiding. This prevents vsync/channel errors during shutdown.
+    await Future<void>.delayed(const Duration(milliseconds: 150));
+    try {
+      final controller = WindowController.fromWindowId(windowId);
+      await controller.close();
+    } catch (e) {
+      // Window may already be closed
+      debugPrint('Sub-window close: $e');
+    }
   }
 }
 
@@ -186,6 +204,7 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
   late TransformationController _transformationController;
   final FocusNode _focusNode = FocusNode();
   bool _isLoading = true;
+  bool _isClosing = false;
 
   AppThemeColors get _colors => widget.themeColors;
 
@@ -466,38 +485,59 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
   }
 
   Future<void> _closeWindow({bool saveProgress = false}) async {
-    final windowId = widget.windowId;
+    // Prevent multiple close attempts and stop UI updates
+    if (_isClosing) return;
+    setState(() => _isClosing = true);
 
-    // Notify main window (window 0) that this window is closing
-    // This is critical because each window has its own memory space
+    final windowId = widget.windowId;
+    final controller = WindowController.fromWindowId(windowId);
+
+    // Step 1: Hide window to stop rendering new frames
+    try {
+      await controller.hide();
+    } catch (e) {
+      debugPrint('Window hide error: $e');
+    }
+
+    // Step 2: Wait for current frame to complete
+    // This ensures no vsync callbacks are pending
+    await SchedulerBinding.instance.endOfFrame;
+
+    // Step 3: Additional delay to ensure Flutter engine settles
+    // The engine may have internal async operations still in flight
+    await Future<void>.delayed(const Duration(milliseconds: 100));
+
+    // Step 4: Notify main window and request close
     try {
       if (saveProgress) {
-        // Save map data and notify main window
         final mapDataJson = jsonEncode(_map.toJson());
         await DesktopMultiWindow.invokeMethod(
-          0, // Main window ID is always 0
+          0,
           'exploreMapSaved',
           mapDataJson,
         );
       } else {
-        // Just notify that window is closing (no save)
         await DesktopMultiWindow.invokeMethod(
-          0, // Main window ID is always 0
+          0,
           'exploreWindowClosed',
           windowId,
         );
       }
+      // Main window will close this window
     } catch (e) {
-      // Notification failure is not critical, window will still close
+      // If notification fails, close from here as fallback
       debugPrint('Failed to notify main window: $e');
+      await _forceClose(controller);
     }
+  }
 
-    // Close this window
+  /// Force close as a fallback when main window communication fails
+  Future<void> _forceClose(WindowController controller) async {
+    await Future<void>.delayed(const Duration(milliseconds: 100));
     try {
-      final controller = WindowController.fromWindowId(windowId);
       await controller.close();
     } catch (e) {
-      debugPrint('Window close error (can be ignored): $e');
+      debugPrint('Force close error: $e');
     }
   }
 
