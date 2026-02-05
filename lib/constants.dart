@@ -663,7 +663,7 @@ class ExploreConstants {
   static const double headerFontSize = 16.0;
 
   // Cell colors (dark mode)
-  static const Color blankColorDark = Color.fromARGB(255, 120, 120, 126);
+  static const Color blankColorDark = Color(0xFFC0C0C0); // Light grey (silver)
   static const Color gridLineColorDark = Color(0xFF3A3A4A);
 
   // Cell colors (light mode)
@@ -674,7 +674,7 @@ class ExploreConstants {
   static const Color mountainColor = Color(0xFF1A1A1A); // Black
   static const Color riverColor = Color(0xFF4A90D9);
   static const Color houseColor = Color(0xFFFFD700); // Yellow
-  static const Color monsterColor = Color(0xFF4AD94A);
+  static const Color monsterColor = Color(0xFF2E7D32); // Forest green
   static const Color bossColor = Color(0xFFD94A4A); // Red
   static const Color npcColor = Color(0xFFD94AD9);
   static const Color playerColor = Color(0xFF00FFFF); // Cyan for player
