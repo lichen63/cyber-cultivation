@@ -1083,7 +1083,13 @@ class _MyHomePageState extends State<MyHomePage>
   }
 
   void _showExploreWindow() {
-    showExploreWindow(context: context, themeColors: _themeColors);
+    showExploreWindow(
+      context: context,
+      themeColors: _themeColors,
+      level: _level,
+      currentExp: _currentExp,
+      maxExp: _maxExp,
+    );
   }
 
   void _showTodoDialog() {

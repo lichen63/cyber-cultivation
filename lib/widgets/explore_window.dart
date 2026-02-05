@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:flutter/material.dart';
@@ -81,6 +82,9 @@ class ExploreWindowManager {
 Future<void> showExploreWindow({
   required BuildContext context,
   required AppThemeColors themeColors,
+  required int level,
+  required double currentExp,
+  required double maxExp,
 }) async {
   // Check what sub-windows actually exist
   final existingWindows = await DesktopMultiWindow.getAllSubWindowIds();
@@ -103,9 +107,12 @@ Future<void> showExploreWindow({
     }
   }
 
-  // Pass theme data and saved map data to the new window
+  // Pass theme data, level/exp, and saved map data to the new window
   final argsMap = <String, dynamic>{
     'themeMode': themeColors.brightness == Brightness.dark ? 'dark' : 'light',
+    'level': level,
+    'currentExp': currentExp.isInfinite ? 0.0 : currentExp,
+    'maxExp': maxExp.isInfinite ? 1.0 : maxExp,
   };
 
   // Include saved map data if available
@@ -160,6 +167,11 @@ class ExploreWindowApp extends StatelessWidget {
     // Extract saved map data if available
     final savedMapData = args['savedMapData'] as Map<String, dynamic>?;
 
+    // Extract level and exp
+    final level = args['level'] as int? ?? 1;
+    final currentExp = (args['currentExp'] as num?)?.toDouble() ?? 0.0;
+    final maxExp = (args['maxExp'] as num?)?.toDouble() ?? 100.0;
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -177,6 +189,9 @@ class ExploreWindowApp extends StatelessWidget {
         themeColors: themeColors,
         windowId: windowId,
         savedMapData: savedMapData,
+        level: level,
+        currentExp: currentExp,
+        maxExp: maxExp,
       ),
     );
   }
@@ -187,12 +202,18 @@ class ExploreWindowContent extends StatefulWidget {
   final AppThemeColors themeColors;
   final int windowId;
   final Map<String, dynamic>? savedMapData;
+  final int level;
+  final double currentExp;
+  final double maxExp;
 
   const ExploreWindowContent({
     super.key,
     required this.themeColors,
     required this.windowId,
     this.savedMapData,
+    required this.level,
+    required this.currentExp,
+    required this.maxExp,
   });
 
   @override
@@ -267,7 +288,11 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
     // Get window size for center calculation
     final size = MediaQuery.of(context).size;
     final viewportCenterX = size.width / 2;
-    final viewportCenterY = (size.height - ExploreConstants.headerHeight) / 2;
+    final viewportCenterY =
+        (size.height -
+            ExploreConstants.headerHeight -
+            ExploreConstants.bottomPanelHeight) /
+        2;
 
     final matrix = Matrix4.identity()
       ..setTranslationRaw(
@@ -287,7 +312,11 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
     // Get window size for center calculation
     final size = MediaQuery.of(context).size;
     final viewportCenterX = size.width / 2;
-    final viewportCenterY = (size.height - ExploreConstants.headerHeight) / 2;
+    final viewportCenterY =
+        (size.height -
+            ExploreConstants.headerHeight -
+            ExploreConstants.bottomPanelHeight) /
+        2;
 
     // Keep current scale
     final currentScale = _transformationController.value.storage[0];
@@ -308,7 +337,10 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
   Matrix4 _clampMatrix(Matrix4 matrix) {
     final size = MediaQuery.of(context).size;
     final viewWidth = size.width;
-    final viewHeight = size.height - ExploreConstants.headerHeight;
+    final viewHeight =
+        size.height -
+        ExploreConstants.headerHeight -
+        ExploreConstants.bottomPanelHeight;
 
     final gridPixelSize = ExploreConstants.gridSize * ExploreConstants.cellSize;
 
@@ -561,6 +593,7 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
                     )
                   : _buildMapView(),
             ),
+            _buildBottomPanel(l10n),
           ],
         ),
       ),
@@ -700,13 +733,94 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
     );
   }
 
+  /// Calculate fighting capacity based on level and EXP progress
+  double _calculateFightingCapacity() {
+    final level = widget.level;
+    final currentExp = widget.currentExp;
+    final maxExp = widget.maxExp;
+
+    // Base power: exponential growth with level
+    final basePower =
+        ExploreConstants.initialBasePower *
+        pow(ExploreConstants.levelGrowthFactor, level - 1);
+
+    // EXP contribution: partial progress toward next level
+    final expProgress = maxExp <= 0
+        ? 1.0
+        : (currentExp / maxExp).clamp(0.0, 1.0);
+    final expBonus =
+        basePower * ExploreConstants.expProgressMultiplier * expProgress;
+
+    // Milestone bonus for cultivation realm breakthroughs (every 10 levels)
+    final realm = (level - 1) ~/ 10;
+    final milestoneBonus = realm > 0
+        ? ExploreConstants.realmBaseBonus *
+              pow(ExploreConstants.realmGrowthFactor, realm - 1)
+        : 0.0;
+
+    return basePower + expBonus + milestoneBonus;
+  }
+
+  Widget _buildBottomPanel(AppLocalizations l10n) {
+    final fightingCapacity = _calculateFightingCapacity();
+
+    return Container(
+      height: ExploreConstants.bottomPanelHeight,
+      decoration: BoxDecoration(
+        color: _colors.dialogBackground,
+        border: Border(top: BorderSide(color: _colors.border, width: 1)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: ExploreConstants.bottomPanelPaddingH,
+        ),
+        child: Row(
+          children: [
+            // Level display
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: _colors.overlay,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                'Lv. ${widget.level}',
+                style: TextStyle(
+                  color: _colors.primaryText,
+                  fontSize: ExploreConstants.bottomPanelFontSize,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const SizedBox(width: 16),
+            // Fighting capacity display
+            Icon(Icons.local_fire_department, color: Colors.red, size: 18),
+            const SizedBox(width: 6),
+            Text(
+              NumberFormatter.format(fightingCapacity),
+              style: TextStyle(
+                color: _colors.primaryText,
+                fontSize: ExploreConstants.bottomPanelFontSize,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const Spacer(),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildMapView() {
     final gridPixelSize = ExploreConstants.gridSize * ExploreConstants.cellSize;
 
-    // Calculate minimum scale to fill viewport
+    // Calculate minimum scale to fill viewport (account for header and bottom panel)
     final size = MediaQuery.of(context).size;
     final viewWidth = size.width;
-    final viewHeight = size.height - ExploreConstants.headerHeight;
+    final viewHeight =
+        size.height -
+        ExploreConstants.headerHeight -
+        ExploreConstants.bottomPanelHeight;
     final minScaleToFillWidth = viewWidth / gridPixelSize;
     final minScaleToFillHeight = viewHeight / gridPixelSize;
     final minScale = minScaleToFillWidth > minScaleToFillHeight

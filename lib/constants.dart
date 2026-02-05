@@ -679,6 +679,18 @@ class ExploreConstants {
   static const Color npcColor = Color(0xFFD94AD9);
   static const Color playerColor = Color(0xFF00FFFF); // Cyan for player
   static const Color playerBorderColor = Color(0xFFFFD700);
+
+  // Bottom panel
+  static const double bottomPanelHeight = 48.0;
+  static const double bottomPanelPaddingH = 16.0;
+  static const double bottomPanelFontSize = 14.0;
+
+  // Fighting Capacity calculation
+  static const double initialBasePower = 10.0;
+  static const double levelGrowthFactor = 1.15;
+  static const double expProgressMultiplier = 0.3;
+  static const double realmBaseBonus = 50.0;
+  static const double realmGrowthFactor = 2.0;
 }
 
 /// Utility class for formatting numbers with K/M/B/T/Q/Qi suffixes
