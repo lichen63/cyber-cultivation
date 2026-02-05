@@ -456,6 +456,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exploreExitButton => 'Leave';
 
   @override
+  String get exploreSaveAndLeaveButton => 'Save & Leave';
+
+  @override
   String get exploreLegendMountain => 'Mountain';
 
   @override

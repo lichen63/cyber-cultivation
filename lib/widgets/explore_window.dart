@@ -14,6 +14,7 @@ import '../models/explore_map.dart';
 /// so this singleton only works within the same window process.
 class ExploreWindowManager {
   static int? _windowId;
+  static Map<String, dynamic>? _savedMapData;
 
   static bool get isWindowOpen => _windowId != null;
 
@@ -22,6 +23,14 @@ class ExploreWindowManager {
   }
 
   static int? get windowId => _windowId;
+
+  /// Get saved map data for restoring previous progress
+  static Map<String, dynamic>? get savedMapData => _savedMapData;
+
+  /// Clear saved map data
+  static void clearSavedMapData() {
+    _savedMapData = null;
+  }
 
   /// Clear window ID - call this when window is closed
   static void clearWindow() {
@@ -32,6 +41,16 @@ class ExploreWindowManager {
   static void setupMethodHandler() {
     DesktopMultiWindow.setMethodHandler((call, fromWindowId) async {
       if (call.method == 'exploreWindowClosed') {
+        // User left without saving - clear any previously saved map data
+        clearSavedMapData();
+        clearWindow();
+        return 'ok';
+      } else if (call.method == 'exploreMapSaved') {
+        // Save map data from sub-window
+        final mapDataJson = call.arguments as String?;
+        if (mapDataJson != null && mapDataJson.isNotEmpty) {
+          _savedMapData = jsonDecode(mapDataJson) as Map<String, dynamic>;
+        }
         clearWindow();
         return 'ok';
       }
@@ -66,10 +85,17 @@ Future<void> showExploreWindow({
     }
   }
 
-  // Pass theme data to the new window
-  final args = jsonEncode({
+  // Pass theme data and saved map data to the new window
+  final argsMap = <String, dynamic>{
     'themeMode': themeColors.brightness == Brightness.dark ? 'dark' : 'light',
-  });
+  };
+
+  // Include saved map data if available
+  if (ExploreWindowManager.savedMapData != null) {
+    argsMap['savedMapData'] = ExploreWindowManager.savedMapData;
+  }
+
+  final args = jsonEncode(argsMap);
 
   try {
     final window = await DesktopMultiWindow.createWindow(args);
@@ -113,6 +139,9 @@ class ExploreWindowApp extends StatelessWidget {
         : AppThemeMode.light;
     final themeColors = AppThemeColors.fromMode(themeMode);
 
+    // Extract saved map data if available
+    final savedMapData = args['savedMapData'] as Map<String, dynamic>?;
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -126,7 +155,11 @@ class ExploreWindowApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: AppLocalizations.supportedLocales,
-      home: ExploreWindowContent(themeColors: themeColors, windowId: windowId),
+      home: ExploreWindowContent(
+        themeColors: themeColors,
+        windowId: windowId,
+        savedMapData: savedMapData,
+      ),
     );
   }
 }
@@ -135,11 +168,13 @@ class ExploreWindowApp extends StatelessWidget {
 class ExploreWindowContent extends StatefulWidget {
   final AppThemeColors themeColors;
   final int windowId;
+  final Map<String, dynamic>? savedMapData;
 
   const ExploreWindowContent({
     super.key,
     required this.themeColors,
     required this.windowId,
+    this.savedMapData,
   });
 
   @override
@@ -174,14 +209,32 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
   void _generateMap() {
     setState(() => _isLoading = true);
 
-    // Generate map
-    final generator = ExploreMapGenerator();
-    _map = generator.generate();
-
-    // Center the view on grid center initially
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _centerOnGrid();
-    });
+    // Restore from saved data if available, otherwise generate new map
+    if (widget.savedMapData != null) {
+      try {
+        _map = ExploreMap.fromJson(widget.savedMapData!);
+        // Center on player position when restoring
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _centerOnPlayer();
+        });
+      } catch (e) {
+        // If restoration fails, generate new map
+        debugPrint('Failed to restore map: $e');
+        final generator = ExploreMapGenerator();
+        _map = generator.generate();
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _centerOnGrid();
+        });
+      }
+    } else {
+      // Generate new map
+      final generator = ExploreMapGenerator();
+      _map = generator.generate();
+      // Center the view on grid center initially
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _centerOnGrid();
+      });
+    }
 
     setState(() => _isLoading = false);
   }
@@ -390,7 +443,17 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
-              _closeWindow();
+              _closeWindow(saveProgress: true);
+            },
+            child: Text(
+              l10n.exploreSaveAndLeaveButton,
+              style: TextStyle(color: _colors.accent),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _closeWindow(saveProgress: false);
             },
             child: Text(
               l10n.exploreExitButton,
@@ -402,17 +465,28 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
     );
   }
 
-  Future<void> _closeWindow() async {
+  Future<void> _closeWindow({bool saveProgress = false}) async {
     final windowId = widget.windowId;
 
     // Notify main window (window 0) that this window is closing
     // This is critical because each window has its own memory space
     try {
-      await DesktopMultiWindow.invokeMethod(
-        0, // Main window ID is always 0
-        'exploreWindowClosed',
-        windowId,
-      );
+      if (saveProgress) {
+        // Save map data and notify main window
+        final mapDataJson = jsonEncode(_map.toJson());
+        await DesktopMultiWindow.invokeMethod(
+          0, // Main window ID is always 0
+          'exploreMapSaved',
+          mapDataJson,
+        );
+      } else {
+        // Just notify that window is closing (no save)
+        await DesktopMultiWindow.invokeMethod(
+          0, // Main window ID is always 0
+          'exploreWindowClosed',
+          windowId,
+        );
+      }
     } catch (e) {
       // Notification failure is not critical, window will still close
       debugPrint('Failed to notify main window: $e');

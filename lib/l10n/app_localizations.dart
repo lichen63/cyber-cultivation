@@ -956,11 +956,17 @@ abstract class AppLocalizations {
   /// **'Your exploration progress will be lost.'**
   String get exploreExitConfirmContent;
 
-  /// Button to confirm leaving explore window
+  /// Button to confirm leaving explore window without saving
   ///
   /// In en, this message translates to:
   /// **'Leave'**
   String get exploreExitButton;
+
+  /// Button to save progress and leave explore window
+  ///
+  /// In en, this message translates to:
+  /// **'Save & Leave'**
+  String get exploreSaveAndLeaveButton;
 
   /// Legend label for mountain cells
   ///

@@ -450,6 +450,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get exploreExitButton => '离开';
 
   @override
+  String get exploreSaveAndLeaveButton => '保存并离开';
+
+  @override
   String get exploreLegendMountain => '山';
 
   @override

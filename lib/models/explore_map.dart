@@ -21,6 +21,16 @@ class ExploreCell {
   /// Check if this cell is walkable (player can move here)
   bool get isWalkable =>
       type != ExploreCellType.mountain && type != ExploreCellType.river;
+
+  /// Convert to JSON for serialization
+  Map<String, dynamic> toJson() => {'type': type.index, 'x': x, 'y': y};
+
+  /// Create from JSON
+  factory ExploreCell.fromJson(Map<String, dynamic> json) => ExploreCell(
+    type: ExploreCellType.values[json['type'] as int],
+    x: json['x'] as int,
+    y: json['y'] as int,
+  );
 }
 
 /// Represents the explore map data
@@ -38,6 +48,37 @@ class ExploreMap {
     required this.playerX,
     required this.playerY,
   });
+
+  /// Convert to JSON for serialization
+  Map<String, dynamic> toJson() => {
+    'width': width,
+    'height': height,
+    'playerX': playerX,
+    'playerY': playerY,
+    'grid': grid
+        .map((row) => row.map((cell) => cell.toJson()).toList())
+        .toList(),
+  };
+
+  /// Create from JSON
+  factory ExploreMap.fromJson(Map<String, dynamic> json) {
+    final width = json['width'] as int;
+    final height = json['height'] as int;
+    final gridJson = json['grid'] as List<dynamic>;
+    final grid = gridJson.map((row) {
+      return (row as List<dynamic>).map((cell) {
+        return ExploreCell.fromJson(cell as Map<String, dynamic>);
+      }).toList();
+    }).toList();
+
+    return ExploreMap(
+      grid: grid,
+      width: width,
+      height: height,
+      playerX: json['playerX'] as int,
+      playerY: json['playerY'] as int,
+    );
+  }
 
   /// Get cell at position
   ExploreCell? getCell(int x, int y) {

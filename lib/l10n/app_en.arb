@@ -597,7 +597,11 @@
     },
     "exploreExitButton": "Leave",
     "@exploreExitButton": {
-        "description": "Button to confirm leaving explore window"
+        "description": "Button to confirm leaving explore window without saving"
+    },
+    "exploreSaveAndLeaveButton": "Save & Leave",
+    "@exploreSaveAndLeaveButton": {
+        "description": "Button to save progress and leave explore window"
     },
     "exploreLegendMountain": "Mountain",
     "@exploreLegendMountain": {

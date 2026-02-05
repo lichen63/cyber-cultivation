@@ -144,6 +144,7 @@
     "exploreExitConfirmTitle": "离开探索？",
     "exploreExitConfirmContent": "当前的探索进度将丢失。",
     "exploreExitButton": "离开",
+    "exploreSaveAndLeaveButton": "保存并离开",
     "exploreLegendMountain": "山",
     "exploreLegendRiver": "河",
     "exploreLegendHouse": "屋",
