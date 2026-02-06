@@ -161,6 +161,7 @@ class AppConstants {
   static const String toggleAlwaysOnTopValue = 'toggleAlwaysOnTop';
   static const String antiSleepText = 'Anti-Sleep';
   static const String toggleAntiSleepValue = 'toggle_anti_sleep';
+  static const int antiSleepIdleIntervalSeconds = 55;
   static const String hideWindowValue = 'hide_window';
   static const String exitGameText = 'Exit Game';
   static const String exitGameValue = 'exit_game';
@@ -611,6 +612,153 @@ class LevelUpEffectConstants {
   static const double particleSpeed = 250.0;
 }
 
+/// Constants for Explore map window
+class ExploreConstants {
+  // Window configuration
+  static const double defaultWindowWidth = 1000.0;
+  static const double defaultWindowHeight = 1000.0;
+  static const double minWindowWidth = 650.0; // Enough for header content
+  static const double minWindowHeight = 400.0;
+  static const double maxWindowWidth = 2000.0;
+  static const double maxWindowHeight = 2000.0;
+  static const double windowAspectRatio = 1.0;
+
+  // Grid configuration
+  static const int gridSize = 150;
+  static const int totalCells = gridSize * gridSize; // 22500 cells
+
+  // Cell rendering
+  static const double cellSize = 18.0; // Each cell is 18x18 pixels
+  static const double gridLineWidth = 0.5;
+  static const double playerCellScale = 1.2; // Player slightly larger than cell
+
+  // Field of View (FOV) - only cells within this Manhattan distance are visible
+  static const int defaultFovRadius = 5;
+  static const Color fogColorDark = Color(0xFF3A3A4A); // Dark grey
+  static const Color fogColorLight = Color(0xFF9E9EAE); // Medium grey
+
+  // Map generation - target percentages (of total cells)
+  static const double mountainTargetPercent = 0.25; // 20% mountains
+  static const double riverTargetPercent = 0.10; // 5% rivers
+  static const double monsterTargetPercent = 0.10; // 10% monsters
+  static const double bossTargetPercent = 0.01; // 1% bosses
+
+  // Fixed actor counts (spread across different areas)
+  static const int npcFixedCount = 20; // Exactly 20 NPCs
+  static const int houseFixedCount = 5; // Exactly 5 houses
+
+  // Cellular automata settings for terrain generation
+  static const int mountainSeedCount = 20; // Initial mountain cluster seeds
+  static const int riverSeedCount = 30; // Number of river sources
+  static const int cellularAutomataIterations = 4;
+  static const int mountainGrowthThreshold =
+      3; // Neighbors needed to become mountain
+  static const int riverMinLength = 10; // Minimum river length
+  static const int riverMaxLength = 25; // Maximum river length
+
+  // InteractiveViewer settings
+  static const double minScale = 0.5;
+  static const double maxScale = 3.0;
+  static const double initialScale = 1.0;
+
+  // Dialog styling
+  static const double dialogBorderRadius = 16.0;
+  static const double dialogBorderWidth = 2.0;
+  static const double headerHeight = 48.0;
+  static const double headerPaddingH = 16.0;
+  static const double headerFontSize = 16.0;
+
+  // Cell colors (dark mode)
+  static const Color blankColorDark = Color(0xFFC0C0C0); // Light grey (silver)
+  static const Color gridLineColorDark = Color(0xFF3A3A4A);
+
+  // Cell colors (light mode)
+  static const Color blankColorLight = Color(0xFFFFFFFF);
+  static const Color gridLineColorLight = Color(0xFFE0E0E0);
+
+  // Shared cell colors
+  static const Color mountainColor = Color(0xFF1A1A1A); // Black
+  static const Color riverColor = Color(0xFF4A90D9);
+  static const Color houseColor = Color(0xFFFFD700); // Yellow
+  static const Color houseUsedColor = Color(0xFF8B8970); // Dimmed yellow-grey
+  static const Color monsterColor = Color(0xFF2E7D32); // Forest green
+  static const Color bossColor = Color(0xFFD94A4A); // Red
+  static const Color npcColor = Color(0xFFD94AD9);
+  static const Color npcUsedColor = Color(0xFF7A6A7A); // Dimmed purple-grey
+  static const Color playerColor = Color(0xFF00FFFF); // Cyan for player
+  static const Color playerBorderColor = Color(0xFFFFD700);
+
+  // Bottom panel
+  static const double bottomPanelHeight = 48.0;
+  static const double bottomPanelPaddingH = 16.0;
+  static const double bottomPanelFontSize = 14.0;
+
+  // Floating toast
+  static const Duration toastFadeInDuration = Duration(milliseconds: 300);
+  static const Duration toastDisplayDuration = Duration(milliseconds: 1200);
+  static const Duration toastFadeOutDuration = Duration(milliseconds: 500);
+  static const double toastFontSize = 16.0;
+  static const double toastPaddingH = 24.0;
+  static const double toastPaddingV = 12.0;
+  static const double toastBorderRadius = 12.0;
+
+  // Fighting Capacity calculation
+  static const double initialBasePower = 10.0;
+  static const double levelGrowthFactor = 1.15;
+  static const double expProgressMultiplier = 0.3;
+  static const double realmBaseBonus = 50.0;
+  static const double realmGrowthFactor = 2.0;
+
+  // Battle system - Monster FC ratios (relative to enemy base FC)
+  static const double monsterMinFCRatio = 0.5;
+  static const double monsterMaxFCRatio = 1.2;
+  static const double monsterFCVariance = 0.2;
+
+  // Battle system - Boss FC ratios (relative to enemy base FC)
+  static const double bossMinFCRatio = 1.5;
+  static const double bossMaxFCRatio = 3.0;
+  static const double bossFCVariance = 0.3;
+
+  // Battle judgment thresholds
+  static const double battleAutoWinRatio = 1.1;
+  static const double battleAutoLoseRatio = 0.9;
+
+  // Battle rewards & penalties
+  static const double monsterExpRewardRatio = 0.1; // 10% of maxExp
+  static const double bossExpRewardRatio = 0.5; // 50% of maxExp
+  static const double expLossOnDefeatRatio = 0.05; // Lose 5% of current exp
+
+  // Flee mechanic
+  static const double fleeBaseSuccessRate = 0.7; // 70% base flee chance
+
+  // Action Points (AP) system
+  static const int apBase = 100;
+  static const int apPerLevel = 2;
+  static const int apPerRealm = 20;
+  static const int apCostMove = 1;
+  static const int apCostFightMonster = 3;
+  static const int apCostFightBoss = 5;
+  static const int apCostFleeSuccess = 1;
+  static const int apCostNpc = 1;
+  static const int apCostHouse = 0;
+  static const int apHouseRestore = 10;
+
+  // AP display colors
+  static const Color apColorHigh = Color(0xFF4CAF50); // Green (>50%)
+  static const Color apColorMedium = Color(0xFFFFC107); // Yellow (25-50%)
+  static const Color apColorLow = Color(0xFFF44336); // Red (<25%)
+
+  // Battle dialog styling
+  static const double battleDialogWidth = 320.0;
+  static const double battleDialogPadding = 24.0;
+  static const double battleDialogBorderRadius = 16.0;
+  static const double battleDialogIconSize = 48.0;
+  static const double battleDialogTitleFontSize = 20.0;
+  static const double battleDialogSubtitleFontSize = 14.0;
+  static const double battleDialogFCFontSize = 24.0;
+  static const double battleDialogButtonSpacing = 12.0;
+}
+
 /// Utility class for formatting numbers with K/M/B/T/Q/Qi suffixes
 class NumberFormatter {
   /// Formats a large number with K/M/B/T/Q/Qi suffixes for readability.
@@ -645,4 +793,183 @@ class NumberFormatter {
       return roundedValue.toStringAsFixed(1);
     }
   }
+}
+
+/// Constants for NPC effect system
+class NpcEffectConstants {
+  // EXP gift/steal: percentage range of maxExp
+  static const double giftStealMinPercent = 0.05; // 5%
+  static const double giftStealMaxPercent = 0.10; // 10%
+
+  // EXP multiplier
+  static const double positiveMultiplier = 2.0; // 2x EXP
+  static const double negativeMultiplier = 0.5; // 0.5x EXP
+  static const int multiplierDurationBattles = 3;
+
+  // EXP insurance
+  static const int insuranceDurationBattles = 1;
+
+  // EXP floor/ceiling
+  static const int floorDurationBattles = 3;
+
+  // EXP gamble
+  static const double gambleHalveFraction = 0.5;
+
+  // ── FC / Battle Effects ────────────────────────────────────────────
+
+  // FC buff/debuff: ±20% FC for next battles
+  static const double fcBuffMultiplier = 1.20; // +20% FC
+  static const double fcDebuffMultiplier = 0.80; // -20% FC
+  static const int fcBuffDurationBattles = 5;
+
+  // Guaranteed outcome: next battle guaranteed win/loss
+  static const int guaranteedOutcomeDurationBattles = 1;
+
+  // Flee mastery: next N flee attempts always succeed/fail
+  static const int fleeMasteryDurationBattles = 3;
+
+  // First strike: enemy/player FC counted at 50%
+  static const double firstStrikeFCMultiplier = 0.50;
+  static const int firstStrikeDurationBattles = 1;
+
+  // Glass cannon: ±50% FC for next 1 battle
+  static const double glassCannonPositiveMultiplier = 1.50; // +50% FC
+  static const double glassCannonNegativeMultiplier = 0.50; // -50% FC
+  static const int glassCannonDurationBattles = 1;
+
+  // ── Map / Terrain Manipulation ─────────────────────────────────────
+
+  // Path clearing / Terrain obstacle
+  static const int pathClearingMinCells = 3;
+  static const int pathClearingMaxCells = 5;
+
+  // River bridge / River spawn
+  static const int riverBridgeMinCells = 3;
+  static const int riverBridgeMaxCells = 5;
+
+  // Monster cleanse / spawn
+  static const int monsterCleanseCount = 3;
+  static const int monsterSpawnCount = 3;
+
+  // Boss shift
+  static const int bossRemoveCount = 1;
+  static const int bossSpawnCount = 1;
+
+  // Safe zone / Danger zone: 5x5 area around player
+  static const int safeZoneRadius = 2; // 5x5 = radius of 2
+
+  // Terrain swap
+  static const int terrainSwapCount = 5;
+
+  // ── Vision / Revelation ────────────────────────────────────────────
+
+  // FOV modification amounts (randomly chosen from this list)
+  static const List<int> fovModifyAmounts = [2, 3, 4, 5, 8, 10];
+
+  // Boss/NPC/Monster/House radar - reveals nearest location
+  static const int radarHideDurationMoves =
+      20; // How long hidden cells stay hidden
+
+  // Full map reveal
+  static const double mapRevealPercent = 0.20; // 20%
+  static const int fovShrinkMovesDuration = 10;
+  static const int fovShrinkMinRadius = 1;
+
+  // Monster radar range
+  static const int monsterRadarRange = 10;
+
+  // ── Movement Effects ───────────────────────────────────────────────
+
+  // Teleport: min distance for "far away"
+  static const int teleportMinDistance = 15;
+
+  // Speed boost: move 2 cells per step / need 2 presses per move
+  static const int speedBoostDurationMoves = 10;
+
+  // ── Monster / Enemy Manipulation ───────────────────────────────────
+
+  // Weaken/strengthen enemies in radius
+  static const int weakenEnemiesRadius = 10;
+  static const double weakenEnemiesFCMultiplier = 0.70; // -30% FC
+  static const double strengthenEnemiesFCMultiplier = 1.30; // +30% FC
+
+  // Monster conversion count
+  static const int monsterConversionCount = 2;
+
+  // Monster freeze FC boost
+  static const double monsterFreezeFCBoost = 1.50; // +50% FC
+  static const int monsterFreezeDurationBattles = 1;
+
+  // Clear wave radius
+  static const int clearWaveRadius = 3;
+
+  // Monster magnet radius and move distance
+  static const int monsterMagnetRadius = 5;
+  static const int monsterMagnetMoveDistance = 2;
+
+  // ── NPC Chain Effects ──────────────────────────────────────────────
+
+  // NPC spawn count
+  static const int npcSpawnCount = 2;
+  static const int npcRemoveCount = 2;
+
+  // ── Combo / Conditional Effects ────────────────────────────────────
+
+  // Risk/reward
+  static const double riskRewardExpMultiplier = 1.50; // +50% EXP
+  static const double riskRewardFCMultiplier = 0.80; // -20% FC
+  static const double riskRewardExpNegativeMultiplier = 0.50; // -50% EXP
+  static const double riskRewardFCNegativeMultiplier = 1.20; // +20% FC
+  static const int riskRewardDurationBattles = 3;
+
+  // Sacrifice
+  static const double sacrificeExpLossPercent = 0.05; // 5%
+  static const double sacrificeFCBoost = 1.30; // +30% FC
+  static const double sacrificeFCPenalty = 0.70; // -30% FC
+  static const int sacrificeDurationBattles = 5;
+
+  // All-in radius and EXP amount
+  static const int allInClearRadius = 5;
+  static const double allInExpGainPercent = 0.05; // 5% of maxExp
+  static const double allInExpLossPercent = 0.05; // 5% of maxExp
+
+  // Mirror FC multiplier
+  static const double mirrorFCMultiplier = 2.0; // 2x FC
+  static const int mirrorDurationBattles = 1;
+
+  // Counter stack
+  static const int counterStackMaxSteps = 20;
+  static const double counterStackPerStepPercent = 0.01; // +1% per step
+
+  // ── Meta / Map-Level Effects ───────────────────────────────────────
+
+  // Progress boost
+  static const int progressBoostCellCount = 10;
+
+  // Effect dialog styling
+  static const double effectDialogMaxWidth = 400.0;
+  static const double effectDialogMaxHeight = 500.0;
+  static const double effectDialogPadding = 20.0;
+  static const double effectDialogBorderRadius = 16.0;
+  static const double effectDialogIconSize = 40.0;
+  static const double effectDialogTitleFontSize = 18.0;
+  static const double effectDialogDescFontSize = 13.0;
+  static const double effectItemPaddingH = 12.0;
+  static const double effectItemPaddingV = 10.0;
+  static const double effectItemBorderRadius = 10.0;
+  static const double effectItemIconSize = 20.0;
+  static const double effectItemTitleFontSize = 13.0;
+  static const double effectItemDetailFontSize = 11.0;
+
+  // NPC encounter dialog styling
+  static const double npcDialogWidth = 320.0;
+  static const double npcDialogPadding = 24.0;
+  static const double npcDialogBorderRadius = 16.0;
+  static const double npcDialogIconSize = 48.0;
+  static const double npcDialogTitleFontSize = 20.0;
+  static const double npcDialogDescFontSize = 14.0;
+
+  // Colors
+  static const Color positiveEffectColor = Color(0xFF4CAF50);
+  static const Color negativeEffectColor = Color(0xFFF44336);
 }

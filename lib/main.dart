@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -28,6 +30,7 @@ import 'services/popover_service.dart';
 import 'services/window_capture_service.dart';
 import 'widgets/accessibility_dialog.dart';
 import 'widgets/debug_level_exp_dialog.dart';
+import 'widgets/explore_window.dart';
 import 'widgets/floating_exp_indicator.dart';
 import 'widgets/games_list_dialog.dart';
 import 'widgets/home_page_content.dart';
@@ -41,8 +44,25 @@ import 'widgets/todo_dialog.dart';
 void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Check if this is a sub-window (explore window)
+  if (args.firstOrNull == 'multi_window') {
+    final windowId = int.parse(args[1]);
+    final argument = args[2].isEmpty
+        ? const <String, dynamic>{}
+        : jsonDecode(args[2]) as Map<String, dynamic>;
+
+    // Note: Don't set window ID here - it's in sub-window's memory space
+    // The main window tracks it separately
+
+    runApp(ExploreWindowApp(args: argument, windowId: windowId));
+    return;
+  }
+
   // Main window initialization
   await windowManager.ensureInitialized();
+
+  // Setup method handler to receive messages from sub-windows
+  ExploreWindowManager.setupMethodHandler();
 
   launchAtStartup.setup(
     appName: AppConstants.appTitle,
@@ -72,10 +92,13 @@ void main(List<String> args) async {
   final windowWidth = gameData.windowWidth ?? AppConstants.defaultWindowWidth;
   final windowHeight =
       gameData.windowHeight ?? AppConstants.defaultWindowHeight;
+  final windowX = gameData.windowX;
+  final windowY = gameData.windowY;
+  final hasStoredPosition = windowX != null && windowY != null;
 
   final windowOptions = WindowOptions(
     size: Size(windowWidth, windowHeight),
-    center: true,
+    center: !hasStoredPosition,
     backgroundColor: AppConstants.transparentColor,
     skipTaskbar: true,
     titleBarStyle: TitleBarStyle.hidden,
@@ -93,6 +116,10 @@ void main(List<String> args) async {
     await windowManager.setAspectRatio(AppConstants.windowAspectRatio);
     await windowManager.setOpacity(1.0);
     await windowManager.show();
+    // Restore saved position after showing (must be after show to take effect)
+    if (hasStoredPosition) {
+      await windowManager.setPosition(Offset(windowX, windowY));
+    }
     await windowManager.focus();
   });
 
@@ -586,6 +613,8 @@ class _MyHomePageState extends State<MyHomePage>
   String? _userId;
   double _windowWidth = AppConstants.defaultWindowWidth;
   double _windowHeight = AppConstants.defaultWindowHeight;
+  double? _windowX;
+  double? _windowY;
   String? _language;
 
   // Todos
@@ -631,6 +660,7 @@ class _MyHomePageState extends State<MyHomePage>
     _menuBarSettings = widget.menuBarSettings;
 
     _initializeServices();
+    _setupExploreWindowCallback();
 
     if (widget.initialGameData != null) {
       _applyGameData(widget.initialGameData!);
@@ -639,6 +669,32 @@ class _MyHomePageState extends State<MyHomePage>
     }
 
     _checkAccessibilityPermission();
+  }
+
+  /// Setup callback to receive EXP changes from explore window
+  void _setupExploreWindowCallback() {
+    ExploreWindowManager.setExpChangeCallback((newExp) {
+      if (!mounted) return;
+      // Calculate the difference and apply it
+      final expDiff = newExp - _currentExp;
+      if (expDiff > 0) {
+        // Gained EXP - use _gainExp to handle level ups
+        // Note: _gainExp already calls setState internally
+        _gainExp(expDiff);
+      } else if (expDiff < 0) {
+        // Lost EXP - directly update (no level down)
+        setState(() {
+          _currentExp = newExp.clamp(0.0, double.infinity);
+        });
+        _saveGameData();
+      }
+    });
+
+    // Persist explore map data when it changes (saved or cleared)
+    ExploreWindowManager.setMapDataChangedCallback(() {
+      if (!mounted) return;
+      _saveGameData(immediate: true);
+    });
   }
 
   void _initializeServices() {
@@ -709,6 +765,8 @@ class _MyHomePageState extends State<MyHomePage>
 
   @override
   void dispose() {
+    ExploreWindowManager.setExpChangeCallback(null);
+    ExploreWindowManager.setMapDataChangedCallback(null);
     _pomodoroService.removeListener(_onPomodoroStateChanged);
     _pomodoroService.dispose();
     _inputMonitorService.removeListener(_onInputMonitorChanged);
@@ -758,6 +816,20 @@ class _MyHomePageState extends State<MyHomePage>
     });
   }
 
+  @override
+  void onWindowMove() {
+    // Don't update window position while animating
+    if (_isAnimatingWindow) return;
+
+    windowManager.getPosition().then((position) {
+      if (mounted) {
+        _windowX = position.dx;
+        _windowY = position.dy;
+        _scheduleSave();
+      }
+    });
+  }
+
   void _scheduleSave() {
     _saveDebounce?.cancel();
     _saveDebounce = Timer(const Duration(seconds: 1), () => _saveGameData());
@@ -782,6 +854,8 @@ class _MyHomePageState extends State<MyHomePage>
       _menuBarSettings = data.menuBarSettings;
       _windowWidth = data.windowWidth ?? AppConstants.defaultWindowWidth;
       _windowHeight = data.windowHeight ?? AppConstants.defaultWindowHeight;
+      _windowX = data.windowX;
+      _windowY = data.windowY;
       _todos = List.from(data.todos);
 
       _dailyStatsMap = Map.of(data.dailyStats);
@@ -793,6 +867,9 @@ class _MyHomePageState extends State<MyHomePage>
       _defaultPomodoroDuration = data.defaultPomodoroDuration;
       _defaultPomodoroRelax = data.defaultPomodoroRelax;
       _defaultPomodoroLoops = data.defaultPomodoroLoops;
+
+      // Restore explore map data from save
+      ExploreWindowManager.setSavedMapData(data.exploreMapData);
 
       if (_level >= AppConstants.maxLevel) {
         _currentExp = double.infinity;
@@ -844,6 +921,8 @@ class _MyHomePageState extends State<MyHomePage>
           systemStatsRefreshSeconds: _systemStatsRefreshSeconds,
           windowWidth: _windowWidth,
           windowHeight: _windowHeight,
+          windowX: _windowX,
+          windowY: _windowY,
           userId: _userId,
           language: _language,
           themeMode: _themeMode,
@@ -853,6 +932,7 @@ class _MyHomePageState extends State<MyHomePage>
           defaultPomodoroDuration: _defaultPomodoroDuration,
           defaultPomodoroRelax: _defaultPomodoroRelax,
           defaultPomodoroLoops: _defaultPomodoroLoops,
+          exploreMapData: ExploreWindowManager.savedMapData,
         ),
       );
     }
@@ -1036,6 +1116,34 @@ class _MyHomePageState extends State<MyHomePage>
     );
   }
 
+  void _showExploreWindow() {
+    showExploreWindow(
+      context: context,
+      themeColors: _themeColors,
+      level: _level,
+      currentExp: _currentExp,
+      maxExp: _maxExp,
+      locale: _language,
+    );
+  }
+
+  /// Notify the explore sub-window about a theme change
+  void _notifyExploreWindowThemeChanged(AppThemeMode mode) {
+    final windowId = ExploreWindowManager.windowId;
+    if (windowId != null) {
+      final themeStr = mode == AppThemeMode.dark ? 'dark' : 'light';
+      DesktopMultiWindow.invokeMethod(windowId, 'themeChanged', themeStr);
+    }
+  }
+
+  /// Notify the explore sub-window about a locale change
+  void _notifyExploreWindowLocaleChanged(String? locale) {
+    final windowId = ExploreWindowManager.windowId;
+    if (windowId != null) {
+      DesktopMultiWindow.invokeMethod(windowId, 'localeChanged', locale ?? '');
+    }
+  }
+
   void _showTodoDialog() {
     showDialog(
       context: context,
@@ -1099,11 +1207,15 @@ class _MyHomePageState extends State<MyHomePage>
         onLanguageChanged: (value) {
           setState(() => _language = value);
           widget.onLanguageChanged?.call(value);
+          // Notify explore window (if open) about locale change
+          _notifyExploreWindowLocaleChanged(value);
           _saveGameData();
         },
         onThemeModeChanged: (value) {
           setState(() => _themeMode = value);
           widget.onThemeModeChanged?.call(value);
+          // Notify explore window (if open) about theme change
+          _notifyExploreWindowThemeChanged(value);
           _saveGameData();
         },
         onMenuBarSettingsChanged: (value) {
@@ -1461,11 +1573,7 @@ class _MyHomePageState extends State<MyHomePage>
       },
       child: DragToMoveArea(
         child: Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: _themeColors.border, width: 3.0),
-            color: _themeColors.overlay,
-          ),
+          decoration: const BoxDecoration(shape: BoxShape.circle),
           child: ClipOval(
             child: Image.asset(
               AppConstants.characterImagePath,
@@ -1517,6 +1625,7 @@ class _MyHomePageState extends State<MyHomePage>
       onTodoPressed: _showTodoDialog,
       onSettingsPressed: _showSettingsDialog,
       onGamesPressed: _showGamesDialog,
+      onExplorePressed: _showExploreWindow,
       onContextMenu: _showContextMenu,
     );
 

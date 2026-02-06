@@ -17,6 +17,8 @@ class GameData {
   final int systemStatsRefreshSeconds;
   final double? windowWidth;
   final double? windowHeight;
+  final double? windowX;
+  final double? windowY;
   final String? userId;
   final String? language;
   final AppThemeMode themeMode;
@@ -26,6 +28,7 @@ class GameData {
   final int defaultPomodoroDuration;
   final int defaultPomodoroRelax;
   final int defaultPomodoroLoops;
+  final Map<String, dynamic>? exploreMapData;
 
   GameData({
     required this.level,
@@ -42,6 +45,8 @@ class GameData {
         AppConstants.defaultSystemStatsRefreshSeconds,
     this.windowWidth,
     this.windowHeight,
+    this.windowX,
+    this.windowY,
     this.userId,
     this.language,
     this.themeMode = AppThemeMode.dark,
@@ -51,6 +56,7 @@ class GameData {
     this.defaultPomodoroDuration = AppConstants.defaultPomodoroDuration,
     this.defaultPomodoroRelax = AppConstants.defaultRelaxDuration,
     this.defaultPomodoroLoops = AppConstants.defaultPomodoroLoops,
+    this.exploreMapData,
   }) : dailyStats = dailyStats ?? {},
        todos = todos ?? [],
        menuBarSettings = menuBarSettings ?? const MenuBarSettings();
@@ -71,6 +77,8 @@ class GameData {
       'systemStatsRefreshSeconds': systemStatsRefreshSeconds,
       'windowWidth': windowWidth,
       'windowHeight': windowHeight,
+      'windowX': windowX,
+      'windowY': windowY,
       'userId': userId,
       'language': language,
       'themeMode': themeMode.name,
@@ -80,6 +88,7 @@ class GameData {
       'defaultPomodoroDuration': defaultPomodoroDuration,
       'defaultPomodoroRelax': defaultPomodoroRelax,
       'defaultPomodoroLoops': defaultPomodoroLoops,
+      'exploreMapData': exploreMapData,
     };
   }
 
@@ -102,6 +111,8 @@ class GameData {
           AppConstants.defaultSystemStatsRefreshSeconds,
       windowWidth: (json['windowWidth'] as num?)?.toDouble(),
       windowHeight: (json['windowHeight'] as num?)?.toDouble(),
+      windowX: (json['windowX'] as num?)?.toDouble(),
+      windowY: (json['windowY'] as num?)?.toDouble(),
       userId: json['userId'] as String?,
       language: json['language'] as String?,
       themeMode: _parseThemeMode(json['themeMode'] as String?),
@@ -127,6 +138,7 @@ class GameData {
       defaultPomodoroLoops:
           json['defaultPomodoroLoops'] as int? ??
           AppConstants.defaultPomodoroLoops,
+      exploreMapData: json['exploreMapData'] as Map<String, dynamic>?,
     );
   }
 
@@ -149,6 +161,8 @@ class GameData {
     int? systemStatsRefreshSeconds,
     double? windowWidth,
     double? windowHeight,
+    double? windowX,
+    double? windowY,
     String? userId,
     String? language,
     AppThemeMode? themeMode,
@@ -158,6 +172,7 @@ class GameData {
     int? defaultPomodoroDuration,
     int? defaultPomodoroRelax,
     int? defaultPomodoroLoops,
+    Map<String, dynamic>? exploreMapData,
   }) {
     return GameData(
       level: level ?? this.level,
@@ -175,6 +190,8 @@ class GameData {
           systemStatsRefreshSeconds ?? this.systemStatsRefreshSeconds,
       windowWidth: windowWidth ?? this.windowWidth,
       windowHeight: windowHeight ?? this.windowHeight,
+      windowX: windowX ?? this.windowX,
+      windowY: windowY ?? this.windowY,
       userId: userId ?? this.userId,
       language: language ?? this.language,
       themeMode: themeMode ?? this.themeMode,
@@ -185,6 +202,7 @@ class GameData {
           defaultPomodoroDuration ?? this.defaultPomodoroDuration,
       defaultPomodoroRelax: defaultPomodoroRelax ?? this.defaultPomodoroRelax,
       defaultPomodoroLoops: defaultPomodoroLoops ?? this.defaultPomodoroLoops,
+      exploreMapData: exploreMapData ?? this.exploreMapData,
     );
   }
 }

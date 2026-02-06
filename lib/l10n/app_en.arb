@@ -578,5 +578,1172 @@
     "debugApplyButton": "Apply",
     "@debugApplyButton": {
         "description": "Button to apply debug changes"
+    },
+    "exploreTitle": "Explore",
+    "@exploreTitle": {
+        "description": "Title for the explore window"
+    },
+    "exploreControlsHint": "WASD to move • Scroll to zoom",
+    "@exploreControlsHint": {
+        "description": "Control hints for explore window"
+    },
+    "exploreExitConfirmTitle": "Leave Exploration?",
+    "@exploreExitConfirmTitle": {
+        "description": "Title for explore exit confirmation dialog"
+    },
+    "exploreExitConfirmContent": "Your exploration progress will be lost.",
+    "@exploreExitConfirmContent": {
+        "description": "Content for explore exit confirmation dialog"
+    },
+    "exploreExitButton": "Leave",
+    "@exploreExitButton": {
+        "description": "Button to confirm leaving explore window without saving"
+    },
+    "exploreSaveAndLeaveButton": "Save & Leave",
+    "@exploreSaveAndLeaveButton": {
+        "description": "Button to save progress and leave explore window"
+    },
+    "exploreLegendMountain": "Mountain",
+    "@exploreLegendMountain": {
+        "description": "Legend label for mountain cells"
+    },
+    "exploreLegendRiver": "River",
+    "@exploreLegendRiver": {
+        "description": "Legend label for river cells"
+    },
+    "exploreLegendHouse": "House",
+    "@exploreLegendHouse": {
+        "description": "Legend label for house cells"
+    },
+    "exploreLegendMonster": "Monster",
+    "@exploreLegendMonster": {
+        "description": "Legend label for monster cells"
+    },
+    "exploreLegendBoss": "Boss",
+    "@exploreLegendBoss": {
+        "description": "Legend label for boss cells"
+    },
+    "exploreLegendNpc": "NPC",
+    "@exploreLegendNpc": {
+        "description": "Legend label for NPC cells"
+    },
+    "exploreLegendPlayer": "Player",
+    "@exploreLegendPlayer": {
+        "description": "Legend label for player cell"
+    },
+    "exploreLocatePlayer": "Locate Player",
+    "@exploreLocatePlayer": {
+        "description": "Tooltip for button to center view on player"
+    },
+    "battleEncounterTitle": "Battle!",
+    "@battleEncounterTitle": {
+        "description": "Title for battle encounter dialog"
+    },
+    "battleEncounterMonster": "A monster blocks your path!",
+    "@battleEncounterMonster": {
+        "description": "Subtitle when encountering a monster"
+    },
+    "battleEncounterBoss": "A powerful boss appears!",
+    "@battleEncounterBoss": {
+        "description": "Subtitle when encountering a boss"
+    },
+    "battleYourPower": "Your Power",
+    "@battleYourPower": {
+        "description": "Label for player's fighting capacity"
+    },
+    "battleEnemyPower": "Enemy Power",
+    "@battleEnemyPower": {
+        "description": "Label for enemy's fighting capacity"
+    },
+    "battleFightButton": "Fight!",
+    "@battleFightButton": {
+        "description": "Button to start the battle"
+    },
+    "battleFleeButton": "Flee",
+    "@battleFleeButton": {
+        "description": "Button to attempt fleeing"
+    },
+    "battleFleeSuccess": "You escaped safely!",
+    "@battleFleeSuccess": {
+        "description": "Message when flee succeeds"
+    },
+    "battleFleeFailed": "Failed to escape! The enemy attacks!",
+    "@battleFleeFailed": {
+        "description": "Message when flee fails"
+    },
+    "battleResultVictory": "Victory!",
+    "@battleResultVictory": {
+        "description": "Title when player wins the battle"
+    },
+    "battleResultDefeat": "Defeat!",
+    "@battleResultDefeat": {
+        "description": "Title when player loses the battle"
+    },
+    "battleExpGained": "+{exp} EXP",
+    "@battleExpGained": {
+        "description": "EXP gained message",
+        "placeholders": {
+            "exp": {
+                "type": "String"
+            }
+        }
+    },
+    "battleExpLost": "-{exp} EXP",
+    "@battleExpLost": {
+        "description": "EXP lost message",
+        "placeholders": {
+            "exp": {
+                "type": "String"
+            }
+        }
+    },
+    "battleOkButton": "OK",
+    "@battleOkButton": {
+        "description": "OK button in battle dialogs"
+    },
+    "exploreApLabel": "AP",
+    "@exploreApLabel": {
+        "description": "Label for action points display"
+    },
+    "exploreApExhaustedTitle": "Action Points Exhausted",
+    "@exploreApExhaustedTitle": {
+        "description": "Title for AP exhausted dialog"
+    },
+    "exploreApExhaustedContent": "You have no action points left. Leave to start a new exploration next time.",
+    "@exploreApExhaustedContent": {
+        "description": "Content for AP exhausted dialog"
+    },
+    "exploreHouseRestoreAp": "Rested at the house. +{ap} AP restored.",
+    "@exploreHouseRestoreAp": {
+        "description": "Message when player restores AP at a house",
+        "placeholders": {
+            "ap": {
+                "type": "int"
+            }
+        }
+    },
+    "exploreHouseAlreadyUsed": "This house has already been used.",
+    "@exploreHouseAlreadyUsed": {
+        "description": "Message when house has already been used this session"
+    },
+    "exploreNpcAlreadyMet": "You've already met this NPC.",
+    "@exploreNpcAlreadyMet": {
+        "description": "Message when NPC has already been interacted with this session"
+    },
+    "exploreNotEnoughAp": "Not enough action points.",
+    "@exploreNotEnoughAp": {
+        "description": "Message when player lacks AP for an action"
+    },
+    "exploreDebugTitle": "Debug Tools",
+    "@exploreDebugTitle": {
+        "description": "Title for explore debug dialog"
+    },
+    "exploreDebugToggleFog": "Reveal Map",
+    "@exploreDebugToggleFog": {
+        "description": "Toggle to reveal or hide fog of war"
+    },
+    "exploreDebugFogOn": "Fog ON",
+    "@exploreDebugFogOn": {
+        "description": "Status when fog is enabled"
+    },
+    "exploreDebugFogOff": "Fog OFF",
+    "@exploreDebugFogOff": {
+        "description": "Status when fog is disabled (map revealed)"
+    },
+    "exploreDebugModifyAp": "Set AP",
+    "@exploreDebugModifyAp": {
+        "description": "Label for modify action points"
+    },
+    "exploreDebugApHint": "Enter AP value",
+    "@exploreDebugApHint": {
+        "description": "Hint for AP input field"
+    },
+    "exploreDebugTeleport": "Teleport",
+    "@exploreDebugTeleport": {
+        "description": "Label for teleport feature"
+    },
+    "exploreDebugTeleportX": "X",
+    "@exploreDebugTeleportX": {
+        "description": "Label for X coordinate input"
+    },
+    "exploreDebugTeleportY": "Y",
+    "@exploreDebugTeleportY": {
+        "description": "Label for Y coordinate input"
+    },
+    "exploreDebugTeleportGo": "Go",
+    "@exploreDebugTeleportGo": {
+        "description": "Button to execute teleport"
+    },
+    "exploreDebugTeleportInvalid": "Invalid position or non-walkable cell.",
+    "@exploreDebugTeleportInvalid": {
+        "description": "Error when teleport target is invalid"
+    },
+    "exploreDebugBattleMode": "Battle Mode",
+    "@exploreDebugBattleMode": {
+        "description": "Label for battle mode toggle"
+    },
+    "exploreDebugBattleNormal": "Normal",
+    "@exploreDebugBattleNormal": {
+        "description": "Normal battle mode"
+    },
+    "exploreDebugBattleAutoWin": "Auto Win",
+    "@exploreDebugBattleAutoWin": {
+        "description": "Auto win battle mode"
+    },
+    "exploreDebugBattleAutoLose": "Auto Lose",
+    "@exploreDebugBattleAutoLose": {
+        "description": "Auto lose battle mode"
+    },
+    "exploreDebugResetHouses": "Reset Houses",
+    "@exploreDebugResetHouses": {
+        "description": "Button to reset all used houses"
+    },
+    "exploreDebugHousesReset": "All houses reset.",
+    "@exploreDebugHousesReset": {
+        "description": "Message when houses have been reset"
+    },
+    "exploreDebugRegenerateMap": "Regenerate Map",
+    "@exploreDebugRegenerateMap": {
+        "description": "Button to regenerate the map"
+    },
+    "exploreDebugMapRegenerated": "Map regenerated.",
+    "@exploreDebugMapRegenerated": {
+        "description": "Message when map has been regenerated"
+    },
+    "exploreDebugAddEffects": "Add NPC Effects",
+    "@exploreDebugAddEffects": {
+        "description": "Section label for adding NPC effects in debug dialog"
+    },
+    "exploreDebugApplyEffects": "Apply Selected",
+    "@exploreDebugApplyEffects": {
+        "description": "Button to apply selected effects"
+    },
+    "exploreDebugEffectsAdded": "{count} effect(s) added.",
+    "@exploreDebugEffectsAdded": {
+        "description": "Message when effects have been added",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "exploreDebugEffectPositive": "Positive",
+    "@exploreDebugEffectPositive": {
+        "description": "Positive effect toggle label"
+    },
+    "exploreDebugEffectNegative": "Negative",
+    "@exploreDebugEffectNegative": {
+        "description": "Negative effect toggle label"
+    },
+    "npcEncounterTitle": "NPC Encounter",
+    "@npcEncounterTitle": {
+        "description": "Title for NPC encounter dialog"
+    },
+    "npcEffectPositive": "A traveler shares their blessing with you!",
+    "@npcEffectPositive": {
+        "description": "Message when NPC gives positive effect"
+    },
+    "npcEffectNegative": "A traveler places a curse upon you!",
+    "@npcEffectNegative": {
+        "description": "Message when NPC gives negative effect"
+    },
+    "npcEffectExpGiftPositive": "EXP Gift: +{amount} EXP",
+    "@npcEffectExpGiftPositive": {
+        "description": "Positive EXP gift effect",
+        "placeholders": {
+            "amount": { "type": "String" }
+        }
+    },
+    "npcEffectExpStealNegative": "EXP Stolen: -{amount} EXP",
+    "@npcEffectExpStealNegative": {
+        "description": "Negative EXP steal effect",
+        "placeholders": {
+            "amount": { "type": "String" }
+        }
+    },
+    "npcEffectExpMultiplierPositive": "EXP Boost: Next {count} battles give 2x EXP!",
+    "@npcEffectExpMultiplierPositive": {
+        "description": "Positive EXP multiplier effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "npcEffectExpMultiplierNegative": "EXP Curse: Next {count} battles give 0.5x EXP!",
+    "@npcEffectExpMultiplierNegative": {
+        "description": "Negative EXP multiplier effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "npcEffectExpInsurancePositive": "EXP Insurance: Next loss will have no EXP penalty!",
+    "@npcEffectExpInsurancePositive": {
+        "description": "Positive EXP insurance effect"
+    },
+    "npcEffectExpInsuranceNegative": "EXP Curse: Next win will give no EXP reward!",
+    "@npcEffectExpInsuranceNegative": {
+        "description": "Negative EXP insurance effect"
+    },
+    "npcEffectExpFloorPositive": "EXP Shield: EXP can't drop below current value for {count} battles!",
+    "@npcEffectExpFloorPositive": {
+        "description": "Positive EXP floor effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "npcEffectExpFloorNegative": "EXP Ceiling: EXP can't gain above current value for {count} battles!",
+    "@npcEffectExpFloorNegative": {
+        "description": "Negative EXP floor effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "npcEffectExpGamblePositive": "Lucky Gamble: EXP doubled!",
+    "@npcEffectExpGamblePositive": {
+        "description": "Positive EXP gamble effect"
+    },
+    "npcEffectExpGambleNegative": "Unlucky Gamble: EXP halved!",
+    "@npcEffectExpGambleNegative": {
+        "description": "Negative EXP gamble effect"
+    },
+    "npcEffectsButtonTooltip": "Active Effects",
+    "@npcEffectsButtonTooltip": {
+        "description": "Tooltip for the effects button in bottom panel"
+    },
+    "npcEffectsDialogTitle": "Active Effects",
+    "@npcEffectsDialogTitle": {
+        "description": "Title for the active effects dialog"
+    },
+    "npcEffectsEmpty": "No active effects.",
+    "@npcEffectsEmpty": {
+        "description": "Message when there are no active effects"
+    },
+    "npcEffectRemainingBattles": "{count} battles remaining",
+    "@npcEffectRemainingBattles": {
+        "description": "Shows remaining battles for duration-based effects",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "npcEffectNameExpGiftSteal": "EXP Gift/Steal",
+    "@npcEffectNameExpGiftSteal": {
+        "description": "Name for EXP gift/steal effect"
+    },
+    "npcEffectNameExpMultiplier": "EXP Multiplier",
+    "@npcEffectNameExpMultiplier": {
+        "description": "Name for EXP multiplier effect"
+    },
+    "npcEffectNameExpInsurance": "EXP Insurance",
+    "@npcEffectNameExpInsurance": {
+        "description": "Name for EXP insurance effect"
+    },
+    "npcEffectNameExpFloor": "EXP Floor",
+    "@npcEffectNameExpFloor": {
+        "description": "Name for EXP floor effect"
+    },
+    "npcEffectDescMultiplierPositive": "2x EXP from battles",
+    "@npcEffectDescMultiplierPositive": {
+        "description": "Description for positive multiplier effect"
+    },
+    "npcEffectDescMultiplierNegative": "0.5x EXP from battles",
+    "@npcEffectDescMultiplierNegative": {
+        "description": "Description for negative multiplier effect"
+    },
+    "npcEffectDescInsurancePositive": "No EXP penalty on next loss",
+    "@npcEffectDescInsurancePositive": {
+        "description": "Description for positive insurance effect"
+    },
+    "npcEffectDescInsuranceNegative": "No EXP reward on next win",
+    "@npcEffectDescInsuranceNegative": {
+        "description": "Description for negative insurance effect"
+    },
+    "npcEffectDescFloorPositive": "EXP can't drop below {value}",
+    "@npcEffectDescFloorPositive": {
+        "description": "Description for positive floor effect",
+        "placeholders": {
+            "value": { "type": "String" }
+        }
+    },
+    "npcEffectDescFloorNegative": "EXP can't gain above {value}",
+    "@npcEffectDescFloorNegative": {
+        "description": "Description for negative floor effect",
+        "placeholders": {
+            "value": { "type": "String" }
+        }
+    },
+    "npcEffectNameExpGamble": "EXP Gamble",
+    "@npcEffectNameExpGamble": {
+        "description": "Name for EXP gamble effect"
+    },
+    "npcEffectRemainingMoves": "{count} moves remaining",
+    "@npcEffectRemainingMoves": {
+        "description": "Shows remaining moves for move-duration effects",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+
+    "npcEffectNameFcBuff": "FC Buff",
+    "@npcEffectNameFcBuff": {
+        "description": "Name for FC buff/debuff effect"
+    },
+    "npcEffectFcBuffPositive": "FC Boost: +20% Fighting Capacity for next {count} battles!",
+    "@npcEffectFcBuffPositive": {
+        "description": "Positive FC buff effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "npcEffectFcBuffNegative": "FC Curse: -20% Fighting Capacity for next {count} battles!",
+    "@npcEffectFcBuffNegative": {
+        "description": "Negative FC debuff effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "npcEffectDescFcBuffPositive": "+20% FC in battles",
+    "@npcEffectDescFcBuffPositive": {
+        "description": "Description for positive FC buff"
+    },
+    "npcEffectDescFcBuffNegative": "-20% FC in battles",
+    "@npcEffectDescFcBuffNegative": {
+        "description": "Description for negative FC debuff"
+    },
+
+    "npcEffectNameGuaranteedOutcome": "Fate Seal",
+    "@npcEffectNameGuaranteedOutcome": {
+        "description": "Name for guaranteed outcome effect"
+    },
+    "npcEffectGuaranteedOutcomePositive": "Victory Seal: Next battle is a guaranteed win!",
+    "@npcEffectGuaranteedOutcomePositive": {
+        "description": "Positive guaranteed win effect"
+    },
+    "npcEffectGuaranteedOutcomeNegative": "Doom Seal: Next battle is a guaranteed loss!",
+    "@npcEffectGuaranteedOutcomeNegative": {
+        "description": "Negative guaranteed loss effect"
+    },
+    "npcEffectDescGuaranteedOutcomePositive": "Next battle: guaranteed win",
+    "@npcEffectDescGuaranteedOutcomePositive": {
+        "description": "Description for positive guaranteed outcome"
+    },
+    "npcEffectDescGuaranteedOutcomeNegative": "Next battle: guaranteed loss",
+    "@npcEffectDescGuaranteedOutcomeNegative": {
+        "description": "Description for negative guaranteed outcome"
+    },
+
+    "npcEffectNameFleeMastery": "Flee Mastery",
+    "@npcEffectNameFleeMastery": {
+        "description": "Name for flee mastery effect"
+    },
+    "npcEffectFleeMasteryPositive": "Escape Artist: Next {count} flee attempts always succeed!",
+    "@npcEffectFleeMasteryPositive": {
+        "description": "Positive flee mastery effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "npcEffectFleeMasteryNegative": "Trapped: Next {count} flee attempts always fail!",
+    "@npcEffectFleeMasteryNegative": {
+        "description": "Negative flee mastery effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "npcEffectDescFleeMasteryPositive": "Flee always succeeds",
+    "@npcEffectDescFleeMasteryPositive": {
+        "description": "Description for positive flee mastery"
+    },
+    "npcEffectDescFleeMasteryNegative": "Flee always fails",
+    "@npcEffectDescFleeMasteryNegative": {
+        "description": "Description for negative flee mastery"
+    },
+
+    "npcEffectNameFirstStrike": "First Strike",
+    "@npcEffectNameFirstStrike": {
+        "description": "Name for first strike effect"
+    },
+    "npcEffectFirstStrikePositive": "First Strike: Enemy FC counted at 50% in next battle!",
+    "@npcEffectFirstStrikePositive": {
+        "description": "Positive first strike effect"
+    },
+    "npcEffectFirstStrikeNegative": "Ambushed: Your FC counted at 50% in next battle!",
+    "@npcEffectFirstStrikeNegative": {
+        "description": "Negative first strike effect"
+    },
+    "npcEffectDescFirstStrikePositive": "Enemy FC at 50%",
+    "@npcEffectDescFirstStrikePositive": {
+        "description": "Description for positive first strike"
+    },
+    "npcEffectDescFirstStrikeNegative": "Your FC at 50%",
+    "@npcEffectDescFirstStrikeNegative": {
+        "description": "Description for negative first strike"
+    },
+
+    "npcEffectNameGlassCannon": "Glass Cannon",
+    "@npcEffectNameGlassCannon": {
+        "description": "Name for glass cannon effect"
+    },
+    "npcEffectGlassCannonPositive": "Glass Cannon: +50% FC for next battle!",
+    "@npcEffectGlassCannonPositive": {
+        "description": "Positive glass cannon effect"
+    },
+    "npcEffectGlassCannonNegative": "Weakened: -50% FC for next battle!",
+    "@npcEffectGlassCannonNegative": {
+        "description": "Negative glass cannon effect"
+    },
+    "npcEffectDescGlassCannonPositive": "+50% FC next battle",
+    "@npcEffectDescGlassCannonPositive": {
+        "description": "Description for positive glass cannon"
+    },
+    "npcEffectDescGlassCannonNegative": "-50% FC next battle",
+    "@npcEffectDescGlassCannonNegative": {
+        "description": "Description for negative glass cannon"
+    },
+
+    "npcEffectNamePathClearing": "Path Clearing",
+    "@npcEffectNamePathClearing": {
+        "description": "Name for path clearing effect"
+    },
+    "npcEffectPathClearingPositive": "Path Cleared: {count} mountains removed!",
+    "@npcEffectPathClearingPositive": {
+        "description": "Positive path clearing effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "npcEffectPathClearingNegative": "Landslide: {count} new mountains appeared!",
+    "@npcEffectPathClearingNegative": {
+        "description": "Negative path clearing effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+
+    "npcEffectNameRiverBridge": "River Bridge",
+    "@npcEffectNameRiverBridge": {
+        "description": "Name for river bridge effect"
+    },
+    "npcEffectRiverBridgePositive": "River Crossed: {count} river cells bridged!",
+    "@npcEffectRiverBridgePositive": {
+        "description": "Positive river bridge effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "npcEffectRiverBridgeNegative": "Flood: {count} new river cells appeared!",
+    "@npcEffectRiverBridgeNegative": {
+        "description": "Negative river bridge effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+
+    "npcEffectNameMonsterCleanse": "Monster Cleanse",
+    "@npcEffectNameMonsterCleanse": {
+        "description": "Name for monster cleanse effect"
+    },
+    "npcEffectMonsterCleansePositive": "Monster Cleanse: {count} nearby monsters vanished!",
+    "@npcEffectMonsterCleansePositive": {
+        "description": "Positive monster cleanse effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "npcEffectMonsterCleanseNegative": "Monster Surge: {count} new monsters appeared!",
+    "@npcEffectMonsterCleanseNegative": {
+        "description": "Negative monster cleanse effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+
+    "npcEffectNameBossShift": "Boss Shift",
+    "@npcEffectNameBossShift": {
+        "description": "Name for boss shift effect"
+    },
+    "npcEffectBossShiftPositive": "Boss Banished: Nearest boss removed!",
+    "@npcEffectBossShiftPositive": {
+        "description": "Positive boss shift effect"
+    },
+    "npcEffectBossShiftNegative": "Boss Summoned: A new boss appeared!",
+    "@npcEffectBossShiftNegative": {
+        "description": "Negative boss shift effect"
+    },
+
+    "npcEffectNameSafeZone": "Safe Zone",
+    "@npcEffectNameSafeZone": {
+        "description": "Name for safe zone effect"
+    },
+    "npcEffectSafeZonePositive": "Safe Zone: Area around you cleared of dangers!",
+    "@npcEffectSafeZonePositive": {
+        "description": "Positive safe zone effect"
+    },
+    "npcEffectSafeZoneNegative": "Danger Zone: Monsters spawned around you!",
+    "@npcEffectSafeZoneNegative": {
+        "description": "Negative safe zone effect"
+    },
+
+    "npcEffectNameTerrainSwap": "Terrain Swap",
+    "@npcEffectNameTerrainSwap": {
+        "description": "Name for terrain swap effect"
+    },
+    "npcEffectTerrainSwapPositive": "Terrain Cleared: {count} mountains converted to paths!",
+    "@npcEffectTerrainSwapPositive": {
+        "description": "Positive terrain swap effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "npcEffectTerrainSwapNegative": "Terrain Blocked: {count} paths turned to mountains!",
+    "@npcEffectTerrainSwapNegative": {
+        "description": "Negative terrain swap effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+
+    "npcEffectNameFovModify": "Vision",
+    "@npcEffectNameFovModify": {
+        "description": "Name for FOV modify effect"
+    },
+    "npcEffectFovModifyPositive": "Far Sight: Field of view increased by {amount} tiles!",
+    "@npcEffectFovModifyPositive": {
+        "description": "Positive FOV modify effect",
+        "placeholders": {
+            "amount": { "type": "int" }
+        }
+    },
+    "npcEffectFovModifyNegative": "Blinded: Field of view decreased by {amount} tiles!",
+    "@npcEffectFovModifyNegative": {
+        "description": "Negative FOV modify effect",
+        "placeholders": {
+            "amount": { "type": "int" }
+        }
+    },
+    "npcEffectDescFovModifyPositive": "+{amount} FOV",
+    "@npcEffectDescFovModifyPositive": {
+        "description": "Description for positive FOV modify",
+        "placeholders": {
+            "amount": { "type": "int" }
+        }
+    },
+    "npcEffectDescFovModifyNegative": "-{amount} FOV",
+    "@npcEffectDescFovModifyNegative": {
+        "description": "Description for negative FOV modify",
+        "placeholders": {
+            "amount": { "type": "int" }
+        }
+    },
+
+    "npcEffectNameBossRadar": "Boss Radar",
+    "@npcEffectNameBossRadar": {
+        "description": "Name for boss radar effect"
+    },
+    "npcEffectBossRadarPositive": "Boss Radar: Nearest boss location revealed!",
+    "@npcEffectBossRadarPositive": {
+        "description": "Positive boss radar effect"
+    },
+    "npcEffectBossRadarNegative": "Boss Cloaked: Boss cells hidden until stepped on!",
+    "@npcEffectBossRadarNegative": {
+        "description": "Negative boss radar effect"
+    },
+    "npcEffectDescBossRadarNegative": "Bosses appear as blank",
+    "@npcEffectDescBossRadarNegative": {
+        "description": "Description for negative boss radar"
+    },
+
+    "npcEffectNameNpcRadar": "NPC Radar",
+    "@npcEffectNameNpcRadar": {
+        "description": "Name for NPC radar effect"
+    },
+    "npcEffectNpcRadarPositive": "NPC Radar: Nearest NPC location revealed!",
+    "@npcEffectNpcRadarPositive": {
+        "description": "Positive NPC radar effect"
+    },
+    "npcEffectNpcRadarNegative": "NPC Cloaked: NPC cells hidden until stepped on!",
+    "@npcEffectNpcRadarNegative": {
+        "description": "Negative NPC radar effect"
+    },
+    "npcEffectDescNpcRadarNegative": "NPCs appear as blank",
+    "@npcEffectDescNpcRadarNegative": {
+        "description": "Description for negative NPC radar"
+    },
+
+    "npcEffectNameMapReveal": "Map Reveal",
+    "@npcEffectNameMapReveal": {
+        "description": "Name for map reveal effect"
+    },
+    "npcEffectMapRevealPositive": "Cartographer: 20% of unexplored map revealed!",
+    "@npcEffectMapRevealPositive": {
+        "description": "Positive map reveal effect"
+    },
+    "npcEffectMapRevealNegative": "Fog of War: FOV shrunk to 1 tile for {count} moves!",
+    "@npcEffectMapRevealNegative": {
+        "description": "Negative map reveal effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "npcEffectDescMapRevealNegative": "FOV limited to 1 tile",
+    "@npcEffectDescMapRevealNegative": {
+        "description": "Description for negative map reveal"
+    },
+
+    "npcEffectNameMonsterRadar": "Monster Radar",
+    "@npcEffectNameMonsterRadar": {
+        "description": "Name for monster radar effect"
+    },
+    "npcEffectMonsterRadarPositive": "Monster Radar: All monsters within 10 tiles revealed!",
+    "@npcEffectMonsterRadarPositive": {
+        "description": "Positive monster radar effect"
+    },
+    "npcEffectMonsterRadarNegative": "Monster Cloak: Monsters within 10 tiles now invisible!",
+    "@npcEffectMonsterRadarNegative": {
+        "description": "Negative monster radar effect"
+    },
+    "npcEffectDescMonsterRadarNegative": "Nearby monsters invisible",
+    "@npcEffectDescMonsterRadarNegative": {
+        "description": "Description for negative monster radar"
+    },
+
+    "npcEffectNameHouseRadar": "House Radar",
+    "@npcEffectNameHouseRadar": {
+        "description": "Name for house radar effect"
+    },
+    "npcEffectHouseRadarPositive": "House Radar: Nearest house location revealed!",
+    "@npcEffectHouseRadarPositive": {
+        "description": "Positive house radar effect"
+    },
+    "npcEffectHouseRadarNegative": "Houses Cloaked: House cells hidden until stepped on!",
+    "@npcEffectHouseRadarNegative": {
+        "description": "Negative house radar effect"
+    },
+    "npcEffectDescHouseRadarNegative": "Houses appear as blank",
+    "@npcEffectDescHouseRadarNegative": {
+        "description": "Description for negative house radar"
+    },
+
+    "npcEffectNameTeleport": "Teleport",
+    "@npcEffectNameTeleport": {
+        "description": "Name for teleport effect"
+    },
+    "npcEffectTeleportPositive": "Far Teleport: Teleported to a distant location!",
+    "@npcEffectTeleportPositive": {
+        "description": "Positive teleport effect"
+    },
+    "npcEffectTeleportNegative": "Return: Teleported back to spawn point!",
+    "@npcEffectTeleportNegative": {
+        "description": "Negative teleport effect"
+    },
+
+    "npcEffectNameSpeedBoost": "Speed Boost",
+    "@npcEffectNameSpeedBoost": {
+        "description": "Name for speed boost effect"
+    },
+    "npcEffectSpeedBoostPositive": "Speed Boost: Move 2 cells per step for {count} moves!",
+    "@npcEffectSpeedBoostPositive": {
+        "description": "Positive speed boost effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "npcEffectSpeedBoostNegative": "Slow: Move only every 2 key presses for {count} moves!",
+    "@npcEffectSpeedBoostNegative": {
+        "description": "Negative speed boost effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "npcEffectDescSpeedBoostPositive": "Move 2 cells per step",
+    "@npcEffectDescSpeedBoostPositive": {
+        "description": "Description for positive speed boost"
+    },
+    "npcEffectDescSpeedBoostNegative": "Move every 2 presses",
+    "@npcEffectDescSpeedBoostNegative": {
+        "description": "Description for negative speed boost"
+    },
+
+    "npcEffectNameTeleportHouse": "Teleport to House",
+    "@npcEffectNameTeleportHouse": {
+        "description": "Name for teleport to house effect"
+    },
+    "npcEffectTeleportHousePositive": "House Teleport: Teleported to nearest house!",
+    "@npcEffectTeleportHousePositive": {
+        "description": "Positive teleport to house effect"
+    },
+    "npcEffectTeleportHouseNegative": "Boss Teleport: Teleported to nearest boss!",
+    "@npcEffectTeleportHouseNegative": {
+        "description": "Negative teleport to house effect"
+    },
+
+    "npcEffectNamePathfinder": "Pathfinder",
+    "@npcEffectNamePathfinder": {
+        "description": "Name for pathfinder effect"
+    },
+    "npcEffectPathfinderPositive": "Pathfinder: Shortest path to nearest house revealed!",
+    "@npcEffectPathfinderPositive": {
+        "description": "Positive pathfinder effect"
+    },
+    "npcEffectPathfinderNegative": "Lost: All houses removed from map!",
+    "@npcEffectPathfinderNegative": {
+        "description": "Negative pathfinder effect"
+    },
+
+    "npcEffectNameWeakenEnemies": "Weaken Enemies",
+    "@npcEffectNameWeakenEnemies": {
+        "description": "Name for weaken enemies effect"
+    },
+    "npcEffectWeakenEnemiesPositive": "Weaken Aura: Monsters in 10-tile radius get -30% FC!",
+    "@npcEffectWeakenEnemiesPositive": {
+        "description": "Positive weaken enemies effect"
+    },
+    "npcEffectWeakenEnemiesNegative": "Rage Aura: Monsters in 10-tile radius get +30% FC!",
+    "@npcEffectWeakenEnemiesNegative": {
+        "description": "Negative weaken enemies effect"
+    },
+
+    "npcEffectNameMonsterConversion": "Monster Conversion",
+    "@npcEffectNameMonsterConversion": {
+        "description": "Name for monster conversion effect"
+    },
+    "npcEffectMonsterConversionPositive": "Taming: {count} nearest monsters became NPCs!",
+    "@npcEffectMonsterConversionPositive": {
+        "description": "Positive monster conversion effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "npcEffectMonsterConversionNegative": "Corruption: {count} nearest NPCs became monsters!",
+    "@npcEffectMonsterConversionNegative": {
+        "description": "Negative monster conversion effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+
+    "npcEffectNameBossDowngrade": "Boss Downgrade",
+    "@npcEffectNameBossDowngrade": {
+        "description": "Name for boss downgrade effect"
+    },
+    "npcEffectBossDowngradePositive": "Demotion: Nearest boss became regular monster!",
+    "@npcEffectBossDowngradePositive": {
+        "description": "Positive boss downgrade effect"
+    },
+    "npcEffectBossDowngradeNegative": "Promotion: Nearest monster became boss!",
+    "@npcEffectBossDowngradeNegative": {
+        "description": "Negative boss downgrade effect"
+    },
+
+    "npcEffectNameMonsterFreeze": "Monster Freeze",
+    "@npcEffectNameMonsterFreeze": {
+        "description": "Name for monster freeze effect"
+    },
+    "npcEffectMonsterFreezePositive": "Fear Aura: Next monster will flee on contact!",
+    "@npcEffectMonsterFreezePositive": {
+        "description": "Positive monster freeze effect"
+    },
+    "npcEffectMonsterFreezeNegative": "Enrage: Next monster gets +50% FC!",
+    "@npcEffectMonsterFreezeNegative": {
+        "description": "Negative monster freeze effect"
+    },
+    "npcEffectDescMonsterFreezePositive": "Next monster flees",
+    "@npcEffectDescMonsterFreezePositive": {
+        "description": "Description for positive monster freeze"
+    },
+    "npcEffectDescMonsterFreezeNegative": "Next monster +50% FC",
+    "@npcEffectDescMonsterFreezeNegative": {
+        "description": "Description for negative monster freeze"
+    },
+
+    "npcEffectNameClearWave": "Clear Wave",
+    "@npcEffectNameClearWave": {
+        "description": "Name for clear wave effect"
+    },
+    "npcEffectClearWavePositive": "Purge: Monsters in 3-tile radius eliminated!",
+    "@npcEffectClearWavePositive": {
+        "description": "Positive clear wave effect"
+    },
+    "npcEffectClearWaveNegative": "Infestation: Monsters spawned in 3-tile radius!",
+    "@npcEffectClearWaveNegative": {
+        "description": "Negative clear wave effect"
+    },
+
+    "npcEffectNameMonsterMagnet": "Monster Magnet",
+    "@npcEffectNameMonsterMagnet": {
+        "description": "Name for monster magnet effect"
+    },
+    "npcEffectMonsterMagnetPositive": "Repel: Monsters in 5-tile radius moved away!",
+    "@npcEffectMonsterMagnetPositive": {
+        "description": "Positive monster magnet effect"
+    },
+    "npcEffectMonsterMagnetNegative": "Attract: Monsters in 5-tile radius moved closer!",
+    "@npcEffectMonsterMagnetNegative": {
+        "description": "Negative monster magnet effect"
+    },
+
+    "npcEffectNameNpcBlessingChain": "NPC Blessing Chain",
+    "@npcEffectNameNpcBlessingChain": {
+        "description": "Name for NPC blessing chain effect"
+    },
+    "npcEffectNpcBlessingChainPositive": "Blessing Chain: Next NPC encounter guaranteed positive!",
+    "@npcEffectNpcBlessingChainPositive": {
+        "description": "Positive NPC blessing chain effect"
+    },
+    "npcEffectNpcBlessingChainNegative": "Curse Chain: Next NPC encounter guaranteed negative!",
+    "@npcEffectNpcBlessingChainNegative": {
+        "description": "Negative NPC blessing chain effect"
+    },
+    "npcEffectDescNpcBlessingChainPositive": "Next NPC is positive",
+    "@npcEffectDescNpcBlessingChainPositive": {
+        "description": "Description for positive NPC blessing chain"
+    },
+    "npcEffectDescNpcBlessingChainNegative": "Next NPC is negative",
+    "@npcEffectDescNpcBlessingChainNegative": {
+        "description": "Description for negative NPC blessing chain"
+    },
+
+    "npcEffectNameNpcSpawn": "NPC Spawn",
+    "@npcEffectNameNpcSpawn": {
+        "description": "Name for NPC spawn effect"
+    },
+    "npcEffectNpcSpawnPositive": "NPC Spawn: {count} new NPCs appeared on the map!",
+    "@npcEffectNpcSpawnPositive": {
+        "description": "Positive NPC spawn effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "npcEffectNpcSpawnNegative": "NPC Removal: {count} NPCs vanished from the map!",
+    "@npcEffectNpcSpawnNegative": {
+        "description": "Negative NPC spawn effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+
+    "npcEffectNameNpcUpgrade": "NPC Upgrade",
+    "@npcEffectNameNpcUpgrade": {
+        "description": "Name for NPC upgrade effect"
+    },
+    "npcEffectNpcUpgradePositive": "Double Effect: Next NPC effect is doubled!",
+    "@npcEffectNpcUpgradePositive": {
+        "description": "Positive NPC upgrade effect"
+    },
+    "npcEffectNpcUpgradeNegative": "Reverse: Next NPC effect is reversed!",
+    "@npcEffectNpcUpgradeNegative": {
+        "description": "Negative NPC upgrade effect"
+    },
+    "npcEffectDescNpcUpgradePositive": "Next NPC effect 2x",
+    "@npcEffectDescNpcUpgradePositive": {
+        "description": "Description for positive NPC upgrade"
+    },
+    "npcEffectDescNpcUpgradeNegative": "Next NPC effect reversed",
+    "@npcEffectDescNpcUpgradeNegative": {
+        "description": "Description for negative NPC upgrade"
+    },
+
+    "npcEffectNameHouseSpawn": "House Spawn",
+    "@npcEffectNameHouseSpawn": {
+        "description": "Name for house spawn effect"
+    },
+    "npcEffectHouseSpawnPositive": "New Shelter: A house appeared nearby!",
+    "@npcEffectHouseSpawnPositive": {
+        "description": "Positive house spawn effect"
+    },
+    "npcEffectHouseSpawnNegative": "House Destroyed: Nearest house removed!",
+    "@npcEffectHouseSpawnNegative": {
+        "description": "Negative house spawn effect"
+    },
+
+    "npcEffectNameHouseUpgrade": "House Upgrade",
+    "@npcEffectNameHouseUpgrade": {
+        "description": "Name for house upgrade effect"
+    },
+    "npcEffectHouseUpgradePositive": "Enhanced Rest: Next house visit gives 2x benefit!",
+    "@npcEffectHouseUpgradePositive": {
+        "description": "Positive house upgrade effect"
+    },
+    "npcEffectHouseUpgradeNegative": "Poor Rest: Next house visit gives 0.5x benefit!",
+    "@npcEffectHouseUpgradeNegative": {
+        "description": "Negative house upgrade effect"
+    },
+    "npcEffectDescHouseUpgradePositive": "Next house 2x benefit",
+    "@npcEffectDescHouseUpgradePositive": {
+        "description": "Description for positive house upgrade"
+    },
+    "npcEffectDescHouseUpgradeNegative": "Next house 0.5x benefit",
+    "@npcEffectDescHouseUpgradeNegative": {
+        "description": "Description for negative house upgrade"
+    },
+
+    "npcEffectNameRiskReward": "Risk/Reward",
+    "@npcEffectNameRiskReward": {
+        "description": "Name for risk/reward effect"
+    },
+    "npcEffectRiskRewardPositive": "Risk Taker: +50% EXP but -20% FC for {count} battles!",
+    "@npcEffectRiskRewardPositive": {
+        "description": "Positive risk/reward effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "npcEffectRiskRewardNegative": "Safe Play: +20% FC but -50% EXP for {count} battles!",
+    "@npcEffectRiskRewardNegative": {
+        "description": "Negative risk/reward effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "npcEffectDescRiskRewardPositive": "+50% EXP, -20% FC",
+    "@npcEffectDescRiskRewardPositive": {
+        "description": "Description for positive risk/reward"
+    },
+    "npcEffectDescRiskRewardNegative": "+20% FC, -50% EXP",
+    "@npcEffectDescRiskRewardNegative": {
+        "description": "Description for negative risk/reward"
+    },
+
+    "npcEffectNameSacrifice": "Sacrifice",
+    "@npcEffectNameSacrifice": {
+        "description": "Name for sacrifice effect"
+    },
+    "npcEffectSacrificePositive": "Sacrifice: Lose 5% EXP now, +30% FC for {count} battles!",
+    "@npcEffectSacrificePositive": {
+        "description": "Positive sacrifice effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "npcEffectSacrificeNegative": "Dark Deal: Gain 5% EXP now, -30% FC for {count} battles!",
+    "@npcEffectSacrificeNegative": {
+        "description": "Negative sacrifice effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "npcEffectDescSacrificePositive": "+30% FC",
+    "@npcEffectDescSacrificePositive": {
+        "description": "Description for positive sacrifice"
+    },
+    "npcEffectDescSacrificeNegative": "-30% FC",
+    "@npcEffectDescSacrificeNegative": {
+        "description": "Description for negative sacrifice"
+    },
+
+    "npcEffectNameAllIn": "All-In",
+    "@npcEffectNameAllIn": {
+        "description": "Name for all-in effect"
+    },
+    "npcEffectAllInPositive": "Purification: Monsters in 5 tiles cleared + bonus EXP!",
+    "@npcEffectAllInPositive": {
+        "description": "Positive all-in effect"
+    },
+    "npcEffectAllInNegative": "Catastrophe: Extra boss spawned + EXP lost!",
+    "@npcEffectAllInNegative": {
+        "description": "Negative all-in effect"
+    },
+
+    "npcEffectNameMirror": "Mirror",
+    "@npcEffectNameMirror": {
+        "description": "Name for mirror effect"
+    },
+    "npcEffectMirrorPositive": "Mirror: Your FC doubled for next fight!",
+    "@npcEffectMirrorPositive": {
+        "description": "Positive mirror effect"
+    },
+    "npcEffectMirrorNegative": "Mirror: Next enemy copies your FC (50/50 chance)!",
+    "@npcEffectMirrorNegative": {
+        "description": "Negative mirror effect"
+    },
+    "npcEffectDescMirrorPositive": "2x FC next fight",
+    "@npcEffectDescMirrorPositive": {
+        "description": "Description for positive mirror"
+    },
+    "npcEffectDescMirrorNegative": "Enemy has your FC",
+    "@npcEffectDescMirrorNegative": {
+        "description": "Description for negative mirror"
+    },
+
+    "npcEffectNameCounterStack": "Counter Stack",
+    "@npcEffectNameCounterStack": {
+        "description": "Name for counter stack effect"
+    },
+    "npcEffectCounterStackPositive": "Momentum: Each step gives +1% FC up to {count} steps!",
+    "@npcEffectCounterStackPositive": {
+        "description": "Positive counter stack effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "npcEffectCounterStackNegative": "Fatigue: Each step gives -1% FC for {count} steps!",
+    "@npcEffectCounterStackNegative": {
+        "description": "Negative counter stack effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "npcEffectDescCounterStackPositive": "+{percent}% FC ({count} stacks)",
+    "@npcEffectDescCounterStackPositive": {
+        "description": "Description for positive counter stack",
+        "placeholders": {
+            "percent": { "type": "int" },
+            "count": { "type": "int" }
+        }
+    },
+    "npcEffectDescCounterStackNegative": "-{percent}% FC ({count} steps left)",
+    "@npcEffectDescCounterStackNegative": {
+        "description": "Description for negative counter stack",
+        "placeholders": {
+            "percent": { "type": "int" },
+            "count": { "type": "int" }
+        }
+    },
+
+    "npcEffectNameMapScramble": "Map Scramble",
+    "@npcEffectNameMapScramble": {
+        "description": "Name for map scramble effect"
+    },
+    "npcEffectMapScramblePositive": "Monster Shuffle: All monsters moved to new positions!",
+    "@npcEffectMapScramblePositive": {
+        "description": "Positive map scramble effect"
+    },
+    "npcEffectMapScrambleNegative": "NPC Shuffle: All NPCs moved to new positions!",
+    "@npcEffectMapScrambleNegative": {
+        "description": "Negative map scramble effect"
+    },
+
+    "npcEffectNameCellCounter": "Cell Counter",
+    "@npcEffectNameCellCounter": {
+        "description": "Name for cell counter effect"
+    },
+    "npcEffectCellCounterPositive": "Monster Count: {count} monsters remaining on map!",
+    "@npcEffectCellCounterPositive": {
+        "description": "Positive cell counter effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "npcEffectCellCounterNegative": "Confused Count: Roughly {count} monsters on map (maybe)!",
+    "@npcEffectCellCounterNegative": {
+        "description": "Negative cell counter effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+
+    "npcEffectNameProgressBoost": "Progress Boost",
+    "@npcEffectNameProgressBoost": {
+        "description": "Name for progress boost effect"
+    },
+    "npcEffectProgressBoostPositive": "Explorer: {count} random cells marked as explored!",
+    "@npcEffectProgressBoostPositive": {
+        "description": "Positive progress boost effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "npcEffectProgressBoostNegative": "Amnesia: {count} explored cells forgotten!",
+    "@npcEffectProgressBoostNegative": {
+        "description": "Negative progress boost effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
     }
 }
