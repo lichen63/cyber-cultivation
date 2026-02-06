@@ -691,6 +691,15 @@ class ExploreConstants {
   static const double bottomPanelPaddingH = 16.0;
   static const double bottomPanelFontSize = 14.0;
 
+  // Floating toast
+  static const Duration toastFadeInDuration = Duration(milliseconds: 300);
+  static const Duration toastDisplayDuration = Duration(milliseconds: 1200);
+  static const Duration toastFadeOutDuration = Duration(milliseconds: 500);
+  static const double toastFontSize = 16.0;
+  static const double toastPaddingH = 24.0;
+  static const double toastPaddingV = 12.0;
+  static const double toastBorderRadius = 12.0;
+
   // Fighting Capacity calculation
   static const double initialBasePower = 10.0;
   static const double levelGrowthFactor = 1.15;

@@ -317,7 +317,8 @@ class ExploreWindowContent extends StatefulWidget {
   State<ExploreWindowContent> createState() => _ExploreWindowContentState();
 }
 
-class _ExploreWindowContentState extends State<ExploreWindowContent> {
+class _ExploreWindowContentState extends State<ExploreWindowContent>
+    with TickerProviderStateMixin {
   late ExploreMap _map;
   late TransformationController _transformationController;
   final FocusNode _focusNode = FocusNode();
@@ -327,6 +328,11 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
 
   // Mutable state for exp changes during battles
   late double _currentExp;
+
+  // Floating toast animation
+  AnimationController? _toastController;
+  String _toastMessage = '';
+  Color _toastColor = Colors.white;
 
   // Battle service
   final BattleService _battleService = BattleService();
@@ -366,6 +372,7 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
 
   @override
   void dispose() {
+    _toastController?.dispose();
     _transformationController.dispose();
     _focusNode.dispose();
     // Note: Don't call ExploreWindowManager.clearWindow() here
@@ -495,16 +502,75 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
     );
   }
 
+  /// Show a floating toast message in the center of the screen
+  void _showFloatingToast(String message, {Color? color}) {
+    _toastController?.dispose();
+
+    final totalDuration =
+        ExploreConstants.toastFadeInDuration +
+        ExploreConstants.toastDisplayDuration +
+        ExploreConstants.toastFadeOutDuration;
+
+    _toastController = AnimationController(
+      vsync: this,
+      duration: totalDuration,
+    );
+
+    setState(() {
+      _toastMessage = message;
+      _toastColor = color ?? _colors.primaryText;
+    });
+
+    _toastController!.forward().then((_) {
+      if (mounted) {
+        setState(() {
+          _toastMessage = '';
+        });
+      }
+    });
+  }
+
+  /// Build the floating toast opacity based on animation progress
+  double _toastOpacity() {
+    final controller = _toastController;
+    if (controller == null ||
+        !controller.isAnimating && !controller.isCompleted) {
+      return 0.0;
+    }
+
+    final totalMs =
+        (ExploreConstants.toastFadeInDuration +
+                ExploreConstants.toastDisplayDuration +
+                ExploreConstants.toastFadeOutDuration)
+            .inMilliseconds;
+    final fadeInEnd =
+        ExploreConstants.toastFadeInDuration.inMilliseconds / totalMs;
+    final fadeOutStart =
+        (ExploreConstants.toastFadeInDuration +
+                ExploreConstants.toastDisplayDuration)
+            .inMilliseconds /
+        totalMs;
+
+    final t = controller.value;
+    if (t <= fadeInEnd) {
+      // Fade in
+      return (t / fadeInEnd).clamp(0.0, 1.0);
+    } else if (t <= fadeOutStart) {
+      // Fully visible
+      return 1.0;
+    } else {
+      // Fade out
+      return ((1.0 - t) / (1.0 - fadeOutStart)).clamp(0.0, 1.0);
+    }
+  }
+
   /// Handle stepping on a house cell
   void _handleHouseInteraction(int x, int y) {
     final l10n = AppLocalizations.of(context)!;
     if (_map.isHouseUsed(x, y)) {
-      // Already used this session
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.exploreHouseAlreadyUsed),
-          duration: const Duration(seconds: 2),
-        ),
+      _showFloatingToast(
+        l10n.exploreHouseAlreadyUsed,
+        color: _colors.secondaryText,
       );
     } else {
       // Restore AP and mark house as used
@@ -513,11 +579,9 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
       setState(() {
         _map.currentAP = (_map.currentAP + restored).clamp(0, _map.maxAP);
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.exploreHouseRestoreAp(restored)),
-          duration: const Duration(seconds: 2),
-        ),
+      _showFloatingToast(
+        l10n.exploreHouseRestoreAp(restored),
+        color: ExploreConstants.apColorHigh,
       );
     }
   }
@@ -1063,17 +1127,60 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
         focusNode: _focusNode,
         autofocus: true,
         onKeyEvent: _handleKeyEvent,
-        child: Column(
+        child: Stack(
           children: [
-            _buildHeader(l10n),
-            Expanded(
-              child: _isLoading
-                  ? Center(
-                      child: CircularProgressIndicator(color: _colors.accent),
-                    )
-                  : _buildMapView(),
+            Column(
+              children: [
+                _buildHeader(l10n),
+                Expanded(
+                  child: _isLoading
+                      ? Center(
+                          child: CircularProgressIndicator(
+                            color: _colors.accent,
+                          ),
+                        )
+                      : _buildMapView(),
+                ),
+                _buildBottomPanel(l10n),
+              ],
             ),
-            _buildBottomPanel(l10n),
+            // Floating toast overlay
+            if (_toastMessage.isNotEmpty && _toastController != null)
+              AnimatedBuilder(
+                animation: _toastController!,
+                builder: (context, child) {
+                  return Positioned.fill(
+                    child: IgnorePointer(
+                      child: Center(
+                        child: Opacity(
+                          opacity: _toastOpacity(),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: ExploreConstants.toastPaddingH,
+                              vertical: ExploreConstants.toastPaddingV,
+                            ),
+                            decoration: BoxDecoration(
+                              color: _colors.dialogBackground,
+                              borderRadius: BorderRadius.circular(
+                                ExploreConstants.toastBorderRadius,
+                              ),
+                              border: Border.all(color: _colors.border),
+                            ),
+                            child: Text(
+                              _toastMessage,
+                              style: TextStyle(
+                                color: _toastColor,
+                                fontSize: ExploreConstants.toastFontSize,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
           ],
         ),
       ),
