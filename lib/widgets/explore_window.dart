@@ -278,6 +278,19 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
 
   AppThemeColors get _colors => widget.themeColors;
 
+  /// Mark cells within the current FOV as visited (Manhattan distance)
+  void _updateVisitedCells() {
+    final fovRadius = ExploreConstants.defaultFovRadius;
+    final px = _map.playerX;
+    final py = _map.playerY;
+    for (int dy = -fovRadius; dy <= fovRadius; dy++) {
+      final remainingX = fovRadius - dy.abs();
+      for (int dx = -remainingX; dx <= remainingX; dx++) {
+        _map.markVisited(px + dx, py + dy);
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -303,6 +316,8 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
     if (widget.savedMapData != null) {
       try {
         _map = ExploreMap.fromJson(widget.savedMapData!);
+        // Mark current FOV as visited (in case of old saves without visited data)
+        _updateVisitedCells();
         // Center on player position when restoring
         WidgetsBinding.instance.addPostFrameCallback((_) {
           _centerOnPlayer();
@@ -315,8 +330,9 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
           playerLevel: widget.level,
           playerExp: widget.currentExp,
         );
+        _updateVisitedCells();
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          _centerOnGrid();
+          _centerOnPlayer();
         });
       }
     } else {
@@ -326,38 +342,15 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
         playerLevel: widget.level,
         playerExp: widget.currentExp,
       );
-      // Center the view on grid center initially
+      // Mark initial FOV as visited
+      _updateVisitedCells();
+      // Center the view on player initially (FOV is centered on player)
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _centerOnGrid();
+        _centerOnPlayer();
       });
     }
 
     setState(() => _isLoading = false);
-  }
-
-  void _centerOnGrid() {
-    final cellSize = ExploreConstants.cellSize;
-    final gridPixelSize = ExploreConstants.gridSize * cellSize;
-    final gridCenterX = gridPixelSize / 2;
-    final gridCenterY = gridPixelSize / 2;
-
-    // Get window size for center calculation
-    final size = MediaQuery.of(context).size;
-    final viewportCenterX = size.width / 2;
-    final viewportCenterY =
-        (size.height -
-            ExploreConstants.headerHeight -
-            ExploreConstants.bottomPanelHeight) /
-        2;
-
-    final matrix = Matrix4.identity()
-      ..setTranslationRaw(
-        viewportCenterX - gridCenterX,
-        viewportCenterY - gridCenterY,
-        0,
-      );
-
-    _transformationController.value = _clampMatrix(matrix);
   }
 
   void _centerOnPlayer() {
@@ -488,6 +481,7 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
 
     // Normal move
     if (_map.movePlayer(dx, dy)) {
+      _updateVisitedCells();
       setState(() {});
       _panToKeepPlayerVisible();
     }
@@ -660,6 +654,7 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
           type: ExploreCellType.blank,
         );
         _map.movePlayer(dx, dy);
+        _updateVisitedCells();
         _panToKeepPlayerVisible();
       });
     }
@@ -1103,7 +1098,11 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
           width: gridPixelSize,
           height: gridPixelSize,
           child: CustomPaint(
-            painter: ExploreMapPainter(map: _map, themeColors: _colors),
+            painter: ExploreMapPainter(
+              map: _map,
+              themeColors: _colors,
+              visitedCells: _map.visitedCells,
+            ),
             size: Size(gridPixelSize, gridPixelSize),
           ),
         ),
@@ -1112,29 +1111,66 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
   }
 }
 
-/// CustomPainter for rendering the explore map
+/// CustomPainter for rendering the explore map with field of view
 class ExploreMapPainter extends CustomPainter {
   final ExploreMap map;
   final AppThemeColors themeColors;
+  final Set<int> visitedCells;
 
-  ExploreMapPainter({required this.map, required this.themeColors});
+  ExploreMapPainter({
+    required this.map,
+    required this.themeColors,
+    required this.visitedCells,
+  });
+
+  /// Check if a cell is within the current FOV (Manhattan distance)
+  bool _isInFov(int x, int y, int playerX, int playerY, int fovRadius) {
+    return (x - playerX).abs() + (y - playerY).abs() <= fovRadius;
+  }
 
   @override
   void paint(Canvas canvas, Size size) {
     final cellSize = ExploreConstants.cellSize;
     final isDark = themeColors.brightness == Brightness.dark;
+    final fovRadius = ExploreConstants.defaultFovRadius;
+    final playerX = map.playerX;
+    final playerY = map.playerY;
+    final mapWidth = map.width;
 
-    // Draw grid background (theme-aware)
+    // Draw fog background over entire grid
+    final fogColor = isDark
+        ? ExploreConstants.fogColorDark
+        : ExploreConstants.fogColorLight;
+    final fogPaint = Paint()..color = fogColor;
+    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), fogPaint);
+
+    // Draw grid lines across entire grid so cell shapes are visible in fog
+    final fogGridLineColor = isDark
+        ? const Color(0xFF50506A) // Lighter than fog for contrast
+        : const Color(0xFF858598); // Darker than fog for contrast
+    final fogGridLinePaint = Paint()
+      ..color = fogGridLineColor
+      ..strokeWidth = ExploreConstants.gridLineWidth;
+
+    for (int i = 0; i <= ExploreConstants.gridSize; i++) {
+      final pos = i * cellSize;
+      canvas.drawLine(
+        Offset(0, pos),
+        Offset(size.width, pos),
+        fogGridLinePaint,
+      );
+      canvas.drawLine(
+        Offset(pos, 0),
+        Offset(pos, size.height),
+        fogGridLinePaint,
+      );
+    }
+
+    // Prepare paints
     final blankColor = isDark
         ? ExploreConstants.blankColorDark
         : ExploreConstants.blankColorLight;
-    final backgroundPaint = Paint()..color = blankColor;
-    canvas.drawRect(
-      Rect.fromLTWH(0, 0, size.width, size.height),
-      backgroundPaint,
-    );
-
-    // Draw grid lines (theme-aware)
+    final blankPaint = Paint()..color = blankColor;
     final gridLineColor = isDark
         ? ExploreConstants.gridLineColorDark
         : ExploreConstants.gridLineColorLight;
@@ -1142,15 +1178,111 @@ class ExploreMapPainter extends CustomPainter {
       ..color = gridLineColor
       ..strokeWidth = ExploreConstants.gridLineWidth;
 
-    for (int i = 0; i <= ExploreConstants.gridSize; i++) {
-      final pos = i * cellSize;
-      canvas.drawLine(Offset(0, pos), Offset(size.width, pos), gridLinePaint);
-      canvas.drawLine(Offset(pos, 0), Offset(pos, size.height), gridLinePaint);
+    // Bounding box for all visible cells (FOV + visited)
+    // Start with FOV bounds, then expand with visited cells
+    final fovMinX = (playerX - fovRadius).clamp(0, map.width - 1);
+    final fovMaxX = (playerX + fovRadius).clamp(0, map.width - 1);
+    final fovMinY = (playerY - fovRadius).clamp(0, map.height - 1);
+    final fovMaxY = (playerY + fovRadius).clamp(0, map.height - 1);
+
+    // Draw visited cells that are outside current FOV
+    for (final encoded in visitedCells) {
+      final vy = encoded ~/ mapWidth;
+      final vx = encoded % mapWidth;
+      if (_isInFov(vx, vy, playerX, playerY, fovRadius)) continue;
+
+      // Draw blank background for visited cell
+      final cellRect = Rect.fromLTWH(
+        vx * cellSize,
+        vy * cellSize,
+        cellSize,
+        cellSize,
+      );
+      canvas.drawRect(cellRect, blankPaint);
+
+      // Draw grid lines around this cell
+      canvas.drawLine(
+        Offset(vx * cellSize, vy * cellSize),
+        Offset((vx + 1) * cellSize, vy * cellSize),
+        gridLinePaint,
+      );
+      canvas.drawLine(
+        Offset(vx * cellSize, (vy + 1) * cellSize),
+        Offset((vx + 1) * cellSize, (vy + 1) * cellSize),
+        gridLinePaint,
+      );
+      canvas.drawLine(
+        Offset(vx * cellSize, vy * cellSize),
+        Offset(vx * cellSize, (vy + 1) * cellSize),
+        gridLinePaint,
+      );
+      canvas.drawLine(
+        Offset((vx + 1) * cellSize, vy * cellSize),
+        Offset((vx + 1) * cellSize, (vy + 1) * cellSize),
+        gridLinePaint,
+      );
+
+      // Draw cell content
+      final cell = map.grid[vy][vx];
+      if (cell.type != ExploreCellType.blank) {
+        final contentRect = Rect.fromLTWH(
+          vx * cellSize + 1,
+          vy * cellSize + 1,
+          cellSize - 2,
+          cellSize - 2,
+        );
+        final paint = Paint()..color = _getCellColor(cell.type, isDark);
+        canvas.drawRect(contentRect, paint);
+      }
     }
 
-    // Draw cells
-    for (int y = 0; y < map.height; y++) {
-      for (int x = 0; x < map.width; x++) {
+    // Draw current FOV cells (Manhattan distance diamond)
+    for (int y = fovMinY; y <= fovMaxY; y++) {
+      for (int x = fovMinX; x <= fovMaxX; x++) {
+        if (!_isInFov(x, y, playerX, playerY, fovRadius)) continue;
+
+        // Draw blank background
+        final cellRect = Rect.fromLTWH(
+          x * cellSize,
+          y * cellSize,
+          cellSize,
+          cellSize,
+        );
+        canvas.drawRect(cellRect, blankPaint);
+      }
+    }
+
+    // Draw grid lines for FOV area
+    for (int y = fovMinY; y <= fovMaxY; y++) {
+      for (int x = fovMinX; x <= fovMaxX; x++) {
+        if (!_isInFov(x, y, playerX, playerY, fovRadius)) continue;
+
+        final left = x * cellSize;
+        final top = y * cellSize;
+        final right = (x + 1) * cellSize;
+        final bottom = (y + 1) * cellSize;
+
+        // Draw cell borders (only on edges where neighbor is not in FOV)
+        canvas.drawLine(Offset(left, top), Offset(right, top), gridLinePaint);
+        canvas.drawLine(
+          Offset(left, bottom),
+          Offset(right, bottom),
+          gridLinePaint,
+        );
+        canvas.drawLine(Offset(left, top), Offset(left, bottom), gridLinePaint);
+        canvas.drawLine(
+          Offset(right, top),
+          Offset(right, bottom),
+          gridLinePaint,
+        );
+      }
+    }
+
+    // Draw cell contents in FOV
+    for (int y = fovMinY; y <= fovMaxY; y++) {
+      for (int x = fovMinX; x <= fovMaxX; x++) {
+        if (!_isInFov(x, y, playerX, playerY, fovRadius)) continue;
+
         final cell = map.grid[y][x];
         if (cell.type == ExploreCellType.blank) continue;
 
@@ -1166,8 +1298,8 @@ class ExploreMapPainter extends CustomPainter {
       }
     }
 
-    // Draw player
-    _drawPlayer(canvas, map.playerX, map.playerY, cellSize);
+    // Draw player (always visible)
+    _drawPlayer(canvas, playerX, playerY, cellSize);
   }
 
   Color _getCellColor(ExploreCellType type, bool isDark) {
@@ -1217,6 +1349,7 @@ class ExploreMapPainter extends CustomPainter {
   @override
   bool shouldRepaint(ExploreMapPainter oldDelegate) {
     return oldDelegate.map.playerX != map.playerX ||
-        oldDelegate.map.playerY != map.playerY;
+        oldDelegate.map.playerY != map.playerY ||
+        oldDelegate.visitedCells.length != visitedCells.length;
   }
 }

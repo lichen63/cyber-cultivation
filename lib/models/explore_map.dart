@@ -49,6 +49,9 @@ class ExploreMap {
   /// Stored for potential future use
   final double generatedAtExp;
 
+  /// Set of cells the player has visited/seen (encoded as y * width + x)
+  final Set<int> visitedCells;
+
   ExploreMap({
     required this.grid,
     required this.width,
@@ -57,7 +60,18 @@ class ExploreMap {
     required this.playerY,
     required this.generatedAtLevel,
     required this.generatedAtExp,
-  });
+    Set<int>? visitedCells,
+  }) : visitedCells = visitedCells ?? {};
+
+  /// Mark a cell as visited
+  void markVisited(int x, int y) {
+    if (x >= 0 && x < width && y >= 0 && y < height) {
+      visitedCells.add(y * width + x);
+    }
+  }
+
+  /// Check if a cell has been visited
+  bool isVisited(int x, int y) => visitedCells.contains(y * width + x);
 
   /// Convert to JSON for serialization
   Map<String, dynamic> toJson() => {
@@ -67,6 +81,7 @@ class ExploreMap {
     'playerY': playerY,
     'generatedAtLevel': generatedAtLevel,
     'generatedAtExp': generatedAtExp,
+    'visitedCells': visitedCells.toList(),
     'grid': grid
         .map((row) => row.map((cell) => cell.toJson()).toList())
         .toList(),
@@ -83,6 +98,12 @@ class ExploreMap {
       }).toList();
     }).toList();
 
+    // Restore visited cells if available
+    final visitedJson = json['visitedCells'] as List<dynamic>?;
+    final visitedSet = visitedJson != null
+        ? visitedJson.map((e) => e as int).toSet()
+        : <int>{};
+
     return ExploreMap(
       grid: grid,
       width: width,
@@ -92,6 +113,7 @@ class ExploreMap {
       // Default to level 1 and exp 0 for backward compatibility with old saves
       generatedAtLevel: json['generatedAtLevel'] as int? ?? 1,
       generatedAtExp: (json['generatedAtExp'] as num?)?.toDouble() ?? 0.0,
+      visitedCells: visitedSet,
     );
   }
 

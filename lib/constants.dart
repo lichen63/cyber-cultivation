@@ -632,6 +632,11 @@ class ExploreConstants {
   static const double gridLineWidth = 0.5;
   static const double playerCellScale = 1.2; // Player slightly larger than cell
 
+  // Field of View (FOV) - only cells within this Manhattan distance are visible
+  static const int defaultFovRadius = 5;
+  static const Color fogColorDark = Color(0xFF3A3A4A); // Dark grey
+  static const Color fogColorLight = Color(0xFF9E9EAE); // Medium grey
+
   // Map generation - target percentages (of total cells)
   static const double mountainTargetPercent = 0.25; // 20% mountains
   static const double riverTargetPercent = 0.10; // 5% rivers
