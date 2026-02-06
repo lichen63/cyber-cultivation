@@ -127,6 +127,7 @@ Future<void> showExploreWindow({
   required int level,
   required double currentExp,
   required double maxExp,
+  String? locale,
 }) async {
   // Check what sub-windows actually exist
   final existingWindows = await DesktopMultiWindow.getAllSubWindowIds();
@@ -149,9 +150,10 @@ Future<void> showExploreWindow({
     }
   }
 
-  // Pass theme data, level/exp, and saved map data to the new window
+  // Pass theme data, locale, level/exp, and saved map data to the new window
   final argsMap = <String, dynamic>{
     'themeMode': themeColors.brightness == Brightness.dark ? 'dark' : 'light',
+    'locale': locale,
     'level': level,
     'currentExp': currentExp.isInfinite ? 0.0 : currentExp,
     'maxExp': maxExp.isInfinite ? 1.0 : maxExp,
@@ -205,6 +207,7 @@ class ExploreWindowApp extends StatefulWidget {
 
 class _ExploreWindowAppState extends State<ExploreWindowApp> {
   late AppThemeColors _themeColors;
+  Locale? _locale;
 
   @override
   void initState() {
@@ -214,7 +217,12 @@ class _ExploreWindowAppState extends State<ExploreWindowApp> {
         : AppThemeMode.light;
     _themeColors = AppThemeColors.fromMode(themeMode);
 
-    // Listen for theme change messages from the main window
+    final localeStr = widget.args['locale'] as String?;
+    if (localeStr != null) {
+      _locale = Locale(localeStr);
+    }
+
+    // Listen for theme/locale change messages from the main window
     DesktopMultiWindow.setMethodHandler((call, fromWindowId) async {
       if (call.method == 'themeChanged') {
         final newThemeMode = call.arguments == 'dark'
@@ -222,6 +230,14 @@ class _ExploreWindowAppState extends State<ExploreWindowApp> {
             : AppThemeMode.light;
         setState(() {
           _themeColors = AppThemeColors.fromMode(newThemeMode);
+        });
+        return 'ok';
+      } else if (call.method == 'localeChanged') {
+        final newLocale = call.arguments as String?;
+        setState(() {
+          _locale = (newLocale != null && newLocale.isNotEmpty)
+              ? Locale(newLocale)
+              : null;
         });
         return 'ok';
       }
@@ -252,6 +268,7 @@ class _ExploreWindowAppState extends State<ExploreWindowApp> {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: AppLocalizations.supportedLocales,
+      locale: _locale,
       home: ExploreWindowContent(
         themeColors: _themeColors,
         windowId: widget.windowId,

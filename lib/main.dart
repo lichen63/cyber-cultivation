@@ -1112,6 +1112,7 @@ class _MyHomePageState extends State<MyHomePage>
       level: _level,
       currentExp: _currentExp,
       maxExp: _maxExp,
+      locale: _language,
     );
   }
 
@@ -1121,6 +1122,14 @@ class _MyHomePageState extends State<MyHomePage>
     if (windowId != null) {
       final themeStr = mode == AppThemeMode.dark ? 'dark' : 'light';
       DesktopMultiWindow.invokeMethod(windowId, 'themeChanged', themeStr);
+    }
+  }
+
+  /// Notify the explore sub-window about a locale change
+  void _notifyExploreWindowLocaleChanged(String? locale) {
+    final windowId = ExploreWindowManager.windowId;
+    if (windowId != null) {
+      DesktopMultiWindow.invokeMethod(windowId, 'localeChanged', locale ?? '');
     }
   }
 
@@ -1187,6 +1196,8 @@ class _MyHomePageState extends State<MyHomePage>
         onLanguageChanged: (value) {
           setState(() => _language = value);
           widget.onLanguageChanged?.call(value);
+          // Notify explore window (if open) about locale change
+          _notifyExploreWindowLocaleChanged(value);
           _saveGameData();
         },
         onThemeModeChanged: (value) {
