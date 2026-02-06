@@ -23,6 +23,7 @@ class ExploreWindowManager {
   static int? _windowId;
   static Map<String, dynamic>? _savedMapData;
   static ExpChangeCallback? _onExpChanged;
+  static VoidCallback? _onMapDataChanged;
 
   static bool get isWindowOpen => _windowId != null;
 
@@ -35,9 +36,15 @@ class ExploreWindowManager {
   /// Get saved map data for restoring previous progress
   static Map<String, dynamic>? get savedMapData => _savedMapData;
 
+  /// Set saved map data (e.g. restored from persistent storage)
+  static void setSavedMapData(Map<String, dynamic>? data) {
+    _savedMapData = data;
+  }
+
   /// Clear saved map data
   static void clearSavedMapData() {
     _savedMapData = null;
+    _onMapDataChanged?.call();
   }
 
   /// Clear window ID - call this when window is closed
@@ -48,6 +55,11 @@ class ExploreWindowManager {
   /// Register a callback to be notified when EXP changes in explore window
   static void setExpChangeCallback(ExpChangeCallback? callback) {
     _onExpChanged = callback;
+  }
+
+  /// Register a callback to be notified when map data changes
+  static void setMapDataChangedCallback(VoidCallback? callback) {
+    _onMapDataChanged = callback;
   }
 
   /// Setup method handler to receive messages from sub-windows (main window only)
@@ -92,6 +104,7 @@ class ExploreWindowManager {
             }
             // Store map data (without currentExp, it's in the map's own data)
             _savedMapData = data['mapData'] as Map<String, dynamic>?;
+            _onMapDataChanged?.call();
           }
           // Close the sub-window from main window to avoid race conditions
           await _closeSubWindow(fromWindowId);

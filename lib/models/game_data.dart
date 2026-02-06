@@ -28,6 +28,7 @@ class GameData {
   final int defaultPomodoroDuration;
   final int defaultPomodoroRelax;
   final int defaultPomodoroLoops;
+  final Map<String, dynamic>? exploreMapData;
 
   GameData({
     required this.level,
@@ -55,6 +56,7 @@ class GameData {
     this.defaultPomodoroDuration = AppConstants.defaultPomodoroDuration,
     this.defaultPomodoroRelax = AppConstants.defaultRelaxDuration,
     this.defaultPomodoroLoops = AppConstants.defaultPomodoroLoops,
+    this.exploreMapData,
   }) : dailyStats = dailyStats ?? {},
        todos = todos ?? [],
        menuBarSettings = menuBarSettings ?? const MenuBarSettings();
@@ -86,6 +88,7 @@ class GameData {
       'defaultPomodoroDuration': defaultPomodoroDuration,
       'defaultPomodoroRelax': defaultPomodoroRelax,
       'defaultPomodoroLoops': defaultPomodoroLoops,
+      'exploreMapData': exploreMapData,
     };
   }
 
@@ -135,6 +138,7 @@ class GameData {
       defaultPomodoroLoops:
           json['defaultPomodoroLoops'] as int? ??
           AppConstants.defaultPomodoroLoops,
+      exploreMapData: json['exploreMapData'] as Map<String, dynamic>?,
     );
   }
 
@@ -168,6 +172,7 @@ class GameData {
     int? defaultPomodoroDuration,
     int? defaultPomodoroRelax,
     int? defaultPomodoroLoops,
+    Map<String, dynamic>? exploreMapData,
   }) {
     return GameData(
       level: level ?? this.level,
@@ -197,6 +202,7 @@ class GameData {
           defaultPomodoroDuration ?? this.defaultPomodoroDuration,
       defaultPomodoroRelax: defaultPomodoroRelax ?? this.defaultPomodoroRelax,
       defaultPomodoroLoops: defaultPomodoroLoops ?? this.defaultPomodoroLoops,
+      exploreMapData: exploreMapData ?? this.exploreMapData,
     );
   }
 }

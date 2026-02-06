@@ -689,6 +689,12 @@ class _MyHomePageState extends State<MyHomePage>
         _saveGameData();
       }
     });
+
+    // Persist explore map data when it changes (saved or cleared)
+    ExploreWindowManager.setMapDataChangedCallback(() {
+      if (!mounted) return;
+      _saveGameData(immediate: true);
+    });
   }
 
   void _initializeServices() {
@@ -760,6 +766,7 @@ class _MyHomePageState extends State<MyHomePage>
   @override
   void dispose() {
     ExploreWindowManager.setExpChangeCallback(null);
+    ExploreWindowManager.setMapDataChangedCallback(null);
     _pomodoroService.removeListener(_onPomodoroStateChanged);
     _pomodoroService.dispose();
     _inputMonitorService.removeListener(_onInputMonitorChanged);
@@ -861,6 +868,9 @@ class _MyHomePageState extends State<MyHomePage>
       _defaultPomodoroRelax = data.defaultPomodoroRelax;
       _defaultPomodoroLoops = data.defaultPomodoroLoops;
 
+      // Restore explore map data from save
+      ExploreWindowManager.setSavedMapData(data.exploreMapData);
+
       if (_level >= AppConstants.maxLevel) {
         _currentExp = double.infinity;
         _maxExp = double.infinity;
@@ -922,6 +932,7 @@ class _MyHomePageState extends State<MyHomePage>
           defaultPomodoroDuration: _defaultPomodoroDuration,
           defaultPomodoroRelax: _defaultPomodoroRelax,
           defaultPomodoroLoops: _defaultPomodoroLoops,
+          exploreMapData: ExploreWindowManager.savedMapData,
         ),
       );
     }
