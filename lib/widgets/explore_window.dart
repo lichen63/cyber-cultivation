@@ -12,8 +12,10 @@ import '../constants.dart';
 import '../l10n/app_localizations.dart';
 import '../models/battle_result.dart';
 import '../models/explore_map.dart';
+import '../models/npc_effect.dart';
 import 'battle_dialog.dart';
 import 'explore_debug_dialog.dart';
+import 'npc_effect_dialog.dart';
 
 /// Callback type for EXP changes from explore window
 typedef ExpChangeCallback = void Function(double newExp);
@@ -339,6 +341,9 @@ class _ExploreWindowContentState extends State<ExploreWindowContent>
   // Battle service
   final BattleService _battleService = BattleService();
 
+  // NPC effect service
+  final NpcEffectService _npcEffectService = NpcEffectService();
+
   /// Track current theme colors locally so we react to parent rebuilds
   late AppThemeColors _colors;
 
@@ -592,6 +597,91 @@ class _ExploreWindowContentState extends State<ExploreWindowContent>
     }
   }
 
+  /// Handle stepping on an NPC cell — generate and apply a random effect
+  Future<void> _handleNpcInteraction() async {
+    final l10n = AppLocalizations.of(context)!;
+    final effect = _npcEffectService.generateEffect(
+      currentExp: _currentExp,
+      maxExp: widget.maxExp,
+    );
+
+    // Get effect description for the dialog
+    final description = _getNpcEffectDescription(effect, l10n);
+
+    // Apply immediate EXP changes for instant effects
+    final expChange = _npcEffectService.calculateImmediateExpChange(
+      effect,
+      _currentExp,
+      widget.maxExp,
+    );
+    if (expChange != 0.0) {
+      _applyBattleExpChange(expChange);
+    }
+
+    // Add duration-based effects to the active effects list
+    if (effect.type == NpcEffectType.expMultiplier ||
+        effect.type == NpcEffectType.expInsurance ||
+        effect.type == NpcEffectType.expFloor) {
+      setState(() {
+        _map.activeEffects.add(effect);
+      });
+    }
+
+    // Show encounter dialog
+    if (!mounted) return;
+    await showNpcEncounterDialog(
+      context: context,
+      effect: effect,
+      effectDescription: description,
+      colors: _colors,
+      l10n: l10n,
+    );
+  }
+
+  /// Get localized description string for an NPC effect
+  String _getNpcEffectDescription(NpcEffect effect, AppLocalizations l10n) {
+    switch (effect.type) {
+      case NpcEffectType.expGiftSteal:
+        final expChange = _npcEffectService.calculateImmediateExpChange(
+          effect,
+          _currentExp,
+          widget.maxExp,
+        );
+        final amount = NumberFormatter.format(expChange.abs());
+        return effect.isPositive
+            ? l10n.npcEffectExpGiftPositive(amount)
+            : l10n.npcEffectExpStealNegative(amount);
+
+      case NpcEffectType.expMultiplier:
+        return effect.isPositive
+            ? l10n.npcEffectExpMultiplierPositive(
+                NpcEffectConstants.multiplierDurationBattles,
+              )
+            : l10n.npcEffectExpMultiplierNegative(
+                NpcEffectConstants.multiplierDurationBattles,
+              );
+
+      case NpcEffectType.expInsurance:
+        return effect.isPositive
+            ? l10n.npcEffectExpInsurancePositive
+            : l10n.npcEffectExpInsuranceNegative;
+
+      case NpcEffectType.expFloor:
+        return effect.isPositive
+            ? l10n.npcEffectExpFloorPositive(
+                NpcEffectConstants.floorDurationBattles,
+              )
+            : l10n.npcEffectExpFloorNegative(
+                NpcEffectConstants.floorDurationBattles,
+              );
+
+      case NpcEffectType.expGamble:
+        return effect.isPositive
+            ? l10n.npcEffectExpGamblePositive
+            : l10n.npcEffectExpGambleNegative;
+    }
+  }
+
   void _centerOnPlayer() {
     final cellSize = ExploreConstants.cellSize;
     final playerCenterX = _map.playerX * cellSize + cellSize / 2;
@@ -729,6 +819,7 @@ class _ExploreWindowContentState extends State<ExploreWindowContent>
         _updateVisitedCells();
         setState(() {});
         _panToKeepPlayerVisible();
+        _handleNpcInteraction();
       }
       return;
     }
@@ -894,12 +985,25 @@ class _ExploreWindowContentState extends State<ExploreWindowContent>
     final l10n = AppLocalizations.of(context)!;
     final outcome = _judgeBattleOutcome(playerFC, enemyFC);
 
-    final expChange = _battleService.calculateExpChange(
+    var expChange = _battleService.calculateExpChange(
       outcome,
       enemyCell.type,
       _currentExp,
       widget.maxExp,
     );
+
+    // Apply active NPC effects to the EXP change
+    expChange = _npcEffectService.applyBattleEffects(
+      baseExpChange: expChange,
+      isVictory: outcome == BattleOutcome.victory,
+      currentExp: _currentExp,
+      activeEffects: _map.activeEffects,
+    );
+
+    // Consume battle charges from duration-based effects and remove expired
+    setState(() {
+      _npcEffectService.consumeBattleCharges(_map.activeEffects);
+    });
 
     final result = BattleResult(
       enemyType: enemyCell.type,
@@ -1495,7 +1599,63 @@ class _ExploreWindowContentState extends State<ExploreWindowContent>
               ),
             ),
             const Spacer(),
+            // Active Effects button
+            _buildEffectsButton(l10n),
           ],
+        ),
+      ),
+    );
+  }
+
+  /// Build the active effects button for the bottom panel
+  Widget _buildEffectsButton(AppLocalizations l10n) {
+    final effectCount = _map.activeEffects.length;
+    final hasEffects = effectCount > 0;
+
+    return Tooltip(
+      message: l10n.npcEffectsButtonTooltip,
+      child: InkWell(
+        onTap: () {
+          showActiveEffectsDialog(
+            context: context,
+            effects: _map.activeEffects,
+            colors: _colors,
+            l10n: l10n,
+          );
+        },
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: hasEffects
+                ? _colors.accent.withValues(alpha: 0.15)
+                : _colors.overlay,
+            borderRadius: BorderRadius.circular(8),
+            border: hasEffects
+                ? Border.all(color: _colors.accent.withValues(alpha: 0.4))
+                : null,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.auto_awesome,
+                color: hasEffects ? _colors.accent : _colors.secondaryText,
+                size: 16,
+              ),
+              if (hasEffects) ...[
+                const SizedBox(width: 4),
+                Text(
+                  '$effectCount',
+                  style: TextStyle(
+                    color: _colors.accent,
+                    fontSize: ExploreConstants.bottomPanelFontSize,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ],
+          ),
         ),
       ),
     );

@@ -2,6 +2,7 @@ import 'dart:collection';
 import 'dart:math';
 
 import '../constants.dart';
+import 'npc_effect.dart';
 
 /// Types of cells in the explore map
 enum ExploreCellType { blank, mountain, river, house, monster, boss, npc }
@@ -61,6 +62,9 @@ class ExploreMap {
   /// Set of house positions already used this session (encoded as y * width + x)
   final Set<int> usedHouses;
 
+  /// List of active NPC effects on the player
+  final List<NpcEffect> activeEffects;
+
   ExploreMap({
     required this.grid,
     required this.width,
@@ -73,8 +77,10 @@ class ExploreMap {
     this.currentAP = 0,
     this.maxAP = 0,
     Set<int>? usedHouses,
+    List<NpcEffect>? activeEffects,
   }) : visitedCells = visitedCells ?? {},
-       usedHouses = usedHouses ?? {};
+       usedHouses = usedHouses ?? {},
+       activeEffects = activeEffects ?? [];
 
   /// Mark a cell as visited
   void markVisited(int x, int y) {
@@ -112,6 +118,7 @@ class ExploreMap {
     'currentAP': currentAP,
     'maxAP': maxAP,
     'usedHouses': usedHouses.toList(),
+    'activeEffects': activeEffects.map((e) => e.toJson()).toList(),
     'grid': grid
         .map((row) => row.map((cell) => cell.toJson()).toList())
         .toList(),
@@ -140,6 +147,14 @@ class ExploreMap {
         ? usedHousesJson.map((e) => e as int).toSet()
         : <int>{};
 
+    // Restore active NPC effects if available
+    final effectsJson = json['activeEffects'] as List<dynamic>?;
+    final effectsList = effectsJson != null
+        ? effectsJson
+              .map((e) => NpcEffect.fromJson(e as Map<String, dynamic>))
+              .toList()
+        : <NpcEffect>[];
+
     return ExploreMap(
       grid: grid,
       width: width,
@@ -153,6 +168,7 @@ class ExploreMap {
       currentAP: json['currentAP'] as int? ?? 0,
       maxAP: json['maxAP'] as int? ?? 0,
       usedHouses: usedHousesSet,
+      activeEffects: effectsList,
     );
   }
 

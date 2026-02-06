@@ -792,3 +792,51 @@ class NumberFormatter {
     }
   }
 }
+
+/// Constants for NPC effect system
+class NpcEffectConstants {
+  // EXP gift/steal: percentage range of maxExp
+  static const double giftStealMinPercent = 0.05; // 5%
+  static const double giftStealMaxPercent = 0.10; // 10%
+
+  // EXP multiplier
+  static const double positiveMultiplier = 2.0; // 2x EXP
+  static const double negativeMultiplier = 0.5; // 0.5x EXP
+  static const int multiplierDurationBattles = 3;
+
+  // EXP insurance
+  static const int insuranceDurationBattles = 1;
+
+  // EXP floor/ceiling
+  static const int floorDurationBattles = 3;
+
+  // EXP gamble
+  static const double gambleHalveFraction = 0.5;
+
+  // Effect dialog styling
+  static const double effectDialogMaxWidth = 400.0;
+  static const double effectDialogMaxHeight = 500.0;
+  static const double effectDialogPadding = 20.0;
+  static const double effectDialogBorderRadius = 16.0;
+  static const double effectDialogIconSize = 40.0;
+  static const double effectDialogTitleFontSize = 18.0;
+  static const double effectDialogDescFontSize = 13.0;
+  static const double effectItemPaddingH = 12.0;
+  static const double effectItemPaddingV = 10.0;
+  static const double effectItemBorderRadius = 10.0;
+  static const double effectItemIconSize = 20.0;
+  static const double effectItemTitleFontSize = 13.0;
+  static const double effectItemDetailFontSize = 11.0;
+
+  // NPC encounter dialog styling
+  static const double npcDialogWidth = 320.0;
+  static const double npcDialogPadding = 24.0;
+  static const double npcDialogBorderRadius = 16.0;
+  static const double npcDialogIconSize = 48.0;
+  static const double npcDialogTitleFontSize = 20.0;
+  static const double npcDialogDescFontSize = 14.0;
+
+  // Colors
+  static const Color positiveEffectColor = Color(0xFF4CAF50);
+  static const Color negativeEffectColor = Color(0xFFF44336);
+}

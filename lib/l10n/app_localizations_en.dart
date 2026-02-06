@@ -606,4 +606,102 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get exploreDebugMapRegenerated => 'Map regenerated.';
+
+  @override
+  String get npcEncounterTitle => 'NPC Encounter';
+
+  @override
+  String get npcEffectPositive => 'A traveler shares their blessing with you!';
+
+  @override
+  String get npcEffectNegative => 'A traveler places a curse upon you!';
+
+  @override
+  String npcEffectExpGiftPositive(String amount) {
+    return 'EXP Gift: +$amount EXP';
+  }
+
+  @override
+  String npcEffectExpStealNegative(String amount) {
+    return 'EXP Stolen: -$amount EXP';
+  }
+
+  @override
+  String npcEffectExpMultiplierPositive(int count) {
+    return 'EXP Boost: Next $count battles give 2x EXP!';
+  }
+
+  @override
+  String npcEffectExpMultiplierNegative(int count) {
+    return 'EXP Curse: Next $count battles give 0.5x EXP!';
+  }
+
+  @override
+  String get npcEffectExpInsurancePositive =>
+      'EXP Insurance: Next loss will have no EXP penalty!';
+
+  @override
+  String get npcEffectExpInsuranceNegative =>
+      'EXP Curse: Next win will give no EXP reward!';
+
+  @override
+  String npcEffectExpFloorPositive(int count) {
+    return 'EXP Shield: EXP can\'t drop below current value for $count battles!';
+  }
+
+  @override
+  String npcEffectExpFloorNegative(int count) {
+    return 'EXP Ceiling: EXP can\'t gain above current value for $count battles!';
+  }
+
+  @override
+  String get npcEffectExpGamblePositive => 'Lucky Gamble: EXP doubled!';
+
+  @override
+  String get npcEffectExpGambleNegative => 'Unlucky Gamble: EXP halved!';
+
+  @override
+  String get npcEffectsButtonTooltip => 'Active Effects';
+
+  @override
+  String get npcEffectsDialogTitle => 'Active Effects';
+
+  @override
+  String get npcEffectsEmpty => 'No active effects.';
+
+  @override
+  String npcEffectRemainingBattles(int count) {
+    return '$count battles remaining';
+  }
+
+  @override
+  String get npcEffectNameExpMultiplier => 'EXP Multiplier';
+
+  @override
+  String get npcEffectNameExpInsurance => 'EXP Insurance';
+
+  @override
+  String get npcEffectNameExpFloor => 'EXP Floor';
+
+  @override
+  String get npcEffectDescMultiplierPositive => '2x EXP from battles';
+
+  @override
+  String get npcEffectDescMultiplierNegative => '0.5x EXP from battles';
+
+  @override
+  String get npcEffectDescInsurancePositive => 'No EXP penalty on next loss';
+
+  @override
+  String get npcEffectDescInsuranceNegative => 'No EXP reward on next win';
+
+  @override
+  String npcEffectDescFloorPositive(String value) {
+    return 'EXP can\'t drop below $value';
+  }
+
+  @override
+  String npcEffectDescFloorNegative(String value) {
+    return 'EXP can\'t gain above $value';
+  }
 }

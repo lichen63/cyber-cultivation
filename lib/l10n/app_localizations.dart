@@ -1249,6 +1249,162 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Map regenerated.'**
   String get exploreDebugMapRegenerated;
+
+  /// Title for NPC encounter dialog
+  ///
+  /// In en, this message translates to:
+  /// **'NPC Encounter'**
+  String get npcEncounterTitle;
+
+  /// Message when NPC gives positive effect
+  ///
+  /// In en, this message translates to:
+  /// **'A traveler shares their blessing with you!'**
+  String get npcEffectPositive;
+
+  /// Message when NPC gives negative effect
+  ///
+  /// In en, this message translates to:
+  /// **'A traveler places a curse upon you!'**
+  String get npcEffectNegative;
+
+  /// Positive EXP gift effect
+  ///
+  /// In en, this message translates to:
+  /// **'EXP Gift: +{amount} EXP'**
+  String npcEffectExpGiftPositive(String amount);
+
+  /// Negative EXP steal effect
+  ///
+  /// In en, this message translates to:
+  /// **'EXP Stolen: -{amount} EXP'**
+  String npcEffectExpStealNegative(String amount);
+
+  /// Positive EXP multiplier effect
+  ///
+  /// In en, this message translates to:
+  /// **'EXP Boost: Next {count} battles give 2x EXP!'**
+  String npcEffectExpMultiplierPositive(int count);
+
+  /// Negative EXP multiplier effect
+  ///
+  /// In en, this message translates to:
+  /// **'EXP Curse: Next {count} battles give 0.5x EXP!'**
+  String npcEffectExpMultiplierNegative(int count);
+
+  /// Positive EXP insurance effect
+  ///
+  /// In en, this message translates to:
+  /// **'EXP Insurance: Next loss will have no EXP penalty!'**
+  String get npcEffectExpInsurancePositive;
+
+  /// Negative EXP insurance effect
+  ///
+  /// In en, this message translates to:
+  /// **'EXP Curse: Next win will give no EXP reward!'**
+  String get npcEffectExpInsuranceNegative;
+
+  /// Positive EXP floor effect
+  ///
+  /// In en, this message translates to:
+  /// **'EXP Shield: EXP can\'t drop below current value for {count} battles!'**
+  String npcEffectExpFloorPositive(int count);
+
+  /// Negative EXP floor effect
+  ///
+  /// In en, this message translates to:
+  /// **'EXP Ceiling: EXP can\'t gain above current value for {count} battles!'**
+  String npcEffectExpFloorNegative(int count);
+
+  /// Positive EXP gamble effect
+  ///
+  /// In en, this message translates to:
+  /// **'Lucky Gamble: EXP doubled!'**
+  String get npcEffectExpGamblePositive;
+
+  /// Negative EXP gamble effect
+  ///
+  /// In en, this message translates to:
+  /// **'Unlucky Gamble: EXP halved!'**
+  String get npcEffectExpGambleNegative;
+
+  /// Tooltip for the effects button in bottom panel
+  ///
+  /// In en, this message translates to:
+  /// **'Active Effects'**
+  String get npcEffectsButtonTooltip;
+
+  /// Title for the active effects dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Active Effects'**
+  String get npcEffectsDialogTitle;
+
+  /// Message when there are no active effects
+  ///
+  /// In en, this message translates to:
+  /// **'No active effects.'**
+  String get npcEffectsEmpty;
+
+  /// Shows remaining battles for duration-based effects
+  ///
+  /// In en, this message translates to:
+  /// **'{count} battles remaining'**
+  String npcEffectRemainingBattles(int count);
+
+  /// Name for EXP multiplier effect
+  ///
+  /// In en, this message translates to:
+  /// **'EXP Multiplier'**
+  String get npcEffectNameExpMultiplier;
+
+  /// Name for EXP insurance effect
+  ///
+  /// In en, this message translates to:
+  /// **'EXP Insurance'**
+  String get npcEffectNameExpInsurance;
+
+  /// Name for EXP floor effect
+  ///
+  /// In en, this message translates to:
+  /// **'EXP Floor'**
+  String get npcEffectNameExpFloor;
+
+  /// Description for positive multiplier effect
+  ///
+  /// In en, this message translates to:
+  /// **'2x EXP from battles'**
+  String get npcEffectDescMultiplierPositive;
+
+  /// Description for negative multiplier effect
+  ///
+  /// In en, this message translates to:
+  /// **'0.5x EXP from battles'**
+  String get npcEffectDescMultiplierNegative;
+
+  /// Description for positive insurance effect
+  ///
+  /// In en, this message translates to:
+  /// **'No EXP penalty on next loss'**
+  String get npcEffectDescInsurancePositive;
+
+  /// Description for negative insurance effect
+  ///
+  /// In en, this message translates to:
+  /// **'No EXP reward on next win'**
+  String get npcEffectDescInsuranceNegative;
+
+  /// Description for positive floor effect
+  ///
+  /// In en, this message translates to:
+  /// **'EXP can\'t drop below {value}'**
+  String npcEffectDescFloorPositive(String value);
+
+  /// Description for negative floor effect
+  ///
+  /// In en, this message translates to:
+  /// **'EXP can\'t gain above {value}'**
+  String npcEffectDescFloorNegative(String value);
 }
 
 class _AppLocalizationsDelegate

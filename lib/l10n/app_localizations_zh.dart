@@ -598,4 +598,100 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get exploreDebugMapRegenerated => '地图已重新生成。';
+
+  @override
+  String get npcEncounterTitle => 'NPC遭遇';
+
+  @override
+  String get npcEffectPositive => '一位旅者赐予你祝福！';
+
+  @override
+  String get npcEffectNegative => '一位旅者对你施加了诅咒！';
+
+  @override
+  String npcEffectExpGiftPositive(String amount) {
+    return '经验赠礼：+$amount 经验';
+  }
+
+  @override
+  String npcEffectExpStealNegative(String amount) {
+    return '经验被窃：-$amount 经验';
+  }
+
+  @override
+  String npcEffectExpMultiplierPositive(int count) {
+    return '经验提升：接下来 $count 场战斗获得2倍经验！';
+  }
+
+  @override
+  String npcEffectExpMultiplierNegative(int count) {
+    return '经验诅咒：接下来 $count 场战斗只获得0.5倍经验！';
+  }
+
+  @override
+  String get npcEffectExpInsurancePositive => '经验保险：下次战败不会损失经验！';
+
+  @override
+  String get npcEffectExpInsuranceNegative => '经验诅咒：下次战胜不会获得经验！';
+
+  @override
+  String npcEffectExpFloorPositive(int count) {
+    return '经验护盾：接下来 $count 场战斗经验不会低于当前值！';
+  }
+
+  @override
+  String npcEffectExpFloorNegative(int count) {
+    return '经验封顶：接下来 $count 场战斗经验不会超过当前值！';
+  }
+
+  @override
+  String get npcEffectExpGamblePositive => '幸运赌博：经验翻倍！';
+
+  @override
+  String get npcEffectExpGambleNegative => '不幸赌博：经验减半！';
+
+  @override
+  String get npcEffectsButtonTooltip => '当前效果';
+
+  @override
+  String get npcEffectsDialogTitle => '当前效果';
+
+  @override
+  String get npcEffectsEmpty => '暂无生效中的效果。';
+
+  @override
+  String npcEffectRemainingBattles(int count) {
+    return '剩余 $count 场战斗';
+  }
+
+  @override
+  String get npcEffectNameExpMultiplier => '经验倍增';
+
+  @override
+  String get npcEffectNameExpInsurance => '经验保险';
+
+  @override
+  String get npcEffectNameExpFloor => '经验保底';
+
+  @override
+  String get npcEffectDescMultiplierPositive => '战斗经验2倍';
+
+  @override
+  String get npcEffectDescMultiplierNegative => '战斗经验0.5倍';
+
+  @override
+  String get npcEffectDescInsurancePositive => '下次战败无经验惩罚';
+
+  @override
+  String get npcEffectDescInsuranceNegative => '下次战胜无经验奖励';
+
+  @override
+  String npcEffectDescFloorPositive(String value) {
+    return '经验不会低于 $value';
+  }
+
+  @override
+  String npcEffectDescFloorNegative(String value) {
+    return '经验不会超过 $value';
+  }
 }

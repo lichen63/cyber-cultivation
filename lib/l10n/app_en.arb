@@ -805,5 +805,136 @@
     "exploreDebugMapRegenerated": "Map regenerated.",
     "@exploreDebugMapRegenerated": {
         "description": "Message when map has been regenerated"
+    },
+    "npcEncounterTitle": "NPC Encounter",
+    "@npcEncounterTitle": {
+        "description": "Title for NPC encounter dialog"
+    },
+    "npcEffectPositive": "A traveler shares their blessing with you!",
+    "@npcEffectPositive": {
+        "description": "Message when NPC gives positive effect"
+    },
+    "npcEffectNegative": "A traveler places a curse upon you!",
+    "@npcEffectNegative": {
+        "description": "Message when NPC gives negative effect"
+    },
+    "npcEffectExpGiftPositive": "EXP Gift: +{amount} EXP",
+    "@npcEffectExpGiftPositive": {
+        "description": "Positive EXP gift effect",
+        "placeholders": {
+            "amount": { "type": "String" }
+        }
+    },
+    "npcEffectExpStealNegative": "EXP Stolen: -{amount} EXP",
+    "@npcEffectExpStealNegative": {
+        "description": "Negative EXP steal effect",
+        "placeholders": {
+            "amount": { "type": "String" }
+        }
+    },
+    "npcEffectExpMultiplierPositive": "EXP Boost: Next {count} battles give 2x EXP!",
+    "@npcEffectExpMultiplierPositive": {
+        "description": "Positive EXP multiplier effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "npcEffectExpMultiplierNegative": "EXP Curse: Next {count} battles give 0.5x EXP!",
+    "@npcEffectExpMultiplierNegative": {
+        "description": "Negative EXP multiplier effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "npcEffectExpInsurancePositive": "EXP Insurance: Next loss will have no EXP penalty!",
+    "@npcEffectExpInsurancePositive": {
+        "description": "Positive EXP insurance effect"
+    },
+    "npcEffectExpInsuranceNegative": "EXP Curse: Next win will give no EXP reward!",
+    "@npcEffectExpInsuranceNegative": {
+        "description": "Negative EXP insurance effect"
+    },
+    "npcEffectExpFloorPositive": "EXP Shield: EXP can't drop below current value for {count} battles!",
+    "@npcEffectExpFloorPositive": {
+        "description": "Positive EXP floor effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "npcEffectExpFloorNegative": "EXP Ceiling: EXP can't gain above current value for {count} battles!",
+    "@npcEffectExpFloorNegative": {
+        "description": "Negative EXP floor effect",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "npcEffectExpGamblePositive": "Lucky Gamble: EXP doubled!",
+    "@npcEffectExpGamblePositive": {
+        "description": "Positive EXP gamble effect"
+    },
+    "npcEffectExpGambleNegative": "Unlucky Gamble: EXP halved!",
+    "@npcEffectExpGambleNegative": {
+        "description": "Negative EXP gamble effect"
+    },
+    "npcEffectsButtonTooltip": "Active Effects",
+    "@npcEffectsButtonTooltip": {
+        "description": "Tooltip for the effects button in bottom panel"
+    },
+    "npcEffectsDialogTitle": "Active Effects",
+    "@npcEffectsDialogTitle": {
+        "description": "Title for the active effects dialog"
+    },
+    "npcEffectsEmpty": "No active effects.",
+    "@npcEffectsEmpty": {
+        "description": "Message when there are no active effects"
+    },
+    "npcEffectRemainingBattles": "{count} battles remaining",
+    "@npcEffectRemainingBattles": {
+        "description": "Shows remaining battles for duration-based effects",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "npcEffectNameExpMultiplier": "EXP Multiplier",
+    "@npcEffectNameExpMultiplier": {
+        "description": "Name for EXP multiplier effect"
+    },
+    "npcEffectNameExpInsurance": "EXP Insurance",
+    "@npcEffectNameExpInsurance": {
+        "description": "Name for EXP insurance effect"
+    },
+    "npcEffectNameExpFloor": "EXP Floor",
+    "@npcEffectNameExpFloor": {
+        "description": "Name for EXP floor effect"
+    },
+    "npcEffectDescMultiplierPositive": "2x EXP from battles",
+    "@npcEffectDescMultiplierPositive": {
+        "description": "Description for positive multiplier effect"
+    },
+    "npcEffectDescMultiplierNegative": "0.5x EXP from battles",
+    "@npcEffectDescMultiplierNegative": {
+        "description": "Description for negative multiplier effect"
+    },
+    "npcEffectDescInsurancePositive": "No EXP penalty on next loss",
+    "@npcEffectDescInsurancePositive": {
+        "description": "Description for positive insurance effect"
+    },
+    "npcEffectDescInsuranceNegative": "No EXP reward on next win",
+    "@npcEffectDescInsuranceNegative": {
+        "description": "Description for negative insurance effect"
+    },
+    "npcEffectDescFloorPositive": "EXP can't drop below {value}",
+    "@npcEffectDescFloorPositive": {
+        "description": "Description for positive floor effect",
+        "placeholders": {
+            "value": { "type": "String" }
+        }
+    },
+    "npcEffectDescFloorNegative": "EXP can't gain above {value}",
+    "@npcEffectDescFloorNegative": {
+        "description": "Description for negative floor effect",
+        "placeholders": {
+            "value": { "type": "String" }
+        }
     }
 }
