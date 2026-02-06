@@ -16,8 +16,8 @@ void main() {
   });
 
   group('NpcEffectRegistry', () {
-    test('initializes with 5 built-in definitions', () {
-      expect(NpcEffectRegistry.count, 5);
+    test('initializes with 45 built-in definitions', () {
+      expect(NpcEffectRegistry.count, 45);
     });
 
     test('can look up each definition by typeId', () {
@@ -47,7 +47,7 @@ void main() {
     test('initialize is idempotent', () {
       NpcEffectRegistry.initialize();
       NpcEffectRegistry.initialize();
-      expect(NpcEffectRegistry.count, 5);
+      expect(NpcEffectRegistry.count, 45);
     });
 
     test('custom definition can be registered', () {
@@ -986,7 +986,7 @@ void main() {
 
         // Now initialize — built-in effects should still register
         NpcEffectRegistry.initialize();
-        expect(NpcEffectRegistry.count, 6); // 5 built-in + 1 custom
+        expect(NpcEffectRegistry.count, 46); // 45 built-in + 1 custom
         expect(NpcEffectRegistry.get('exp_gift_steal'), isNotNull);
         expect(NpcEffectRegistry.get('exp_multiplier'), isNotNull);
       },

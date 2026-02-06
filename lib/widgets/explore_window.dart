@@ -1482,6 +1482,35 @@ class _ExploreWindowContentState extends State<ExploreWindowContent>
             color: _colors.accent,
           );
         },
+        onAddEffects: (effects) {
+          setState(() {
+            for (final effect in effects) {
+              // Apply immediate EXP changes for instant effects
+              final expChange = _npcEffectService.calculateImmediateExpChange(
+                effect,
+                _currentExp,
+                widget.maxExp,
+              );
+
+              // Apply encounter-time map mutations
+              _npcEffectService.applyMapEffects(effect, _map);
+
+              if (expChange != 0.0) {
+                _applyBattleExpChange(expChange);
+              }
+
+              // Add duration-based effects to the active effects list
+              if (effect.isDurationBased) {
+                _map.activeEffects.add(effect);
+              }
+            }
+          });
+          final l10n = AppLocalizations.of(context)!;
+          _showFloatingToast(
+            l10n.exploreDebugEffectsAdded(effects.length),
+            color: _colors.accent,
+          );
+        },
       ),
     );
   }
@@ -1972,6 +2001,13 @@ class ExploreMapPainter extends CustomPainter {
   }
 
   Color _getCellColor(ExploreCellType type, bool isDark, int x, int y) {
+    // Check if there's an active effect hiding this cell type
+    if (_isCellTypeHidden(type, x, y)) {
+      return isDark
+          ? ExploreConstants.blankColorDark
+          : ExploreConstants.blankColorLight;
+    }
+
     switch (type) {
       case ExploreCellType.blank:
         return isDark
@@ -1994,6 +2030,32 @@ class ExploreMapPainter extends CustomPainter {
             ? ExploreConstants.npcUsedColor
             : ExploreConstants.npcColor;
     }
+  }
+
+  /// Check if a cell type should be hidden due to active effects
+  bool _isCellTypeHidden(ExploreCellType type, int x, int y) {
+    final playerX = map.playerX;
+    final playerY = map.playerY;
+
+    for (final effect in map.activeEffects) {
+      final hiddenTypeIndex = effect.data['hiddenType'] as int?;
+      if (hiddenTypeIndex == null) continue;
+      if (hiddenTypeIndex != type.index) continue;
+
+      // Check if this effect has a range (e.g., monster radar)
+      final range = effect.data['range'] as int?;
+      if (range != null) {
+        // Only hide if within range (Manhattan distance)
+        final distance = (x - playerX).abs() + (y - playerY).abs();
+        if (distance <= range) {
+          return true;
+        }
+      } else {
+        // No range specified, hide all cells of this type
+        return true;
+      }
+    }
+    return false;
   }
 
   void _drawPlayer(Canvas canvas, int x, int y, double cellSize) {

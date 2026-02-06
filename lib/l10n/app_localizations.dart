@@ -1256,6 +1256,36 @@ abstract class AppLocalizations {
   /// **'Map regenerated.'**
   String get exploreDebugMapRegenerated;
 
+  /// Section label for adding NPC effects in debug dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Add NPC Effects'**
+  String get exploreDebugAddEffects;
+
+  /// Button to apply selected effects
+  ///
+  /// In en, this message translates to:
+  /// **'Apply Selected'**
+  String get exploreDebugApplyEffects;
+
+  /// Message when effects have been added
+  ///
+  /// In en, this message translates to:
+  /// **'{count} effect(s) added.'**
+  String exploreDebugEffectsAdded(int count);
+
+  /// Positive effect toggle label
+  ///
+  /// In en, this message translates to:
+  /// **'Positive'**
+  String get exploreDebugEffectPositive;
+
+  /// Negative effect toggle label
+  ///
+  /// In en, this message translates to:
+  /// **'Negative'**
+  String get exploreDebugEffectNegative;
+
   /// Title for NPC encounter dialog
   ///
   /// In en, this message translates to:
@@ -1423,6 +1453,942 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'EXP Gamble'**
   String get npcEffectNameExpGamble;
+
+  /// Shows remaining moves for move-duration effects
+  ///
+  /// In en, this message translates to:
+  /// **'{count} moves remaining'**
+  String npcEffectRemainingMoves(int count);
+
+  /// Name for FC buff/debuff effect
+  ///
+  /// In en, this message translates to:
+  /// **'FC Buff'**
+  String get npcEffectNameFcBuff;
+
+  /// Positive FC buff effect
+  ///
+  /// In en, this message translates to:
+  /// **'FC Boost: +20% Fighting Capacity for next {count} battles!'**
+  String npcEffectFcBuffPositive(int count);
+
+  /// Negative FC debuff effect
+  ///
+  /// In en, this message translates to:
+  /// **'FC Curse: -20% Fighting Capacity for next {count} battles!'**
+  String npcEffectFcBuffNegative(int count);
+
+  /// Description for positive FC buff
+  ///
+  /// In en, this message translates to:
+  /// **'+20% FC in battles'**
+  String get npcEffectDescFcBuffPositive;
+
+  /// Description for negative FC debuff
+  ///
+  /// In en, this message translates to:
+  /// **'-20% FC in battles'**
+  String get npcEffectDescFcBuffNegative;
+
+  /// Name for guaranteed outcome effect
+  ///
+  /// In en, this message translates to:
+  /// **'Fate Seal'**
+  String get npcEffectNameGuaranteedOutcome;
+
+  /// Positive guaranteed win effect
+  ///
+  /// In en, this message translates to:
+  /// **'Victory Seal: Next battle is a guaranteed win!'**
+  String get npcEffectGuaranteedOutcomePositive;
+
+  /// Negative guaranteed loss effect
+  ///
+  /// In en, this message translates to:
+  /// **'Doom Seal: Next battle is a guaranteed loss!'**
+  String get npcEffectGuaranteedOutcomeNegative;
+
+  /// Description for positive guaranteed outcome
+  ///
+  /// In en, this message translates to:
+  /// **'Next battle: guaranteed win'**
+  String get npcEffectDescGuaranteedOutcomePositive;
+
+  /// Description for negative guaranteed outcome
+  ///
+  /// In en, this message translates to:
+  /// **'Next battle: guaranteed loss'**
+  String get npcEffectDescGuaranteedOutcomeNegative;
+
+  /// Name for flee mastery effect
+  ///
+  /// In en, this message translates to:
+  /// **'Flee Mastery'**
+  String get npcEffectNameFleeMastery;
+
+  /// Positive flee mastery effect
+  ///
+  /// In en, this message translates to:
+  /// **'Escape Artist: Next {count} flee attempts always succeed!'**
+  String npcEffectFleeMasteryPositive(int count);
+
+  /// Negative flee mastery effect
+  ///
+  /// In en, this message translates to:
+  /// **'Trapped: Next {count} flee attempts always fail!'**
+  String npcEffectFleeMasteryNegative(int count);
+
+  /// Description for positive flee mastery
+  ///
+  /// In en, this message translates to:
+  /// **'Flee always succeeds'**
+  String get npcEffectDescFleeMasteryPositive;
+
+  /// Description for negative flee mastery
+  ///
+  /// In en, this message translates to:
+  /// **'Flee always fails'**
+  String get npcEffectDescFleeMasteryNegative;
+
+  /// Name for first strike effect
+  ///
+  /// In en, this message translates to:
+  /// **'First Strike'**
+  String get npcEffectNameFirstStrike;
+
+  /// Positive first strike effect
+  ///
+  /// In en, this message translates to:
+  /// **'First Strike: Enemy FC counted at 50% in next battle!'**
+  String get npcEffectFirstStrikePositive;
+
+  /// Negative first strike effect
+  ///
+  /// In en, this message translates to:
+  /// **'Ambushed: Your FC counted at 50% in next battle!'**
+  String get npcEffectFirstStrikeNegative;
+
+  /// Description for positive first strike
+  ///
+  /// In en, this message translates to:
+  /// **'Enemy FC at 50%'**
+  String get npcEffectDescFirstStrikePositive;
+
+  /// Description for negative first strike
+  ///
+  /// In en, this message translates to:
+  /// **'Your FC at 50%'**
+  String get npcEffectDescFirstStrikeNegative;
+
+  /// Name for glass cannon effect
+  ///
+  /// In en, this message translates to:
+  /// **'Glass Cannon'**
+  String get npcEffectNameGlassCannon;
+
+  /// Positive glass cannon effect
+  ///
+  /// In en, this message translates to:
+  /// **'Glass Cannon: +50% FC for next battle!'**
+  String get npcEffectGlassCannonPositive;
+
+  /// Negative glass cannon effect
+  ///
+  /// In en, this message translates to:
+  /// **'Weakened: -50% FC for next battle!'**
+  String get npcEffectGlassCannonNegative;
+
+  /// Description for positive glass cannon
+  ///
+  /// In en, this message translates to:
+  /// **'+50% FC next battle'**
+  String get npcEffectDescGlassCannonPositive;
+
+  /// Description for negative glass cannon
+  ///
+  /// In en, this message translates to:
+  /// **'-50% FC next battle'**
+  String get npcEffectDescGlassCannonNegative;
+
+  /// Name for path clearing effect
+  ///
+  /// In en, this message translates to:
+  /// **'Path Clearing'**
+  String get npcEffectNamePathClearing;
+
+  /// Positive path clearing effect
+  ///
+  /// In en, this message translates to:
+  /// **'Path Cleared: {count} mountains removed!'**
+  String npcEffectPathClearingPositive(int count);
+
+  /// Negative path clearing effect
+  ///
+  /// In en, this message translates to:
+  /// **'Landslide: {count} new mountains appeared!'**
+  String npcEffectPathClearingNegative(int count);
+
+  /// Name for river bridge effect
+  ///
+  /// In en, this message translates to:
+  /// **'River Bridge'**
+  String get npcEffectNameRiverBridge;
+
+  /// Positive river bridge effect
+  ///
+  /// In en, this message translates to:
+  /// **'River Crossed: {count} river cells bridged!'**
+  String npcEffectRiverBridgePositive(int count);
+
+  /// Negative river bridge effect
+  ///
+  /// In en, this message translates to:
+  /// **'Flood: {count} new river cells appeared!'**
+  String npcEffectRiverBridgeNegative(int count);
+
+  /// Name for monster cleanse effect
+  ///
+  /// In en, this message translates to:
+  /// **'Monster Cleanse'**
+  String get npcEffectNameMonsterCleanse;
+
+  /// Positive monster cleanse effect
+  ///
+  /// In en, this message translates to:
+  /// **'Monster Cleanse: {count} nearby monsters vanished!'**
+  String npcEffectMonsterCleansePositive(int count);
+
+  /// Negative monster cleanse effect
+  ///
+  /// In en, this message translates to:
+  /// **'Monster Surge: {count} new monsters appeared!'**
+  String npcEffectMonsterCleanseNegative(int count);
+
+  /// Name for boss shift effect
+  ///
+  /// In en, this message translates to:
+  /// **'Boss Shift'**
+  String get npcEffectNameBossShift;
+
+  /// Positive boss shift effect
+  ///
+  /// In en, this message translates to:
+  /// **'Boss Banished: Nearest boss removed!'**
+  String get npcEffectBossShiftPositive;
+
+  /// Negative boss shift effect
+  ///
+  /// In en, this message translates to:
+  /// **'Boss Summoned: A new boss appeared!'**
+  String get npcEffectBossShiftNegative;
+
+  /// Name for safe zone effect
+  ///
+  /// In en, this message translates to:
+  /// **'Safe Zone'**
+  String get npcEffectNameSafeZone;
+
+  /// Positive safe zone effect
+  ///
+  /// In en, this message translates to:
+  /// **'Safe Zone: Area around you cleared of dangers!'**
+  String get npcEffectSafeZonePositive;
+
+  /// Negative safe zone effect
+  ///
+  /// In en, this message translates to:
+  /// **'Danger Zone: Monsters spawned around you!'**
+  String get npcEffectSafeZoneNegative;
+
+  /// Name for terrain swap effect
+  ///
+  /// In en, this message translates to:
+  /// **'Terrain Swap'**
+  String get npcEffectNameTerrainSwap;
+
+  /// Positive terrain swap effect
+  ///
+  /// In en, this message translates to:
+  /// **'Terrain Cleared: {count} mountains converted to paths!'**
+  String npcEffectTerrainSwapPositive(int count);
+
+  /// Negative terrain swap effect
+  ///
+  /// In en, this message translates to:
+  /// **'Terrain Blocked: {count} paths turned to mountains!'**
+  String npcEffectTerrainSwapNegative(int count);
+
+  /// Name for FOV modify effect
+  ///
+  /// In en, this message translates to:
+  /// **'Vision'**
+  String get npcEffectNameFovModify;
+
+  /// Positive FOV modify effect
+  ///
+  /// In en, this message translates to:
+  /// **'Far Sight: Field of view increased by {amount} tiles!'**
+  String npcEffectFovModifyPositive(int amount);
+
+  /// Negative FOV modify effect
+  ///
+  /// In en, this message translates to:
+  /// **'Blinded: Field of view decreased by {amount} tiles!'**
+  String npcEffectFovModifyNegative(int amount);
+
+  /// Description for positive FOV modify
+  ///
+  /// In en, this message translates to:
+  /// **'+{amount} FOV'**
+  String npcEffectDescFovModifyPositive(int amount);
+
+  /// Description for negative FOV modify
+  ///
+  /// In en, this message translates to:
+  /// **'-{amount} FOV'**
+  String npcEffectDescFovModifyNegative(int amount);
+
+  /// Name for boss radar effect
+  ///
+  /// In en, this message translates to:
+  /// **'Boss Radar'**
+  String get npcEffectNameBossRadar;
+
+  /// Positive boss radar effect
+  ///
+  /// In en, this message translates to:
+  /// **'Boss Radar: Nearest boss location revealed!'**
+  String get npcEffectBossRadarPositive;
+
+  /// Negative boss radar effect
+  ///
+  /// In en, this message translates to:
+  /// **'Boss Cloaked: Boss cells hidden until stepped on!'**
+  String get npcEffectBossRadarNegative;
+
+  /// Description for negative boss radar
+  ///
+  /// In en, this message translates to:
+  /// **'Bosses appear as blank'**
+  String get npcEffectDescBossRadarNegative;
+
+  /// Name for NPC radar effect
+  ///
+  /// In en, this message translates to:
+  /// **'NPC Radar'**
+  String get npcEffectNameNpcRadar;
+
+  /// Positive NPC radar effect
+  ///
+  /// In en, this message translates to:
+  /// **'NPC Radar: Nearest NPC location revealed!'**
+  String get npcEffectNpcRadarPositive;
+
+  /// Negative NPC radar effect
+  ///
+  /// In en, this message translates to:
+  /// **'NPC Cloaked: NPC cells hidden until stepped on!'**
+  String get npcEffectNpcRadarNegative;
+
+  /// Description for negative NPC radar
+  ///
+  /// In en, this message translates to:
+  /// **'NPCs appear as blank'**
+  String get npcEffectDescNpcRadarNegative;
+
+  /// Name for map reveal effect
+  ///
+  /// In en, this message translates to:
+  /// **'Map Reveal'**
+  String get npcEffectNameMapReveal;
+
+  /// Positive map reveal effect
+  ///
+  /// In en, this message translates to:
+  /// **'Cartographer: 20% of unexplored map revealed!'**
+  String get npcEffectMapRevealPositive;
+
+  /// Negative map reveal effect
+  ///
+  /// In en, this message translates to:
+  /// **'Fog of War: FOV shrunk to 1 tile for {count} moves!'**
+  String npcEffectMapRevealNegative(int count);
+
+  /// Description for negative map reveal
+  ///
+  /// In en, this message translates to:
+  /// **'FOV limited to 1 tile'**
+  String get npcEffectDescMapRevealNegative;
+
+  /// Name for monster radar effect
+  ///
+  /// In en, this message translates to:
+  /// **'Monster Radar'**
+  String get npcEffectNameMonsterRadar;
+
+  /// Positive monster radar effect
+  ///
+  /// In en, this message translates to:
+  /// **'Monster Radar: All monsters within 10 tiles revealed!'**
+  String get npcEffectMonsterRadarPositive;
+
+  /// Negative monster radar effect
+  ///
+  /// In en, this message translates to:
+  /// **'Monster Cloak: Monsters within 10 tiles now invisible!'**
+  String get npcEffectMonsterRadarNegative;
+
+  /// Description for negative monster radar
+  ///
+  /// In en, this message translates to:
+  /// **'Nearby monsters invisible'**
+  String get npcEffectDescMonsterRadarNegative;
+
+  /// Name for house radar effect
+  ///
+  /// In en, this message translates to:
+  /// **'House Radar'**
+  String get npcEffectNameHouseRadar;
+
+  /// Positive house radar effect
+  ///
+  /// In en, this message translates to:
+  /// **'House Radar: Nearest house location revealed!'**
+  String get npcEffectHouseRadarPositive;
+
+  /// Negative house radar effect
+  ///
+  /// In en, this message translates to:
+  /// **'Houses Cloaked: House cells hidden until stepped on!'**
+  String get npcEffectHouseRadarNegative;
+
+  /// Description for negative house radar
+  ///
+  /// In en, this message translates to:
+  /// **'Houses appear as blank'**
+  String get npcEffectDescHouseRadarNegative;
+
+  /// Name for teleport effect
+  ///
+  /// In en, this message translates to:
+  /// **'Teleport'**
+  String get npcEffectNameTeleport;
+
+  /// Positive teleport effect
+  ///
+  /// In en, this message translates to:
+  /// **'Far Teleport: Teleported to a distant location!'**
+  String get npcEffectTeleportPositive;
+
+  /// Negative teleport effect
+  ///
+  /// In en, this message translates to:
+  /// **'Return: Teleported back to spawn point!'**
+  String get npcEffectTeleportNegative;
+
+  /// Name for speed boost effect
+  ///
+  /// In en, this message translates to:
+  /// **'Speed Boost'**
+  String get npcEffectNameSpeedBoost;
+
+  /// Positive speed boost effect
+  ///
+  /// In en, this message translates to:
+  /// **'Speed Boost: Move 2 cells per step for {count} moves!'**
+  String npcEffectSpeedBoostPositive(int count);
+
+  /// Negative speed boost effect
+  ///
+  /// In en, this message translates to:
+  /// **'Slow: Move only every 2 key presses for {count} moves!'**
+  String npcEffectSpeedBoostNegative(int count);
+
+  /// Description for positive speed boost
+  ///
+  /// In en, this message translates to:
+  /// **'Move 2 cells per step'**
+  String get npcEffectDescSpeedBoostPositive;
+
+  /// Description for negative speed boost
+  ///
+  /// In en, this message translates to:
+  /// **'Move every 2 presses'**
+  String get npcEffectDescSpeedBoostNegative;
+
+  /// Name for teleport to house effect
+  ///
+  /// In en, this message translates to:
+  /// **'Teleport to House'**
+  String get npcEffectNameTeleportHouse;
+
+  /// Positive teleport to house effect
+  ///
+  /// In en, this message translates to:
+  /// **'House Teleport: Teleported to nearest house!'**
+  String get npcEffectTeleportHousePositive;
+
+  /// Negative teleport to house effect
+  ///
+  /// In en, this message translates to:
+  /// **'Boss Teleport: Teleported to nearest boss!'**
+  String get npcEffectTeleportHouseNegative;
+
+  /// Name for pathfinder effect
+  ///
+  /// In en, this message translates to:
+  /// **'Pathfinder'**
+  String get npcEffectNamePathfinder;
+
+  /// Positive pathfinder effect
+  ///
+  /// In en, this message translates to:
+  /// **'Pathfinder: Shortest path to nearest house revealed!'**
+  String get npcEffectPathfinderPositive;
+
+  /// Negative pathfinder effect
+  ///
+  /// In en, this message translates to:
+  /// **'Lost: All houses removed from map!'**
+  String get npcEffectPathfinderNegative;
+
+  /// Name for weaken enemies effect
+  ///
+  /// In en, this message translates to:
+  /// **'Weaken Enemies'**
+  String get npcEffectNameWeakenEnemies;
+
+  /// Positive weaken enemies effect
+  ///
+  /// In en, this message translates to:
+  /// **'Weaken Aura: Monsters in 10-tile radius get -30% FC!'**
+  String get npcEffectWeakenEnemiesPositive;
+
+  /// Negative weaken enemies effect
+  ///
+  /// In en, this message translates to:
+  /// **'Rage Aura: Monsters in 10-tile radius get +30% FC!'**
+  String get npcEffectWeakenEnemiesNegative;
+
+  /// Name for monster conversion effect
+  ///
+  /// In en, this message translates to:
+  /// **'Monster Conversion'**
+  String get npcEffectNameMonsterConversion;
+
+  /// Positive monster conversion effect
+  ///
+  /// In en, this message translates to:
+  /// **'Taming: {count} nearest monsters became NPCs!'**
+  String npcEffectMonsterConversionPositive(int count);
+
+  /// Negative monster conversion effect
+  ///
+  /// In en, this message translates to:
+  /// **'Corruption: {count} nearest NPCs became monsters!'**
+  String npcEffectMonsterConversionNegative(int count);
+
+  /// Name for boss downgrade effect
+  ///
+  /// In en, this message translates to:
+  /// **'Boss Downgrade'**
+  String get npcEffectNameBossDowngrade;
+
+  /// Positive boss downgrade effect
+  ///
+  /// In en, this message translates to:
+  /// **'Demotion: Nearest boss became regular monster!'**
+  String get npcEffectBossDowngradePositive;
+
+  /// Negative boss downgrade effect
+  ///
+  /// In en, this message translates to:
+  /// **'Promotion: Nearest monster became boss!'**
+  String get npcEffectBossDowngradeNegative;
+
+  /// Name for monster freeze effect
+  ///
+  /// In en, this message translates to:
+  /// **'Monster Freeze'**
+  String get npcEffectNameMonsterFreeze;
+
+  /// Positive monster freeze effect
+  ///
+  /// In en, this message translates to:
+  /// **'Fear Aura: Next monster will flee on contact!'**
+  String get npcEffectMonsterFreezePositive;
+
+  /// Negative monster freeze effect
+  ///
+  /// In en, this message translates to:
+  /// **'Enrage: Next monster gets +50% FC!'**
+  String get npcEffectMonsterFreezeNegative;
+
+  /// Description for positive monster freeze
+  ///
+  /// In en, this message translates to:
+  /// **'Next monster flees'**
+  String get npcEffectDescMonsterFreezePositive;
+
+  /// Description for negative monster freeze
+  ///
+  /// In en, this message translates to:
+  /// **'Next monster +50% FC'**
+  String get npcEffectDescMonsterFreezeNegative;
+
+  /// Name for clear wave effect
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Wave'**
+  String get npcEffectNameClearWave;
+
+  /// Positive clear wave effect
+  ///
+  /// In en, this message translates to:
+  /// **'Purge: Monsters in 3-tile radius eliminated!'**
+  String get npcEffectClearWavePositive;
+
+  /// Negative clear wave effect
+  ///
+  /// In en, this message translates to:
+  /// **'Infestation: Monsters spawned in 3-tile radius!'**
+  String get npcEffectClearWaveNegative;
+
+  /// Name for monster magnet effect
+  ///
+  /// In en, this message translates to:
+  /// **'Monster Magnet'**
+  String get npcEffectNameMonsterMagnet;
+
+  /// Positive monster magnet effect
+  ///
+  /// In en, this message translates to:
+  /// **'Repel: Monsters in 5-tile radius moved away!'**
+  String get npcEffectMonsterMagnetPositive;
+
+  /// Negative monster magnet effect
+  ///
+  /// In en, this message translates to:
+  /// **'Attract: Monsters in 5-tile radius moved closer!'**
+  String get npcEffectMonsterMagnetNegative;
+
+  /// Name for NPC blessing chain effect
+  ///
+  /// In en, this message translates to:
+  /// **'NPC Blessing Chain'**
+  String get npcEffectNameNpcBlessingChain;
+
+  /// Positive NPC blessing chain effect
+  ///
+  /// In en, this message translates to:
+  /// **'Blessing Chain: Next NPC encounter guaranteed positive!'**
+  String get npcEffectNpcBlessingChainPositive;
+
+  /// Negative NPC blessing chain effect
+  ///
+  /// In en, this message translates to:
+  /// **'Curse Chain: Next NPC encounter guaranteed negative!'**
+  String get npcEffectNpcBlessingChainNegative;
+
+  /// Description for positive NPC blessing chain
+  ///
+  /// In en, this message translates to:
+  /// **'Next NPC is positive'**
+  String get npcEffectDescNpcBlessingChainPositive;
+
+  /// Description for negative NPC blessing chain
+  ///
+  /// In en, this message translates to:
+  /// **'Next NPC is negative'**
+  String get npcEffectDescNpcBlessingChainNegative;
+
+  /// Name for NPC spawn effect
+  ///
+  /// In en, this message translates to:
+  /// **'NPC Spawn'**
+  String get npcEffectNameNpcSpawn;
+
+  /// Positive NPC spawn effect
+  ///
+  /// In en, this message translates to:
+  /// **'NPC Spawn: {count} new NPCs appeared on the map!'**
+  String npcEffectNpcSpawnPositive(int count);
+
+  /// Negative NPC spawn effect
+  ///
+  /// In en, this message translates to:
+  /// **'NPC Removal: {count} NPCs vanished from the map!'**
+  String npcEffectNpcSpawnNegative(int count);
+
+  /// Name for NPC upgrade effect
+  ///
+  /// In en, this message translates to:
+  /// **'NPC Upgrade'**
+  String get npcEffectNameNpcUpgrade;
+
+  /// Positive NPC upgrade effect
+  ///
+  /// In en, this message translates to:
+  /// **'Double Effect: Next NPC effect is doubled!'**
+  String get npcEffectNpcUpgradePositive;
+
+  /// Negative NPC upgrade effect
+  ///
+  /// In en, this message translates to:
+  /// **'Reverse: Next NPC effect is reversed!'**
+  String get npcEffectNpcUpgradeNegative;
+
+  /// Description for positive NPC upgrade
+  ///
+  /// In en, this message translates to:
+  /// **'Next NPC effect 2x'**
+  String get npcEffectDescNpcUpgradePositive;
+
+  /// Description for negative NPC upgrade
+  ///
+  /// In en, this message translates to:
+  /// **'Next NPC effect reversed'**
+  String get npcEffectDescNpcUpgradeNegative;
+
+  /// Name for house spawn effect
+  ///
+  /// In en, this message translates to:
+  /// **'House Spawn'**
+  String get npcEffectNameHouseSpawn;
+
+  /// Positive house spawn effect
+  ///
+  /// In en, this message translates to:
+  /// **'New Shelter: A house appeared nearby!'**
+  String get npcEffectHouseSpawnPositive;
+
+  /// Negative house spawn effect
+  ///
+  /// In en, this message translates to:
+  /// **'House Destroyed: Nearest house removed!'**
+  String get npcEffectHouseSpawnNegative;
+
+  /// Name for house upgrade effect
+  ///
+  /// In en, this message translates to:
+  /// **'House Upgrade'**
+  String get npcEffectNameHouseUpgrade;
+
+  /// Positive house upgrade effect
+  ///
+  /// In en, this message translates to:
+  /// **'Enhanced Rest: Next house visit gives 2x benefit!'**
+  String get npcEffectHouseUpgradePositive;
+
+  /// Negative house upgrade effect
+  ///
+  /// In en, this message translates to:
+  /// **'Poor Rest: Next house visit gives 0.5x benefit!'**
+  String get npcEffectHouseUpgradeNegative;
+
+  /// Description for positive house upgrade
+  ///
+  /// In en, this message translates to:
+  /// **'Next house 2x benefit'**
+  String get npcEffectDescHouseUpgradePositive;
+
+  /// Description for negative house upgrade
+  ///
+  /// In en, this message translates to:
+  /// **'Next house 0.5x benefit'**
+  String get npcEffectDescHouseUpgradeNegative;
+
+  /// Name for risk/reward effect
+  ///
+  /// In en, this message translates to:
+  /// **'Risk/Reward'**
+  String get npcEffectNameRiskReward;
+
+  /// Positive risk/reward effect
+  ///
+  /// In en, this message translates to:
+  /// **'Risk Taker: +50% EXP but -20% FC for {count} battles!'**
+  String npcEffectRiskRewardPositive(int count);
+
+  /// Negative risk/reward effect
+  ///
+  /// In en, this message translates to:
+  /// **'Safe Play: +20% FC but -50% EXP for {count} battles!'**
+  String npcEffectRiskRewardNegative(int count);
+
+  /// Description for positive risk/reward
+  ///
+  /// In en, this message translates to:
+  /// **'+50% EXP, -20% FC'**
+  String get npcEffectDescRiskRewardPositive;
+
+  /// Description for negative risk/reward
+  ///
+  /// In en, this message translates to:
+  /// **'+20% FC, -50% EXP'**
+  String get npcEffectDescRiskRewardNegative;
+
+  /// Name for sacrifice effect
+  ///
+  /// In en, this message translates to:
+  /// **'Sacrifice'**
+  String get npcEffectNameSacrifice;
+
+  /// Positive sacrifice effect
+  ///
+  /// In en, this message translates to:
+  /// **'Sacrifice: Lose 5% EXP now, +30% FC for {count} battles!'**
+  String npcEffectSacrificePositive(int count);
+
+  /// Negative sacrifice effect
+  ///
+  /// In en, this message translates to:
+  /// **'Dark Deal: Gain 5% EXP now, -30% FC for {count} battles!'**
+  String npcEffectSacrificeNegative(int count);
+
+  /// Description for positive sacrifice
+  ///
+  /// In en, this message translates to:
+  /// **'+30% FC'**
+  String get npcEffectDescSacrificePositive;
+
+  /// Description for negative sacrifice
+  ///
+  /// In en, this message translates to:
+  /// **'-30% FC'**
+  String get npcEffectDescSacrificeNegative;
+
+  /// Name for all-in effect
+  ///
+  /// In en, this message translates to:
+  /// **'All-In'**
+  String get npcEffectNameAllIn;
+
+  /// Positive all-in effect
+  ///
+  /// In en, this message translates to:
+  /// **'Purification: Monsters in 5 tiles cleared + bonus EXP!'**
+  String get npcEffectAllInPositive;
+
+  /// Negative all-in effect
+  ///
+  /// In en, this message translates to:
+  /// **'Catastrophe: Extra boss spawned + EXP lost!'**
+  String get npcEffectAllInNegative;
+
+  /// Name for mirror effect
+  ///
+  /// In en, this message translates to:
+  /// **'Mirror'**
+  String get npcEffectNameMirror;
+
+  /// Positive mirror effect
+  ///
+  /// In en, this message translates to:
+  /// **'Mirror: Your FC doubled for next fight!'**
+  String get npcEffectMirrorPositive;
+
+  /// Negative mirror effect
+  ///
+  /// In en, this message translates to:
+  /// **'Mirror: Next enemy copies your FC (50/50 chance)!'**
+  String get npcEffectMirrorNegative;
+
+  /// Description for positive mirror
+  ///
+  /// In en, this message translates to:
+  /// **'2x FC next fight'**
+  String get npcEffectDescMirrorPositive;
+
+  /// Description for negative mirror
+  ///
+  /// In en, this message translates to:
+  /// **'Enemy has your FC'**
+  String get npcEffectDescMirrorNegative;
+
+  /// Name for counter stack effect
+  ///
+  /// In en, this message translates to:
+  /// **'Counter Stack'**
+  String get npcEffectNameCounterStack;
+
+  /// Positive counter stack effect
+  ///
+  /// In en, this message translates to:
+  /// **'Momentum: Each step gives +1% FC up to {count} steps!'**
+  String npcEffectCounterStackPositive(int count);
+
+  /// Negative counter stack effect
+  ///
+  /// In en, this message translates to:
+  /// **'Fatigue: Each step gives -1% FC for {count} steps!'**
+  String npcEffectCounterStackNegative(int count);
+
+  /// Description for positive counter stack
+  ///
+  /// In en, this message translates to:
+  /// **'+{percent}% FC ({count} stacks)'**
+  String npcEffectDescCounterStackPositive(int percent, int count);
+
+  /// Description for negative counter stack
+  ///
+  /// In en, this message translates to:
+  /// **'-{percent}% FC ({count} steps left)'**
+  String npcEffectDescCounterStackNegative(int percent, int count);
+
+  /// Name for map scramble effect
+  ///
+  /// In en, this message translates to:
+  /// **'Map Scramble'**
+  String get npcEffectNameMapScramble;
+
+  /// Positive map scramble effect
+  ///
+  /// In en, this message translates to:
+  /// **'Monster Shuffle: All monsters moved to new positions!'**
+  String get npcEffectMapScramblePositive;
+
+  /// Negative map scramble effect
+  ///
+  /// In en, this message translates to:
+  /// **'NPC Shuffle: All NPCs moved to new positions!'**
+  String get npcEffectMapScrambleNegative;
+
+  /// Name for cell counter effect
+  ///
+  /// In en, this message translates to:
+  /// **'Cell Counter'**
+  String get npcEffectNameCellCounter;
+
+  /// Positive cell counter effect
+  ///
+  /// In en, this message translates to:
+  /// **'Monster Count: {count} monsters remaining on map!'**
+  String npcEffectCellCounterPositive(int count);
+
+  /// Negative cell counter effect
+  ///
+  /// In en, this message translates to:
+  /// **'Confused Count: Roughly {count} monsters on map (maybe)!'**
+  String npcEffectCellCounterNegative(int count);
+
+  /// Name for progress boost effect
+  ///
+  /// In en, this message translates to:
+  /// **'Progress Boost'**
+  String get npcEffectNameProgressBoost;
+
+  /// Positive progress boost effect
+  ///
+  /// In en, this message translates to:
+  /// **'Explorer: {count} random cells marked as explored!'**
+  String npcEffectProgressBoostPositive(int count);
+
+  /// Negative progress boost effect
+  ///
+  /// In en, this message translates to:
+  /// **'Amnesia: {count} explored cells forgotten!'**
+  String npcEffectProgressBoostNegative(int count);
 }
 
 class _AppLocalizationsDelegate

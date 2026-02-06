@@ -306,6 +306,22 @@ class _ActiveEffectsDialog extends StatelessWidget {
                 ),
               ),
             ),
+          if (effect.remainingMoves > 0)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: effectColor.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                l10n.npcEffectRemainingMoves(effect.remainingMoves),
+                style: TextStyle(
+                  color: effectColor,
+                  fontSize: NpcEffectConstants.effectItemDetailFontSize,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
         ],
       ),
     );

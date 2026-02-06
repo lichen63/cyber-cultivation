@@ -815,6 +815,137 @@ class NpcEffectConstants {
   // EXP gamble
   static const double gambleHalveFraction = 0.5;
 
+  // ── FC / Battle Effects ────────────────────────────────────────────
+
+  // FC buff/debuff: ±20% FC for next battles
+  static const double fcBuffMultiplier = 1.20; // +20% FC
+  static const double fcDebuffMultiplier = 0.80; // -20% FC
+  static const int fcBuffDurationBattles = 5;
+
+  // Guaranteed outcome: next battle guaranteed win/loss
+  static const int guaranteedOutcomeDurationBattles = 1;
+
+  // Flee mastery: next N flee attempts always succeed/fail
+  static const int fleeMasteryDurationBattles = 3;
+
+  // First strike: enemy/player FC counted at 50%
+  static const double firstStrikeFCMultiplier = 0.50;
+  static const int firstStrikeDurationBattles = 1;
+
+  // Glass cannon: ±50% FC for next 1 battle
+  static const double glassCannonPositiveMultiplier = 1.50; // +50% FC
+  static const double glassCannonNegativeMultiplier = 0.50; // -50% FC
+  static const int glassCannonDurationBattles = 1;
+
+  // ── Map / Terrain Manipulation ─────────────────────────────────────
+
+  // Path clearing / Terrain obstacle
+  static const int pathClearingMinCells = 3;
+  static const int pathClearingMaxCells = 5;
+
+  // River bridge / River spawn
+  static const int riverBridgeMinCells = 3;
+  static const int riverBridgeMaxCells = 5;
+
+  // Monster cleanse / spawn
+  static const int monsterCleanseCount = 3;
+  static const int monsterSpawnCount = 3;
+
+  // Boss shift
+  static const int bossRemoveCount = 1;
+  static const int bossSpawnCount = 1;
+
+  // Safe zone / Danger zone: 5x5 area around player
+  static const int safeZoneRadius = 2; // 5x5 = radius of 2
+
+  // Terrain swap
+  static const int terrainSwapCount = 5;
+
+  // ── Vision / Revelation ────────────────────────────────────────────
+
+  // FOV modification amounts (randomly chosen from this list)
+  static const List<int> fovModifyAmounts = [2, 3, 4, 5, 8, 10];
+
+  // Boss/NPC/Monster/House radar - reveals nearest location
+  static const int radarHideDurationMoves =
+      20; // How long hidden cells stay hidden
+
+  // Full map reveal
+  static const double mapRevealPercent = 0.20; // 20%
+  static const int fovShrinkMovesDuration = 10;
+  static const int fovShrinkMinRadius = 1;
+
+  // Monster radar range
+  static const int monsterRadarRange = 10;
+
+  // ── Movement Effects ───────────────────────────────────────────────
+
+  // Teleport: min distance for "far away"
+  static const int teleportMinDistance = 15;
+
+  // Speed boost: move 2 cells per step / need 2 presses per move
+  static const int speedBoostDurationMoves = 10;
+
+  // ── Monster / Enemy Manipulation ───────────────────────────────────
+
+  // Weaken/strengthen enemies in radius
+  static const int weakenEnemiesRadius = 10;
+  static const double weakenEnemiesFCMultiplier = 0.70; // -30% FC
+  static const double strengthenEnemiesFCMultiplier = 1.30; // +30% FC
+
+  // Monster conversion count
+  static const int monsterConversionCount = 2;
+
+  // Monster freeze FC boost
+  static const double monsterFreezeFCBoost = 1.50; // +50% FC
+  static const int monsterFreezeDurationBattles = 1;
+
+  // Clear wave radius
+  static const int clearWaveRadius = 3;
+
+  // Monster magnet radius and move distance
+  static const int monsterMagnetRadius = 5;
+  static const int monsterMagnetMoveDistance = 2;
+
+  // ── NPC Chain Effects ──────────────────────────────────────────────
+
+  // NPC spawn count
+  static const int npcSpawnCount = 2;
+  static const int npcRemoveCount = 2;
+
+  // ── Combo / Conditional Effects ────────────────────────────────────
+
+  // Risk/reward
+  static const double riskRewardExpMultiplier = 1.50; // +50% EXP
+  static const double riskRewardFCMultiplier = 0.80; // -20% FC
+  static const double riskRewardExpNegativeMultiplier = 0.50; // -50% EXP
+  static const double riskRewardFCNegativeMultiplier = 1.20; // +20% FC
+  static const int riskRewardDurationBattles = 3;
+
+  // Sacrifice
+  static const double sacrificeExpLossPercent = 0.05; // 5%
+  static const double sacrificeFCBoost = 1.30; // +30% FC
+  static const double sacrificeFCPenalty = 0.70; // -30% FC
+  static const int sacrificeDurationBattles = 5;
+
+  // All-in radius and EXP amount
+  static const int allInClearRadius = 5;
+  static const double allInExpGainPercent = 0.05; // 5% of maxExp
+  static const double allInExpLossPercent = 0.05; // 5% of maxExp
+
+  // Mirror FC multiplier
+  static const double mirrorFCMultiplier = 2.0; // 2x FC
+  static const int mirrorDurationBattles = 1;
+
+  // Counter stack
+  static const int counterStackMaxSteps = 20;
+  static const double counterStackPerStepPercent = 0.01; // +1% per step
+
+  // ── Meta / Map-Level Effects ───────────────────────────────────────
+
+  // Progress boost
+  static const int progressBoostCellCount = 10;
+
   // Effect dialog styling
   static const double effectDialogMaxWidth = 400.0;
   static const double effectDialogMaxHeight = 500.0;

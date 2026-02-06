@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../constants.dart';
 import '../l10n/app_localizations.dart';
+import '../models/npc_effect.dart';
 
 /// Battle mode for debug purposes
 enum DebugBattleMode { normal, autoWin, autoLose }
@@ -25,6 +26,7 @@ class ExploreDebugDialog extends StatefulWidget {
   final void Function(DebugBattleMode mode) onBattleModeChanged;
   final VoidCallback onResetHouses;
   final VoidCallback onRegenerateMap;
+  final void Function(List<NpcEffect> effects) onAddEffects;
 
   const ExploreDebugDialog({
     super.key,
@@ -42,6 +44,7 @@ class ExploreDebugDialog extends StatefulWidget {
     required this.onBattleModeChanged,
     required this.onResetHouses,
     required this.onRegenerateMap,
+    required this.onAddEffects,
   });
 
   @override
@@ -55,6 +58,12 @@ class _ExploreDebugDialogState extends State<ExploreDebugDialog> {
   late bool _fogRevealed;
   late DebugBattleMode _battleMode;
   String? _teleportError;
+
+  /// Selected effect type IDs
+  final Set<String> _selectedEffects = {};
+
+  /// Whether each selected effect should be positive (true) or negative (false)
+  final Map<String, bool> _effectPositive = {};
 
   AppThemeColors get _colors => widget.themeColors;
 
@@ -110,7 +119,7 @@ class _ExploreDebugDialogState extends State<ExploreDebugDialog> {
         ],
       ),
       content: SizedBox(
-        width: 360,
+        width: 400,
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -126,6 +135,8 @@ class _ExploreDebugDialogState extends State<ExploreDebugDialog> {
               _buildResetHouses(l10n),
               const SizedBox(height: 16),
               _buildRegenerateMap(l10n),
+              const SizedBox(height: 16),
+              _buildEffectsSelector(l10n),
             ],
           ),
         ),
@@ -502,5 +513,299 @@ class _ExploreDebugDialogState extends State<ExploreDebugDialog> {
         borderSide: BorderSide(color: _colors.accent),
       ),
     );
+  }
+
+  /// Build NPC effects selector section
+  Widget _buildEffectsSelector(AppLocalizations l10n) {
+    // Ensure registry is initialized
+    NpcEffectRegistry.initialize();
+    final allDefs = NpcEffectRegistry.all;
+
+    return _buildSection(
+      icon: Icons.auto_awesome,
+      label: l10n.exploreDebugAddEffects,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Apply button row (at top for visibility)
+          Row(
+            children: [
+              Text(
+                '${_selectedEffects.length} selected',
+                style: TextStyle(color: _colors.secondaryText, fontSize: 12),
+              ),
+              const Spacer(),
+              _buildSmallButton(
+                label: l10n.exploreDebugApplyEffects,
+                onPressed: _selectedEffects.isEmpty
+                    ? () {}
+                    : _applySelectedEffects,
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // Effect list with checkboxes
+          Container(
+            constraints: const BoxConstraints(maxHeight: 160),
+            decoration: BoxDecoration(
+              border: Border.all(color: _colors.border.withValues(alpha: 0.5)),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: allDefs.length,
+              itemBuilder: (context, index) {
+                final def = allDefs[index];
+                final typeId = def.typeId;
+                final isSelected = _selectedEffects.contains(typeId);
+                final isPositive = _effectPositive[typeId] ?? true;
+
+                // Create a dummy effect to get the name
+                final dummyEffect = NpcEffect(typeId: typeId, isPositive: true);
+                final effectName = def.getName(dummyEffect, l10n);
+
+                return _buildEffectItem(
+                  typeId: typeId,
+                  name: effectName,
+                  isSelected: isSelected,
+                  isPositive: isPositive,
+                  l10n: l10n,
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Build a single effect item with checkbox and positive/negative toggle
+  Widget _buildEffectItem({
+    required String typeId,
+    required String name,
+    required bool isSelected,
+    required bool isPositive,
+    required AppLocalizations l10n,
+  }) {
+    return InkWell(
+      onTap: () {
+        setState(() {
+          if (isSelected) {
+            _selectedEffects.remove(typeId);
+          } else {
+            _selectedEffects.add(typeId);
+            _effectPositive[typeId] = true; // Default to positive
+          }
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? _colors.accent.withValues(alpha: 0.1)
+              : Colors.transparent,
+        ),
+        child: Row(
+          children: [
+            // Checkbox
+            SizedBox(
+              width: 24,
+              height: 24,
+              child: Checkbox(
+                value: isSelected,
+                activeColor: _colors.accent,
+                onChanged: (value) {
+                  setState(() {
+                    if (value == true) {
+                      _selectedEffects.add(typeId);
+                      _effectPositive[typeId] = true;
+                    } else {
+                      _selectedEffects.remove(typeId);
+                    }
+                  });
+                },
+              ),
+            ),
+            const SizedBox(width: 8),
+            // Effect name
+            Expanded(
+              child: Text(
+                name,
+                style: TextStyle(
+                  color: isSelected
+                      ? _colors.primaryText
+                      : _colors.secondaryText,
+                  fontSize: 12,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            // Positive/Negative toggle (only show when selected)
+            if (isSelected) ...[
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _effectPositive[typeId] = true;
+                  });
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isPositive
+                        ? ExploreConstants.apColorHigh.withValues(alpha: 0.2)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(
+                      color: isPositive
+                          ? ExploreConstants.apColorHigh
+                          : _colors.border.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Text(
+                    '+',
+                    style: TextStyle(
+                      color: isPositive
+                          ? ExploreConstants.apColorHigh
+                          : _colors.secondaryText,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 4),
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _effectPositive[typeId] = false;
+                  });
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: !isPositive
+                        ? _colors.error.withValues(alpha: 0.2)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(
+                      color: !isPositive
+                          ? _colors.error
+                          : _colors.border.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Text(
+                    '-',
+                    style: TextStyle(
+                      color: !isPositive
+                          ? _colors.error
+                          : _colors.secondaryText,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Apply selected effects and close dialog
+  void _applySelectedEffects() {
+    if (_selectedEffects.isEmpty) return;
+
+    final effects = <NpcEffect>[];
+    for (final typeId in _selectedEffects) {
+      final isPositive = _effectPositive[typeId] ?? true;
+      final def = NpcEffectRegistry.get(typeId);
+      if (def != null) {
+        // Create effect with the selected polarity
+        // For effects that need duration (like radar hide effects), we need special handling
+        final effect = _createEffectWithPolarity(def, isPositive);
+        effects.add(effect);
+      }
+    }
+
+    widget.onAddEffects(effects);
+    Navigator.of(context).pop();
+  }
+
+  /// Create an effect with the specified polarity
+  NpcEffect _createEffectWithPolarity(
+    NpcEffectDefinition def,
+    bool isPositive,
+  ) {
+    // For radar effects that hide things, negative needs duration
+    if (!isPositive &&
+        (def.typeId == 'boss_radar' ||
+            def.typeId == 'npc_radar' ||
+            def.typeId == 'monster_radar' ||
+            def.typeId == 'house_radar')) {
+      return _createRadarHideEffect(def.typeId);
+    }
+
+    // For map_reveal negative, needs duration
+    if (!isPositive && def.typeId == 'map_reveal') {
+      return NpcEffect(
+        typeId: def.typeId,
+        isPositive: false,
+        durationType: EffectDurationType.moves,
+        remainingMoves: NpcEffectConstants.fovShrinkMovesDuration,
+      );
+    }
+
+    // Default: create simple effect
+    return NpcEffect(typeId: def.typeId, isPositive: isPositive);
+  }
+
+  /// Create radar hide effect with proper duration
+  NpcEffect _createRadarHideEffect(String typeId) {
+    switch (typeId) {
+      case 'boss_radar':
+        return NpcEffect(
+          typeId: typeId,
+          isPositive: false,
+          durationType: EffectDurationType.moves,
+          remainingMoves: NpcEffectConstants.radarHideDurationMoves,
+          data: {'hiddenType': 5}, // ExploreCellType.boss.index
+        );
+      case 'npc_radar':
+        return NpcEffect(
+          typeId: typeId,
+          isPositive: false,
+          durationType: EffectDurationType.moves,
+          remainingMoves: NpcEffectConstants.radarHideDurationMoves,
+          data: {'hiddenType': 6}, // ExploreCellType.npc.index
+        );
+      case 'monster_radar':
+        return NpcEffect(
+          typeId: typeId,
+          isPositive: false,
+          durationType: EffectDurationType.moves,
+          remainingMoves: NpcEffectConstants.radarHideDurationMoves,
+          data: {
+            'hiddenType': 4, // ExploreCellType.monster.index
+            'range': NpcEffectConstants.monsterRadarRange,
+          },
+        );
+      case 'house_radar':
+        return NpcEffect(
+          typeId: typeId,
+          isPositive: false,
+          durationType: EffectDurationType.moves,
+          remainingMoves: NpcEffectConstants.radarHideDurationMoves,
+          data: {'hiddenType': 3}, // ExploreCellType.house.index
+        );
+      default:
+        return NpcEffect(typeId: typeId, isPositive: false);
+    }
   }
 }
