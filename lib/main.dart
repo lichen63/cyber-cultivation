@@ -1539,11 +1539,7 @@ class _MyHomePageState extends State<MyHomePage>
       },
       child: DragToMoveArea(
         child: Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: _themeColors.border, width: 3.0),
-            color: _themeColors.overlay,
-          ),
+          decoration: const BoxDecoration(shape: BoxShape.circle),
           child: ClipOval(
             child: Image.asset(
               AppConstants.characterImagePath,
