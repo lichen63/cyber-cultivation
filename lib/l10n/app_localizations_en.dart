@@ -547,6 +547,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exploreHouseAlreadyUsed => 'This house has already been used.';
 
   @override
+  String get exploreNpcAlreadyMet => 'You\'ve already met this NPC.';
+
+  @override
   String get exploreNotEnoughAp => 'Not enough action points.';
 
   @override
@@ -675,6 +678,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get npcEffectNameExpGiftSteal => 'EXP Gift/Steal';
+
+  @override
   String get npcEffectNameExpMultiplier => 'EXP Multiplier';
 
   @override
@@ -704,4 +710,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String npcEffectDescFloorNegative(String value) {
     return 'EXP can\'t gain above $value';
   }
+
+  @override
+  String get npcEffectNameExpGamble => 'EXP Gamble';
 }

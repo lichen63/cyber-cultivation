@@ -540,6 +540,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get exploreHouseAlreadyUsed => '这间屋子已经使用过了。';
 
   @override
+  String get exploreNpcAlreadyMet => '你已经见过这位NPC了。';
+
+  @override
   String get exploreNotEnoughAp => '行动力不足。';
 
   @override
@@ -665,6 +668,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get npcEffectNameExpGiftSteal => '经验赠窃';
+
+  @override
   String get npcEffectNameExpMultiplier => '经验倍增';
 
   @override
@@ -694,4 +700,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String npcEffectDescFloorNegative(String value) {
     return '经验不会超过 $value';
   }
+
+  @override
+  String get npcEffectNameExpGamble => '经验赌博';
 }

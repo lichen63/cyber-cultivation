@@ -680,9 +680,11 @@ class ExploreConstants {
   static const Color mountainColor = Color(0xFF1A1A1A); // Black
   static const Color riverColor = Color(0xFF4A90D9);
   static const Color houseColor = Color(0xFFFFD700); // Yellow
+  static const Color houseUsedColor = Color(0xFF8B8970); // Dimmed yellow-grey
   static const Color monsterColor = Color(0xFF2E7D32); // Forest green
   static const Color bossColor = Color(0xFFD94A4A); // Red
   static const Color npcColor = Color(0xFFD94AD9);
+  static const Color npcUsedColor = Color(0xFF7A6A7A); // Dimmed purple-grey
   static const Color playerColor = Color(0xFF00FFFF); // Cyan for player
   static const Color playerBorderColor = Color(0xFFFFD700);
 

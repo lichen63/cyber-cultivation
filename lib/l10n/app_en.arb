@@ -726,6 +726,10 @@
     "@exploreHouseAlreadyUsed": {
         "description": "Message when house has already been used this session"
     },
+    "exploreNpcAlreadyMet": "You've already met this NPC.",
+    "@exploreNpcAlreadyMet": {
+        "description": "Message when NPC has already been interacted with this session"
+    },
     "exploreNotEnoughAp": "Not enough action points.",
     "@exploreNotEnoughAp": {
         "description": "Message when player lacks AP for an action"
@@ -895,6 +899,10 @@
             "count": { "type": "int" }
         }
     },
+    "npcEffectNameExpGiftSteal": "EXP Gift/Steal",
+    "@npcEffectNameExpGiftSteal": {
+        "description": "Name for EXP gift/steal effect"
+    },
     "npcEffectNameExpMultiplier": "EXP Multiplier",
     "@npcEffectNameExpMultiplier": {
         "description": "Name for EXP multiplier effect"
@@ -936,5 +944,9 @@
         "placeholders": {
             "value": { "type": "String" }
         }
+    },
+    "npcEffectNameExpGamble": "EXP Gamble",
+    "@npcEffectNameExpGamble": {
+        "description": "Name for EXP gamble effect"
     }
 }

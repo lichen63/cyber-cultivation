@@ -150,8 +150,11 @@ class BattleService {
 
   /// Attempt to flee from battle
   /// Returns true if flee succeeds, false if caught
-  bool attemptFlee() {
-    return _random.nextDouble() < ExploreConstants.fleeBaseSuccessRate;
+  /// [successRate] defaults to [ExploreConstants.fleeBaseSuccessRate] if not
+  /// provided (backward compatible).
+  bool attemptFlee({double? successRate}) {
+    final rate = successRate ?? ExploreConstants.fleeBaseSuccessRate;
+    return _random.nextDouble() < rate;
   }
 
   /// Perform a complete battle and return the result

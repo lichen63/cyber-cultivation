@@ -1130,6 +1130,12 @@ abstract class AppLocalizations {
   /// **'This house has already been used.'**
   String get exploreHouseAlreadyUsed;
 
+  /// Message when NPC has already been interacted with this session
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve already met this NPC.'**
+  String get exploreNpcAlreadyMet;
+
   /// Message when player lacks AP for an action
   ///
   /// In en, this message translates to:
@@ -1352,6 +1358,12 @@ abstract class AppLocalizations {
   /// **'{count} battles remaining'**
   String npcEffectRemainingBattles(int count);
 
+  /// Name for EXP gift/steal effect
+  ///
+  /// In en, this message translates to:
+  /// **'EXP Gift/Steal'**
+  String get npcEffectNameExpGiftSteal;
+
   /// Name for EXP multiplier effect
   ///
   /// In en, this message translates to:
@@ -1405,6 +1417,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'EXP can\'t gain above {value}'**
   String npcEffectDescFloorNegative(String value);
+
+  /// Name for EXP gamble effect
+  ///
+  /// In en, this message translates to:
+  /// **'EXP Gamble'**
+  String get npcEffectNameExpGamble;
 }
 
 class _AppLocalizationsDelegate

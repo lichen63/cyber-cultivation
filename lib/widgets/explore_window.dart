@@ -353,7 +353,11 @@ class _ExploreWindowContentState extends State<ExploreWindowContent>
 
   /// Mark cells within the current FOV as visited (Manhattan distance)
   void _updateVisitedCells() {
-    final fovRadius = ExploreConstants.defaultFovRadius;
+    final baseFovRadius = ExploreConstants.defaultFovRadius;
+    final fovRadius = _npcEffectService.applyFovModifiers(
+      baseFovRadius,
+      _map.activeEffects,
+    );
     final px = _map.playerX;
     final py = _map.playerY;
     for (int dy = -fovRadius; dy <= fovRadius; dy++) {
@@ -586,7 +590,11 @@ class _ExploreWindowContentState extends State<ExploreWindowContent>
     } else {
       // Restore AP and mark house as used
       _map.markHouseUsed(x, y);
-      final restored = ExploreConstants.apHouseRestore;
+      final baseRestore = ExploreConstants.apHouseRestore;
+      final restored = _npcEffectService.applyHouseRestoreModifiers(
+        baseRestore,
+        _map.activeEffects,
+      );
       setState(() {
         _map.currentAP = (_map.currentAP + restored).clamp(0, _map.maxAP);
       });
@@ -598,15 +606,26 @@ class _ExploreWindowContentState extends State<ExploreWindowContent>
   }
 
   /// Handle stepping on an NPC cell — generate and apply a random effect
-  Future<void> _handleNpcInteraction() async {
+  Future<void> _handleNpcInteraction(int x, int y) async {
     final l10n = AppLocalizations.of(context)!;
+
+    // Check if this NPC has already been interacted with
+    if (_map.isNpcUsed(x, y)) {
+      _showFloatingToast(
+        l10n.exploreNpcAlreadyMet,
+        color: _colors.secondaryText,
+      );
+      return;
+    }
+
+    // Mark NPC as used before generating effect
+    _map.markNpcUsed(x, y);
+
     final effect = _npcEffectService.generateEffect(
       currentExp: _currentExp,
       maxExp: widget.maxExp,
+      activeEffects: _map.activeEffects,
     );
-
-    // Get effect description for the dialog
-    final description = _getNpcEffectDescription(effect, l10n);
 
     // Apply immediate EXP changes for instant effects
     final expChange = _npcEffectService.calculateImmediateExpChange(
@@ -614,14 +633,21 @@ class _ExploreWindowContentState extends State<ExploreWindowContent>
       _currentExp,
       widget.maxExp,
     );
+
+    // Apply encounter-time map mutations (e.g. reveal cells, place items)
+    _npcEffectService.applyMapEffects(effect, _map);
+
+    // Get effect description for the dialog (after calculating expChange)
+    final def = NpcEffectRegistry.get(effect.typeId);
+    final description =
+        def?.getEncounterDescription(effect, l10n, expChange: expChange) ?? '';
+
     if (expChange != 0.0) {
       _applyBattleExpChange(expChange);
     }
 
     // Add duration-based effects to the active effects list
-    if (effect.type == NpcEffectType.expMultiplier ||
-        effect.type == NpcEffectType.expInsurance ||
-        effect.type == NpcEffectType.expFloor) {
+    if (effect.isDurationBased) {
       setState(() {
         _map.activeEffects.add(effect);
       });
@@ -636,50 +662,6 @@ class _ExploreWindowContentState extends State<ExploreWindowContent>
       colors: _colors,
       l10n: l10n,
     );
-  }
-
-  /// Get localized description string for an NPC effect
-  String _getNpcEffectDescription(NpcEffect effect, AppLocalizations l10n) {
-    switch (effect.type) {
-      case NpcEffectType.expGiftSteal:
-        final expChange = _npcEffectService.calculateImmediateExpChange(
-          effect,
-          _currentExp,
-          widget.maxExp,
-        );
-        final amount = NumberFormatter.format(expChange.abs());
-        return effect.isPositive
-            ? l10n.npcEffectExpGiftPositive(amount)
-            : l10n.npcEffectExpStealNegative(amount);
-
-      case NpcEffectType.expMultiplier:
-        return effect.isPositive
-            ? l10n.npcEffectExpMultiplierPositive(
-                NpcEffectConstants.multiplierDurationBattles,
-              )
-            : l10n.npcEffectExpMultiplierNegative(
-                NpcEffectConstants.multiplierDurationBattles,
-              );
-
-      case NpcEffectType.expInsurance:
-        return effect.isPositive
-            ? l10n.npcEffectExpInsurancePositive
-            : l10n.npcEffectExpInsuranceNegative;
-
-      case NpcEffectType.expFloor:
-        return effect.isPositive
-            ? l10n.npcEffectExpFloorPositive(
-                NpcEffectConstants.floorDurationBattles,
-              )
-            : l10n.npcEffectExpFloorNegative(
-                NpcEffectConstants.floorDurationBattles,
-              );
-
-      case NpcEffectType.expGamble:
-        return effect.isPositive
-            ? l10n.npcEffectExpGamblePositive
-            : l10n.npcEffectExpGambleNegative;
-    }
   }
 
   void _centerOnPlayer() {
@@ -816,10 +798,12 @@ class _ExploreWindowContentState extends State<ExploreWindowContent>
       }
       _consumeAP(ExploreConstants.apCostMove + ExploreConstants.apCostNpc);
       if (_map.movePlayer(dx, dy)) {
+        // Consume move-duration charges for NPC cell moves
+        _npcEffectService.consumeMoveCharges(_map.activeEffects, _map);
         _updateVisitedCells();
         setState(() {});
         _panToKeepPlayerVisible();
-        _handleNpcInteraction();
+        _handleNpcInteraction(newX, newY);
       }
       return;
     }
@@ -829,6 +813,8 @@ class _ExploreWindowContentState extends State<ExploreWindowContent>
       if (!_checkAP(ExploreConstants.apCostMove)) return;
       _consumeAP(ExploreConstants.apCostMove);
       if (_map.movePlayer(dx, dy)) {
+        // Consume move-duration charges for house cell moves
+        _npcEffectService.consumeMoveCharges(_map.activeEffects, _map);
         _updateVisitedCells();
         setState(() {});
         _panToKeepPlayerVisible();
@@ -841,6 +827,8 @@ class _ExploreWindowContentState extends State<ExploreWindowContent>
     if (!_checkAP(ExploreConstants.apCostMove)) return;
     _consumeAP(ExploreConstants.apCostMove);
     if (_map.movePlayer(dx, dy)) {
+      // Consume move-duration charges and run onMove hooks
+      _npcEffectService.consumeMoveCharges(_map.activeEffects, _map);
       _updateVisitedCells();
       setState(() {});
       _panToKeepPlayerVisible();
@@ -853,14 +841,27 @@ class _ExploreWindowContentState extends State<ExploreWindowContent>
     setState(() => _isBattleInProgress = true);
 
     final l10n = AppLocalizations.of(context)!;
-    final playerFC = _calculateFightingCapacity();
+    final basePlayerFC = _calculateFightingCapacity();
+
+    // Apply active NPC effects to player FC
+    final playerFC = _npcEffectService.applyPlayerFCModifiers(
+      basePlayerFC,
+      _map.activeEffects,
+    );
 
     // Calculate enemy FC using the level when the map was generated
     // This ensures consistent difficulty within a map session
-    final enemyFC = _battleService.calculateEnemyFC(
+    final baseEnemyFC = _battleService.calculateEnemyFC(
       _map.generatedAtLevel,
       widget.maxExp,
       enemyCell.type,
+    );
+
+    // Apply active NPC effects to enemy FC
+    final enemyFC = _npcEffectService.applyEnemyFCModifiers(
+      baseEnemyFC,
+      enemyCell.type,
+      _map.activeEffects,
     );
 
     // Determine AP cost for this fight
@@ -925,7 +926,16 @@ class _ExploreWindowContentState extends State<ExploreWindowContent>
     int fightCost,
   ) async {
     final l10n = AppLocalizations.of(context)!;
-    final fleeSuccess = _battleService.attemptFlee();
+
+    // Apply active NPC effects to flee chance
+    final baseFleeChance = ExploreConstants.fleeBaseSuccessRate;
+    final modifiedFleeChance = _npcEffectService.applyFleeModifiers(
+      baseFleeChance,
+      _map.activeEffects,
+    );
+    final fleeSuccess = _battleService.attemptFlee(
+      successRate: modifiedFleeChance,
+    );
 
     if (fleeSuccess) {
       // Flee success costs move + flee AP
@@ -964,12 +974,26 @@ class _ExploreWindowContentState extends State<ExploreWindowContent>
   }
 
   /// Judge battle outcome, respecting debug battle mode overrides
-  BattleOutcome _judgeBattleOutcome(double playerFC, double enemyFC) {
+  /// and active NPC effect overrides.
+  BattleOutcome _judgeBattleOutcome(
+    double playerFC,
+    double enemyFC,
+    ExploreCellType cellType,
+  ) {
     if (_debugBattleMode == DebugBattleMode.autoWin) {
       return BattleOutcome.victory;
     } else if (_debugBattleMode == DebugBattleMode.autoLose) {
       return BattleOutcome.defeat;
     }
+    // Check for NPC effect overrides
+    final npcOverride = _npcEffectService.getOutcomeOverride(
+      playerFC,
+      enemyFC,
+      cellType,
+      _map.activeEffects,
+    );
+    if (npcOverride != null) return npcOverride;
+
     return _battleService.judgeBattle(playerFC, enemyFC);
   }
 
@@ -983,7 +1007,7 @@ class _ExploreWindowContentState extends State<ExploreWindowContent>
     int dy,
   ) async {
     final l10n = AppLocalizations.of(context)!;
-    final outcome = _judgeBattleOutcome(playerFC, enemyFC);
+    final outcome = _judgeBattleOutcome(playerFC, enemyFC, enemyCell.type);
 
     var expChange = _battleService.calculateExpChange(
       outcome,
@@ -997,7 +1021,16 @@ class _ExploreWindowContentState extends State<ExploreWindowContent>
       baseExpChange: expChange,
       isVictory: outcome == BattleOutcome.victory,
       currentExp: _currentExp,
+      cellType: enemyCell.type,
       activeEffects: _map.activeEffects,
+    );
+
+    // Notify effects of battle completion (side-effects)
+    _npcEffectService.notifyBattleComplete(
+      outcome == BattleOutcome.victory,
+      enemyCell.type,
+      _map,
+      _map.activeEffects,
     );
 
     // Consume battle charges from duration-based effects and remove expired
@@ -1042,6 +1075,8 @@ class _ExploreWindowContentState extends State<ExploreWindowContent>
           type: ExploreCellType.blank,
         );
         _map.movePlayer(dx, dy);
+        // Consume move-duration charges for battle victory moves
+        _npcEffectService.consumeMoveCharges(_map.activeEffects, _map);
         _updateVisitedCells();
         _panToKeepPlayerVisible();
       });
@@ -1791,7 +1826,7 @@ class ExploreMapPainter extends CustomPainter {
             cellSize - 2,
             cellSize - 2,
           );
-          final paint = Paint()..color = _getCellColor(cell.type, isDark);
+          final paint = Paint()..color = _getCellColor(cell.type, isDark, x, y);
           canvas.drawRect(cellRect, paint);
         }
       }
@@ -1865,7 +1900,7 @@ class ExploreMapPainter extends CustomPainter {
           cellSize - 2,
           cellSize - 2,
         );
-        final paint = Paint()..color = _getCellColor(cell.type, isDark);
+        final paint = Paint()..color = _getCellColor(cell.type, isDark, vx, vy);
         canvas.drawRect(contentRect, paint);
       }
     }
@@ -1927,7 +1962,7 @@ class ExploreMapPainter extends CustomPainter {
           cellSize - 2,
         );
 
-        final paint = Paint()..color = _getCellColor(cell.type, isDark);
+        final paint = Paint()..color = _getCellColor(cell.type, isDark, x, y);
         canvas.drawRect(cellRect, paint);
       }
     }
@@ -1936,7 +1971,7 @@ class ExploreMapPainter extends CustomPainter {
     _drawPlayer(canvas, playerX, playerY, cellSize);
   }
 
-  Color _getCellColor(ExploreCellType type, bool isDark) {
+  Color _getCellColor(ExploreCellType type, bool isDark, int x, int y) {
     switch (type) {
       case ExploreCellType.blank:
         return isDark
@@ -1947,13 +1982,17 @@ class ExploreMapPainter extends CustomPainter {
       case ExploreCellType.river:
         return ExploreConstants.riverColor;
       case ExploreCellType.house:
-        return ExploreConstants.houseColor;
+        return map.isHouseUsed(x, y)
+            ? ExploreConstants.houseUsedColor
+            : ExploreConstants.houseColor;
       case ExploreCellType.monster:
         return ExploreConstants.monsterColor;
       case ExploreCellType.boss:
         return ExploreConstants.bossColor;
       case ExploreCellType.npc:
-        return ExploreConstants.npcColor;
+        return map.isNpcUsed(x, y)
+            ? ExploreConstants.npcUsedColor
+            : ExploreConstants.npcColor;
     }
   }
 

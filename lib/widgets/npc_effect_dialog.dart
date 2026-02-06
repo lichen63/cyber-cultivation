@@ -242,9 +242,10 @@ class _ActiveEffectsDialog extends StatelessWidget {
         ? NpcEffectConstants.positiveEffectColor
         : NpcEffectConstants.negativeEffectColor;
 
-    final effectName = _getEffectName(effect);
-    final effectDesc = _getEffectDescription(effect);
-    final icon = _getEffectIcon(effect);
+    final def = NpcEffectRegistry.get(effect.typeId);
+    final icon = def?.getIcon(effect) ?? Icons.help_outline;
+    final effectName = def?.getName(effect, l10n) ?? effect.typeId;
+    final effectDesc = def?.getActiveDescription(effect, l10n) ?? '';
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -308,51 +309,5 @@ class _ActiveEffectsDialog extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  IconData _getEffectIcon(NpcEffect effect) {
-    return switch (effect.type) {
-      NpcEffectType.expMultiplier => Icons.speed,
-      NpcEffectType.expInsurance => Icons.shield,
-      NpcEffectType.expFloor =>
-        effect.isPositive ? Icons.arrow_downward : Icons.arrow_upward,
-      NpcEffectType.expGiftSteal =>
-        effect.isPositive ? Icons.card_giftcard : Icons.money_off,
-      NpcEffectType.expGamble => Icons.casino,
-    };
-  }
-
-  String _getEffectName(NpcEffect effect) {
-    return switch (effect.type) {
-      NpcEffectType.expMultiplier => l10n.npcEffectNameExpMultiplier,
-      NpcEffectType.expInsurance => l10n.npcEffectNameExpInsurance,
-      NpcEffectType.expFloor => l10n.npcEffectNameExpFloor,
-      // Instant effects shouldn't appear in active list, but handle anyway
-      NpcEffectType.expGiftSteal =>
-        effect.isPositive ? 'EXP Gift' : 'EXP Steal',
-      NpcEffectType.expGamble => 'EXP Gamble',
-    };
-  }
-
-  String _getEffectDescription(NpcEffect effect) {
-    return switch (effect.type) {
-      NpcEffectType.expMultiplier =>
-        effect.isPositive
-            ? l10n.npcEffectDescMultiplierPositive
-            : l10n.npcEffectDescMultiplierNegative,
-      NpcEffectType.expInsurance =>
-        effect.isPositive
-            ? l10n.npcEffectDescInsurancePositive
-            : l10n.npcEffectDescInsuranceNegative,
-      NpcEffectType.expFloor =>
-        effect.isPositive
-            ? l10n.npcEffectDescFloorPositive(
-                NumberFormatter.format(effect.storedValue),
-              )
-            : l10n.npcEffectDescFloorNegative(
-                NumberFormatter.format(effect.storedValue),
-              ),
-      _ => '',
-    };
   }
 }

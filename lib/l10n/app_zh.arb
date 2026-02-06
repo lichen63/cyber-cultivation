@@ -172,6 +172,7 @@
     "exploreApExhaustedContent": "你已没有行动力，离开后下次将开启新的探索。",
     "exploreHouseRestoreAp": "在屋中休憩，恢复了 +{ap} 行动力。",
     "exploreHouseAlreadyUsed": "这间屋子已经使用过了。",
+    "exploreNpcAlreadyMet": "你已经见过这位NPC了。",
     "exploreNotEnoughAp": "行动力不足。",
     "exploreDebugTitle": "调试工具",
     "exploreDebugToggleFog": "显示地图",
@@ -209,6 +210,7 @@
     "npcEffectsDialogTitle": "当前效果",
     "npcEffectsEmpty": "暂无生效中的效果。",
     "npcEffectRemainingBattles": "剩余 {count} 场战斗",
+    "npcEffectNameExpGiftSteal": "经验赠窃",
     "npcEffectNameExpMultiplier": "经验倍增",
     "npcEffectNameExpInsurance": "经验保险",
     "npcEffectNameExpFloor": "经验保底",
@@ -217,5 +219,6 @@
     "npcEffectDescInsurancePositive": "下次战败无经验惩罚",
     "npcEffectDescInsuranceNegative": "下次战胜无经验奖励",
     "npcEffectDescFloorPositive": "经验不会低于 {value}",
-    "npcEffectDescFloorNegative": "经验不会超过 {value}"
+    "npcEffectDescFloorNegative": "经验不会超过 {value}",
+    "npcEffectNameExpGamble": "经验赌博"
 }

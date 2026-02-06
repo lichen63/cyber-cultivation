@@ -62,6 +62,9 @@ class ExploreMap {
   /// Set of house positions already used this session (encoded as y * width + x)
   final Set<int> usedHouses;
 
+  /// Set of NPC positions already interacted with this session (encoded as y * width + x)
+  final Set<int> usedNpcs;
+
   /// List of active NPC effects on the player
   final List<NpcEffect> activeEffects;
 
@@ -77,9 +80,11 @@ class ExploreMap {
     this.currentAP = 0,
     this.maxAP = 0,
     Set<int>? usedHouses,
+    Set<int>? usedNpcs,
     List<NpcEffect>? activeEffects,
   }) : visitedCells = visitedCells ?? {},
        usedHouses = usedHouses ?? {},
+       usedNpcs = usedNpcs ?? {},
        activeEffects = activeEffects ?? [];
 
   /// Mark a cell as visited
@@ -106,6 +111,12 @@ class ExploreMap {
   /// Mark a house at (x, y) as used
   void markHouseUsed(int x, int y) => usedHouses.add(y * width + x);
 
+  /// Check if an NPC at (x, y) has been interacted with this session
+  bool isNpcUsed(int x, int y) => usedNpcs.contains(y * width + x);
+
+  /// Mark an NPC at (x, y) as interacted with
+  void markNpcUsed(int x, int y) => usedNpcs.add(y * width + x);
+
   /// Convert to JSON for serialization
   Map<String, dynamic> toJson() => {
     'width': width,
@@ -118,6 +129,7 @@ class ExploreMap {
     'currentAP': currentAP,
     'maxAP': maxAP,
     'usedHouses': usedHouses.toList(),
+    'usedNpcs': usedNpcs.toList(),
     'activeEffects': activeEffects.map((e) => e.toJson()).toList(),
     'grid': grid
         .map((row) => row.map((cell) => cell.toJson()).toList())
@@ -147,6 +159,12 @@ class ExploreMap {
         ? usedHousesJson.map((e) => e as int).toSet()
         : <int>{};
 
+    // Restore used NPCs if available
+    final usedNpcsJson = json['usedNpcs'] as List<dynamic>?;
+    final usedNpcsSet = usedNpcsJson != null
+        ? usedNpcsJson.map((e) => e as int).toSet()
+        : <int>{};
+
     // Restore active NPC effects if available
     final effectsJson = json['activeEffects'] as List<dynamic>?;
     final effectsList = effectsJson != null
@@ -168,6 +186,7 @@ class ExploreMap {
       currentAP: json['currentAP'] as int? ?? 0,
       maxAP: json['maxAP'] as int? ?? 0,
       usedHouses: usedHousesSet,
+      usedNpcs: usedNpcsSet,
       activeEffects: effectsList,
     );
   }
