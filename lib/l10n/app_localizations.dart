@@ -1135,6 +1135,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Not enough action points.'**
   String get exploreNotEnoughAp;
+
+  /// Title for explore debug dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Debug Tools'**
+  String get exploreDebugTitle;
+
+  /// Toggle to reveal or hide fog of war
+  ///
+  /// In en, this message translates to:
+  /// **'Reveal Map'**
+  String get exploreDebugToggleFog;
+
+  /// Status when fog is enabled
+  ///
+  /// In en, this message translates to:
+  /// **'Fog ON'**
+  String get exploreDebugFogOn;
+
+  /// Status when fog is disabled (map revealed)
+  ///
+  /// In en, this message translates to:
+  /// **'Fog OFF'**
+  String get exploreDebugFogOff;
+
+  /// Label for modify action points
+  ///
+  /// In en, this message translates to:
+  /// **'Set AP'**
+  String get exploreDebugModifyAp;
+
+  /// Hint for AP input field
+  ///
+  /// In en, this message translates to:
+  /// **'Enter AP value'**
+  String get exploreDebugApHint;
+
+  /// Label for teleport feature
+  ///
+  /// In en, this message translates to:
+  /// **'Teleport'**
+  String get exploreDebugTeleport;
+
+  /// Label for X coordinate input
+  ///
+  /// In en, this message translates to:
+  /// **'X'**
+  String get exploreDebugTeleportX;
+
+  /// Label for Y coordinate input
+  ///
+  /// In en, this message translates to:
+  /// **'Y'**
+  String get exploreDebugTeleportY;
+
+  /// Button to execute teleport
+  ///
+  /// In en, this message translates to:
+  /// **'Go'**
+  String get exploreDebugTeleportGo;
+
+  /// Error when teleport target is invalid
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid position or non-walkable cell.'**
+  String get exploreDebugTeleportInvalid;
+
+  /// Label for battle mode toggle
+  ///
+  /// In en, this message translates to:
+  /// **'Battle Mode'**
+  String get exploreDebugBattleMode;
+
+  /// Normal battle mode
+  ///
+  /// In en, this message translates to:
+  /// **'Normal'**
+  String get exploreDebugBattleNormal;
+
+  /// Auto win battle mode
+  ///
+  /// In en, this message translates to:
+  /// **'Auto Win'**
+  String get exploreDebugBattleAutoWin;
+
+  /// Auto lose battle mode
+  ///
+  /// In en, this message translates to:
+  /// **'Auto Lose'**
+  String get exploreDebugBattleAutoLose;
+
+  /// Button to reset all used houses
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Houses'**
+  String get exploreDebugResetHouses;
+
+  /// Message when houses have been reset
+  ///
+  /// In en, this message translates to:
+  /// **'All houses reset.'**
+  String get exploreDebugHousesReset;
+
+  /// Button to regenerate the map
+  ///
+  /// In en, this message translates to:
+  /// **'Regenerate Map'**
+  String get exploreDebugRegenerateMap;
+
+  /// Message when map has been regenerated
+  ///
+  /// In en, this message translates to:
+  /// **'Map regenerated.'**
+  String get exploreDebugMapRegenerated;
 }
 
 class _AppLocalizationsDelegate

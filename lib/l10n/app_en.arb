@@ -729,5 +729,81 @@
     "exploreNotEnoughAp": "Not enough action points.",
     "@exploreNotEnoughAp": {
         "description": "Message when player lacks AP for an action"
+    },
+    "exploreDebugTitle": "Debug Tools",
+    "@exploreDebugTitle": {
+        "description": "Title for explore debug dialog"
+    },
+    "exploreDebugToggleFog": "Reveal Map",
+    "@exploreDebugToggleFog": {
+        "description": "Toggle to reveal or hide fog of war"
+    },
+    "exploreDebugFogOn": "Fog ON",
+    "@exploreDebugFogOn": {
+        "description": "Status when fog is enabled"
+    },
+    "exploreDebugFogOff": "Fog OFF",
+    "@exploreDebugFogOff": {
+        "description": "Status when fog is disabled (map revealed)"
+    },
+    "exploreDebugModifyAp": "Set AP",
+    "@exploreDebugModifyAp": {
+        "description": "Label for modify action points"
+    },
+    "exploreDebugApHint": "Enter AP value",
+    "@exploreDebugApHint": {
+        "description": "Hint for AP input field"
+    },
+    "exploreDebugTeleport": "Teleport",
+    "@exploreDebugTeleport": {
+        "description": "Label for teleport feature"
+    },
+    "exploreDebugTeleportX": "X",
+    "@exploreDebugTeleportX": {
+        "description": "Label for X coordinate input"
+    },
+    "exploreDebugTeleportY": "Y",
+    "@exploreDebugTeleportY": {
+        "description": "Label for Y coordinate input"
+    },
+    "exploreDebugTeleportGo": "Go",
+    "@exploreDebugTeleportGo": {
+        "description": "Button to execute teleport"
+    },
+    "exploreDebugTeleportInvalid": "Invalid position or non-walkable cell.",
+    "@exploreDebugTeleportInvalid": {
+        "description": "Error when teleport target is invalid"
+    },
+    "exploreDebugBattleMode": "Battle Mode",
+    "@exploreDebugBattleMode": {
+        "description": "Label for battle mode toggle"
+    },
+    "exploreDebugBattleNormal": "Normal",
+    "@exploreDebugBattleNormal": {
+        "description": "Normal battle mode"
+    },
+    "exploreDebugBattleAutoWin": "Auto Win",
+    "@exploreDebugBattleAutoWin": {
+        "description": "Auto win battle mode"
+    },
+    "exploreDebugBattleAutoLose": "Auto Lose",
+    "@exploreDebugBattleAutoLose": {
+        "description": "Auto lose battle mode"
+    },
+    "exploreDebugResetHouses": "Reset Houses",
+    "@exploreDebugResetHouses": {
+        "description": "Button to reset all used houses"
+    },
+    "exploreDebugHousesReset": "All houses reset.",
+    "@exploreDebugHousesReset": {
+        "description": "Message when houses have been reset"
+    },
+    "exploreDebugRegenerateMap": "Regenerate Map",
+    "@exploreDebugRegenerateMap": {
+        "description": "Button to regenerate the map"
+    },
+    "exploreDebugMapRegenerated": "Map regenerated.",
+    "@exploreDebugMapRegenerated": {
+        "description": "Message when map has been regenerated"
     }
 }

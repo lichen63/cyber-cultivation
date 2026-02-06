@@ -541,4 +541,61 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get exploreNotEnoughAp => '行动力不足。';
+
+  @override
+  String get exploreDebugTitle => '调试工具';
+
+  @override
+  String get exploreDebugToggleFog => '显示地图';
+
+  @override
+  String get exploreDebugFogOn => '迷雾 开';
+
+  @override
+  String get exploreDebugFogOff => '迷雾 关';
+
+  @override
+  String get exploreDebugModifyAp => '设置行动力';
+
+  @override
+  String get exploreDebugApHint => '输入行动力值';
+
+  @override
+  String get exploreDebugTeleport => '传送';
+
+  @override
+  String get exploreDebugTeleportX => 'X';
+
+  @override
+  String get exploreDebugTeleportY => 'Y';
+
+  @override
+  String get exploreDebugTeleportGo => '传送';
+
+  @override
+  String get exploreDebugTeleportInvalid => '无效位置或不可通行的格子。';
+
+  @override
+  String get exploreDebugBattleMode => '战斗模式';
+
+  @override
+  String get exploreDebugBattleNormal => '正常';
+
+  @override
+  String get exploreDebugBattleAutoWin => '必胜';
+
+  @override
+  String get exploreDebugBattleAutoLose => '必败';
+
+  @override
+  String get exploreDebugResetHouses => '重置房屋';
+
+  @override
+  String get exploreDebugHousesReset => '所有房屋已重置。';
+
+  @override
+  String get exploreDebugRegenerateMap => '重新生成地图';
+
+  @override
+  String get exploreDebugMapRegenerated => '地图已重新生成。';
 }

@@ -548,4 +548,62 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get exploreNotEnoughAp => 'Not enough action points.';
+
+  @override
+  String get exploreDebugTitle => 'Debug Tools';
+
+  @override
+  String get exploreDebugToggleFog => 'Reveal Map';
+
+  @override
+  String get exploreDebugFogOn => 'Fog ON';
+
+  @override
+  String get exploreDebugFogOff => 'Fog OFF';
+
+  @override
+  String get exploreDebugModifyAp => 'Set AP';
+
+  @override
+  String get exploreDebugApHint => 'Enter AP value';
+
+  @override
+  String get exploreDebugTeleport => 'Teleport';
+
+  @override
+  String get exploreDebugTeleportX => 'X';
+
+  @override
+  String get exploreDebugTeleportY => 'Y';
+
+  @override
+  String get exploreDebugTeleportGo => 'Go';
+
+  @override
+  String get exploreDebugTeleportInvalid =>
+      'Invalid position or non-walkable cell.';
+
+  @override
+  String get exploreDebugBattleMode => 'Battle Mode';
+
+  @override
+  String get exploreDebugBattleNormal => 'Normal';
+
+  @override
+  String get exploreDebugBattleAutoWin => 'Auto Win';
+
+  @override
+  String get exploreDebugBattleAutoLose => 'Auto Lose';
+
+  @override
+  String get exploreDebugResetHouses => 'Reset Houses';
+
+  @override
+  String get exploreDebugHousesReset => 'All houses reset.';
+
+  @override
+  String get exploreDebugRegenerateMap => 'Regenerate Map';
+
+  @override
+  String get exploreDebugMapRegenerated => 'Map regenerated.';
 }

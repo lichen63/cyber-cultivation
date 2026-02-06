@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:desktop_multi_window/desktop_multi_window.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
@@ -12,6 +13,7 @@ import '../l10n/app_localizations.dart';
 import '../models/battle_result.dart';
 import '../models/explore_map.dart';
 import 'battle_dialog.dart';
+import 'explore_debug_dialog.dart';
 
 /// Callback type for EXP changes from explore window
 typedef ExpChangeCallback = void Function(double newExp);
@@ -339,6 +341,10 @@ class _ExploreWindowContentState extends State<ExploreWindowContent>
 
   /// Track current theme colors locally so we react to parent rebuilds
   late AppThemeColors _colors;
+
+  // Debug state
+  bool _debugFogRevealed = false;
+  DebugBattleMode _debugBattleMode = DebugBattleMode.normal;
 
   /// Mark cells within the current FOV as visited (Manhattan distance)
   void _updateVisitedCells() {
@@ -815,42 +821,7 @@ class _ExploreWindowContentState extends State<ExploreWindowContent>
     int dx,
     int dy,
   ) async {
-    final l10n = AppLocalizations.of(context)!;
-
-    // Judge battle outcome
-    final outcome = _battleService.judgeBattle(playerFC, enemyFC);
-
-    // Calculate EXP change
-    final expChange = _battleService.calculateExpChange(
-      outcome,
-      enemyCell.type,
-      _currentExp,
-      widget.maxExp,
-    );
-
-    final result = BattleResult(
-      enemyType: enemyCell.type,
-      playerFC: playerFC,
-      enemyFC: enemyFC,
-      outcome: outcome,
-      expChange: expChange,
-    );
-
-    // Apply EXP change and sync to main window BEFORE showing dialog
-    // This way the main window updates immediately when result is shown
-    _applyBattleExpChange(result.expChange);
-
-    // Show result dialog
-    await showBattleResultDialog(
-      context: context,
-      result: result,
-      colors: _colors,
-      l10n: l10n,
-    );
-
-    // Apply map changes (cell update, player move) after dialog
-    if (!mounted) return;
-    _applyBattleMapChanges(result, enemyCell, dx, dy);
+    await _executeBattleAndApply(enemyCell, playerFC, enemyFC, dx, dy);
   }
 
   /// Handle flee attempt
@@ -886,37 +857,8 @@ class _ExploreWindowContentState extends State<ExploreWindowContent>
     if (!mounted) return;
 
     if (!fleeSuccess) {
-      // Flee failed - forced to fight normally (no escape)
-      final outcome = _battleService.judgeBattle(playerFC, enemyFC);
-      final expChange = _battleService.calculateExpChange(
-        outcome,
-        enemyCell.type,
-        _currentExp,
-        widget.maxExp,
-      );
-
-      final result = BattleResult(
-        enemyType: enemyCell.type,
-        playerFC: playerFC,
-        enemyFC: enemyFC,
-        outcome: outcome,
-        expChange: expChange,
-      );
-
-      // Apply EXP change and sync BEFORE showing dialog
-      _applyBattleExpChange(result.expChange);
-
-      // Show defeat result
-      await showBattleResultDialog(
-        context: context,
-        result: result,
-        colors: _colors,
-        l10n: l10n,
-      );
-
-      // Apply map changes after dialog
-      if (!mounted) return;
-      _applyBattleMapChanges(result, enemyCell, dx, dy);
+      // Flee failed - forced to fight (no escape)
+      await _executeBattleAndApply(enemyCell, playerFC, enemyFC, dx, dy);
     }
     // If flee succeeded, just return to exploration (enemy stays)
   }
@@ -928,6 +870,59 @@ class _ExploreWindowContentState extends State<ExploreWindowContent>
     });
     // Sync to main window immediately
     _syncExpToMainWindow();
+  }
+
+  /// Judge battle outcome, respecting debug battle mode overrides
+  BattleOutcome _judgeBattleOutcome(double playerFC, double enemyFC) {
+    if (_debugBattleMode == DebugBattleMode.autoWin) {
+      return BattleOutcome.victory;
+    } else if (_debugBattleMode == DebugBattleMode.autoLose) {
+      return BattleOutcome.defeat;
+    }
+    return _battleService.judgeBattle(playerFC, enemyFC);
+  }
+
+  /// Execute a battle: judge outcome, calculate rewards, show result dialog,
+  /// and apply map changes. Shared by direct fights and flee-failed fights.
+  Future<void> _executeBattleAndApply(
+    ExploreCell enemyCell,
+    double playerFC,
+    double enemyFC,
+    int dx,
+    int dy,
+  ) async {
+    final l10n = AppLocalizations.of(context)!;
+    final outcome = _judgeBattleOutcome(playerFC, enemyFC);
+
+    final expChange = _battleService.calculateExpChange(
+      outcome,
+      enemyCell.type,
+      _currentExp,
+      widget.maxExp,
+    );
+
+    final result = BattleResult(
+      enemyType: enemyCell.type,
+      playerFC: playerFC,
+      enemyFC: enemyFC,
+      outcome: outcome,
+      expChange: expChange,
+    );
+
+    // Apply EXP change and sync to main window BEFORE showing dialog
+    _applyBattleExpChange(result.expChange);
+
+    // Show result dialog
+    await showBattleResultDialog(
+      context: context,
+      result: result,
+      colors: _colors,
+      l10n: l10n,
+    );
+
+    // Apply map changes (cell update, player move) after dialog
+    if (!mounted) return;
+    _applyBattleMapChanges(result, enemyCell, dx, dy);
   }
 
   /// Apply map changes after battle (cell update, player movement)
@@ -1253,6 +1248,21 @@ class _ExploreWindowContentState extends State<ExploreWindowContent>
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                 ),
+                if (kDebugMode) ...[
+                  const SizedBox(width: 8),
+                  // Debug tools button
+                  IconButton(
+                    onPressed: _showDebugDialog,
+                    icon: Icon(
+                      Icons.bug_report,
+                      color: _colors.accent,
+                      size: 18,
+                    ),
+                    tooltip: l10n.exploreDebugTitle,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                ],
                 const SizedBox(width: 8),
                 // Close button
                 IconButton(
@@ -1264,6 +1274,75 @@ class _ExploreWindowContentState extends State<ExploreWindowContent>
             );
           },
         ),
+      ),
+    );
+  }
+
+  /// Show the debug tools dialog
+  void _showDebugDialog() {
+    showDialog(
+      context: context,
+      barrierColor: _colors.overlay,
+      builder: (context) => ExploreDebugDialog(
+        themeColors: _colors,
+        fogRevealed: _debugFogRevealed,
+        currentAP: _map.currentAP,
+        maxAP: _map.maxAP,
+        playerX: _map.playerX,
+        playerY: _map.playerY,
+        gridSize: ExploreConstants.gridSize,
+        battleMode: _debugBattleMode,
+        onFogToggle: (revealed) {
+          setState(() => _debugFogRevealed = revealed);
+        },
+        onSetAP: (ap) {
+          setState(() {
+            _map.currentAP = ap.clamp(0, _map.maxAP);
+          });
+        },
+        onTeleport: (x, y) {
+          if (_map.canMoveTo(x, y)) {
+            setState(() {
+              _map.playerX = x;
+              _map.playerY = y;
+              _updateVisitedCells();
+            });
+            _centerOnPlayer();
+          }
+        },
+        onBattleModeChanged: (mode) {
+          setState(() => _debugBattleMode = mode);
+        },
+        onResetHouses: () {
+          setState(() {
+            _map.usedHouses.clear();
+          });
+          final l10n = AppLocalizations.of(context)!;
+          _showFloatingToast(
+            l10n.exploreDebugHousesReset,
+            color: _colors.accent,
+          );
+        },
+        onRegenerateMap: () {
+          setState(() {
+            final generator = ExploreMapGenerator();
+            _map = generator.generate(
+              playerLevel: widget.level,
+              playerExp: widget.currentExp,
+            );
+            _initializeAP();
+            _updateVisitedCells();
+            _debugFogRevealed = false;
+          });
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _centerOnPlayer();
+          });
+          final l10n = AppLocalizations.of(context)!;
+          _showFloatingToast(
+            l10n.exploreDebugMapRegenerated,
+            color: _colors.accent,
+          );
+        },
       ),
     );
   }
@@ -1459,6 +1538,7 @@ class _ExploreWindowContentState extends State<ExploreWindowContent>
               map: _map,
               themeColors: _colors,
               visitedCells: _map.visitedCells,
+              fogRevealed: _debugFogRevealed,
             ),
             size: Size(gridPixelSize, gridPixelSize),
           ),
@@ -1473,11 +1553,13 @@ class ExploreMapPainter extends CustomPainter {
   final ExploreMap map;
   final AppThemeColors themeColors;
   final Set<int> visitedCells;
+  final bool fogRevealed;
 
   ExploreMapPainter({
     required this.map,
     required this.themeColors,
     required this.visitedCells,
+    this.fogRevealed = false,
   });
 
   /// Check if a cell is within the current FOV (Manhattan distance)
@@ -1494,12 +1576,26 @@ class ExploreMapPainter extends CustomPainter {
     final playerY = map.playerY;
     final mapWidth = map.width;
 
-    // Draw fog background over entire grid
-    final fogColor = isDark
-        ? ExploreConstants.fogColorDark
-        : ExploreConstants.fogColorLight;
-    final fogPaint = Paint()..color = fogColor;
-    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), fogPaint);
+    // Draw fog background over entire grid (skip if fog is revealed)
+    if (!fogRevealed) {
+      final fogColor = isDark
+          ? ExploreConstants.fogColorDark
+          : ExploreConstants.fogColorLight;
+      final fogPaint = Paint()..color = fogColor;
+      canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), fogPaint);
+    }
+
+    // When fog is revealed, draw all cells with blank background first
+    if (fogRevealed) {
+      final blankAll = isDark
+          ? ExploreConstants.blankColorDark
+          : ExploreConstants.blankColorLight;
+      final blankAllPaint = Paint()..color = blankAll;
+      canvas.drawRect(
+        Rect.fromLTWH(0, 0, size.width, size.height),
+        blankAllPaint,
+      );
+    }
 
     // Draw grid lines across entire grid so cell shapes are visible in fog
     final fogGridLineColor = isDark
@@ -1521,6 +1617,27 @@ class ExploreMapPainter extends CustomPainter {
         Offset(pos, size.height),
         fogGridLinePaint,
       );
+    }
+
+    // When fog is revealed, draw all cell contents
+    if (fogRevealed) {
+      for (int y = 0; y < map.height; y++) {
+        for (int x = 0; x < map.width; x++) {
+          final cell = map.grid[y][x];
+          if (cell.type == ExploreCellType.blank) continue;
+          final cellRect = Rect.fromLTWH(
+            x * cellSize + 1,
+            y * cellSize + 1,
+            cellSize - 2,
+            cellSize - 2,
+          );
+          final paint = Paint()..color = _getCellColor(cell.type, isDark);
+          canvas.drawRect(cellRect, paint);
+        }
+      }
+      // Draw player on top and return early
+      _drawPlayer(canvas, playerX, playerY, cellSize);
+      return;
     }
 
     // Prepare paints
@@ -1708,6 +1825,7 @@ class ExploreMapPainter extends CustomPainter {
     return oldDelegate.map.playerX != map.playerX ||
         oldDelegate.map.playerY != map.playerY ||
         oldDelegate.visitedCells.length != visitedCells.length ||
-        oldDelegate.themeColors != themeColors;
+        oldDelegate.themeColors != themeColors ||
+        oldDelegate.fogRevealed != fogRevealed;
   }
 }
