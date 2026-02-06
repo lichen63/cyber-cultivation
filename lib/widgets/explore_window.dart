@@ -189,7 +189,7 @@ Future<void> showExploreWindow({
 }
 
 /// Entry point for the explore window - called from main.dart
-class ExploreWindowApp extends StatelessWidget {
+class ExploreWindowApp extends StatefulWidget {
   final Map<String, dynamic> args;
   final int windowId;
 
@@ -200,24 +200,49 @@ class ExploreWindowApp extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final themeMode = args['themeMode'] == 'dark'
+  State<ExploreWindowApp> createState() => _ExploreWindowAppState();
+}
+
+class _ExploreWindowAppState extends State<ExploreWindowApp> {
+  late AppThemeColors _themeColors;
+
+  @override
+  void initState() {
+    super.initState();
+    final themeMode = widget.args['themeMode'] == 'dark'
         ? AppThemeMode.dark
         : AppThemeMode.light;
-    final themeColors = AppThemeColors.fromMode(themeMode);
+    _themeColors = AppThemeColors.fromMode(themeMode);
 
+    // Listen for theme change messages from the main window
+    DesktopMultiWindow.setMethodHandler((call, fromWindowId) async {
+      if (call.method == 'themeChanged') {
+        final newThemeMode = call.arguments == 'dark'
+            ? AppThemeMode.dark
+            : AppThemeMode.light;
+        setState(() {
+          _themeColors = AppThemeColors.fromMode(newThemeMode);
+        });
+        return 'ok';
+      }
+      return null;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     // Extract saved map data if available
-    final savedMapData = args['savedMapData'] as Map<String, dynamic>?;
+    final savedMapData = widget.args['savedMapData'] as Map<String, dynamic>?;
 
     // Extract level and exp
-    final level = args['level'] as int? ?? 1;
-    final currentExp = (args['currentExp'] as num?)?.toDouble() ?? 0.0;
-    final maxExp = (args['maxExp'] as num?)?.toDouble() ?? 100.0;
+    final level = widget.args['level'] as int? ?? 1;
+    final currentExp = (widget.args['currentExp'] as num?)?.toDouble() ?? 0.0;
+    final maxExp = (widget.args['maxExp'] as num?)?.toDouble() ?? 100.0;
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        brightness: themeColors.brightness,
+        brightness: _themeColors.brightness,
         fontFamily: 'NotoSansSC',
       ),
       localizationsDelegates: const [
@@ -228,8 +253,8 @@ class ExploreWindowApp extends StatelessWidget {
       ],
       supportedLocales: AppLocalizations.supportedLocales,
       home: ExploreWindowContent(
-        themeColors: themeColors,
-        windowId: windowId,
+        themeColors: _themeColors,
+        windowId: widget.windowId,
         savedMapData: savedMapData,
         level: level,
         currentExp: currentExp,
@@ -276,7 +301,8 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
   // Battle service
   final BattleService _battleService = BattleService();
 
-  AppThemeColors get _colors => widget.themeColors;
+  /// Track current theme colors locally so we react to parent rebuilds
+  late AppThemeColors _colors;
 
   /// Mark cells within the current FOV as visited (Manhattan distance)
   void _updateVisitedCells() {
@@ -294,9 +320,18 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
   @override
   void initState() {
     super.initState();
+    _colors = widget.themeColors;
     _currentExp = widget.currentExp;
     _transformationController = TransformationController();
     _generateMap();
+  }
+
+  @override
+  void didUpdateWidget(ExploreWindowContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.themeColors != widget.themeColors) {
+      _colors = widget.themeColors;
+    }
   }
 
   @override
@@ -1350,6 +1385,7 @@ class ExploreMapPainter extends CustomPainter {
   bool shouldRepaint(ExploreMapPainter oldDelegate) {
     return oldDelegate.map.playerX != map.playerX ||
         oldDelegate.map.playerY != map.playerY ||
-        oldDelegate.visitedCells.length != visitedCells.length;
+        oldDelegate.visitedCells.length != visitedCells.length ||
+        oldDelegate.themeColors != themeColors;
   }
 }

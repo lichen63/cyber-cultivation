@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -1114,6 +1115,15 @@ class _MyHomePageState extends State<MyHomePage>
     );
   }
 
+  /// Notify the explore sub-window about a theme change
+  void _notifyExploreWindowThemeChanged(AppThemeMode mode) {
+    final windowId = ExploreWindowManager.windowId;
+    if (windowId != null) {
+      final themeStr = mode == AppThemeMode.dark ? 'dark' : 'light';
+      DesktopMultiWindow.invokeMethod(windowId, 'themeChanged', themeStr);
+    }
+  }
+
   void _showTodoDialog() {
     showDialog(
       context: context,
@@ -1182,6 +1192,8 @@ class _MyHomePageState extends State<MyHomePage>
         onThemeModeChanged: (value) {
           setState(() => _themeMode = value);
           widget.onThemeModeChanged?.call(value);
+          // Notify explore window (if open) about theme change
+          _notifyExploreWindowThemeChanged(value);
           _saveGameData();
         },
         onMenuBarSettingsChanged: (value) {
