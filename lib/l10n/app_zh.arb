@@ -166,5 +166,11 @@
     "battleResultDefeat": "失败！",
     "battleExpGained": "+{exp} 经验",
     "battleExpLost": "-{exp} 经验",
-    "battleOkButton": "确定"
+    "battleOkButton": "确定",
+    "exploreApLabel": "行动力",
+    "exploreApExhaustedTitle": "行动力耗尽",
+    "exploreApExhaustedContent": "你已没有行动力，离开后下次将开启新的探索。",
+    "exploreHouseRestoreAp": "在屋中休憩，恢复了 +{ap} 行动力。",
+    "exploreHouseAlreadyUsed": "这间屋子已经使用过了。",
+    "exploreNotEnoughAp": "行动力不足。"
 }

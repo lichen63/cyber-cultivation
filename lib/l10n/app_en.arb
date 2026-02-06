@@ -700,5 +700,34 @@
     "battleOkButton": "OK",
     "@battleOkButton": {
         "description": "OK button in battle dialogs"
+    },
+    "exploreApLabel": "AP",
+    "@exploreApLabel": {
+        "description": "Label for action points display"
+    },
+    "exploreApExhaustedTitle": "Action Points Exhausted",
+    "@exploreApExhaustedTitle": {
+        "description": "Title for AP exhausted dialog"
+    },
+    "exploreApExhaustedContent": "You have no action points left. Leave to start a new exploration next time.",
+    "@exploreApExhaustedContent": {
+        "description": "Content for AP exhausted dialog"
+    },
+    "exploreHouseRestoreAp": "Rested at the house. +{ap} AP restored.",
+    "@exploreHouseRestoreAp": {
+        "description": "Message when player restores AP at a house",
+        "placeholders": {
+            "ap": {
+                "type": "int"
+            }
+        }
+    },
+    "exploreHouseAlreadyUsed": "This house has already been used.",
+    "@exploreHouseAlreadyUsed": {
+        "description": "Message when house has already been used this session"
+    },
+    "exploreNotEnoughAp": "Not enough action points.",
+    "@exploreNotEnoughAp": {
+        "description": "Message when player lacks AP for an action"
     }
 }

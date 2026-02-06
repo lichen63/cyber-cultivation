@@ -527,4 +527,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get battleOkButton => 'OK';
+
+  @override
+  String get exploreApLabel => 'AP';
+
+  @override
+  String get exploreApExhaustedTitle => 'Action Points Exhausted';
+
+  @override
+  String get exploreApExhaustedContent =>
+      'You have no action points left. Leave to start a new exploration next time.';
+
+  @override
+  String exploreHouseRestoreAp(int ap) {
+    return 'Rested at the house. +$ap AP restored.';
+  }
+
+  @override
+  String get exploreHouseAlreadyUsed => 'This house has already been used.';
+
+  @override
+  String get exploreNotEnoughAp => 'Not enough action points.';
 }

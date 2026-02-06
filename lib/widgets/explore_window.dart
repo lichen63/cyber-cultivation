@@ -381,6 +381,9 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
     if (widget.savedMapData != null) {
       try {
         _map = ExploreMap.fromJson(widget.savedMapData!);
+        // Re-entry: recalculate max AP from current level but
+        // keep the saved current AP so exhausted maps stay exhausted
+        _map.maxAP = ExploreMap.calculateMaxAP(widget.level);
         // Mark current FOV as visited (in case of old saves without visited data)
         _updateVisitedCells();
         // Center on player position when restoring
@@ -395,6 +398,7 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
           playerLevel: widget.level,
           playerExp: widget.currentExp,
         );
+        _initializeAP();
         _updateVisitedCells();
         WidgetsBinding.instance.addPostFrameCallback((_) {
           _centerOnPlayer();
@@ -407,6 +411,7 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
         playerLevel: widget.level,
         playerExp: widget.currentExp,
       );
+      _initializeAP();
       // Mark initial FOV as visited
       _updateVisitedCells();
       // Center the view on player initially (FOV is centered on player)
@@ -416,6 +421,105 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
     }
 
     setState(() => _isLoading = false);
+  }
+
+  /// Initialize AP for this session based on current player level
+  void _initializeAP() {
+    final maxAP = ExploreMap.calculateMaxAP(widget.level);
+    _map.maxAP = maxAP;
+    _map.currentAP = maxAP;
+    _map.usedHouses.clear();
+  }
+
+  /// Consume AP for an action. Returns true if enough AP, false otherwise.
+  bool _consumeAP(int cost) {
+    if (_map.currentAP < cost) return false;
+    setState(() {
+      _map.currentAP -= cost;
+    });
+    return true;
+  }
+
+  /// Check if player has enough AP and show exhausted dialog if not
+  bool _checkAP(int cost) {
+    if (_map.currentAP >= cost) return true;
+    _showApExhaustedDialog();
+    return false;
+  }
+
+  /// Show AP exhausted dialog prompting player to leave
+  void _showApExhaustedDialog() {
+    final l10n = AppLocalizations.of(context)!;
+    showDialog(
+      context: context,
+      barrierColor: _colors.overlay,
+      builder: (context) => AlertDialog(
+        backgroundColor: _colors.dialogBackground,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(
+            ExploreConstants.dialogBorderRadius,
+          ),
+          side: BorderSide(
+            color: _colors.border,
+            width: ExploreConstants.dialogBorderWidth,
+          ),
+        ),
+        title: Text(
+          l10n.exploreApExhaustedTitle,
+          style: TextStyle(color: _colors.primaryText),
+        ),
+        content: Text(
+          l10n.exploreApExhaustedContent,
+          style: TextStyle(color: _colors.secondaryText),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              l10n.cancelButtonText,
+              style: TextStyle(color: _colors.inactive),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _closeWindow(saveProgress: false);
+            },
+            child: Text(
+              l10n.exploreExitButton,
+              style: TextStyle(color: _colors.error),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Handle stepping on a house cell
+  void _handleHouseInteraction(int x, int y) {
+    final l10n = AppLocalizations.of(context)!;
+    if (_map.isHouseUsed(x, y)) {
+      // Already used this session
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.exploreHouseAlreadyUsed),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    } else {
+      // Restore AP and mark house as used
+      _map.markHouseUsed(x, y);
+      final restored = ExploreConstants.apHouseRestore;
+      setState(() {
+        _map.currentAP = (_map.currentAP + restored).clamp(0, _map.maxAP);
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.exploreHouseRestoreAp(restored)),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   void _centerOnPlayer() {
@@ -540,11 +644,41 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
     // Check for enemy encounters
     if (targetCell.type == ExploreCellType.monster ||
         targetCell.type == ExploreCellType.boss) {
+      // AP check is done inside _initiateBattle (fight/flee have different costs)
       _initiateBattle(targetCell, dx, dy);
       return;
     }
 
-    // Normal move
+    // Check for NPC interaction
+    if (targetCell.type == ExploreCellType.npc) {
+      if (!_checkAP(ExploreConstants.apCostMove + ExploreConstants.apCostNpc)) {
+        return;
+      }
+      _consumeAP(ExploreConstants.apCostMove + ExploreConstants.apCostNpc);
+      if (_map.movePlayer(dx, dy)) {
+        _updateVisitedCells();
+        setState(() {});
+        _panToKeepPlayerVisible();
+      }
+      return;
+    }
+
+    // Check for house interaction
+    if (targetCell.type == ExploreCellType.house) {
+      if (!_checkAP(ExploreConstants.apCostMove)) return;
+      _consumeAP(ExploreConstants.apCostMove);
+      if (_map.movePlayer(dx, dy)) {
+        _updateVisitedCells();
+        setState(() {});
+        _panToKeepPlayerVisible();
+        _handleHouseInteraction(newX, newY);
+      }
+      return;
+    }
+
+    // Normal move — check AP
+    if (!_checkAP(ExploreConstants.apCostMove)) return;
+    _consumeAP(ExploreConstants.apCostMove);
     if (_map.movePlayer(dx, dy)) {
       _updateVisitedCells();
       setState(() {});
@@ -568,6 +702,20 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
       enemyCell.type,
     );
 
+    // Determine AP cost for this fight
+    final fightCost = enemyCell.type == ExploreCellType.boss
+        ? ExploreConstants.apCostFightBoss
+        : ExploreConstants.apCostFightMonster;
+
+    // Check if player has enough AP to fight (move + fight cost)
+    // We need at least move cost + flee cost to even attempt the encounter
+    if (!_checkAP(
+      ExploreConstants.apCostMove + ExploreConstants.apCostFleeSuccess,
+    )) {
+      setState(() => _isBattleInProgress = false);
+      return;
+    }
+
     // Show encounter dialog
     final shouldFight = await showBattleEncounterDialog(
       context: context,
@@ -583,11 +731,12 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
     }
 
     if (shouldFight == true) {
-      // Player chose to fight - use the same enemyFC we showed
+      // Player chose to fight — consume move + fight AP
+      _consumeAP(ExploreConstants.apCostMove + fightCost);
       await _performBattle(enemyCell, playerFC, enemyFC, dx, dy);
     } else if (shouldFight == false) {
       // Player chose to flee
-      await _handleFlee(enemyCell, playerFC, enemyFC, dx, dy);
+      await _handleFlee(enemyCell, playerFC, enemyFC, dx, dy, fightCost);
     }
 
     if (!mounted) return;
@@ -647,9 +796,20 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
     double enemyFC,
     int dx,
     int dy,
+    int fightCost,
   ) async {
     final l10n = AppLocalizations.of(context)!;
     final fleeSuccess = _battleService.attemptFlee();
+
+    if (fleeSuccess) {
+      // Flee success costs move + flee AP
+      _consumeAP(
+        ExploreConstants.apCostMove + ExploreConstants.apCostFleeSuccess,
+      );
+    } else {
+      // Flee failed → forced fight costs move + fight AP
+      _consumeAP(ExploreConstants.apCostMove + fightCost);
+    }
 
     // Show flee result
     await showFleeResultDialog(
@@ -1082,6 +1242,12 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
 
   Widget _buildBottomPanel(AppLocalizations l10n) {
     final fightingCapacity = _calculateFightingCapacity();
+    final apRatio = _map.maxAP > 0 ? _map.currentAP / _map.maxAP : 0.0;
+    final apColor = apRatio > 0.5
+        ? ExploreConstants.apColorHigh
+        : apRatio > 0.25
+        ? ExploreConstants.apColorMedium
+        : ExploreConstants.apColorLow;
 
     return Container(
       height: ExploreConstants.bottomPanelHeight,
@@ -1119,6 +1285,25 @@ class _ExploreWindowContentState extends State<ExploreWindowContent> {
               NumberFormatter.format(fightingCapacity),
               style: TextStyle(
                 color: _colors.primaryText,
+                fontSize: ExploreConstants.bottomPanelFontSize,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(width: 16),
+            // Action Points display
+            Icon(Icons.bolt, color: apColor, size: 18),
+            const SizedBox(width: 4),
+            Text(
+              '${l10n.exploreApLabel}: ',
+              style: TextStyle(
+                color: _colors.secondaryText,
+                fontSize: ExploreConstants.bottomPanelFontSize,
+              ),
+            ),
+            Text(
+              '${_map.currentAP} / ${_map.maxAP}',
+              style: TextStyle(
+                color: apColor,
                 fontSize: ExploreConstants.bottomPanelFontSize,
                 fontWeight: FontWeight.bold,
               ),

@@ -521,4 +521,24 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get battleOkButton => '确定';
+
+  @override
+  String get exploreApLabel => '行动力';
+
+  @override
+  String get exploreApExhaustedTitle => '行动力耗尽';
+
+  @override
+  String get exploreApExhaustedContent => '你已没有行动力，离开后下次将开启新的探索。';
+
+  @override
+  String exploreHouseRestoreAp(int ap) {
+    return '在屋中休憩，恢复了 +$ap 行动力。';
+  }
+
+  @override
+  String get exploreHouseAlreadyUsed => '这间屋子已经使用过了。';
+
+  @override
+  String get exploreNotEnoughAp => '行动力不足。';
 }

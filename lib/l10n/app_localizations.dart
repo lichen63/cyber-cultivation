@@ -1099,6 +1099,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'OK'**
   String get battleOkButton;
+
+  /// Label for action points display
+  ///
+  /// In en, this message translates to:
+  /// **'AP'**
+  String get exploreApLabel;
+
+  /// Title for AP exhausted dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Action Points Exhausted'**
+  String get exploreApExhaustedTitle;
+
+  /// Content for AP exhausted dialog
+  ///
+  /// In en, this message translates to:
+  /// **'You have no action points left. Leave to start a new exploration next time.'**
+  String get exploreApExhaustedContent;
+
+  /// Message when player restores AP at a house
+  ///
+  /// In en, this message translates to:
+  /// **'Rested at the house. +{ap} AP restored.'**
+  String exploreHouseRestoreAp(int ap);
+
+  /// Message when house has already been used this session
+  ///
+  /// In en, this message translates to:
+  /// **'This house has already been used.'**
+  String get exploreHouseAlreadyUsed;
+
+  /// Message when player lacks AP for an action
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough action points.'**
+  String get exploreNotEnoughAp;
 }
 
 class _AppLocalizationsDelegate

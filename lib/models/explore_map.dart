@@ -52,6 +52,15 @@ class ExploreMap {
   /// Set of cells the player has visited/seen (encoded as y * width + x)
   final Set<int> visitedCells;
 
+  /// Current action points remaining
+  int currentAP;
+
+  /// Maximum action points for this session
+  int maxAP;
+
+  /// Set of house positions already used this session (encoded as y * width + x)
+  final Set<int> usedHouses;
+
   ExploreMap({
     required this.grid,
     required this.width,
@@ -61,7 +70,11 @@ class ExploreMap {
     required this.generatedAtLevel,
     required this.generatedAtExp,
     Set<int>? visitedCells,
-  }) : visitedCells = visitedCells ?? {};
+    this.currentAP = 0,
+    this.maxAP = 0,
+    Set<int>? usedHouses,
+  }) : visitedCells = visitedCells ?? {},
+       usedHouses = usedHouses ?? {};
 
   /// Mark a cell as visited
   void markVisited(int x, int y) {
@@ -73,6 +86,20 @@ class ExploreMap {
   /// Check if a cell has been visited
   bool isVisited(int x, int y) => visitedCells.contains(y * width + x);
 
+  /// Calculate max AP based on player level
+  static int calculateMaxAP(int level) {
+    final realm = (level - 1) ~/ 10;
+    return ExploreConstants.apBase +
+        (level - 1) * ExploreConstants.apPerLevel +
+        realm * ExploreConstants.apPerRealm;
+  }
+
+  /// Check if a house at (x, y) has been used this session
+  bool isHouseUsed(int x, int y) => usedHouses.contains(y * width + x);
+
+  /// Mark a house at (x, y) as used
+  void markHouseUsed(int x, int y) => usedHouses.add(y * width + x);
+
   /// Convert to JSON for serialization
   Map<String, dynamic> toJson() => {
     'width': width,
@@ -82,6 +109,9 @@ class ExploreMap {
     'generatedAtLevel': generatedAtLevel,
     'generatedAtExp': generatedAtExp,
     'visitedCells': visitedCells.toList(),
+    'currentAP': currentAP,
+    'maxAP': maxAP,
+    'usedHouses': usedHouses.toList(),
     'grid': grid
         .map((row) => row.map((cell) => cell.toJson()).toList())
         .toList(),
@@ -104,6 +134,12 @@ class ExploreMap {
         ? visitedJson.map((e) => e as int).toSet()
         : <int>{};
 
+    // Restore used houses if available
+    final usedHousesJson = json['usedHouses'] as List<dynamic>?;
+    final usedHousesSet = usedHousesJson != null
+        ? usedHousesJson.map((e) => e as int).toSet()
+        : <int>{};
+
     return ExploreMap(
       grid: grid,
       width: width,
@@ -114,6 +150,9 @@ class ExploreMap {
       generatedAtLevel: json['generatedAtLevel'] as int? ?? 1,
       generatedAtExp: (json['generatedAtExp'] as num?)?.toDouble() ?? 0.0,
       visitedCells: visitedSet,
+      currentAP: json['currentAP'] as int? ?? 0,
+      maxAP: json['maxAP'] as int? ?? 0,
+      usedHouses: usedHousesSet,
     );
   }
 

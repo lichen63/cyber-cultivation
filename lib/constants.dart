@@ -720,6 +720,23 @@ class ExploreConstants {
   // Flee mechanic
   static const double fleeBaseSuccessRate = 0.7; // 70% base flee chance
 
+  // Action Points (AP) system
+  static const int apBase = 100;
+  static const int apPerLevel = 2;
+  static const int apPerRealm = 20;
+  static const int apCostMove = 1;
+  static const int apCostFightMonster = 3;
+  static const int apCostFightBoss = 5;
+  static const int apCostFleeSuccess = 1;
+  static const int apCostNpc = 1;
+  static const int apCostHouse = 0;
+  static const int apHouseRestore = 10;
+
+  // AP display colors
+  static const Color apColorHigh = Color(0xFF4CAF50); // Green (>50%)
+  static const Color apColorMedium = Color(0xFFFFC107); // Yellow (25-50%)
+  static const Color apColorLow = Color(0xFFF44336); // Red (<25%)
+
   // Battle dialog styling
   static const double battleDialogWidth = 320.0;
   static const double battleDialogPadding = 24.0;
