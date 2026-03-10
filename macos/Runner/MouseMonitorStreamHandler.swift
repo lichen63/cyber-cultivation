@@ -5,6 +5,7 @@ class MouseMonitorStreamHandler: NSObject, FlutterStreamHandler {
   private var eventTap: CFMachPort?
   private var runLoopSource: CFRunLoopSource?
   private var eventSink: FlutterEventSink?
+  private var wakeObserver: NSObjectProtocol?
   
   func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
     self.eventSink = events
@@ -32,13 +33,22 @@ class MouseMonitorStreamHandler: NSObject, FlutterStreamHandler {
     guard let eventTap = CGEvent.tapCreate(
       tap: .cgSessionEventTap,
       place: .headInsertEventTap,
-      options: .defaultTap,
+      options: .listenOnly,
       eventsOfInterest: CGEventMask(eventMask),
       callback: { (proxy, type, event, refcon) -> Unmanaged<CGEvent>? in
+        // Re-enable the tap if macOS disabled it (e.g. after sleep/wake or timeout)
+        if type == .tapDisabledByTimeout || type == .tapDisabledByUserInput {
+          if let handler = Unmanaged<MouseMonitorStreamHandler>.fromOpaque(refcon!).takeUnretainedValue() as MouseMonitorStreamHandler? {
+            if let tap = handler.eventTap {
+              CGEvent.tapEnable(tap: tap, enable: true)
+            }
+          }
+          return Unmanaged.passUnretained(event)
+        }
         if let streamHandler = Unmanaged<MouseMonitorStreamHandler>.fromOpaque(refcon!).takeUnretainedValue() as MouseMonitorStreamHandler? {
           streamHandler.handleCGEvent(event: event)
         }
-        return Unmanaged.passRetained(event)
+        return Unmanaged.passUnretained(event)
       },
       userInfo: Unmanaged.passUnretained(self).toOpaque()
     ) else {
@@ -54,10 +64,25 @@ class MouseMonitorStreamHandler: NSObject, FlutterStreamHandler {
     // Enable the event tap
     CGEvent.tapEnable(tap: eventTap, enable: true)
     
+    // Re-enable the event tap after system wake from sleep
+    wakeObserver = NSWorkspace.shared.notificationCenter.addObserver(
+      forName: NSWorkspace.didWakeNotification,
+      object: nil, queue: .main
+    ) { [weak self] _ in
+      if let tap = self?.eventTap {
+        CGEvent.tapEnable(tap: tap, enable: true)
+      }
+    }
+    
     return nil
   }
   
   func onCancel(withArguments arguments: Any?) -> FlutterError? {
+    // Remove sleep/wake observer
+    if let observer = wakeObserver {
+      NSWorkspace.shared.notificationCenter.removeObserver(observer)
+      wakeObserver = nil
+    }
     // Disable and cleanup event tap
     if let eventTap = eventTap {
       CGEvent.tapEnable(tap: eventTap, enable: false)

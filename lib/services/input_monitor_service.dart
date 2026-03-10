@@ -63,6 +63,7 @@ class InputMonitorService extends ChangeNotifier {
   bool _moveToggle = false;
   bool _enableAntiSleep = false;
   double _accumulatedMoveDistance = 0.0;
+  bool _disposed = false;
 
   /// Callbacks for exp and stats updates
   final void Function(double amount)? onExpGain;
@@ -88,6 +89,7 @@ class InputMonitorService extends ChangeNotifier {
   }
 
   void _setupKeyboardListener() {
+    _keySubscription?.cancel();
     _keySubscription = _keyEventChannel.receiveBroadcastStream().listen(
       (dynamic event) {
         if (event is String) {
@@ -98,12 +100,19 @@ class InputMonitorService extends ChangeNotifier {
         }
       },
       onError: (dynamic error) {
-        debugPrint('Keyboard event error: ${error.message}');
+        debugPrint('Keyboard event error: $error');
+      },
+      onDone: () {
+        debugPrint('Keyboard event stream closed, reconnecting...');
+        if (!_disposed) {
+          Future.delayed(const Duration(seconds: 2), _setupKeyboardListener);
+        }
       },
     );
   }
 
   void _setupMouseListener() {
+    _mouseSubscription?.cancel();
     _mouseSubscription = _mouseEventChannel.receiveBroadcastStream().listen(
       (dynamic event) {
         _lastMouseMoveTime = DateTime.now();
@@ -123,7 +132,13 @@ class InputMonitorService extends ChangeNotifier {
         }
       },
       onError: (dynamic error) {
-        debugPrint('Mouse event error: ${error.message}');
+        debugPrint('Mouse event error: $error');
+      },
+      onDone: () {
+        debugPrint('Mouse event stream closed, reconnecting...');
+        if (!_disposed) {
+          Future.delayed(const Duration(seconds: 2), _setupMouseListener);
+        }
       },
     );
   }
@@ -217,6 +232,7 @@ class InputMonitorService extends ChangeNotifier {
 
   @override
   void dispose() {
+    _disposed = true;
     _keySubscription?.cancel();
     _mouseSubscription?.cancel();
     _idleCheckTimer?.cancel();

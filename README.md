@@ -31,6 +31,13 @@ A gamified desktop companion that transforms your keyboard and mouse activity in
 - **Menu Bar Integration** — Display selected stats (Pomodoro, level, system info, battery) directly in macOS menu bar
 - **Keyboard & Mouse Visualization** — Real-time input tracking with visual feedback
 
+### 🗺️ Explore Mode
+- **Procedural Map** — 150×150 roguelike map with mountains, rivers, houses, monsters, bosses, and NPCs
+- **Action Points System** — Strategic resource management—movement, battles, and interactions consume AP; rest at houses to recover
+- **FC Battle System** — Fight monsters and bosses using Fighting Capacity (FC) comparison; earn EXP for victories
+- **NPC Encounters** — Meet NPCs for random effects: EXP boosts, FC buffs, terrain changes, vision modifications, teleportation, and more
+- **Fog of War** — Limited visibility with discoverable map; save and resume exploration progress
+
 ### 🎯 Mini Games
 - **Snake** — Classic snake game with EXP rewards
 - **Flappy Bird** — Tap-to-fly arcade game
