@@ -74,6 +74,13 @@ class KeyMonitorStreamHandler: NSObject, FlutterStreamHandler {
           return Unmanaged.passUnretained(event)
         }
         if let streamHandler = Unmanaged<KeyMonitorStreamHandler>.fromOpaque(refcon!).takeUnretainedValue() as KeyMonitorStreamHandler? {
+          // Key Shield: block modifier combos for protected apps
+          if KeyShieldHandler.shared.shouldBlockEvent(event, type: type) {
+            // Still send the event for keyboard tracking, then block
+            streamHandler.handleCGEvent(event: event, type: type)
+            return nil
+          }
+          
           streamHandler.handleCGEvent(event: event, type: type)
           
           // Workaround for Flutter crash with NumLock (71)

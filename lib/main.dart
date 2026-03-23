@@ -19,10 +19,12 @@ import 'constants.dart';
 import 'l10n/app_localizations.dart';
 import 'models/daily_stats.dart';
 import 'models/game_data.dart';
+import 'models/key_shield_config.dart';
 import 'models/menu_bar_settings.dart';
 import 'models/todo_item.dart';
 import 'services/game_data_service.dart';
 import 'services/input_monitor_service.dart';
+import 'services/key_shield_service.dart';
 import 'services/menu_bar_helper.dart';
 import 'services/menu_bar_info_service.dart';
 import 'services/pomodoro_service.dart';
@@ -139,6 +141,8 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
   Locale? _locale;
   AppThemeMode _themeMode = AppThemeMode.dark;
   MenuBarSettings _menuBarSettings = const MenuBarSettings();
+  KeyShieldConfig _keyShieldConfig = const KeyShieldConfig();
+  final KeyShieldService _keyShieldService = KeyShieldService();
   String _trayIconPath = '';
   bool _trayIconPositioned = false; // Track if icon has been positioned left
   bool _isMenuBarUpdating = false; // Lock to prevent concurrent updates
@@ -175,7 +179,27 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
     MenuBarHelper.initialize(
       onItemClicked: _onMenuBarItemClicked,
       onNativePopupShowing: _hidePopupWindow,
+      onKeyShieldToggled: _onKeyShieldToggled,
     );
+  }
+
+  /// Handle Key Shield toggled from native keyboard popover
+  void _onKeyShieldToggled(bool enabled) {
+    _keyShieldConfig = _keyShieldConfig.copyWith(isEnabled: enabled);
+    _keyShieldService.syncConfig(_keyShieldConfig);
+    // Persist the toggle change to disk
+    _persistKeyShieldConfig();
+  }
+
+  /// Save only the Key Shield config change to game_save.json
+  Future<void> _persistKeyShieldConfig() async {
+    final gameDataService = GameDataService();
+    final gameData = await gameDataService.loadGameData();
+    if (gameData != null) {
+      await gameDataService.saveGameData(
+        gameData.copyWith(keyShieldConfig: _keyShieldConfig),
+      );
+    }
   }
 
   /// Hide any open popup window (used when native popup or tray menu is shown).
@@ -238,7 +262,28 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
         final gameData = await gameDataService.loadGameData();
         final todayKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
         final todayStats = gameData?.dailyStats[todayKey];
-        return {...baseData, 'keyCount': todayStats?.keyboardCount ?? 0};
+        // Use Flutter-side config for isEnabled (always up-to-date)
+        // Use native status only for runtime state (active blocking, frontmost app)
+        final keyShieldStatus = await _keyShieldService.getStatus();
+        return {
+          ...baseData,
+          'keyCount': todayStats?.keyboardCount ?? 0,
+          'keyShieldEnabled': _keyShieldConfig.isEnabled,
+          'keyShieldConfigured':
+              _keyShieldConfig.globalBlockedModifiers.isNotEmpty,
+          'keyShieldActive': keyShieldStatus.isActivelyBlocking,
+          'keyShieldApp': keyShieldStatus.frontmostAppName ?? '',
+          'keyShieldAppsCount': _keyShieldConfig.appRules.length,
+          'keyShieldBlockedModifiers': _keyShieldConfig.globalBlockedModifiers
+              .map(
+                (m) =>
+                    '${KeyShieldConstants.modifierSymbols[m] ?? ''} ${m[0].toUpperCase()}${m.substring(1)}',
+              )
+              .join(', '),
+          'keyShieldAllowedCombos': _keyShieldConfig.globalAllowedCombos
+              .map((c) => c.toString())
+              .join(', '),
+        };
 
       case 'mouse':
         final gameDataService = GameDataService();
@@ -252,6 +297,69 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
     }
   }
 
+  /// Build the labels dictionary for native Swift views from AppLocalizations.
+  /// This is the single source of truth — Swift views receive pre-resolved strings.
+  Map<String, String> _buildNativeLabels(String? localeCode) {
+    final l10n = lookupAppLocalizations(Locale(localeCode ?? 'en'));
+    return {
+      // Popover titles
+      'titleFocus': l10n.popoverTitleFocus,
+      'titleRam': l10n.popoverTitleRam,
+      'titleNetwork': l10n.popoverTitleNetwork,
+      'titleDisk': l10n.popoverTitleDisk,
+      'titleBattery': l10n.popoverTitleBattery,
+      'titleTodo': l10n.popoverTitleTodo,
+      'titleLevel': l10n.popoverTitleLevel,
+      'titleKeyboard': l10n.popoverTitleKeyboard,
+      'titleMouse': l10n.popoverTitleMouse,
+      // Shared button tooltips
+      'showWindow': l10n.popoverShowWindow,
+      'hideWindow': l10n.hideWindowText,
+      'exitApp': l10n.popoverExitApp,
+      'exitGame': l10n.exitGameText,
+      // Focus content
+      'statusLabel': l10n.popoverStatusLabel,
+      'timeRemainingLabel': l10n.popoverTimeRemainingLabel,
+      'loopsLabel': l10n.popoverLoopsLabel,
+      'statusIdle': l10n.popoverStatusIdle,
+      'statusRelaxing': l10n.popoverStatusRelaxing,
+      'statusFocusing': l10n.popoverStatusFocusing,
+      // Network content
+      'interfaceLabel': l10n.popoverInterfaceLabel,
+      'networkNameLabel': l10n.popoverNetworkNameLabel,
+      'localIpLabel': l10n.popoverLocalIpLabel,
+      'publicIpLabel': l10n.popoverPublicIpLabel,
+      'gatewayLabel': l10n.popoverGatewayLabel,
+      // Level/Exp content
+      'levelLabel': l10n.popoverLevelLabel,
+      'currentExpLabel': l10n.popoverCurrentExpLabel,
+      'maxExpLabel': l10n.popoverMaxExpLabel,
+      // Keyboard content
+      'todayKeyEventsLabel': l10n.popoverTodayKeyEventsLabel,
+      // Key Shield content
+      'keyShieldLabel': l10n.popoverKeyShieldLabel,
+      'keyShieldStatus': l10n.popoverKeyShieldStatus,
+      'keyShieldApp': l10n.popoverKeyShieldApp,
+      'keyShieldConfigure': l10n.popoverKeyShieldConfigure,
+      'keyShieldActive': l10n.keyShieldStatusActive,
+      'keyShieldInactive': l10n.keyShieldStatusInactive,
+      'keyShieldBlocking': l10n.popoverKeyShieldBlocking,
+      'keyShieldAllowing': l10n.popoverKeyShieldAllowing,
+      // Mouse content
+      'todayMouseDistanceLabel': l10n.popoverTodayMouseDistanceLabel,
+      // System info
+      'uptimeLabel': l10n.popoverUptimeLabel,
+      'uptimeDaySuffix': l10n.popoverUptimeDaySuffix,
+      'uptimeHourSuffix': l10n.popoverUptimeHourSuffix,
+      'uptimeMinuteSuffix': l10n.popoverUptimeMinuteSuffix,
+      // Tray popup
+      'appTitle': l10n.appTitle,
+      'pinWindow': l10n.popoverPinWindow,
+      'unpin': l10n.popoverUnpin,
+      'loading': l10n.popoverLoading,
+    };
+  }
+
   void _initializeFromGameData() {
     final data = widget.initialGameData;
     if (data != null) {
@@ -260,13 +368,17 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
       }
       _themeMode = data.themeMode;
       _menuBarSettings = data.menuBarSettings;
+      _keyShieldConfig = data.keyShieldConfig;
     }
     // Set initial theme for native UI components
     if (Platform.isMacOS) {
       MenuBarHelper.setTheme(
         isDark: _themeMode == AppThemeMode.dark,
         locale: _locale?.languageCode,
+        labels: _buildNativeLabels(_locale?.languageCode),
       );
+      // Sync Key Shield config to native side
+      _keyShieldService.syncConfig(_keyShieldConfig);
     }
   }
 
@@ -457,6 +569,7 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
         popupWidth: TrayPopupConstants.popupWidth,
         popupHeight: TrayPopupConstants.popupHeight,
         titleBarHeight: TrayPopupConstants.titleBarHeight,
+        labels: _buildNativeLabels(_locale?.languageCode),
       );
     } catch (e) {
       // Fallback to context menu if popup fails
@@ -515,11 +628,12 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
         menuBarSettings: _menuBarSettings,
         onLanguageChanged: (lang) {
           setState(() => _locale = lang != null ? Locale(lang) : null);
-          // Update native UI locale
+          // Update native UI locale and labels
           if (Platform.isMacOS) {
             MenuBarHelper.setTheme(
               isDark: _themeMode == AppThemeMode.dark,
               locale: lang,
+              labels: _buildNativeLabels(lang),
             );
           }
         },
@@ -530,10 +644,14 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
             MenuBarHelper.setTheme(
               isDark: mode == AppThemeMode.dark,
               locale: _locale?.languageCode,
+              labels: _buildNativeLabels(_locale?.languageCode),
             );
           }
         },
         onMenuBarSettingsChanged: _onMenuBarSettingsChanged,
+        onKeyShieldConfigChanged: (config) {
+          _keyShieldConfig = config;
+        },
         onTrayTitleChanged: _updateTrayTitle,
         onMenuBarItemsChanged: _updateMenuBarItems,
         onPomodoroStateChanged: (state) => _pomodoroState = state,
@@ -555,6 +673,7 @@ class MyHomePage extends StatefulWidget {
   final ValueChanged<String?>? onLanguageChanged;
   final ValueChanged<AppThemeMode>? onThemeModeChanged;
   final ValueChanged<MenuBarSettings>? onMenuBarSettingsChanged;
+  final ValueChanged<KeyShieldConfig>? onKeyShieldConfigChanged;
   final ValueChanged<String>? onTrayTitleChanged;
   final ValueChanged<List<MenuBarItem>>? onMenuBarItemsChanged;
   final ValueChanged<PomodoroState>? onPomodoroStateChanged;
@@ -570,6 +689,7 @@ class MyHomePage extends StatefulWidget {
     this.onLanguageChanged,
     this.onThemeModeChanged,
     this.onMenuBarSettingsChanged,
+    this.onKeyShieldConfigChanged,
     this.onTrayTitleChanged,
     this.onMenuBarItemsChanged,
     this.onPomodoroStateChanged,
@@ -605,6 +725,8 @@ class _MyHomePageState extends State<MyHomePage>
       AppConstants.defaultSystemStatsRefreshSeconds;
   late AppThemeMode _themeMode;
   late MenuBarSettings _menuBarSettings;
+  KeyShieldConfig _keyShieldConfig = const KeyShieldConfig();
+  final KeyShieldService _keyShieldService = KeyShieldService();
 
   // EXP System
   int _level = AppConstants.initialLevel;
@@ -746,6 +868,11 @@ class _MyHomePageState extends State<MyHomePage>
   }
 
   void _updateMenuBarInfo() {
+    // Update Key Shield active state for keyboard icon
+    _menuBarInfoService.isKeyShieldActive =
+        _keyShieldConfig.isEnabled &&
+        _keyShieldConfig.globalBlockedModifiers.isNotEmpty;
+
     // Update the data without notifying listeners to avoid recursion
     _menuBarInfoService.updateDataSilently(
       pomodoroState: _pomodoroService.state,
@@ -852,6 +979,7 @@ class _MyHomePageState extends State<MyHomePage>
       _language = data.language;
       _themeMode = data.themeMode;
       _menuBarSettings = data.menuBarSettings;
+      _keyShieldConfig = data.keyShieldConfig;
       _windowWidth = data.windowWidth ?? AppConstants.defaultWindowWidth;
       _windowHeight = data.windowHeight ?? AppConstants.defaultWindowHeight;
       _windowX = data.windowX;
@@ -933,6 +1061,7 @@ class _MyHomePageState extends State<MyHomePage>
           defaultPomodoroRelax: _defaultPomodoroRelax,
           defaultPomodoroLoops: _defaultPomodoroLoops,
           exploreMapData: ExploreWindowManager.savedMapData,
+          keyShieldConfig: _keyShieldConfig,
         ),
       );
     }
@@ -1177,6 +1306,14 @@ class _MyHomePageState extends State<MyHomePage>
         themeColors: _themeColors,
         menuBarSettings: _menuBarSettings,
         menuBarInfoService: _menuBarInfoService,
+        keyShieldConfig: _keyShieldConfig,
+        onKeyShieldConfigChanged: (value) {
+          setState(() => _keyShieldConfig = value);
+          _keyShieldService.syncConfig(value);
+          _updateMenuBarInfo();
+          widget.onKeyShieldConfigChanged?.call(value);
+          _saveGameData();
+        },
         onAlwaysOnTopChanged: _toggleAlwaysOnTop,
         onAntiSleepChanged: (value) {
           setState(() => _inputMonitorService.enableAntiSleep = value);

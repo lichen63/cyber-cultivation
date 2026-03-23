@@ -1321,4 +1321,250 @@ class AppLocalizationsEn extends AppLocalizations {
   String npcEffectProgressBoostNegative(int count) {
     return 'Amnesia: $count explored cells forgotten!';
   }
+
+  @override
+  String get popoverTitleFocus => 'Focus';
+
+  @override
+  String get popoverTitleRam => 'RAM';
+
+  @override
+  String get popoverTitleNetwork => 'Network';
+
+  @override
+  String get popoverTitleDisk => 'Disk';
+
+  @override
+  String get popoverTitleBattery => 'Battery';
+
+  @override
+  String get popoverTitleTodo => 'Todo';
+
+  @override
+  String get popoverTitleLevel => 'Level';
+
+  @override
+  String get popoverTitleKeyboard => 'Keyboard';
+
+  @override
+  String get popoverTitleMouse => 'Mouse';
+
+  @override
+  String get popoverShowWindow => 'Show Window';
+
+  @override
+  String get popoverExitApp => 'Exit App';
+
+  @override
+  String get popoverStatusLabel => 'Status';
+
+  @override
+  String get popoverTimeRemainingLabel => 'Time Remaining';
+
+  @override
+  String get popoverLoopsLabel => 'Loops';
+
+  @override
+  String get popoverStatusIdle => 'Idle';
+
+  @override
+  String get popoverStatusRelaxing => 'Relaxing';
+
+  @override
+  String get popoverStatusFocusing => 'Focusing';
+
+  @override
+  String get popoverInterfaceLabel => 'Interface';
+
+  @override
+  String get popoverNetworkNameLabel => 'Network';
+
+  @override
+  String get popoverLocalIpLabel => 'Local IP';
+
+  @override
+  String get popoverPublicIpLabel => 'Public IP';
+
+  @override
+  String get popoverGatewayLabel => 'Gateway';
+
+  @override
+  String get popoverLevelLabel => 'Level';
+
+  @override
+  String get popoverCurrentExpLabel => 'Current EXP';
+
+  @override
+  String get popoverMaxExpLabel => 'Max EXP';
+
+  @override
+  String get popoverTodayKeyEventsLabel => 'Today Key Events';
+
+  @override
+  String get popoverTodayMouseDistanceLabel => 'Today Mouse Distance';
+
+  @override
+  String get popoverUptimeLabel => 'Uptime';
+
+  @override
+  String get popoverUptimeDaySuffix => 'd';
+
+  @override
+  String get popoverUptimeHourSuffix => 'h';
+
+  @override
+  String get popoverUptimeMinuteSuffix => 'm';
+
+  @override
+  String get popoverPinWindow => 'Pin Window';
+
+  @override
+  String get popoverUnpin => 'Unpin';
+
+  @override
+  String get popoverLoading => 'Loading...';
+
+  @override
+  String get keyShieldTitle => 'Key Shield';
+
+  @override
+  String get keyShieldDescription =>
+      'Block modifier key combos when protected apps are active';
+
+  @override
+  String get keyShieldEnabled => 'Key Shield Enabled';
+
+  @override
+  String get keyShieldConfigure => 'Configure Key Shield';
+
+  @override
+  String get keyShieldGlobalDefaults => 'Global Defaults';
+
+  @override
+  String get keyShieldBlockedModifiers => 'Blocked Modifiers';
+
+  @override
+  String get keyShieldAllowedCombos => 'Allowed Combos';
+
+  @override
+  String get keyShieldAllowedCombosHint =>
+      'These combos always pass through even when blocking';
+
+  @override
+  String get keyShieldAddCombo => 'Add Combo';
+
+  @override
+  String get keyShieldProtectedApps => 'Protected Apps';
+
+  @override
+  String get keyShieldAddApp => 'Add App';
+
+  @override
+  String get keyShieldFromRunningApps => 'From Running Apps';
+
+  @override
+  String get keyShieldNoApps =>
+      'No apps configured.\nAdd apps to protect them from accidental key combos.';
+
+  @override
+  String get keyShieldAutoActivate => 'Auto';
+
+  @override
+  String get keyShieldGlobalRules => 'Global defaults';
+
+  @override
+  String get keyShieldCustomRules => 'Custom';
+
+  @override
+  String get keyShieldCustomize => 'Customize';
+
+  @override
+  String get keyShieldRemove => 'Remove';
+
+  @override
+  String get keyShieldUseGlobalDefaults => 'Use global defaults';
+
+  @override
+  String get keyShieldFeedback => 'Feedback';
+
+  @override
+  String get keyShieldFeedbackNone => 'None';
+
+  @override
+  String get keyShieldFeedbackVisual => 'Visual';
+
+  @override
+  String get keyShieldFeedbackSound => 'Sound';
+
+  @override
+  String get keyShieldModifierCommand => 'Command';
+
+  @override
+  String get keyShieldModifierOption => 'Option';
+
+  @override
+  String get keyShieldModifierControl => 'Control';
+
+  @override
+  String get keyShieldSelectRunningApp => 'Select Running App';
+
+  @override
+  String get keyShieldFilterApps => 'Filter apps...';
+
+  @override
+  String get keyShieldAddSelected => 'Add Selected';
+
+  @override
+  String get keyShieldNoRunningApps => 'No running apps found';
+
+  @override
+  String get keyShieldAlreadyAdded => 'Already added';
+
+  @override
+  String get keyShieldModifier => 'Modifier';
+
+  @override
+  String get keyShieldKey => 'Key';
+
+  @override
+  String get keyShieldStatusActive => 'Active';
+
+  @override
+  String get keyShieldStatusInactive => 'Inactive';
+
+  @override
+  String keyShieldBlocking(String modifiers) {
+    return 'Blocking: $modifiers';
+  }
+
+  @override
+  String keyShieldAllowing(String combos) {
+    return 'Allowing: $combos';
+  }
+
+  @override
+  String keyShieldAppsProtected(int count) {
+    return '$count apps protected';
+  }
+
+  @override
+  String get keyShieldPerAppSettings => 'Per-App Settings';
+
+  @override
+  String get popoverKeyShieldLabel => 'Key Shield';
+
+  @override
+  String get popoverKeyShieldStatus => 'Status';
+
+  @override
+  String get popoverKeyShieldApp => 'App';
+
+  @override
+  String get popoverKeyShieldConfigure => 'Configure...';
+
+  @override
+  String get popoverKeyShieldBlocking => 'Blocking';
+
+  @override
+  String get popoverKeyShieldAllowing => 'Allowing';
 }

@@ -8,7 +8,7 @@ class TrayPopupViewController: NSViewController {
     private var hostingView: NSHostingView<AnyView>?
     private var currentImage: NSImage?
     private var isDarkMode: Bool = true
-    private var locale: String = "en"
+    private var labels: [String: String] = [:]
     private var onShowWindow: (() -> Void)?
     private var onHideWindow: (() -> Void)?
     private var onExitApp: (() -> Void)?
@@ -31,7 +31,7 @@ class TrayPopupViewController: NSViewController {
     
     func configure(
         isDarkMode: Bool,
-        locale: String,
+        labels: [String: String],
         popupWidth: CGFloat,
         popupHeight: CGFloat,
         titleBarHeight: CGFloat,
@@ -42,7 +42,7 @@ class TrayPopupViewController: NSViewController {
         onPinToggle: @escaping () -> Void
     ) {
         self.isDarkMode = isDarkMode
-        self.locale = locale
+        self.labels = labels
         self.popupSize = NSSize(width: popupWidth, height: popupHeight)
         self.titleBarHeight = titleBarHeight
         self.pinState.isPinned = isPinned
@@ -70,7 +70,7 @@ class TrayPopupViewController: NSViewController {
             imageState: imageState,
             pinState: pinState,
             isDarkMode: isDarkMode,
-            locale: locale,
+            labels: labels,
             titleBarHeight: titleBarHeight,
             onShowWindow: { [weak self] in self?.onShowWindow?() },
             onHideWindow: { [weak self] in self?.onHideWindow?() },
@@ -113,7 +113,7 @@ struct TrayPopupContentView: View {
     @ObservedObject var imageState: ImageState
     @ObservedObject var pinState: PinState
     let isDarkMode: Bool
-    let locale: String
+    let labels: [String: String]
     let titleBarHeight: CGFloat
     let onShowWindow: () -> Void
     let onHideWindow: () -> Void
@@ -121,7 +121,7 @@ struct TrayPopupContentView: View {
     let onPinToggle: () -> Void
     
     private var title: String {
-        locale == "zh" ? "赛博修仙" : "Cyber Cultivation"
+        labels["appTitle"] ?? "Cyber Cultivation"
     }
     
     var body: some View {
@@ -156,13 +156,13 @@ struct TrayPopupContentView: View {
                 HStack(spacing: 12) {
                     TrayIconButton(
                         icon: "eye",
-                        tooltip: locale == "zh" ? "显示窗口" : "Show Window",
+                        tooltip: labels["showWindow"] ?? "Show Window",
                         isDarkMode: isDarkMode,
                         action: onShowWindow
                     )
                     TrayIconButton(
                         icon: "eye.slash",
-                        tooltip: locale == "zh" ? "隐藏窗口" : "Hide Window",
+                        tooltip: labels["hideWindow"] ?? "Hide Window",
                         isDarkMode: isDarkMode,
                         action: onHideWindow
                     )
@@ -174,14 +174,14 @@ struct TrayPopupContentView: View {
                 HStack(spacing: 12) {
                     TrayIconButton(
                         icon: pinState.isPinned ? "pin.fill" : "pin",
-                        tooltip: locale == "zh" ? (pinState.isPinned ? "取消固定" : "固定窗口") : (pinState.isPinned ? "Unpin" : "Pin Window"),
+                        tooltip: pinState.isPinned ? (labels["unpin"] ?? "Unpin") : (labels["pinWindow"] ?? "Pin Window"),
                         isActive: pinState.isPinned,
                         isDarkMode: isDarkMode,
                         action: onPinToggle
                     )
                     TrayIconButton(
                         icon: "power",
-                        tooltip: locale == "zh" ? "退出游戏" : "Exit Game",
+                        tooltip: labels["exitGame"] ?? "Exit Game",
                         isDestructive: true,
                         isDarkMode: isDarkMode,
                         action: onExitApp
@@ -208,7 +208,7 @@ struct TrayPopupContentView: View {
                     // Loading placeholder
                     VStack(spacing: 8) {
                         TrayLoadingSpinner(isDarkMode: isDarkMode)
-                        Text(locale == "zh" ? "加载中..." : "Loading...")
+                        Text(labels["loading"] ?? "Loading...")
                             .font(.system(size: 11))
                             .foregroundColor(isDarkMode ? Color.white.opacity(0.6) : .secondary)
                     }

@@ -74,6 +74,7 @@ class PopoverService {
     required double popupWidth,
     required double popupHeight,
     required double titleBarHeight,
+    Map<String, String>? labels,
   }) async {
     if (!Platform.isMacOS) return false;
 
@@ -84,6 +85,7 @@ class PopoverService {
         'popupWidth': popupWidth,
         'popupHeight': popupHeight,
         'titleBarHeight': titleBarHeight,
+        if (labels != null) 'labels': labels,
       });
       return result == true;
     } catch (e) {

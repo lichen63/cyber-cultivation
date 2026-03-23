@@ -14,6 +14,7 @@ class AppDelegate: FlutterAppDelegate {
   private var popoverEventMonitor: Any?
   private var isDarkMode: Bool = true
   private var currentLocale: String = "en"
+  private var currentLabels: [String: String] = [:]
   
   // Native menu bar popover (using custom panel for no arrow)
   private var menuBarPopoverPanel: BorderlessPopoverPanel?
@@ -104,6 +105,33 @@ class AppDelegate: FlutterAppDelegate {
       switch call.method {
       case "updateFrame":
         self?.updateTrayPopupFrame(call, result: result)
+      default:
+        result(FlutterMethodNotImplemented)
+      }
+    }
+    
+    // Set up Key Shield method channel
+    let keyShieldChannel = FlutterMethodChannel(
+      name: "com.lichen63.cyber_cultivation/key_shield",
+      binaryMessenger: controller.engine.binaryMessenger
+    )
+    keyShieldChannel.setMethodCallHandler { (call, result) in
+      switch call.method {
+      case "updateConfig":
+        if let config = call.arguments as? [String: Any] {
+          KeyShieldHandler.shared.updateConfig(config)
+        }
+        result(true)
+      case "setEnabled":
+        if let args = call.arguments as? [String: Any],
+           let enabled = args["enabled"] as? Bool {
+          KeyShieldHandler.shared.setEnabled(enabled)
+        }
+        result(true)
+      case "getRunningApps":
+        result(KeyShieldHandler.shared.getRunningApps())
+      case "getStatus":
+        result(KeyShieldHandler.shared.getStatus())
       default:
         result(FlutterMethodNotImplemented)
       }
@@ -451,7 +479,7 @@ class AppDelegate: FlutterAppDelegate {
         "itemId": itemId,
         "brightness": self.isDarkMode ? "dark" : "light",
         "isLoading": false,
-        "locale": self.currentLocale
+        "labels": self.currentLabels
       ]
       
       switch itemId {
@@ -465,6 +493,7 @@ class AppDelegate: FlutterAppDelegate {
         data["processes"] = helper.getTopDiskProcesses(limit: 5)
       case "battery":
         data["processes"] = helper.getTopBatteryProcesses(limit: 5)
+        data["uptime"] = ProcessInfo.processInfo.systemUptime
       case "network":
         data["processes"] = helper.getTopNetworkProcesses(limit: 5)
         data["networkInfo"] = helper.getNetworkInfo()
@@ -515,7 +544,7 @@ class AppDelegate: FlutterAppDelegate {
       "itemId": itemId,
       "brightness": isDarkMode ? "dark" : "light",
       "isLoading": true,
-      "locale": currentLocale
+      "labels": currentLabels
     ]
     
     menuBarPopoverViewController?.configure(
@@ -536,6 +565,20 @@ class AppDelegate: FlutterAppDelegate {
       onActivityMonitorTap: { [weak self] in
         self?.openActivityMonitor()
         self?.closeMenuBarPopover()
+      },
+      onKeyShieldToggle: { [weak self] in
+        let handler = KeyShieldHandler.shared
+        handler.setEnabled(!handler.isEnabled)
+        // Notify Flutter
+        self?.methodChannel?.invokeMethod("onKeyShieldToggled", arguments: [
+          "enabled": handler.isEnabled,
+        ])
+        // Refresh popover to reflect new state
+        if var data = self?.menuBarPopoverViewController?.currentData {
+          data["keyShieldEnabled"] = handler.isEnabled
+          data["keyShieldActive"] = handler.isActivelyBlocking
+          self?.menuBarPopoverViewController?.updateData(data)
+        }
       }
     )
     
@@ -598,6 +641,10 @@ class AppDelegate: FlutterAppDelegate {
     // Update locale if provided
     if let locale = args["locale"] as? String {
       currentLocale = locale
+    }
+    // Update pre-resolved labels from Flutter
+    if let labels = args["labels"] as? [String: String] {
+      currentLabels = labels
     }
     // Update calendar view controller if it exists
     calendarViewController?.isDarkMode = isDarkMode
@@ -792,7 +839,10 @@ class AppDelegate: FlutterAppDelegate {
       // Only update if the item ID matches the current popover (prevents race condition)
       if let updateItemId = args["itemId"] as? String,
          updateItemId == self?.currentPopoverItemId {
-        self?.menuBarPopoverViewController?.updateData(args)
+        // Inject current labels into the data from Flutter
+        var data = args
+        data["labels"] = self?.currentLabels ?? [:]
+        self?.menuBarPopoverViewController?.updateData(data)
       }
       result(true)
     }
@@ -823,7 +873,7 @@ class AppDelegate: FlutterAppDelegate {
     }
     
     let isDark = args["isDarkMode"] as? Bool ?? true
-    let locale = args["locale"] as? String ?? "en"
+    let labels = args["labels"] as? [String: String] ?? self.currentLabels
     // Get dimensions from Dart constants (with fallback defaults)
     let popupWidth = args["popupWidth"] as? Double ?? 360.0
     let popupHeight = args["popupHeight"] as? Double ?? 280.0
@@ -833,6 +883,11 @@ class AppDelegate: FlutterAppDelegate {
       guard let self = self else {
         result(false)
         return
+      }
+      
+      // Update stored labels
+      if !labels.isEmpty {
+        self.currentLabels = labels
       }
       
       // Close any existing menu bar popover
@@ -864,7 +919,7 @@ class AppDelegate: FlutterAppDelegate {
       // Configure the view controller with dimensions from Dart
       self.trayPopupViewController?.configure(
         isDarkMode: isDark,
-        locale: locale,
+        labels: labels,
         popupWidth: CGFloat(popupWidth),
         popupHeight: CGFloat(popupHeight),
         titleBarHeight: CGFloat(titleBarHeight),

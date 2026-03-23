@@ -14,6 +14,7 @@ You are a specialist Flutter developer for **Cyber Cultivation (赛博修仙)** 
 | Game state model + persistence | `lib/models/game_data.dart`, `lib/services/game_data_service.dart` |
 | Save file | `game_save.json` |
 | Localization | `lib/l10n/app_en.arb` (template), `lib/l10n/app_zh.arb` |
+| Native popover views | `macos/Runner/MenuBarPopoverView.swift`, `TrayPopupView.swift` |
 | Entry point & app state | `lib/main.dart` |
 | Main window layout | `lib/widgets/home_page_content.dart` |
 | Explore map / battle / NPC | `lib/models/explore_map.dart`, `battle_result.dart`, `npc_effect.dart` |
@@ -37,3 +38,4 @@ You are a specialist Flutter developer for **Cyber Cultivation (赛博修仙)** 
 - DO NOT add new dependencies without explicit permission
 - DO NOT break `game_save.json` backwards compatibility — new fields must have defaults in `fromJson()`
 - Multi-window caveat: Explore mode runs in a separate Flutter engine via `desktop_multi_window` — EXP sync happens via method channels
+- Native localization: Swift popover/tray views receive pre-resolved label strings from Flutter via `_buildNativeLabels()` in `main.dart` — never add `locale == "zh"` checks in Swift files; add keys to ARB files instead

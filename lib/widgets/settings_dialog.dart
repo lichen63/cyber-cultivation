@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:cyber_cultivation/l10n/app_localizations.dart';
 import '../constants.dart';
+import '../models/key_shield_config.dart';
 import '../models/menu_bar_settings.dart';
 import '../services/menu_bar_info_service.dart';
 import 'menu_bar_settings_dialog.dart';
+import 'key_shield_settings.dart';
 
 class SettingsDialog extends StatefulWidget {
   final bool isAlwaysOnTop;
@@ -34,6 +36,8 @@ class SettingsDialog extends StatefulWidget {
   final ValueChanged<String?> onLanguageChanged;
   final ValueChanged<AppThemeMode> onThemeModeChanged;
   final ValueChanged<MenuBarSettings> onMenuBarSettingsChanged;
+  final KeyShieldConfig keyShieldConfig;
+  final ValueChanged<KeyShieldConfig> onKeyShieldConfigChanged;
   final VoidCallback? onResetLevelExp;
 
   const SettingsDialog({
@@ -62,6 +66,8 @@ class SettingsDialog extends StatefulWidget {
     required this.onLanguageChanged,
     required this.onThemeModeChanged,
     required this.onMenuBarSettingsChanged,
+    required this.keyShieldConfig,
+    required this.onKeyShieldConfigChanged,
     this.onResetLevelExp,
   });
 
@@ -81,6 +87,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
   late String? _currentLanguage;
   late AppThemeMode _themeMode;
   late MenuBarSettings _menuBarSettings;
+  late KeyShieldConfig _keyShieldConfig;
 
   AppThemeColors get _colors => widget.themeColors;
 
@@ -98,6 +105,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
     _currentLanguage = widget.currentLanguage;
     _themeMode = widget.themeMode;
     _menuBarSettings = widget.menuBarSettings;
+    _keyShieldConfig = widget.keyShieldConfig;
   }
 
   @override
@@ -189,6 +197,8 @@ class _SettingsDialogState extends State<SettingsDialog> {
           _buildLanguageSelector(l10n),
           const SizedBox(height: 16),
           _buildMenuBarSettingsButton(l10n),
+          const SizedBox(height: 16),
+          _buildKeyShieldSection(l10n),
           const SizedBox(height: 16),
           _buildOpenSaveFolderButton(l10n),
           if (widget.onResetLevelExp != null) ...[
@@ -376,6 +386,59 @@ class _SettingsDialogState extends State<SettingsDialog> {
         onSettingsChanged: (newSettings) {
           setState(() => _menuBarSettings = newSettings);
           widget.onMenuBarSettingsChanged(newSettings);
+        },
+      ),
+    );
+  }
+
+  Widget _buildKeyShieldSection(AppLocalizations l10n) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          l10n.keyShieldTitle,
+          style: TextStyle(
+            color: _colors.primaryText,
+            fontSize: AppConstants.fontSizeDialogContent,
+          ),
+        ),
+        TextButton(
+          onPressed: _showKeyShieldDialog,
+          style: TextButton.styleFrom(
+            foregroundColor: _colors.accent,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                _keyShieldConfig.isEnabled ? 'ON' : 'OFF',
+                style: TextStyle(
+                  color: _keyShieldConfig.isEnabled
+                      ? _colors.accent
+                      : _colors.inactive,
+                  fontSize: AppConstants.fontSizeDialogContent,
+                ),
+              ),
+              const SizedBox(width: 4),
+              Icon(Icons.chevron_right, size: 16, color: _colors.accent),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showKeyShieldDialog() {
+    showDialog(
+      context: context,
+      barrierColor: _colors.overlay,
+      builder: (context) => KeyShieldSettingsDialog(
+        config: _keyShieldConfig,
+        themeColors: _colors,
+        onConfigChanged: (newConfig) {
+          setState(() => _keyShieldConfig = newConfig);
+          widget.onKeyShieldConfigChanged(newConfig);
         },
       ),
     );

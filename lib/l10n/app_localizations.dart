@@ -2389,6 +2389,480 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Amnesia: {count} explored cells forgotten!'**
   String npcEffectProgressBoostNegative(int count);
+
+  /// Title for Focus popover
+  ///
+  /// In en, this message translates to:
+  /// **'Focus'**
+  String get popoverTitleFocus;
+
+  /// Title for RAM popover
+  ///
+  /// In en, this message translates to:
+  /// **'RAM'**
+  String get popoverTitleRam;
+
+  /// Title for Network popover
+  ///
+  /// In en, this message translates to:
+  /// **'Network'**
+  String get popoverTitleNetwork;
+
+  /// Title for Disk popover
+  ///
+  /// In en, this message translates to:
+  /// **'Disk'**
+  String get popoverTitleDisk;
+
+  /// Title for Battery popover
+  ///
+  /// In en, this message translates to:
+  /// **'Battery'**
+  String get popoverTitleBattery;
+
+  /// Title for Todo popover
+  ///
+  /// In en, this message translates to:
+  /// **'Todo'**
+  String get popoverTitleTodo;
+
+  /// Title for Level popover
+  ///
+  /// In en, this message translates to:
+  /// **'Level'**
+  String get popoverTitleLevel;
+
+  /// Title for Keyboard popover
+  ///
+  /// In en, this message translates to:
+  /// **'Keyboard'**
+  String get popoverTitleKeyboard;
+
+  /// Title for Mouse popover
+  ///
+  /// In en, this message translates to:
+  /// **'Mouse'**
+  String get popoverTitleMouse;
+
+  /// Tooltip for show window button in popover
+  ///
+  /// In en, this message translates to:
+  /// **'Show Window'**
+  String get popoverShowWindow;
+
+  /// Tooltip for exit app button in popover
+  ///
+  /// In en, this message translates to:
+  /// **'Exit App'**
+  String get popoverExitApp;
+
+  /// Label for status row in focus popover
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get popoverStatusLabel;
+
+  /// Label for time remaining row in focus popover
+  ///
+  /// In en, this message translates to:
+  /// **'Time Remaining'**
+  String get popoverTimeRemainingLabel;
+
+  /// Label for loops row in focus popover
+  ///
+  /// In en, this message translates to:
+  /// **'Loops'**
+  String get popoverLoopsLabel;
+
+  /// Focus status when idle
+  ///
+  /// In en, this message translates to:
+  /// **'Idle'**
+  String get popoverStatusIdle;
+
+  /// Focus status when relaxing
+  ///
+  /// In en, this message translates to:
+  /// **'Relaxing'**
+  String get popoverStatusRelaxing;
+
+  /// Focus status when focusing
+  ///
+  /// In en, this message translates to:
+  /// **'Focusing'**
+  String get popoverStatusFocusing;
+
+  /// Label for network interface type
+  ///
+  /// In en, this message translates to:
+  /// **'Interface'**
+  String get popoverInterfaceLabel;
+
+  /// Label for network name
+  ///
+  /// In en, this message translates to:
+  /// **'Network'**
+  String get popoverNetworkNameLabel;
+
+  /// Label for local IP address
+  ///
+  /// In en, this message translates to:
+  /// **'Local IP'**
+  String get popoverLocalIpLabel;
+
+  /// Label for public IP address
+  ///
+  /// In en, this message translates to:
+  /// **'Public IP'**
+  String get popoverPublicIpLabel;
+
+  /// Label for network gateway
+  ///
+  /// In en, this message translates to:
+  /// **'Gateway'**
+  String get popoverGatewayLabel;
+
+  /// Label for level in level/exp popover
+  ///
+  /// In en, this message translates to:
+  /// **'Level'**
+  String get popoverLevelLabel;
+
+  /// Label for current experience
+  ///
+  /// In en, this message translates to:
+  /// **'Current EXP'**
+  String get popoverCurrentExpLabel;
+
+  /// Label for max experience needed to level up
+  ///
+  /// In en, this message translates to:
+  /// **'Max EXP'**
+  String get popoverMaxExpLabel;
+
+  /// Label for today's keyboard events count
+  ///
+  /// In en, this message translates to:
+  /// **'Today Key Events'**
+  String get popoverTodayKeyEventsLabel;
+
+  /// Label for today's mouse distance
+  ///
+  /// In en, this message translates to:
+  /// **'Today Mouse Distance'**
+  String get popoverTodayMouseDistanceLabel;
+
+  /// Label for system uptime
+  ///
+  /// In en, this message translates to:
+  /// **'Uptime'**
+  String get popoverUptimeLabel;
+
+  /// Day suffix for uptime format (e.g. 3d)
+  ///
+  /// In en, this message translates to:
+  /// **'d'**
+  String get popoverUptimeDaySuffix;
+
+  /// Hour suffix for uptime format (e.g. 5h)
+  ///
+  /// In en, this message translates to:
+  /// **'h'**
+  String get popoverUptimeHourSuffix;
+
+  /// Minute suffix for uptime format (e.g. 12m)
+  ///
+  /// In en, this message translates to:
+  /// **'m'**
+  String get popoverUptimeMinuteSuffix;
+
+  /// Tooltip for pin window button in tray popup
+  ///
+  /// In en, this message translates to:
+  /// **'Pin Window'**
+  String get popoverPinWindow;
+
+  /// Tooltip for unpin button in tray popup
+  ///
+  /// In en, this message translates to:
+  /// **'Unpin'**
+  String get popoverUnpin;
+
+  /// Loading text in tray popup preview
+  ///
+  /// In en, this message translates to:
+  /// **'Loading...'**
+  String get popoverLoading;
+
+  /// Title for the Key Shield feature
+  ///
+  /// In en, this message translates to:
+  /// **'Key Shield'**
+  String get keyShieldTitle;
+
+  /// Description for the Key Shield feature
+  ///
+  /// In en, this message translates to:
+  /// **'Block modifier key combos when protected apps are active'**
+  String get keyShieldDescription;
+
+  /// Toggle label for enabling Key Shield
+  ///
+  /// In en, this message translates to:
+  /// **'Key Shield Enabled'**
+  String get keyShieldEnabled;
+
+  /// Button to open Key Shield settings dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Configure Key Shield'**
+  String get keyShieldConfigure;
+
+  /// Section header for global Key Shield settings
+  ///
+  /// In en, this message translates to:
+  /// **'Global Defaults'**
+  String get keyShieldGlobalDefaults;
+
+  /// Label for blocked modifiers selection
+  ///
+  /// In en, this message translates to:
+  /// **'Blocked Modifiers'**
+  String get keyShieldBlockedModifiers;
+
+  /// Section header for allowed key combos that pass through
+  ///
+  /// In en, this message translates to:
+  /// **'Allowed Combos'**
+  String get keyShieldAllowedCombos;
+
+  /// Hint text for allowed combos section
+  ///
+  /// In en, this message translates to:
+  /// **'These combos always pass through even when blocking'**
+  String get keyShieldAllowedCombosHint;
+
+  /// Button to add a new allowed key combo
+  ///
+  /// In en, this message translates to:
+  /// **'Add Combo'**
+  String get keyShieldAddCombo;
+
+  /// Section header for protected apps list
+  ///
+  /// In en, this message translates to:
+  /// **'Protected Apps'**
+  String get keyShieldProtectedApps;
+
+  /// Button to add an app via file picker
+  ///
+  /// In en, this message translates to:
+  /// **'Add App'**
+  String get keyShieldAddApp;
+
+  /// Button to add from currently running apps
+  ///
+  /// In en, this message translates to:
+  /// **'From Running Apps'**
+  String get keyShieldFromRunningApps;
+
+  /// Empty state text when no protected apps are configured
+  ///
+  /// In en, this message translates to:
+  /// **'No apps configured.\nAdd apps to protect them from accidental key combos.'**
+  String get keyShieldNoApps;
+
+  /// Label for auto-activate toggle on app rules
+  ///
+  /// In en, this message translates to:
+  /// **'Auto'**
+  String get keyShieldAutoActivate;
+
+  /// Badge text when app uses global default rules
+  ///
+  /// In en, this message translates to:
+  /// **'Global defaults'**
+  String get keyShieldGlobalRules;
+
+  /// Badge text when app has custom rules
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get keyShieldCustomRules;
+
+  /// Menu item to customize per-app rules
+  ///
+  /// In en, this message translates to:
+  /// **'Customize'**
+  String get keyShieldCustomize;
+
+  /// Menu item to remove an app from the protected list
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get keyShieldRemove;
+
+  /// Toggle to use global defaults vs custom per-app rules
+  ///
+  /// In en, this message translates to:
+  /// **'Use global defaults'**
+  String get keyShieldUseGlobalDefaults;
+
+  /// Label for feedback mode selection
+  ///
+  /// In en, this message translates to:
+  /// **'Feedback'**
+  String get keyShieldFeedback;
+
+  /// No feedback when a key is blocked
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get keyShieldFeedbackNone;
+
+  /// Visual feedback when a key is blocked
+  ///
+  /// In en, this message translates to:
+  /// **'Visual'**
+  String get keyShieldFeedbackVisual;
+
+  /// Sound feedback when a key is blocked
+  ///
+  /// In en, this message translates to:
+  /// **'Sound'**
+  String get keyShieldFeedbackSound;
+
+  /// Display name for the Command modifier key
+  ///
+  /// In en, this message translates to:
+  /// **'Command'**
+  String get keyShieldModifierCommand;
+
+  /// Display name for the Option modifier key
+  ///
+  /// In en, this message translates to:
+  /// **'Option'**
+  String get keyShieldModifierOption;
+
+  /// Display name for the Control modifier key
+  ///
+  /// In en, this message translates to:
+  /// **'Control'**
+  String get keyShieldModifierControl;
+
+  /// Title for the running app picker dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Select Running App'**
+  String get keyShieldSelectRunningApp;
+
+  /// Placeholder text for app filter search field
+  ///
+  /// In en, this message translates to:
+  /// **'Filter apps...'**
+  String get keyShieldFilterApps;
+
+  /// Button to add selected apps from the picker
+  ///
+  /// In en, this message translates to:
+  /// **'Add Selected'**
+  String get keyShieldAddSelected;
+
+  /// Text when no running apps are available
+  ///
+  /// In en, this message translates to:
+  /// **'No running apps found'**
+  String get keyShieldNoRunningApps;
+
+  /// Text shown when an app is already in the protected list
+  ///
+  /// In en, this message translates to:
+  /// **'Already added'**
+  String get keyShieldAlreadyAdded;
+
+  /// Label for modifier dropdown in combo picker
+  ///
+  /// In en, this message translates to:
+  /// **'Modifier'**
+  String get keyShieldModifier;
+
+  /// Label for key dropdown in combo picker
+  ///
+  /// In en, this message translates to:
+  /// **'Key'**
+  String get keyShieldKey;
+
+  /// Status text when Key Shield is actively blocking
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get keyShieldStatusActive;
+
+  /// Status text when Key Shield is not blocking
+  ///
+  /// In en, this message translates to:
+  /// **'Inactive'**
+  String get keyShieldStatusInactive;
+
+  /// Summary of blocked modifiers in popover
+  ///
+  /// In en, this message translates to:
+  /// **'Blocking: {modifiers}'**
+  String keyShieldBlocking(String modifiers);
+
+  /// Summary of allowed combos in popover
+  ///
+  /// In en, this message translates to:
+  /// **'Allowing: {combos}'**
+  String keyShieldAllowing(String combos);
+
+  /// Count of protected apps in popover
+  ///
+  /// In en, this message translates to:
+  /// **'{count} apps protected'**
+  String keyShieldAppsProtected(int count);
+
+  /// Title for per-app settings dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Per-App Settings'**
+  String get keyShieldPerAppSettings;
+
+  /// Key Shield section label in keyboard popover
+  ///
+  /// In en, this message translates to:
+  /// **'Key Shield'**
+  String get popoverKeyShieldLabel;
+
+  /// Status label in keyboard popover Key Shield section
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get popoverKeyShieldStatus;
+
+  /// Current app label in keyboard popover Key Shield section
+  ///
+  /// In en, this message translates to:
+  /// **'App'**
+  String get popoverKeyShieldApp;
+
+  /// Configure button in keyboard popover Key Shield section
+  ///
+  /// In en, this message translates to:
+  /// **'Configure...'**
+  String get popoverKeyShieldConfigure;
+
+  /// Blocking label in keyboard popover Key Shield section
+  ///
+  /// In en, this message translates to:
+  /// **'Blocking'**
+  String get popoverKeyShieldBlocking;
+
+  /// Allowing label in keyboard popover Key Shield section
+  ///
+  /// In en, this message translates to:
+  /// **'Allowing'**
+  String get popoverKeyShieldAllowing;
 }
 
 class _AppLocalizationsDelegate

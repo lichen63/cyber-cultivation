@@ -8,12 +8,13 @@ class MenuBarPopoverViewController: NSViewController {
     
     private var hostingView: NSHostingView<AnyView>?
     private var currentItemId: String = ""
-    private var currentData: [String: Any] = [:]
+    private(set) var currentData: [String: Any] = [:]
     private var isDarkMode: Bool = true
     private var onShowWindow: (() -> Void)?
     private var onHideWindow: (() -> Void)?
     private var onExitApp: (() -> Void)?
     private var onActivityMonitorTap: (() -> Void)?
+    private var onKeyShieldToggle: (() -> Void)?
     
     override func loadView() {
         view = NSView()
@@ -27,7 +28,8 @@ class MenuBarPopoverViewController: NSViewController {
         onShowWindow: @escaping () -> Void,
         onHideWindow: @escaping () -> Void,
         onExitApp: @escaping () -> Void,
-        onActivityMonitorTap: @escaping () -> Void
+        onActivityMonitorTap: @escaping () -> Void,
+        onKeyShieldToggle: @escaping () -> Void = {}
     ) {
         self.currentItemId = itemId
         self.currentData = data
@@ -36,6 +38,7 @@ class MenuBarPopoverViewController: NSViewController {
         self.onHideWindow = onHideWindow
         self.onExitApp = onExitApp
         self.onActivityMonitorTap = onActivityMonitorTap
+        self.onKeyShieldToggle = onKeyShieldToggle
         
         updateContent()
     }
@@ -77,11 +80,23 @@ class MenuBarPopoverViewController: NSViewController {
             return NSSize(width: 490, height: 280)
         case "disk":
             return NSSize(width: 490, height: 210)
-        case "cpu", "gpu", "ram", "battery":
+        case "cpu", "gpu", "ram":
             return NSSize(width: 430, height: 210)
+        case "battery":
+            return NSSize(width: 430, height: 240)
         case "todo":
             return NSSize(width: 340, height: 210)
-        case "levelExp", "focus", "keyboard", "mouse":
+        case "levelExp", "focus", "mouse":
+            return NSSize(width: 340, height: 156)
+        case "keyboard":
+            // Expand height when Key Shield is configured
+            let keyShieldConfigured = currentData["keyShieldConfigured"] as? Bool ?? false
+            let keyShieldEnabled = currentData["keyShieldEnabled"] as? Bool ?? false
+            if keyShieldConfigured && keyShieldEnabled {
+                return NSSize(width: 340, height: 280)
+            } else if keyShieldConfigured {
+                return NSSize(width: 340, height: 195)
+            }
             return NSSize(width: 340, height: 156)
         default:
             return NSSize(width: 340, height: 136)
@@ -97,7 +112,8 @@ class MenuBarPopoverViewController: NSViewController {
             onShowWindow: { [weak self] in self?.onShowWindow?() },
             onHideWindow: { [weak self] in self?.onHideWindow?() },
             onExitApp: { [weak self] in self?.onExitApp?() },
-            onActivityMonitorTap: { [weak self] in self?.onActivityMonitorTap?() }
+            onActivityMonitorTap: { [weak self] in self?.onActivityMonitorTap?() },
+            onKeyShieldToggle: { [weak self] in self?.onKeyShieldToggle?() }
         )
     }
 }
@@ -111,6 +127,12 @@ struct PopoverContentView: View {
     let onHideWindow: () -> Void
     let onExitApp: () -> Void
     let onActivityMonitorTap: () -> Void
+    let onKeyShieldToggle: () -> Void
+    
+    /// Pre-resolved localized strings from Flutter
+    private var labels: [String: String] {
+        data["labels"] as? [String: String] ?? [:]
+    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -144,13 +166,13 @@ struct PopoverContentView: View {
                 HStack(spacing: 12) {
                     IconButton(
                         icon: "eye",
-                        tooltip: "Show Window",
+                        tooltip: labels["showWindow"] ?? "Show Window",
                         isDarkMode: isDarkMode,
                         action: onShowWindow
                     )
                     IconButton(
                         icon: "eye.slash",
-                        tooltip: "Hide Window",
+                        tooltip: labels["hideWindow"] ?? "Hide Window",
                         isDarkMode: isDarkMode,
                         action: onHideWindow
                     )
@@ -161,7 +183,7 @@ struct PopoverContentView: View {
                 // Right: Exit button
                 IconButton(
                     icon: "power",
-                    tooltip: "Exit App",
+                    tooltip: labels["exitApp"] ?? "Exit App",
                     isDestructive: true,
                     isDarkMode: isDarkMode,
                     action: onExitApp
@@ -175,27 +197,27 @@ struct PopoverContentView: View {
     private func getTitle() -> String {
         switch itemId {
         case "focus":
-            return data["locale"] as? String == "zh" ? "专注" : "Focus"
+            return labels["titleFocus"] ?? "Focus"
         case "cpu":
             return "CPU"
         case "ram":
-            return data["locale"] as? String == "zh" ? "内存" : "RAM"
+            return labels["titleRam"] ?? "RAM"
         case "network":
-            return data["locale"] as? String == "zh" ? "网络" : "Network"
+            return labels["titleNetwork"] ?? "Network"
         case "gpu":
             return "GPU"
         case "disk":
-            return data["locale"] as? String == "zh" ? "磁盘" : "Disk"
+            return labels["titleDisk"] ?? "Disk"
         case "battery":
-            return data["locale"] as? String == "zh" ? "电池" : "Battery"
+            return labels["titleBattery"] ?? "Battery"
         case "todo":
-            return data["locale"] as? String == "zh" ? "待办" : "Todo"
+            return labels["titleTodo"] ?? "Todo"
         case "levelExp":
-            return data["locale"] as? String == "zh" ? "等级" : "Level"
+            return labels["titleLevel"] ?? "Level"
         case "keyboard":
-            return data["locale"] as? String == "zh" ? "键盘" : "Keyboard"
+            return labels["titleKeyboard"] ?? "Keyboard"
         case "mouse":
-            return data["locale"] as? String == "zh" ? "鼠标" : "Mouse"
+            return labels["titleMouse"] ?? "Mouse"
         default:
             return itemId.isEmpty ? "Menu" : itemId.capitalized
         }
@@ -205,8 +227,19 @@ struct PopoverContentView: View {
     private var contentArea: some View {
         switch itemId {
         case "focus":
-            FocusContentView(data: data, isDarkMode: isDarkMode)
-        case "cpu", "gpu", "ram", "battery":
+            FocusContentView(data: data, isDarkMode: isDarkMode, labels: labels)
+        case "battery":
+            VStack(spacing: 0) {
+                SystemInfoSectionView(data: data, isDarkMode: isDarkMode, labels: labels)
+                ProcessListView(
+                    itemId: itemId,
+                    processes: data["processes"] as? [[String: Any]] ?? [],
+                    isLoading: data["isLoading"] as? Bool ?? false,
+                    isDarkMode: isDarkMode,
+                    onTap: onActivityMonitorTap
+                )
+            }
+        case "cpu", "gpu", "ram":
             ProcessListView(
                 itemId: itemId,
                 processes: data["processes"] as? [[String: Any]] ?? [],
@@ -230,11 +263,11 @@ struct PopoverContentView: View {
         case "todo":
             TodoContentView(todos: data["todos"] as? [[String: Any]] ?? [], isDarkMode: isDarkMode)
         case "levelExp":
-            LevelExpContentView(data: data, isDarkMode: isDarkMode)
+            LevelExpContentView(data: data, isDarkMode: isDarkMode, labels: labels)
         case "keyboard":
-            KeyboardContentView(keyCount: data["keyCount"] as? Int ?? 0, isDarkMode: isDarkMode, locale: data["locale"] as? String ?? "en")
+            KeyboardContentView(data: data, isDarkMode: isDarkMode, labels: labels, onToggle: onKeyShieldToggle)
         case "mouse":
-            MouseContentView(distance: data["distance"] as? Int ?? 0, isDarkMode: isDarkMode, locale: data["locale"] as? String ?? "en")
+            MouseContentView(distance: data["distance"] as? Int ?? 0, isDarkMode: isDarkMode, labels: labels)
         default:
             Text("Content placeholder")
                 .foregroundColor(.secondary)
@@ -310,28 +343,28 @@ struct LoadingSpinner: View {
 struct FocusContentView: View {
     let data: [String: Any]
     let isDarkMode: Bool
+    let labels: [String: String]
     
     private var isActive: Bool { data["focusIsActive"] as? Bool ?? false }
     private var isRelaxing: Bool { data["focusIsRelaxing"] as? Bool ?? false }
     private var secondsRemaining: Int { data["focusSecondsRemaining"] as? Int ?? 0 }
     private var currentLoop: Int { data["focusCurrentLoop"] as? Int ?? 1 }
     private var totalLoops: Int { data["focusTotalLoops"] as? Int ?? 1 }
-    private var locale: String { data["locale"] as? String ?? "en" }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             InfoRow(
-                label: locale == "zh" ? "状态" : "Status",
+                label: labels["statusLabel"] ?? "Status",
                 value: stateLabel,
                 isDarkMode: isDarkMode
             )
             InfoRow(
-                label: locale == "zh" ? "剩余时间" : "Time Remaining",
+                label: labels["timeRemainingLabel"] ?? "Time Remaining",
                 value: timeString,
                 isDarkMode: isDarkMode
             )
             InfoRow(
-                label: locale == "zh" ? "循环" : "Loops",
+                label: labels["loopsLabel"] ?? "Loops",
                 value: "\(currentLoop)/\(totalLoops)",
                 isDarkMode: isDarkMode
             )
@@ -341,11 +374,11 @@ struct FocusContentView: View {
     
     private var stateLabel: String {
         if !isActive {
-            return locale == "zh" ? "空闲" : "Idle"
+            return labels["statusIdle"] ?? "Idle"
         } else if isRelaxing {
-            return locale == "zh" ? "休息中" : "Relaxing"
+            return labels["statusRelaxing"] ?? "Relaxing"
         }
-        return locale == "zh" ? "专注中" : "Focusing"
+        return labels["statusFocusing"] ?? "Focusing"
     }
     
     private var timeString: String {
@@ -599,8 +632,8 @@ struct NetworkContentView: View {
     private var isLoading: Bool {
         data["isLoading"] as? Bool ?? false
     }
-    private var locale: String {
-        data["locale"] as? String ?? "en"
+    private var labels: [String: String] {
+        data["labels"] as? [String: String] ?? [:]
     }
     
     var body: some View {
@@ -608,22 +641,22 @@ struct NetworkContentView: View {
             // Network info section
             VStack(alignment: .leading, spacing: 2) {
                 NetworkInfoRow(
-                    label: locale == "zh" ? "接口" : "Interface",
+                    label: labels["interfaceLabel"] ?? "Interface",
                     value: networkInfo["interfaceType"] ?? "-",
                     isDarkMode: isDarkMode
                 )
                 NetworkInfoRow(
-                    label: locale == "zh" ? "网络名称" : "Network",
+                    label: labels["networkNameLabel"] ?? "Network",
                     value: networkInfo["networkName"] ?? "-",
                     isDarkMode: isDarkMode
                 )
                 NetworkInfoRow(
-                    label: locale == "zh" ? "本地 IP" : "Local IP",
+                    label: labels["localIpLabel"] ?? "Local IP",
                     value: networkInfo["localIp"] ?? "-",
                     isDarkMode: isDarkMode
                 )
                 NetworkInfoRow(
-                    label: locale == "zh" ? "公网 IP" : "Public IP",
+                    label: labels["publicIpLabel"] ?? "Public IP",
                     value: networkInfo["publicIp"] ?? "-",
                     isDarkMode: isDarkMode
                 )
@@ -633,7 +666,7 @@ struct NetworkContentView: View {
                     isDarkMode: isDarkMode
                 )
                 NetworkInfoRow(
-                    label: locale == "zh" ? "网关" : "Gateway",
+                    label: labels["gatewayLabel"] ?? "Gateway",
                     value: networkInfo["gateway"] ?? "-",
                     isDarkMode: isDarkMode
                 )
@@ -788,7 +821,7 @@ struct TodoContentView: View {
     var body: some View {
         if todos.isEmpty {
             Text("No todos")
-                .foregroundColor(.secondary)
+                .foregroundColor(isDarkMode ? .white.opacity(0.5) : .black.opacity(0.5))
                 .font(.system(size: 12))
                 .frame(maxWidth: .infinity, minHeight: 80)
         } else {
@@ -853,26 +886,26 @@ struct TodoRow: View {
 struct LevelExpContentView: View {
     let data: [String: Any]
     let isDarkMode: Bool
+    let labels: [String: String]
     
     private var level: Int { data["level"] as? Int ?? 1 }
     private var currentExp: Double { (data["currentExp"] as? NSNumber)?.doubleValue ?? 0 }
     private var maxExp: Double { (data["maxExp"] as? NSNumber)?.doubleValue ?? 100 }
-    private var locale: String { data["locale"] as? String ?? "en" }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             InfoRow(
-                label: locale == "zh" ? "等级" : "Level",
+                label: labels["levelLabel"] ?? "Level",
                 value: "\(level)",
                 isDarkMode: isDarkMode
             )
             InfoRow(
-                label: locale == "zh" ? "当前经验" : "Current EXP",
+                label: labels["currentExpLabel"] ?? "Current EXP",
                 value: "\(Int(currentExp))",
                 isDarkMode: isDarkMode
             )
             InfoRow(
-                label: locale == "zh" ? "升级经验" : "Max EXP",
+                label: labels["maxExpLabel"] ?? "Max EXP",
                 value: "\(Int(maxExp))",
                 isDarkMode: isDarkMode
             )
@@ -884,17 +917,73 @@ struct LevelExpContentView: View {
 // MARK: - Keyboard Content
 
 struct KeyboardContentView: View {
-    let keyCount: Int
+    let data: [String: Any]
     let isDarkMode: Bool
-    let locale: String
+    let labels: [String: String]
+    var onToggle: (() -> Void)? = nil
+    
+    private var keyCount: Int { data["keyCount"] as? Int ?? 0 }
+    private var keyShieldEnabled: Bool { data["keyShieldEnabled"] as? Bool ?? false }
+    private var keyShieldConfigured: Bool { data["keyShieldConfigured"] as? Bool ?? false }
+    private var keyShieldActive: Bool { data["keyShieldActive"] as? Bool ?? false }
+    private var keyShieldApp: String { data["keyShieldApp"] as? String ?? "" }
+    private var keyShieldAppsCount: Int { data["keyShieldAppsCount"] as? Int ?? 0 }
+    private var keyShieldBlockedModifiers: String { data["keyShieldBlockedModifiers"] as? String ?? "" }
+    private var keyShieldAllowedCombos: String { data["keyShieldAllowedCombos"] as? String ?? "" }
+    
+    private var textColor: Color {
+        isDarkMode ? .white : .black
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             InfoRow(
-                label: locale == "zh" ? "今日按键" : "Today Key Events",
+                label: labels["todayKeyEventsLabel"] ?? "Today Key Events",
                 value: formatNumber(keyCount),
                 isDarkMode: isDarkMode
             )
+            
+            if keyShieldConfigured {
+                Divider()
+                    .background(isDarkMode ? Color.white.opacity(0.2) : Color.black.opacity(0.1))
+                
+                HStack {
+                    Text(labels["keyShieldLabel"] ?? "Key Shield")
+                        .font(.system(size: 12))
+                        .foregroundColor(textColor)
+                    Spacer()
+                    KeyShieldToggle(
+                        isOn: keyShieldEnabled,
+                        onToggle: { onToggle?() }
+                    )
+                }
+                
+                if keyShieldEnabled {
+                    if keyShieldActive && !keyShieldApp.isEmpty {
+                        InfoRow(
+                            label: labels["keyShieldApp"] ?? "App",
+                            value: keyShieldApp,
+                            isDarkMode: isDarkMode
+                        )
+                    }
+                    
+                    if !keyShieldBlockedModifiers.isEmpty {
+                        InfoRow(
+                            label: labels["keyShieldBlocking"] ?? "Blocking",
+                            value: keyShieldBlockedModifiers,
+                            isDarkMode: isDarkMode
+                        )
+                    }
+                    
+                    if !keyShieldAllowedCombos.isEmpty {
+                        InfoRow(
+                            label: labels["keyShieldAllowing"] ?? "Allowing",
+                            value: keyShieldAllowedCombos,
+                            isDarkMode: isDarkMode
+                        )
+                    }
+                }
+            }
         }
         .padding(8)
     }
@@ -909,17 +998,46 @@ struct KeyboardContentView: View {
     }
 }
 
+// MARK: - Key Shield Toggle
+
+/// A compact toggle switch for Key Shield on/off in the popover
+struct KeyShieldToggle: View {
+    let isOn: Bool
+    let onToggle: () -> Void
+    
+    private let width: CGFloat = 32
+    private let height: CGFloat = 18
+    private let knobPadding: CGFloat = 2
+    
+    var body: some View {
+        Button(action: onToggle) {
+            ZStack(alignment: isOn ? .trailing : .leading) {
+                Capsule()
+                    .fill(isOn ? Color.green : Color.gray.opacity(0.4))
+                    .frame(width: width, height: height)
+                
+                Circle()
+                    .fill(Color.white)
+                    .shadow(radius: 1)
+                    .frame(width: height - knobPadding * 2, height: height - knobPadding * 2)
+                    .padding(knobPadding)
+            }
+        }
+        .buttonStyle(.plain)
+    }
+}
+
 // MARK: - Mouse Content
 
 struct MouseContentView: View {
     let distance: Int
     let isDarkMode: Bool
-    let locale: String
+    let labels: [String: String]
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             InfoRow(
-                label: locale == "zh" ? "今日鼠标距离" : "Today Mouse Distance",
+                label: labels["todayMouseDistanceLabel"] ?? "Today Mouse Distance",
                 value: formatDistance(distance),
                 isDarkMode: isDarkMode
             )
@@ -960,5 +1078,78 @@ struct InfoRow: View {
                 .foregroundColor(textColor)
         }
         .font(.system(size: 12))
+    }
+}
+
+// MARK: - System Info Section
+
+/// A reusable section displayed above the process list in system stat popovers.
+/// Shows key-value system info rows (e.g. uptime). Designed to be easily extended
+/// with additional entries by appending to the `entries` array.
+struct SystemInfoSectionView: View {
+    let data: [String: Any]
+    let isDarkMode: Bool
+    let labels: [String: String]
+    
+    /// Build the list of info entries from the popover data.
+    /// Each entry is a (label, value) pair. Add new entries here for extensibility.
+    private var entries: [(String, String)] {
+        var items: [(String, String)] = []
+        
+        // Uptime
+        if let uptime = data["uptime"] as? Double, uptime > 0 {
+            items.append((
+                labels["uptimeLabel"] ?? "Uptime",
+                formatUptime(uptime)
+            ))
+        }
+        
+        // Future entries can be added here, e.g.:
+        // items.append(("Label", formattedValue))
+        
+        return items
+    }
+    
+    private var sectionBackground: Color {
+        isDarkMode ? Color.white.opacity(0.04) : Color.black.opacity(0.03)
+    }
+    
+    var body: some View {
+        if !entries.isEmpty {
+            VStack(spacing: 0) {
+                VStack(alignment: .leading, spacing: 4) {
+                    ForEach(Array(entries.enumerated()), id: \.offset) { _, entry in
+                        InfoRow(label: entry.0, value: entry.1, isDarkMode: isDarkMode)
+                    }
+                }
+                .padding(.horizontal, 8)
+                .padding(.vertical, 6)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(sectionBackground)
+                
+                Divider()
+                    .opacity(0.5)
+            }
+        }
+    }
+    
+    /// Format uptime seconds into a human-readable string using labels
+    private func formatUptime(_ seconds: Double) -> String {
+        let totalSeconds = Int(seconds)
+        let days = totalSeconds / 86400
+        let hours = (totalSeconds % 86400) / 3600
+        let minutes = (totalSeconds % 3600) / 60
+        
+        let daySuffix = labels["uptimeDaySuffix"] ?? "d"
+        let hourSuffix = labels["uptimeHourSuffix"] ?? "h"
+        let minuteSuffix = labels["uptimeMinuteSuffix"] ?? "m"
+        
+        if days > 0 {
+            return "\(days)\(daySuffix) \(hours)\(hourSuffix) \(minutes)\(minuteSuffix)"
+        } else if hours > 0 {
+            return "\(hours)\(hourSuffix) \(minutes)\(minuteSuffix)"
+        } else {
+            return "\(minutes)\(minuteSuffix)"
+        }
     }
 }
