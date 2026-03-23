@@ -983,12 +983,6 @@ class KeyShieldConstants {
   // Default blocked modifiers
   static const List<String> defaultBlockedModifiers = ['command'];
 
-  // Default allowed combos (always pass through even when blocking)
-  static const List<Map<String, String>> defaultAllowedCombos = [
-    {'modifier': 'command', 'key': 'tab'},
-    {'modifier': 'command', 'key': 'space'},
-  ];
-
   // Modifier display names (for UI chips)
   static const Map<String, String> modifierSymbols = {
     'command': '⌘',

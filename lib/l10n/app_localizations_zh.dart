@@ -1497,4 +1497,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get popoverKeyShieldConfigure => '配置...';
+
+  @override
+  String get popoverKeyShieldBlocking => '拦截';
+
+  @override
+  String get popoverKeyShieldAllowing => '放行';
 }

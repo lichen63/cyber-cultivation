@@ -1561,4 +1561,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get popoverKeyShieldConfigure => 'Configure...';
+
+  @override
+  String get popoverKeyShieldBlocking => 'Blocking';
+
+  @override
+  String get popoverKeyShieldAllowing => 'Allowing';
 }

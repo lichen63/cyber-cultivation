@@ -2851,6 +2851,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Configure...'**
   String get popoverKeyShieldConfigure;
+
+  /// Blocking label in keyboard popover Key Shield section
+  ///
+  /// In en, this message translates to:
+  /// **'Blocking'**
+  String get popoverKeyShieldBlocking;
+
+  /// Allowing label in keyboard popover Key Shield section
+  ///
+  /// In en, this message translates to:
+  /// **'Allowing'**
+  String get popoverKeyShieldAllowing;
 }
 
 class _AppLocalizationsDelegate

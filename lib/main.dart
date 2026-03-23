@@ -321,6 +321,8 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
       'keyShieldConfigure': l10n.popoverKeyShieldConfigure,
       'keyShieldActive': l10n.keyShieldStatusActive,
       'keyShieldInactive': l10n.keyShieldStatusInactive,
+      'keyShieldBlocking': l10n.popoverKeyShieldBlocking,
+      'keyShieldAllowing': l10n.popoverKeyShieldAllowing,
       // Mouse content
       'todayMouseDistanceLabel': l10n.popoverTodayMouseDistanceLabel,
       // System info

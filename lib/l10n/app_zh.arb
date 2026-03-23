@@ -500,5 +500,7 @@
     "popoverKeyShieldLabel": "按键护盾",
     "popoverKeyShieldStatus": "状态",
     "popoverKeyShieldApp": "应用",
-    "popoverKeyShieldConfigure": "配置..."
+    "popoverKeyShieldConfigure": "配置...",
+    "popoverKeyShieldBlocking": "拦截",
+    "popoverKeyShieldAllowing": "放行"
 }

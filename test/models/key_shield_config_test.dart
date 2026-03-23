@@ -152,13 +152,13 @@ void main() {
         isEnabled: true,
         globalBlockedModifiers: ['command'],
         globalAllowedCombos: [KeyCombo(modifier: 'command', key: 'tab')],
-        feedbackMode: KeyShieldConstants.feedbackSound,
+        feedbackMode: KeyShieldConstants.feedbackVisual,
       );
       final json = config.toJson();
       expect(json['isEnabled'], true);
       expect(json['globalBlockedModifiers'], ['command']);
       expect(json['globalAllowedCombos'], isNotEmpty);
-      expect(json['feedbackMode'], 'sound');
+      expect(json['feedbackMode'], 'visual');
     });
 
     test('deserializes from JSON', () {

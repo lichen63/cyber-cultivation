@@ -50,29 +50,47 @@ class KeyShieldService {
 
   /// Push the full Key Shield configuration to native side
   Future<void> syncConfig(KeyShieldConfig config) async {
-    await _channel.invokeMethod('updateConfig', config.toJson());
+    try {
+      await _channel.invokeMethod('updateConfig', config.toJson());
+    } on PlatformException catch (_) {
+      // Silently ignore — native side may not be ready
+    }
   }
 
   /// Quick toggle Key Shield on/off
   Future<void> setEnabled(bool enabled) async {
-    await _channel.invokeMethod('setEnabled', {'enabled': enabled});
+    try {
+      await _channel.invokeMethod('setEnabled', {'enabled': enabled});
+    } on PlatformException catch (_) {
+      // Silently ignore
+    }
   }
 
   /// Get list of currently running GUI applications
   Future<List<RunningApp>> getRunningApps() async {
-    final result = await _channel.invokeMethod<List<dynamic>>('getRunningApps');
-    if (result == null) return [];
-    return result
-        .map((e) => RunningApp.fromMap(Map<String, dynamic>.from(e as Map)))
-        .toList();
+    try {
+      final result = await _channel.invokeMethod<List<dynamic>>(
+        'getRunningApps',
+      );
+      if (result == null) return [];
+      return result
+          .map((e) => RunningApp.fromMap(Map<String, dynamic>.from(e as Map)))
+          .toList();
+    } on PlatformException catch (_) {
+      return [];
+    }
   }
 
   /// Get current Key Shield status from native
   Future<KeyShieldStatus> getStatus() async {
-    final result = await _channel.invokeMethod<Map<dynamic, dynamic>>(
-      'getStatus',
-    );
-    if (result == null) return const KeyShieldStatus();
-    return KeyShieldStatus.fromMap(Map<String, dynamic>.from(result));
+    try {
+      final result = await _channel.invokeMethod<Map<dynamic, dynamic>>(
+        'getStatus',
+      );
+      if (result == null) return const KeyShieldStatus();
+      return KeyShieldStatus.fromMap(Map<String, dynamic>.from(result));
+    } on PlatformException catch (_) {
+      return const KeyShieldStatus();
+    }
   }
 }

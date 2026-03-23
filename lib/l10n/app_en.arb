@@ -2064,5 +2064,13 @@
     "popoverKeyShieldConfigure": "Configure...",
     "@popoverKeyShieldConfigure": {
         "description": "Configure button in keyboard popover Key Shield section"
+    },
+    "popoverKeyShieldBlocking": "Blocking",
+    "@popoverKeyShieldBlocking": {
+        "description": "Blocking label in keyboard popover Key Shield section"
+    },
+    "popoverKeyShieldAllowing": "Allowing",
+    "@popoverKeyShieldAllowing": {
+        "description": "Allowing label in keyboard popover Key Shield section"
     }
 }

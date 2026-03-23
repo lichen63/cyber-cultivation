@@ -956,7 +956,7 @@ struct KeyboardContentView: View {
                 
                 if !keyShieldBlockedModifiers.isEmpty {
                     InfoRow(
-                        label: "Blocking",
+                        label: labels["keyShieldBlocking"] ?? "Blocking",
                         value: keyShieldBlockedModifiers,
                         isDarkMode: isDarkMode
                     )
@@ -964,7 +964,7 @@ struct KeyboardContentView: View {
                 
                 if !keyShieldAllowedCombos.isEmpty {
                     InfoRow(
-                        label: "Allowing",
+                        label: labels["keyShieldAllowing"] ?? "Allowing",
                         value: keyShieldAllowedCombos,
                         isDarkMode: isDarkMode
                     )
