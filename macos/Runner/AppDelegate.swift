@@ -465,6 +465,7 @@ class AppDelegate: FlutterAppDelegate {
         data["processes"] = helper.getTopDiskProcesses(limit: 5)
       case "battery":
         data["processes"] = helper.getTopBatteryProcesses(limit: 5)
+        data["uptime"] = ProcessInfo.processInfo.systemUptime
       case "network":
         data["processes"] = helper.getTopNetworkProcesses(limit: 5)
         data["networkInfo"] = helper.getNetworkInfo()

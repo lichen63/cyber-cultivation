@@ -260,6 +260,11 @@ class SystemInfoHandler {
     }
   }
   
+  /// Get system uptime since last reboot in seconds
+  func getSystemUptime() -> TimeInterval {
+    return ProcessInfo.processInfo.systemUptime
+  }
+  
   /// Get battery level and charging status
   /// Returns (level: Int, isOnPower: Bool) where level is -1 if no battery
   /// isOnPower is true when connected to AC power (shows charging icon even at 100%)

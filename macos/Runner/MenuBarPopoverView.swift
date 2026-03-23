@@ -77,8 +77,10 @@ class MenuBarPopoverViewController: NSViewController {
             return NSSize(width: 490, height: 280)
         case "disk":
             return NSSize(width: 490, height: 210)
-        case "cpu", "gpu", "ram", "battery":
+        case "cpu", "gpu", "ram":
             return NSSize(width: 430, height: 210)
+        case "battery":
+            return NSSize(width: 430, height: 240)
         case "todo":
             return NSSize(width: 340, height: 210)
         case "levelExp", "focus", "keyboard", "mouse":
@@ -206,7 +208,18 @@ struct PopoverContentView: View {
         switch itemId {
         case "focus":
             FocusContentView(data: data, isDarkMode: isDarkMode)
-        case "cpu", "gpu", "ram", "battery":
+        case "battery":
+            VStack(spacing: 0) {
+                SystemInfoSectionView(data: data, isDarkMode: isDarkMode)
+                ProcessListView(
+                    itemId: itemId,
+                    processes: data["processes"] as? [[String: Any]] ?? [],
+                    isLoading: data["isLoading"] as? Bool ?? false,
+                    isDarkMode: isDarkMode,
+                    onTap: onActivityMonitorTap
+                )
+            }
+        case "cpu", "gpu", "ram":
             ProcessListView(
                 itemId: itemId,
                 processes: data["processes"] as? [[String: Any]] ?? [],
@@ -960,5 +973,81 @@ struct InfoRow: View {
                 .foregroundColor(textColor)
         }
         .font(.system(size: 12))
+    }
+}
+
+// MARK: - System Info Section
+
+/// A reusable section displayed above the process list in system stat popovers.
+/// Shows key-value system info rows (e.g. uptime). Designed to be easily extended
+/// with additional entries by appending to the `entries` array.
+struct SystemInfoSectionView: View {
+    let data: [String: Any]
+    let isDarkMode: Bool
+    
+    private var locale: String { data["locale"] as? String ?? "en" }
+    
+    /// Build the list of info entries from the popover data.
+    /// Each entry is a (label, value) pair. Add new entries here for extensibility.
+    private var entries: [(String, String)] {
+        var items: [(String, String)] = []
+        
+        // Uptime
+        if let uptime = data["uptime"] as? Double, uptime > 0 {
+            items.append((
+                locale == "zh" ? "运行时间" : "Uptime",
+                formatUptime(uptime)
+            ))
+        }
+        
+        // Future entries can be added here, e.g.:
+        // items.append(("Label", formattedValue))
+        
+        return items
+    }
+    
+    private var sectionBackground: Color {
+        isDarkMode ? Color.white.opacity(0.04) : Color.black.opacity(0.03)
+    }
+    
+    var body: some View {
+        if !entries.isEmpty {
+            VStack(spacing: 0) {
+                VStack(alignment: .leading, spacing: 4) {
+                    ForEach(Array(entries.enumerated()), id: \.offset) { _, entry in
+                        InfoRow(label: entry.0, value: entry.1, isDarkMode: isDarkMode)
+                    }
+                }
+                .padding(.horizontal, 8)
+                .padding(.vertical, 6)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(sectionBackground)
+                
+                Divider()
+                    .opacity(0.5)
+            }
+        }
+    }
+    
+    /// Format uptime seconds into a human-readable string (e.g. "3d 5h 12m")
+    private func formatUptime(_ seconds: Double) -> String {
+        let totalSeconds = Int(seconds)
+        let days = totalSeconds / 86400
+        let hours = (totalSeconds % 86400) / 3600
+        let minutes = (totalSeconds % 3600) / 60
+        
+        if days > 0 {
+            return locale == "zh"
+                ? "\(days)天 \(hours)小时 \(minutes)分钟"
+                : "\(days)d \(hours)h \(minutes)m"
+        } else if hours > 0 {
+            return locale == "zh"
+                ? "\(hours)小时 \(minutes)分钟"
+                : "\(hours)h \(minutes)m"
+        } else {
+            return locale == "zh"
+                ? "\(minutes)分钟"
+                : "\(minutes)m"
+        }
     }
 }
