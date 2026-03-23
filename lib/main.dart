@@ -19,10 +19,12 @@ import 'constants.dart';
 import 'l10n/app_localizations.dart';
 import 'models/daily_stats.dart';
 import 'models/game_data.dart';
+import 'models/key_shield_config.dart';
 import 'models/menu_bar_settings.dart';
 import 'models/todo_item.dart';
 import 'services/game_data_service.dart';
 import 'services/input_monitor_service.dart';
+import 'services/key_shield_service.dart';
 import 'services/menu_bar_helper.dart';
 import 'services/menu_bar_info_service.dart';
 import 'services/pomodoro_service.dart';
@@ -139,6 +141,8 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
   Locale? _locale;
   AppThemeMode _themeMode = AppThemeMode.dark;
   MenuBarSettings _menuBarSettings = const MenuBarSettings();
+  KeyShieldConfig _keyShieldConfig = const KeyShieldConfig();
+  final KeyShieldService _keyShieldService = KeyShieldService();
   String _trayIconPath = '';
   bool _trayIconPositioned = false; // Track if icon has been positioned left
   bool _isMenuBarUpdating = false; // Lock to prevent concurrent updates
@@ -238,7 +242,26 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
         final gameData = await gameDataService.loadGameData();
         final todayKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
         final todayStats = gameData?.dailyStats[todayKey];
-        return {...baseData, 'keyCount': todayStats?.keyboardCount ?? 0};
+        // Use Flutter-side config for isEnabled (always up-to-date)
+        // Use native status only for runtime state (active blocking, frontmost app)
+        final keyShieldStatus = await _keyShieldService.getStatus();
+        return {
+          ...baseData,
+          'keyCount': todayStats?.keyboardCount ?? 0,
+          'keyShieldEnabled': _keyShieldConfig.isEnabled,
+          'keyShieldActive': keyShieldStatus.isActivelyBlocking,
+          'keyShieldApp': keyShieldStatus.frontmostAppName ?? '',
+          'keyShieldAppsCount': _keyShieldConfig.appRules.length,
+          'keyShieldBlockedModifiers': _keyShieldConfig.globalBlockedModifiers
+              .map(
+                (m) =>
+                    '${KeyShieldConstants.modifierSymbols[m] ?? ''} ${m[0].toUpperCase()}${m.substring(1)}',
+              )
+              .join(', '),
+          'keyShieldAllowedCombos': _keyShieldConfig.globalAllowedCombos
+              .map((c) => c.toString())
+              .join(', '),
+        };
 
       case 'mouse':
         final gameDataService = GameDataService();
@@ -291,6 +314,13 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
       'maxExpLabel': l10n.popoverMaxExpLabel,
       // Keyboard content
       'todayKeyEventsLabel': l10n.popoverTodayKeyEventsLabel,
+      // Key Shield content
+      'keyShieldLabel': l10n.popoverKeyShieldLabel,
+      'keyShieldStatus': l10n.popoverKeyShieldStatus,
+      'keyShieldApp': l10n.popoverKeyShieldApp,
+      'keyShieldConfigure': l10n.popoverKeyShieldConfigure,
+      'keyShieldActive': l10n.keyShieldStatusActive,
+      'keyShieldInactive': l10n.keyShieldStatusInactive,
       // Mouse content
       'todayMouseDistanceLabel': l10n.popoverTodayMouseDistanceLabel,
       // System info
@@ -314,6 +344,7 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
       }
       _themeMode = data.themeMode;
       _menuBarSettings = data.menuBarSettings;
+      _keyShieldConfig = data.keyShieldConfig;
     }
     // Set initial theme for native UI components
     if (Platform.isMacOS) {
@@ -322,6 +353,8 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
         locale: _locale?.languageCode,
         labels: _buildNativeLabels(_locale?.languageCode),
       );
+      // Sync Key Shield config to native side
+      _keyShieldService.syncConfig(_keyShieldConfig);
     }
   }
 
@@ -592,6 +625,9 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
           }
         },
         onMenuBarSettingsChanged: _onMenuBarSettingsChanged,
+        onKeyShieldConfigChanged: (config) {
+          _keyShieldConfig = config;
+        },
         onTrayTitleChanged: _updateTrayTitle,
         onMenuBarItemsChanged: _updateMenuBarItems,
         onPomodoroStateChanged: (state) => _pomodoroState = state,
@@ -613,6 +649,7 @@ class MyHomePage extends StatefulWidget {
   final ValueChanged<String?>? onLanguageChanged;
   final ValueChanged<AppThemeMode>? onThemeModeChanged;
   final ValueChanged<MenuBarSettings>? onMenuBarSettingsChanged;
+  final ValueChanged<KeyShieldConfig>? onKeyShieldConfigChanged;
   final ValueChanged<String>? onTrayTitleChanged;
   final ValueChanged<List<MenuBarItem>>? onMenuBarItemsChanged;
   final ValueChanged<PomodoroState>? onPomodoroStateChanged;
@@ -628,6 +665,7 @@ class MyHomePage extends StatefulWidget {
     this.onLanguageChanged,
     this.onThemeModeChanged,
     this.onMenuBarSettingsChanged,
+    this.onKeyShieldConfigChanged,
     this.onTrayTitleChanged,
     this.onMenuBarItemsChanged,
     this.onPomodoroStateChanged,
@@ -663,6 +701,8 @@ class _MyHomePageState extends State<MyHomePage>
       AppConstants.defaultSystemStatsRefreshSeconds;
   late AppThemeMode _themeMode;
   late MenuBarSettings _menuBarSettings;
+  KeyShieldConfig _keyShieldConfig = const KeyShieldConfig();
+  final KeyShieldService _keyShieldService = KeyShieldService();
 
   // EXP System
   int _level = AppConstants.initialLevel;
@@ -804,6 +844,11 @@ class _MyHomePageState extends State<MyHomePage>
   }
 
   void _updateMenuBarInfo() {
+    // Update Key Shield active state for keyboard icon
+    _menuBarInfoService.isKeyShieldActive =
+        _keyShieldConfig.isEnabled &&
+        _keyShieldConfig.globalBlockedModifiers.isNotEmpty;
+
     // Update the data without notifying listeners to avoid recursion
     _menuBarInfoService.updateDataSilently(
       pomodoroState: _pomodoroService.state,
@@ -910,6 +955,7 @@ class _MyHomePageState extends State<MyHomePage>
       _language = data.language;
       _themeMode = data.themeMode;
       _menuBarSettings = data.menuBarSettings;
+      _keyShieldConfig = data.keyShieldConfig;
       _windowWidth = data.windowWidth ?? AppConstants.defaultWindowWidth;
       _windowHeight = data.windowHeight ?? AppConstants.defaultWindowHeight;
       _windowX = data.windowX;
@@ -991,6 +1037,7 @@ class _MyHomePageState extends State<MyHomePage>
           defaultPomodoroRelax: _defaultPomodoroRelax,
           defaultPomodoroLoops: _defaultPomodoroLoops,
           exploreMapData: ExploreWindowManager.savedMapData,
+          keyShieldConfig: _keyShieldConfig,
         ),
       );
     }
@@ -1235,6 +1282,14 @@ class _MyHomePageState extends State<MyHomePage>
         themeColors: _themeColors,
         menuBarSettings: _menuBarSettings,
         menuBarInfoService: _menuBarInfoService,
+        keyShieldConfig: _keyShieldConfig,
+        onKeyShieldConfigChanged: (value) {
+          setState(() => _keyShieldConfig = value);
+          _keyShieldService.syncConfig(value);
+          _updateMenuBarInfo();
+          widget.onKeyShieldConfigChanged?.call(value);
+          _saveGameData();
+        },
         onAlwaysOnTopChanged: _toggleAlwaysOnTop,
         onAntiSleepChanged: (value) {
           setState(() => _inputMonitorService.enableAntiSleep = value);

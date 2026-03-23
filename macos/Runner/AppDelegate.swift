@@ -109,6 +109,33 @@ class AppDelegate: FlutterAppDelegate {
         result(FlutterMethodNotImplemented)
       }
     }
+    
+    // Set up Key Shield method channel
+    let keyShieldChannel = FlutterMethodChannel(
+      name: "com.lichen63.cyber_cultivation/key_shield",
+      binaryMessenger: controller.engine.binaryMessenger
+    )
+    keyShieldChannel.setMethodCallHandler { (call, result) in
+      switch call.method {
+      case "updateConfig":
+        if let config = call.arguments as? [String: Any] {
+          KeyShieldHandler.shared.updateConfig(config)
+        }
+        result(true)
+      case "setEnabled":
+        if let args = call.arguments as? [String: Any],
+           let enabled = args["enabled"] as? Bool {
+          KeyShieldHandler.shared.setEnabled(enabled)
+        }
+        result(true)
+      case "getRunningApps":
+        result(KeyShieldHandler.shared.getRunningApps())
+      case "getStatus":
+        result(KeyShieldHandler.shared.getStatus())
+      default:
+        result(FlutterMethodNotImplemented)
+      }
+    }
   }
   
   @objc private func showWindowClicked() {

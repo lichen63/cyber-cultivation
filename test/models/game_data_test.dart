@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:cyber_cultivation/models/game_data.dart';
 import 'package:cyber_cultivation/models/daily_stats.dart';
+import 'package:cyber_cultivation/models/key_shield_config.dart';
 import 'package:cyber_cultivation/models/todo_item.dart';
 import 'package:cyber_cultivation/constants.dart';
 
@@ -26,9 +27,7 @@ void main() {
       });
 
       test('creates instance with all custom values', () {
-        final dailyStats = {
-          '2024-01-15': DailyStats(keyboardCount: 100),
-        };
+        final dailyStats = {'2024-01-15': DailyStats(keyboardCount: 100)};
         final todos = [
           TodoItem(
             id: '1',
@@ -92,10 +91,7 @@ void main() {
       });
 
       test('handles infinite currentExp', () {
-        final gameData = GameData(
-          level: 1,
-          currentExp: double.infinity,
-        );
+        final gameData = GameData(level: 1, currentExp: double.infinity);
 
         final json = gameData.toJson();
 
@@ -178,10 +174,7 @@ void main() {
       });
 
       test('handles missing boolean fields with defaults', () {
-        final json = {
-          'level': 1,
-          'currentExp': 0,
-        };
+        final json = {'level': 1, 'currentExp': 0};
 
         final gameData = GameData.fromJson(json);
 
@@ -192,11 +185,7 @@ void main() {
       });
 
       test('handles invalid themeMode with default dark', () {
-        final json = {
-          'level': 1,
-          'currentExp': 0,
-          'themeMode': 'invalid',
-        };
+        final json = {'level': 1, 'currentExp': 0, 'themeMode': 'invalid'};
 
         final gameData = GameData.fromJson(json);
 
@@ -204,11 +193,7 @@ void main() {
       });
 
       test('handles null themeMode with default dark', () {
-        final json = {
-          'level': 1,
-          'currentExp': 0,
-          'themeMode': null,
-        };
+        final json = {'level': 1, 'currentExp': 0, 'themeMode': null};
 
         final gameData = GameData.fromJson(json);
 
@@ -256,10 +241,7 @@ void main() {
       });
 
       test('handles missing dailyStats and todos', () {
-        final json = {
-          'level': 1,
-          'currentExp': 0,
-        };
+        final json = {'level': 1, 'currentExp': 0};
 
         final gameData = GameData.fromJson(json);
 
@@ -268,10 +250,7 @@ void main() {
       });
 
       test('handles currentExp as int', () {
-        final json = {
-          'level': 1,
-          'currentExp': 100,
-        };
+        final json = {'level': 1, 'currentExp': 100};
 
         final gameData = GameData.fromJson(json);
 
@@ -352,10 +331,7 @@ void main() {
           language: 'zh',
           themeMode: AppThemeMode.light,
           dailyStats: {
-            '2024-01-15': DailyStats(
-              keyboardCount: 100,
-              mouseClickCount: 50,
-            ),
+            '2024-01-15': DailyStats(keyboardCount: 100, mouseClickCount: 50),
           },
           todos: [
             TodoItem(
@@ -382,6 +358,73 @@ void main() {
         expect(restored.dailyStats.length, original.dailyStats.length);
         expect(restored.todos.length, original.todos.length);
         expect(restored.todos[0].id, original.todos[0].id);
+      });
+    });
+
+    group('keyShieldConfig integration', () {
+      test('default GameData has default KeyShieldConfig', () {
+        final gameData = GameData(level: 1, currentExp: 0);
+        expect(gameData.keyShieldConfig.isEnabled, false);
+        expect(gameData.keyShieldConfig.globalBlockedModifiers, isEmpty);
+        expect(gameData.keyShieldConfig.appRules, isEmpty);
+      });
+
+      test('toJson includes keyShieldConfig', () {
+        final gameData = GameData(
+          level: 1,
+          currentExp: 0,
+          keyShieldConfig: const KeyShieldConfig(
+            isEnabled: true,
+            globalBlockedModifiers: ['command'],
+          ),
+        );
+        final json = gameData.toJson();
+        expect(json['keyShieldConfig'], isNotNull);
+        expect(json['keyShieldConfig']['isEnabled'], true);
+      });
+
+      test('fromJson restores keyShieldConfig', () {
+        final json = {
+          'level': 1,
+          'currentExp': 0,
+          'keyShieldConfig': {
+            'isEnabled': true,
+            'globalBlockedModifiers': ['command'],
+            'globalAllowedCombos': [
+              {'modifier': 'command', 'key': 'tab'},
+            ],
+            'appRules': {
+              'com.valve.dota2': {
+                'bundleId': 'com.valve.dota2',
+                'appName': 'Dota 2',
+                'autoActivate': true,
+              },
+            },
+            'feedbackMode': 'sound',
+          },
+        };
+        final gameData = GameData.fromJson(json);
+        expect(gameData.keyShieldConfig.isEnabled, true);
+        expect(gameData.keyShieldConfig.globalBlockedModifiers, ['command']);
+        expect(gameData.keyShieldConfig.globalAllowedCombos.length, 1);
+        expect(gameData.keyShieldConfig.appRules.length, 1);
+        expect(gameData.keyShieldConfig.feedbackMode, 'sound');
+      });
+
+      test('fromJson handles missing keyShieldConfig (backwards compat)', () {
+        final json = {'level': 1, 'currentExp': 0};
+        final gameData = GameData.fromJson(json);
+        expect(gameData.keyShieldConfig.isEnabled, false);
+        expect(gameData.keyShieldConfig.globalBlockedModifiers, isEmpty);
+      });
+
+      test('copyWith updates keyShieldConfig', () {
+        final original = GameData(level: 1, currentExp: 0);
+        final modified = original.copyWith(
+          keyShieldConfig: const KeyShieldConfig(isEnabled: true),
+        );
+        expect(modified.keyShieldConfig.isEnabled, true);
+        expect(original.keyShieldConfig.isEnabled, false);
       });
     });
   });

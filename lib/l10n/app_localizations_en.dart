@@ -1423,4 +1423,142 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get popoverLoading => 'Loading...';
+
+  @override
+  String get keyShieldTitle => 'Key Shield';
+
+  @override
+  String get keyShieldDescription =>
+      'Block modifier key combos when protected apps are active';
+
+  @override
+  String get keyShieldEnabled => 'Key Shield Enabled';
+
+  @override
+  String get keyShieldConfigure => 'Configure Key Shield';
+
+  @override
+  String get keyShieldGlobalDefaults => 'Global Defaults';
+
+  @override
+  String get keyShieldBlockedModifiers => 'Blocked Modifiers';
+
+  @override
+  String get keyShieldAllowedCombos => 'Allowed Combos';
+
+  @override
+  String get keyShieldAllowedCombosHint =>
+      'These combos always pass through even when blocking';
+
+  @override
+  String get keyShieldAddCombo => 'Add Combo';
+
+  @override
+  String get keyShieldProtectedApps => 'Protected Apps';
+
+  @override
+  String get keyShieldAddApp => 'Add App';
+
+  @override
+  String get keyShieldFromRunningApps => 'From Running Apps';
+
+  @override
+  String get keyShieldNoApps =>
+      'No apps configured.\nAdd apps to protect them from accidental key combos.';
+
+  @override
+  String get keyShieldAutoActivate => 'Auto';
+
+  @override
+  String get keyShieldGlobalRules => 'Global defaults';
+
+  @override
+  String get keyShieldCustomRules => 'Custom';
+
+  @override
+  String get keyShieldCustomize => 'Customize';
+
+  @override
+  String get keyShieldRemove => 'Remove';
+
+  @override
+  String get keyShieldUseGlobalDefaults => 'Use global defaults';
+
+  @override
+  String get keyShieldFeedback => 'Feedback';
+
+  @override
+  String get keyShieldFeedbackNone => 'None';
+
+  @override
+  String get keyShieldFeedbackVisual => 'Visual';
+
+  @override
+  String get keyShieldFeedbackSound => 'Sound';
+
+  @override
+  String get keyShieldModifierCommand => 'Command';
+
+  @override
+  String get keyShieldModifierOption => 'Option';
+
+  @override
+  String get keyShieldModifierControl => 'Control';
+
+  @override
+  String get keyShieldSelectRunningApp => 'Select Running App';
+
+  @override
+  String get keyShieldFilterApps => 'Filter apps...';
+
+  @override
+  String get keyShieldAddSelected => 'Add Selected';
+
+  @override
+  String get keyShieldNoRunningApps => 'No running apps found';
+
+  @override
+  String get keyShieldAlreadyAdded => 'Already added';
+
+  @override
+  String get keyShieldModifier => 'Modifier';
+
+  @override
+  String get keyShieldKey => 'Key';
+
+  @override
+  String get keyShieldStatusActive => 'Active';
+
+  @override
+  String get keyShieldStatusInactive => 'Inactive';
+
+  @override
+  String keyShieldBlocking(String modifiers) {
+    return 'Blocking: $modifiers';
+  }
+
+  @override
+  String keyShieldAllowing(String combos) {
+    return 'Allowing: $combos';
+  }
+
+  @override
+  String keyShieldAppsProtected(int count) {
+    return '$count apps protected';
+  }
+
+  @override
+  String get keyShieldPerAppSettings => 'Per-App Settings';
+
+  @override
+  String get popoverKeyShieldLabel => 'Key Shield';
+
+  @override
+  String get popoverKeyShieldStatus => 'Status';
+
+  @override
+  String get popoverKeyShieldApp => 'App';
+
+  @override
+  String get popoverKeyShieldConfigure => 'Configure...';
 }

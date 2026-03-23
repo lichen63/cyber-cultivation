@@ -99,6 +99,9 @@ class MenuBarInfoService extends ChangeNotifier {
   MenuBarInfoData get data => _data;
   MenuBarSettings get settings => _settings;
 
+  /// Whether Key Shield is currently actively blocking
+  bool isKeyShieldActive = false;
+
   /// Whether battery simulation is enabled
   bool get isSimulatingBattery => _simulateBattery;
 
@@ -481,7 +484,12 @@ class MenuBarInfoService extends ChangeNotifier {
 
   (String, String) _buildKeyboardInfo() {
     final count = _formatNumber(_data.todayKeyboardCount.toDouble());
-    return ('⌨️', count);
+    return (
+      isKeyShieldActive
+          ? KeyShieldConstants.keyboardIconShielded
+          : KeyShieldConstants.keyboardIconNormal,
+      count,
+    );
   }
 
   (String, String) _buildMouseInfo() {

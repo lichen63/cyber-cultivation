@@ -1,4 +1,5 @@
 import 'daily_stats.dart';
+import 'key_shield_config.dart';
 import 'menu_bar_settings.dart';
 import 'todo_item.dart';
 import '../constants.dart';
@@ -29,6 +30,7 @@ class GameData {
   final int defaultPomodoroRelax;
   final int defaultPomodoroLoops;
   final Map<String, dynamic>? exploreMapData;
+  final KeyShieldConfig keyShieldConfig;
 
   GameData({
     required this.level,
@@ -57,6 +59,7 @@ class GameData {
     this.defaultPomodoroRelax = AppConstants.defaultRelaxDuration,
     this.defaultPomodoroLoops = AppConstants.defaultPomodoroLoops,
     this.exploreMapData,
+    this.keyShieldConfig = const KeyShieldConfig(),
   }) : dailyStats = dailyStats ?? {},
        todos = todos ?? [],
        menuBarSettings = menuBarSettings ?? const MenuBarSettings();
@@ -89,6 +92,7 @@ class GameData {
       'defaultPomodoroRelax': defaultPomodoroRelax,
       'defaultPomodoroLoops': defaultPomodoroLoops,
       'exploreMapData': exploreMapData,
+      'keyShieldConfig': keyShieldConfig.toJson(),
     };
   }
 
@@ -139,6 +143,9 @@ class GameData {
           json['defaultPomodoroLoops'] as int? ??
           AppConstants.defaultPomodoroLoops,
       exploreMapData: json['exploreMapData'] as Map<String, dynamic>?,
+      keyShieldConfig: KeyShieldConfig.fromJson(
+        json['keyShieldConfig'] as Map<String, dynamic>?,
+      ),
     );
   }
 
@@ -173,6 +180,7 @@ class GameData {
     int? defaultPomodoroRelax,
     int? defaultPomodoroLoops,
     Map<String, dynamic>? exploreMapData,
+    KeyShieldConfig? keyShieldConfig,
   }) {
     return GameData(
       level: level ?? this.level,
@@ -203,6 +211,7 @@ class GameData {
       defaultPomodoroRelax: defaultPomodoroRelax ?? this.defaultPomodoroRelax,
       defaultPomodoroLoops: defaultPomodoroLoops ?? this.defaultPomodoroLoops,
       exploreMapData: exploreMapData ?? this.exploreMapData,
+      keyShieldConfig: keyShieldConfig ?? this.keyShieldConfig,
     );
   }
 }

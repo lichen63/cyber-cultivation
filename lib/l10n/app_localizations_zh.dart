@@ -1362,4 +1362,139 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get popoverLoading => '加载中...';
+
+  @override
+  String get keyShieldTitle => '按键护盾';
+
+  @override
+  String get keyShieldDescription => '当受保护的应用在前台时，阻止修饰键组合';
+
+  @override
+  String get keyShieldEnabled => '启用按键护盾';
+
+  @override
+  String get keyShieldConfigure => '配置按键护盾';
+
+  @override
+  String get keyShieldGlobalDefaults => '全局默认设置';
+
+  @override
+  String get keyShieldBlockedModifiers => '拦截的修饰键';
+
+  @override
+  String get keyShieldAllowedCombos => '放行的组合键';
+
+  @override
+  String get keyShieldAllowedCombosHint => '这些组合键即使在拦截模式下也会正常通过';
+
+  @override
+  String get keyShieldAddCombo => '添加组合键';
+
+  @override
+  String get keyShieldProtectedApps => '受保护的应用';
+
+  @override
+  String get keyShieldAddApp => '添加应用';
+
+  @override
+  String get keyShieldFromRunningApps => '从运行中的应用选择';
+
+  @override
+  String get keyShieldNoApps => '暂无配置的应用。\n添加应用以防止意外按键操作。';
+
+  @override
+  String get keyShieldAutoActivate => '自动';
+
+  @override
+  String get keyShieldGlobalRules => '全局默认';
+
+  @override
+  String get keyShieldCustomRules => '自定义';
+
+  @override
+  String get keyShieldCustomize => '自定义设置';
+
+  @override
+  String get keyShieldRemove => '移除';
+
+  @override
+  String get keyShieldUseGlobalDefaults => '使用全局默认设置';
+
+  @override
+  String get keyShieldFeedback => '反馈方式';
+
+  @override
+  String get keyShieldFeedbackNone => '无';
+
+  @override
+  String get keyShieldFeedbackVisual => '视觉';
+
+  @override
+  String get keyShieldFeedbackSound => '声音';
+
+  @override
+  String get keyShieldModifierCommand => 'Command';
+
+  @override
+  String get keyShieldModifierOption => 'Option';
+
+  @override
+  String get keyShieldModifierControl => 'Control';
+
+  @override
+  String get keyShieldSelectRunningApp => '选择运行中的应用';
+
+  @override
+  String get keyShieldFilterApps => '筛选应用...';
+
+  @override
+  String get keyShieldAddSelected => '添加所选';
+
+  @override
+  String get keyShieldNoRunningApps => '没有找到运行中的应用';
+
+  @override
+  String get keyShieldAlreadyAdded => '已添加';
+
+  @override
+  String get keyShieldModifier => '修饰键';
+
+  @override
+  String get keyShieldKey => '按键';
+
+  @override
+  String get keyShieldStatusActive => '活跃';
+
+  @override
+  String get keyShieldStatusInactive => '未激活';
+
+  @override
+  String keyShieldBlocking(String modifiers) {
+    return '拦截: $modifiers';
+  }
+
+  @override
+  String keyShieldAllowing(String combos) {
+    return '放行: $combos';
+  }
+
+  @override
+  String keyShieldAppsProtected(int count) {
+    return '$count 个应用受保护';
+  }
+
+  @override
+  String get keyShieldPerAppSettings => '单应用设置';
+
+  @override
+  String get popoverKeyShieldLabel => '按键护盾';
+
+  @override
+  String get popoverKeyShieldStatus => '状态';
+
+  @override
+  String get popoverKeyShieldApp => '应用';
+
+  @override
+  String get popoverKeyShieldConfigure => '配置...';
 }

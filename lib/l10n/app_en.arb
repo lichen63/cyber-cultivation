@@ -1882,5 +1882,187 @@
     "popoverLoading": "Loading...",
     "@popoverLoading": {
         "description": "Loading text in tray popup preview"
+    },
+
+    "keyShieldTitle": "Key Shield",
+    "@keyShieldTitle": {
+        "description": "Title for the Key Shield feature"
+    },
+    "keyShieldDescription": "Block modifier key combos when protected apps are active",
+    "@keyShieldDescription": {
+        "description": "Description for the Key Shield feature"
+    },
+    "keyShieldEnabled": "Key Shield Enabled",
+    "@keyShieldEnabled": {
+        "description": "Toggle label for enabling Key Shield"
+    },
+    "keyShieldConfigure": "Configure Key Shield",
+    "@keyShieldConfigure": {
+        "description": "Button to open Key Shield settings dialog"
+    },
+    "keyShieldGlobalDefaults": "Global Defaults",
+    "@keyShieldGlobalDefaults": {
+        "description": "Section header for global Key Shield settings"
+    },
+    "keyShieldBlockedModifiers": "Blocked Modifiers",
+    "@keyShieldBlockedModifiers": {
+        "description": "Label for blocked modifiers selection"
+    },
+    "keyShieldAllowedCombos": "Allowed Combos",
+    "@keyShieldAllowedCombos": {
+        "description": "Section header for allowed key combos that pass through"
+    },
+    "keyShieldAllowedCombosHint": "These combos always pass through even when blocking",
+    "@keyShieldAllowedCombosHint": {
+        "description": "Hint text for allowed combos section"
+    },
+    "keyShieldAddCombo": "Add Combo",
+    "@keyShieldAddCombo": {
+        "description": "Button to add a new allowed key combo"
+    },
+    "keyShieldProtectedApps": "Protected Apps",
+    "@keyShieldProtectedApps": {
+        "description": "Section header for protected apps list"
+    },
+    "keyShieldAddApp": "Add App",
+    "@keyShieldAddApp": {
+        "description": "Button to add an app via file picker"
+    },
+    "keyShieldFromRunningApps": "From Running Apps",
+    "@keyShieldFromRunningApps": {
+        "description": "Button to add from currently running apps"
+    },
+    "keyShieldNoApps": "No apps configured.\nAdd apps to protect them from accidental key combos.",
+    "@keyShieldNoApps": {
+        "description": "Empty state text when no protected apps are configured"
+    },
+    "keyShieldAutoActivate": "Auto",
+    "@keyShieldAutoActivate": {
+        "description": "Label for auto-activate toggle on app rules"
+    },
+    "keyShieldGlobalRules": "Global defaults",
+    "@keyShieldGlobalRules": {
+        "description": "Badge text when app uses global default rules"
+    },
+    "keyShieldCustomRules": "Custom",
+    "@keyShieldCustomRules": {
+        "description": "Badge text when app has custom rules"
+    },
+    "keyShieldCustomize": "Customize",
+    "@keyShieldCustomize": {
+        "description": "Menu item to customize per-app rules"
+    },
+    "keyShieldRemove": "Remove",
+    "@keyShieldRemove": {
+        "description": "Menu item to remove an app from the protected list"
+    },
+    "keyShieldUseGlobalDefaults": "Use global defaults",
+    "@keyShieldUseGlobalDefaults": {
+        "description": "Toggle to use global defaults vs custom per-app rules"
+    },
+    "keyShieldFeedback": "Feedback",
+    "@keyShieldFeedback": {
+        "description": "Label for feedback mode selection"
+    },
+    "keyShieldFeedbackNone": "None",
+    "@keyShieldFeedbackNone": {
+        "description": "No feedback when a key is blocked"
+    },
+    "keyShieldFeedbackVisual": "Visual",
+    "@keyShieldFeedbackVisual": {
+        "description": "Visual feedback when a key is blocked"
+    },
+    "keyShieldFeedbackSound": "Sound",
+    "@keyShieldFeedbackSound": {
+        "description": "Sound feedback when a key is blocked"
+    },
+    "keyShieldModifierCommand": "Command",
+    "@keyShieldModifierCommand": {
+        "description": "Display name for the Command modifier key"
+    },
+    "keyShieldModifierOption": "Option",
+    "@keyShieldModifierOption": {
+        "description": "Display name for the Option modifier key"
+    },
+    "keyShieldModifierControl": "Control",
+    "@keyShieldModifierControl": {
+        "description": "Display name for the Control modifier key"
+    },
+    "keyShieldSelectRunningApp": "Select Running App",
+    "@keyShieldSelectRunningApp": {
+        "description": "Title for the running app picker dialog"
+    },
+    "keyShieldFilterApps": "Filter apps...",
+    "@keyShieldFilterApps": {
+        "description": "Placeholder text for app filter search field"
+    },
+    "keyShieldAddSelected": "Add Selected",
+    "@keyShieldAddSelected": {
+        "description": "Button to add selected apps from the picker"
+    },
+    "keyShieldNoRunningApps": "No running apps found",
+    "@keyShieldNoRunningApps": {
+        "description": "Text when no running apps are available"
+    },
+    "keyShieldAlreadyAdded": "Already added",
+    "@keyShieldAlreadyAdded": {
+        "description": "Text shown when an app is already in the protected list"
+    },
+    "keyShieldModifier": "Modifier",
+    "@keyShieldModifier": {
+        "description": "Label for modifier dropdown in combo picker"
+    },
+    "keyShieldKey": "Key",
+    "@keyShieldKey": {
+        "description": "Label for key dropdown in combo picker"
+    },
+    "keyShieldStatusActive": "Active",
+    "@keyShieldStatusActive": {
+        "description": "Status text when Key Shield is actively blocking"
+    },
+    "keyShieldStatusInactive": "Inactive",
+    "@keyShieldStatusInactive": {
+        "description": "Status text when Key Shield is not blocking"
+    },
+    "keyShieldBlocking": "Blocking: {modifiers}",
+    "@keyShieldBlocking": {
+        "description": "Summary of blocked modifiers in popover",
+        "placeholders": {
+            "modifiers": { "type": "String" }
+        }
+    },
+    "keyShieldAllowing": "Allowing: {combos}",
+    "@keyShieldAllowing": {
+        "description": "Summary of allowed combos in popover",
+        "placeholders": {
+            "combos": { "type": "String" }
+        }
+    },
+    "keyShieldAppsProtected": "{count} apps protected",
+    "@keyShieldAppsProtected": {
+        "description": "Count of protected apps in popover",
+        "placeholders": {
+            "count": { "type": "int" }
+        }
+    },
+    "keyShieldPerAppSettings": "Per-App Settings",
+    "@keyShieldPerAppSettings": {
+        "description": "Title for per-app settings dialog"
+    },
+    "popoverKeyShieldLabel": "Key Shield",
+    "@popoverKeyShieldLabel": {
+        "description": "Key Shield section label in keyboard popover"
+    },
+    "popoverKeyShieldStatus": "Status",
+    "@popoverKeyShieldStatus": {
+        "description": "Status label in keyboard popover Key Shield section"
+    },
+    "popoverKeyShieldApp": "App",
+    "@popoverKeyShieldApp": {
+        "description": "Current app label in keyboard popover Key Shield section"
+    },
+    "popoverKeyShieldConfigure": "Configure...",
+    "@popoverKeyShieldConfigure": {
+        "description": "Configure button in keyboard popover Key Shield section"
     }
 }

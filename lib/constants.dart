@@ -973,3 +973,53 @@ class NpcEffectConstants {
   static const Color positiveEffectColor = Color(0xFF4CAF50);
   static const Color negativeEffectColor = Color(0xFFF44336);
 }
+
+/// Constants for Key Shield feature
+class KeyShieldConstants {
+  // Method channel
+  static const String keyShieldChannel =
+      'com.lichen63.cyber_cultivation/key_shield';
+
+  // Default blocked modifiers
+  static const List<String> defaultBlockedModifiers = ['command'];
+
+  // Default allowed combos (always pass through even when blocking)
+  static const List<Map<String, String>> defaultAllowedCombos = [
+    {'modifier': 'command', 'key': 'tab'},
+    {'modifier': 'command', 'key': 'space'},
+  ];
+
+  // Modifier display names (for UI chips)
+  static const Map<String, String> modifierSymbols = {
+    'command': '⌘',
+    'option': '⌥',
+    'control': '⌃',
+  };
+
+  // Feedback modes
+  static const String feedbackNone = 'none';
+  static const String feedbackVisual = 'visual';
+
+  // Key Shield dialog dimensions
+  static const double dialogMaxWidth = 500.0;
+  static const double dialogMaxHeight = 600.0;
+  static const double dialogPadding = 20.0;
+  static const double dialogBorderRadius = 16.0;
+
+  // App picker dialog dimensions
+  static const double appPickerMaxWidth = 400.0;
+  static const double appPickerMaxHeight = 500.0;
+
+  // UI dimensions
+  static const double chipPaddingH = 12.0;
+  static const double chipPaddingV = 6.0;
+  static const double chipBorderRadius = 16.0;
+  static const double chipSpacing = 8.0;
+  static const double sectionSpacing = 16.0;
+  static const double itemBorderRadius = 8.0;
+  static const double itemPadding = 12.0;
+
+  // Menu bar icon when active
+  static const String keyboardIconNormal = '⌨️';
+  static const String keyboardIconShielded = '🛡️⌨️';
+}

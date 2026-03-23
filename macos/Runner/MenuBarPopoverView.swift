@@ -83,8 +83,12 @@ class MenuBarPopoverViewController: NSViewController {
             return NSSize(width: 430, height: 240)
         case "todo":
             return NSSize(width: 340, height: 210)
-        case "levelExp", "focus", "keyboard", "mouse":
+        case "levelExp", "focus", "mouse":
             return NSSize(width: 340, height: 156)
+        case "keyboard":
+            // Expand height when Key Shield data is present
+            let keyShieldEnabled = currentData["keyShieldEnabled"] as? Bool ?? false
+            return NSSize(width: 340, height: keyShieldEnabled ? 280 : 156)
         default:
             return NSSize(width: 340, height: 136)
         }
@@ -250,7 +254,7 @@ struct PopoverContentView: View {
         case "levelExp":
             LevelExpContentView(data: data, isDarkMode: isDarkMode, labels: labels)
         case "keyboard":
-            KeyboardContentView(keyCount: data["keyCount"] as? Int ?? 0, isDarkMode: isDarkMode, labels: labels)
+            KeyboardContentView(data: data, isDarkMode: isDarkMode, labels: labels)
         case "mouse":
             MouseContentView(distance: data["distance"] as? Int ?? 0, isDarkMode: isDarkMode, labels: labels)
         default:
@@ -806,7 +810,7 @@ struct TodoContentView: View {
     var body: some View {
         if todos.isEmpty {
             Text("No todos")
-                .foregroundColor(.secondary)
+                .foregroundColor(isDarkMode ? .white.opacity(0.5) : .black.opacity(0.5))
                 .font(.system(size: 12))
                 .frame(maxWidth: .infinity, minHeight: 80)
         } else {
@@ -902,9 +906,21 @@ struct LevelExpContentView: View {
 // MARK: - Keyboard Content
 
 struct KeyboardContentView: View {
-    let keyCount: Int
+    let data: [String: Any]
     let isDarkMode: Bool
     let labels: [String: String]
+    
+    private var keyCount: Int { data["keyCount"] as? Int ?? 0 }
+    private var keyShieldEnabled: Bool { data["keyShieldEnabled"] as? Bool ?? false }
+    private var keyShieldActive: Bool { data["keyShieldActive"] as? Bool ?? false }
+    private var keyShieldApp: String { data["keyShieldApp"] as? String ?? "" }
+    private var keyShieldAppsCount: Int { data["keyShieldAppsCount"] as? Int ?? 0 }
+    private var keyShieldBlockedModifiers: String { data["keyShieldBlockedModifiers"] as? String ?? "" }
+    private var keyShieldAllowedCombos: String { data["keyShieldAllowedCombos"] as? String ?? "" }
+    
+    private var textColor: Color {
+        isDarkMode ? .white : .black
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -913,6 +929,47 @@ struct KeyboardContentView: View {
                 value: formatNumber(keyCount),
                 isDarkMode: isDarkMode
             )
+            
+            if keyShieldEnabled {
+                Divider()
+                    .background(isDarkMode ? Color.white.opacity(0.2) : Color.black.opacity(0.1))
+                
+                HStack {
+                    Text(labels["keyShieldLabel"] ?? "Key Shield")
+                        .foregroundColor(textColor)
+                    Spacer()
+                    Text(keyShieldActive
+                         ? (labels["keyShieldActive"] ?? "Active")
+                         : (labels["keyShieldInactive"] ?? "Enabled"))
+                        .fontWeight(.medium)
+                        .foregroundColor(keyShieldActive ? .green : textColor)
+                }
+                .font(.system(size: 12))
+                
+                if keyShieldActive && !keyShieldApp.isEmpty {
+                    InfoRow(
+                        label: labels["keyShieldApp"] ?? "App",
+                        value: keyShieldApp,
+                        isDarkMode: isDarkMode
+                    )
+                }
+                
+                if !keyShieldBlockedModifiers.isEmpty {
+                    InfoRow(
+                        label: "Blocking",
+                        value: keyShieldBlockedModifiers,
+                        isDarkMode: isDarkMode
+                    )
+                }
+                
+                if !keyShieldAllowedCombos.isEmpty {
+                    InfoRow(
+                        label: "Allowing",
+                        value: keyShieldAllowedCombos,
+                        isDarkMode: isDarkMode
+                    )
+                }
+            }
         }
         .padding(8)
     }
