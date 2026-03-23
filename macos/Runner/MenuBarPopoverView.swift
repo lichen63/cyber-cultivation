@@ -8,12 +8,13 @@ class MenuBarPopoverViewController: NSViewController {
     
     private var hostingView: NSHostingView<AnyView>?
     private var currentItemId: String = ""
-    private var currentData: [String: Any] = [:]
+    private(set) var currentData: [String: Any] = [:]
     private var isDarkMode: Bool = true
     private var onShowWindow: (() -> Void)?
     private var onHideWindow: (() -> Void)?
     private var onExitApp: (() -> Void)?
     private var onActivityMonitorTap: (() -> Void)?
+    private var onKeyShieldToggle: (() -> Void)?
     
     override func loadView() {
         view = NSView()
@@ -27,7 +28,8 @@ class MenuBarPopoverViewController: NSViewController {
         onShowWindow: @escaping () -> Void,
         onHideWindow: @escaping () -> Void,
         onExitApp: @escaping () -> Void,
-        onActivityMonitorTap: @escaping () -> Void
+        onActivityMonitorTap: @escaping () -> Void,
+        onKeyShieldToggle: @escaping () -> Void = {}
     ) {
         self.currentItemId = itemId
         self.currentData = data
@@ -36,6 +38,7 @@ class MenuBarPopoverViewController: NSViewController {
         self.onHideWindow = onHideWindow
         self.onExitApp = onExitApp
         self.onActivityMonitorTap = onActivityMonitorTap
+        self.onKeyShieldToggle = onKeyShieldToggle
         
         updateContent()
     }
@@ -86,9 +89,15 @@ class MenuBarPopoverViewController: NSViewController {
         case "levelExp", "focus", "mouse":
             return NSSize(width: 340, height: 156)
         case "keyboard":
-            // Expand height when Key Shield data is present
+            // Expand height when Key Shield is configured
+            let keyShieldConfigured = currentData["keyShieldConfigured"] as? Bool ?? false
             let keyShieldEnabled = currentData["keyShieldEnabled"] as? Bool ?? false
-            return NSSize(width: 340, height: keyShieldEnabled ? 280 : 156)
+            if keyShieldConfigured && keyShieldEnabled {
+                return NSSize(width: 340, height: 280)
+            } else if keyShieldConfigured {
+                return NSSize(width: 340, height: 195)
+            }
+            return NSSize(width: 340, height: 156)
         default:
             return NSSize(width: 340, height: 136)
         }
@@ -103,7 +112,8 @@ class MenuBarPopoverViewController: NSViewController {
             onShowWindow: { [weak self] in self?.onShowWindow?() },
             onHideWindow: { [weak self] in self?.onHideWindow?() },
             onExitApp: { [weak self] in self?.onExitApp?() },
-            onActivityMonitorTap: { [weak self] in self?.onActivityMonitorTap?() }
+            onActivityMonitorTap: { [weak self] in self?.onActivityMonitorTap?() },
+            onKeyShieldToggle: { [weak self] in self?.onKeyShieldToggle?() }
         )
     }
 }
@@ -117,6 +127,7 @@ struct PopoverContentView: View {
     let onHideWindow: () -> Void
     let onExitApp: () -> Void
     let onActivityMonitorTap: () -> Void
+    let onKeyShieldToggle: () -> Void
     
     /// Pre-resolved localized strings from Flutter
     private var labels: [String: String] {
@@ -254,7 +265,7 @@ struct PopoverContentView: View {
         case "levelExp":
             LevelExpContentView(data: data, isDarkMode: isDarkMode, labels: labels)
         case "keyboard":
-            KeyboardContentView(data: data, isDarkMode: isDarkMode, labels: labels)
+            KeyboardContentView(data: data, isDarkMode: isDarkMode, labels: labels, onToggle: onKeyShieldToggle)
         case "mouse":
             MouseContentView(distance: data["distance"] as? Int ?? 0, isDarkMode: isDarkMode, labels: labels)
         default:
@@ -909,9 +920,11 @@ struct KeyboardContentView: View {
     let data: [String: Any]
     let isDarkMode: Bool
     let labels: [String: String]
+    var onToggle: (() -> Void)? = nil
     
     private var keyCount: Int { data["keyCount"] as? Int ?? 0 }
     private var keyShieldEnabled: Bool { data["keyShieldEnabled"] as? Bool ?? false }
+    private var keyShieldConfigured: Bool { data["keyShieldConfigured"] as? Bool ?? false }
     private var keyShieldActive: Bool { data["keyShieldActive"] as? Bool ?? false }
     private var keyShieldApp: String { data["keyShieldApp"] as? String ?? "" }
     private var keyShieldAppsCount: Int { data["keyShieldAppsCount"] as? Int ?? 0 }
@@ -930,44 +943,45 @@ struct KeyboardContentView: View {
                 isDarkMode: isDarkMode
             )
             
-            if keyShieldEnabled {
+            if keyShieldConfigured {
                 Divider()
                     .background(isDarkMode ? Color.white.opacity(0.2) : Color.black.opacity(0.1))
                 
                 HStack {
                     Text(labels["keyShieldLabel"] ?? "Key Shield")
+                        .font(.system(size: 12))
                         .foregroundColor(textColor)
                     Spacer()
-                    Text(keyShieldActive
-                         ? (labels["keyShieldActive"] ?? "Active")
-                         : (labels["keyShieldInactive"] ?? "Enabled"))
-                        .fontWeight(.medium)
-                        .foregroundColor(keyShieldActive ? .green : textColor)
-                }
-                .font(.system(size: 12))
-                
-                if keyShieldActive && !keyShieldApp.isEmpty {
-                    InfoRow(
-                        label: labels["keyShieldApp"] ?? "App",
-                        value: keyShieldApp,
-                        isDarkMode: isDarkMode
+                    KeyShieldToggle(
+                        isOn: keyShieldEnabled,
+                        onToggle: { onToggle?() }
                     )
                 }
                 
-                if !keyShieldBlockedModifiers.isEmpty {
-                    InfoRow(
-                        label: labels["keyShieldBlocking"] ?? "Blocking",
-                        value: keyShieldBlockedModifiers,
-                        isDarkMode: isDarkMode
-                    )
-                }
-                
-                if !keyShieldAllowedCombos.isEmpty {
-                    InfoRow(
-                        label: labels["keyShieldAllowing"] ?? "Allowing",
-                        value: keyShieldAllowedCombos,
-                        isDarkMode: isDarkMode
-                    )
+                if keyShieldEnabled {
+                    if keyShieldActive && !keyShieldApp.isEmpty {
+                        InfoRow(
+                            label: labels["keyShieldApp"] ?? "App",
+                            value: keyShieldApp,
+                            isDarkMode: isDarkMode
+                        )
+                    }
+                    
+                    if !keyShieldBlockedModifiers.isEmpty {
+                        InfoRow(
+                            label: labels["keyShieldBlocking"] ?? "Blocking",
+                            value: keyShieldBlockedModifiers,
+                            isDarkMode: isDarkMode
+                        )
+                    }
+                    
+                    if !keyShieldAllowedCombos.isEmpty {
+                        InfoRow(
+                            label: labels["keyShieldAllowing"] ?? "Allowing",
+                            value: keyShieldAllowedCombos,
+                            isDarkMode: isDarkMode
+                        )
+                    }
                 }
             }
         }
@@ -981,6 +995,35 @@ struct KeyboardContentView: View {
             return String(format: "%.1fK", Double(num) / 1_000)
         }
         return "\(num)"
+    }
+}
+
+// MARK: - Key Shield Toggle
+
+/// A compact toggle switch for Key Shield on/off in the popover
+struct KeyShieldToggle: View {
+    let isOn: Bool
+    let onToggle: () -> Void
+    
+    private let width: CGFloat = 32
+    private let height: CGFloat = 18
+    private let knobPadding: CGFloat = 2
+    
+    var body: some View {
+        Button(action: onToggle) {
+            ZStack(alignment: isOn ? .trailing : .leading) {
+                Capsule()
+                    .fill(isOn ? Color.green : Color.gray.opacity(0.4))
+                    .frame(width: width, height: height)
+                
+                Circle()
+                    .fill(Color.white)
+                    .shadow(radius: 1)
+                    .frame(width: height - knobPadding * 2, height: height - knobPadding * 2)
+                    .padding(knobPadding)
+            }
+        }
+        .buttonStyle(.plain)
     }
 }
 

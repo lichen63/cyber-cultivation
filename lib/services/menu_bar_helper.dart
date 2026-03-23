@@ -7,20 +7,26 @@ typedef MenuBarItemClickCallback = void Function(String itemId);
 /// Callback type for when a native popup (like calendar) is about to show.
 typedef NativePopupShowingCallback = void Function();
 
+/// Callback type for Key Shield toggled from native popover.
+typedef KeyShieldToggledCallback = void Function(bool enabled);
+
 /// Helper class to set menu bar title with custom font size on macOS.
 /// Uses native code to support NSAttributedString with custom font.
 class MenuBarHelper {
   static const MethodChannel _channel = MethodChannel('menu_bar_helper');
   static MenuBarItemClickCallback? _onItemClicked;
   static NativePopupShowingCallback? _onNativePopupShowing;
+  static KeyShieldToggledCallback? _onKeyShieldToggled;
 
   /// Initialize the helper and set up method call handlers.
   static void initialize({
     MenuBarItemClickCallback? onItemClicked,
     NativePopupShowingCallback? onNativePopupShowing,
+    KeyShieldToggledCallback? onKeyShieldToggled,
   }) {
     _onItemClicked = onItemClicked;
     _onNativePopupShowing = onNativePopupShowing;
+    _onKeyShieldToggled = onKeyShieldToggled;
     _channel.setMethodCallHandler(_handleMethodCall);
   }
 
@@ -28,6 +34,7 @@ class MenuBarHelper {
   static void dispose() {
     _onItemClicked = null;
     _onNativePopupShowing = null;
+    _onKeyShieldToggled = null;
     _channel.setMethodCallHandler(null);
   }
 
@@ -42,6 +49,11 @@ class MenuBarHelper {
       case 'onNativePopupShowing':
         // Native popup (like calendar) is about to show, hide any Flutter popup
         _onNativePopupShowing?.call();
+        return true;
+      case 'onKeyShieldToggled':
+        final args = call.arguments as Map<dynamic, dynamic>;
+        final enabled = args['enabled'] as bool;
+        _onKeyShieldToggled?.call(enabled);
         return true;
       default:
         return null;

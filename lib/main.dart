@@ -179,7 +179,17 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
     MenuBarHelper.initialize(
       onItemClicked: _onMenuBarItemClicked,
       onNativePopupShowing: _hidePopupWindow,
+      onKeyShieldToggled: _onKeyShieldToggled,
     );
+  }
+
+  /// Handle Key Shield toggled from native keyboard popover
+  void _onKeyShieldToggled(bool enabled) {
+    _keyShieldConfig = _keyShieldConfig.copyWith(isEnabled: enabled);
+    // Propagate to MyHomePage via a rebuild — MyHomePage reads
+    // initialGameData on first load but we need to inform the child.
+    // The simplest approach: directly sync native and mark for save.
+    _keyShieldService.syncConfig(_keyShieldConfig);
   }
 
   /// Hide any open popup window (used when native popup or tray menu is shown).
@@ -249,6 +259,8 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
           ...baseData,
           'keyCount': todayStats?.keyboardCount ?? 0,
           'keyShieldEnabled': _keyShieldConfig.isEnabled,
+          'keyShieldConfigured':
+              _keyShieldConfig.globalBlockedModifiers.isNotEmpty,
           'keyShieldActive': keyShieldStatus.isActivelyBlocking,
           'keyShieldApp': keyShieldStatus.frontmostAppName ?? '',
           'keyShieldAppsCount': _keyShieldConfig.appRules.length,

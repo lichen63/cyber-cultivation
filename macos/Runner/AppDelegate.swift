@@ -565,6 +565,20 @@ class AppDelegate: FlutterAppDelegate {
       onActivityMonitorTap: { [weak self] in
         self?.openActivityMonitor()
         self?.closeMenuBarPopover()
+      },
+      onKeyShieldToggle: { [weak self] in
+        let handler = KeyShieldHandler.shared
+        handler.setEnabled(!handler.isEnabled)
+        // Notify Flutter
+        self?.methodChannel?.invokeMethod("onKeyShieldToggled", arguments: [
+          "enabled": handler.isEnabled,
+        ])
+        // Refresh popover to reflect new state
+        if var data = self?.menuBarPopoverViewController?.currentData {
+          data["keyShieldEnabled"] = handler.isEnabled
+          data["keyShieldActive"] = handler.isActivelyBlocking
+          self?.menuBarPopoverViewController?.updateData(data)
+        }
       }
     )
     
