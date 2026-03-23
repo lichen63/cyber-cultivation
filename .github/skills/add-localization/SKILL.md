@@ -67,8 +67,25 @@ Use ICU message format for dynamic values:
 
 Usage: `l10n.levelDisplay(playerLevel)`
 
+## Native Swift Views (Popovers & Tray Popup)
+
+Swift views in `macos/Runner/` (MenuBarPopoverView.swift, TrayPopupView.swift) do NOT do their own locale checks. Instead, Flutter pre-resolves strings and sends them as a `labels` dictionary via method channels.
+
+To add a string used in a Swift view:
+
+1. Add the key to both ARB files (prefix with `popover*` for popover strings)
+2. Run `flutter gen-l10n`
+3. Add the key to `_buildNativeLabels()` in `lib/main.dart`:
+   ```dart
+   'myNewLabel': l10n.popoverMyNewLabel,
+   ```
+4. Use it in Swift as `labels["myNewLabel"] ?? "Fallback"`
+
+**Never** add `locale == "zh" ? ... : ...` patterns in Swift files.
+
 ## Pitfalls
 
 - Keys in Chinese but not English → build failure (English is the template)
 - Missing `@` metadata → gen-l10n warning
+- Native Swift labels not updating → check `_buildNativeLabels()` includes the new key
 - Trailing commas in JSON → parse error

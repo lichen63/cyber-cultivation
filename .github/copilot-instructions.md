@@ -19,6 +19,7 @@ Please follow these rules in every interaction:
 4.  **Localization**: 
     - Every time you add or modify UI text, you MUST implement it using the localization system (`l10n`/`arb` files).
     - Never hardcode user-facing strings.
+    - Native Swift views (menu bar popovers, tray popup) also use ARB strings — they receive pre-resolved labels from Flutter via method channels. Add new keys to ARB files and include them in `_buildNativeLabels()` in `main.dart`.
 
 5.  **State Management**:
     - Keep state management consistent. Use `setState` for local state. Do not introduce new libraries without permission.

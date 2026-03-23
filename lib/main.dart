@@ -252,6 +252,60 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
     }
   }
 
+  /// Build the labels dictionary for native Swift views from AppLocalizations.
+  /// This is the single source of truth — Swift views receive pre-resolved strings.
+  Map<String, String> _buildNativeLabels(String? localeCode) {
+    final l10n = lookupAppLocalizations(Locale(localeCode ?? 'en'));
+    return {
+      // Popover titles
+      'titleFocus': l10n.popoverTitleFocus,
+      'titleRam': l10n.popoverTitleRam,
+      'titleNetwork': l10n.popoverTitleNetwork,
+      'titleDisk': l10n.popoverTitleDisk,
+      'titleBattery': l10n.popoverTitleBattery,
+      'titleTodo': l10n.popoverTitleTodo,
+      'titleLevel': l10n.popoverTitleLevel,
+      'titleKeyboard': l10n.popoverTitleKeyboard,
+      'titleMouse': l10n.popoverTitleMouse,
+      // Shared button tooltips
+      'showWindow': l10n.popoverShowWindow,
+      'hideWindow': l10n.hideWindowText,
+      'exitApp': l10n.popoverExitApp,
+      'exitGame': l10n.exitGameText,
+      // Focus content
+      'statusLabel': l10n.popoverStatusLabel,
+      'timeRemainingLabel': l10n.popoverTimeRemainingLabel,
+      'loopsLabel': l10n.popoverLoopsLabel,
+      'statusIdle': l10n.popoverStatusIdle,
+      'statusRelaxing': l10n.popoverStatusRelaxing,
+      'statusFocusing': l10n.popoverStatusFocusing,
+      // Network content
+      'interfaceLabel': l10n.popoverInterfaceLabel,
+      'networkNameLabel': l10n.popoverNetworkNameLabel,
+      'localIpLabel': l10n.popoverLocalIpLabel,
+      'publicIpLabel': l10n.popoverPublicIpLabel,
+      'gatewayLabel': l10n.popoverGatewayLabel,
+      // Level/Exp content
+      'levelLabel': l10n.popoverLevelLabel,
+      'currentExpLabel': l10n.popoverCurrentExpLabel,
+      'maxExpLabel': l10n.popoverMaxExpLabel,
+      // Keyboard content
+      'todayKeyEventsLabel': l10n.popoverTodayKeyEventsLabel,
+      // Mouse content
+      'todayMouseDistanceLabel': l10n.popoverTodayMouseDistanceLabel,
+      // System info
+      'uptimeLabel': l10n.popoverUptimeLabel,
+      'uptimeDaySuffix': l10n.popoverUptimeDaySuffix,
+      'uptimeHourSuffix': l10n.popoverUptimeHourSuffix,
+      'uptimeMinuteSuffix': l10n.popoverUptimeMinuteSuffix,
+      // Tray popup
+      'appTitle': l10n.appTitle,
+      'pinWindow': l10n.popoverPinWindow,
+      'unpin': l10n.popoverUnpin,
+      'loading': l10n.popoverLoading,
+    };
+  }
+
   void _initializeFromGameData() {
     final data = widget.initialGameData;
     if (data != null) {
@@ -266,6 +320,7 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
       MenuBarHelper.setTheme(
         isDark: _themeMode == AppThemeMode.dark,
         locale: _locale?.languageCode,
+        labels: _buildNativeLabels(_locale?.languageCode),
       );
     }
   }
@@ -457,6 +512,7 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
         popupWidth: TrayPopupConstants.popupWidth,
         popupHeight: TrayPopupConstants.popupHeight,
         titleBarHeight: TrayPopupConstants.titleBarHeight,
+        labels: _buildNativeLabels(_locale?.languageCode),
       );
     } catch (e) {
       // Fallback to context menu if popup fails
@@ -515,11 +571,12 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
         menuBarSettings: _menuBarSettings,
         onLanguageChanged: (lang) {
           setState(() => _locale = lang != null ? Locale(lang) : null);
-          // Update native UI locale
+          // Update native UI locale and labels
           if (Platform.isMacOS) {
             MenuBarHelper.setTheme(
               isDark: _themeMode == AppThemeMode.dark,
               locale: lang,
+              labels: _buildNativeLabels(lang),
             );
           }
         },
@@ -530,6 +587,7 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
             MenuBarHelper.setTheme(
               isDark: mode == AppThemeMode.dark,
               locale: _locale?.languageCode,
+              labels: _buildNativeLabels(_locale?.languageCode),
             );
           }
         },

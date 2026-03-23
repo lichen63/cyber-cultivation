@@ -114,6 +114,11 @@ struct PopoverContentView: View {
     let onExitApp: () -> Void
     let onActivityMonitorTap: () -> Void
     
+    /// Pre-resolved localized strings from Flutter
+    private var labels: [String: String] {
+        data["labels"] as? [String: String] ?? [:]
+    }
+    
     var body: some View {
         VStack(spacing: 0) {
             // Title bar
@@ -146,13 +151,13 @@ struct PopoverContentView: View {
                 HStack(spacing: 12) {
                     IconButton(
                         icon: "eye",
-                        tooltip: "Show Window",
+                        tooltip: labels["showWindow"] ?? "Show Window",
                         isDarkMode: isDarkMode,
                         action: onShowWindow
                     )
                     IconButton(
                         icon: "eye.slash",
-                        tooltip: "Hide Window",
+                        tooltip: labels["hideWindow"] ?? "Hide Window",
                         isDarkMode: isDarkMode,
                         action: onHideWindow
                     )
@@ -163,7 +168,7 @@ struct PopoverContentView: View {
                 // Right: Exit button
                 IconButton(
                     icon: "power",
-                    tooltip: "Exit App",
+                    tooltip: labels["exitApp"] ?? "Exit App",
                     isDestructive: true,
                     isDarkMode: isDarkMode,
                     action: onExitApp
@@ -177,27 +182,27 @@ struct PopoverContentView: View {
     private func getTitle() -> String {
         switch itemId {
         case "focus":
-            return data["locale"] as? String == "zh" ? "专注" : "Focus"
+            return labels["titleFocus"] ?? "Focus"
         case "cpu":
             return "CPU"
         case "ram":
-            return data["locale"] as? String == "zh" ? "内存" : "RAM"
+            return labels["titleRam"] ?? "RAM"
         case "network":
-            return data["locale"] as? String == "zh" ? "网络" : "Network"
+            return labels["titleNetwork"] ?? "Network"
         case "gpu":
             return "GPU"
         case "disk":
-            return data["locale"] as? String == "zh" ? "磁盘" : "Disk"
+            return labels["titleDisk"] ?? "Disk"
         case "battery":
-            return data["locale"] as? String == "zh" ? "电池" : "Battery"
+            return labels["titleBattery"] ?? "Battery"
         case "todo":
-            return data["locale"] as? String == "zh" ? "待办" : "Todo"
+            return labels["titleTodo"] ?? "Todo"
         case "levelExp":
-            return data["locale"] as? String == "zh" ? "等级" : "Level"
+            return labels["titleLevel"] ?? "Level"
         case "keyboard":
-            return data["locale"] as? String == "zh" ? "键盘" : "Keyboard"
+            return labels["titleKeyboard"] ?? "Keyboard"
         case "mouse":
-            return data["locale"] as? String == "zh" ? "鼠标" : "Mouse"
+            return labels["titleMouse"] ?? "Mouse"
         default:
             return itemId.isEmpty ? "Menu" : itemId.capitalized
         }
@@ -207,10 +212,10 @@ struct PopoverContentView: View {
     private var contentArea: some View {
         switch itemId {
         case "focus":
-            FocusContentView(data: data, isDarkMode: isDarkMode)
+            FocusContentView(data: data, isDarkMode: isDarkMode, labels: labels)
         case "battery":
             VStack(spacing: 0) {
-                SystemInfoSectionView(data: data, isDarkMode: isDarkMode)
+                SystemInfoSectionView(data: data, isDarkMode: isDarkMode, labels: labels)
                 ProcessListView(
                     itemId: itemId,
                     processes: data["processes"] as? [[String: Any]] ?? [],
@@ -243,11 +248,11 @@ struct PopoverContentView: View {
         case "todo":
             TodoContentView(todos: data["todos"] as? [[String: Any]] ?? [], isDarkMode: isDarkMode)
         case "levelExp":
-            LevelExpContentView(data: data, isDarkMode: isDarkMode)
+            LevelExpContentView(data: data, isDarkMode: isDarkMode, labels: labels)
         case "keyboard":
-            KeyboardContentView(keyCount: data["keyCount"] as? Int ?? 0, isDarkMode: isDarkMode, locale: data["locale"] as? String ?? "en")
+            KeyboardContentView(keyCount: data["keyCount"] as? Int ?? 0, isDarkMode: isDarkMode, labels: labels)
         case "mouse":
-            MouseContentView(distance: data["distance"] as? Int ?? 0, isDarkMode: isDarkMode, locale: data["locale"] as? String ?? "en")
+            MouseContentView(distance: data["distance"] as? Int ?? 0, isDarkMode: isDarkMode, labels: labels)
         default:
             Text("Content placeholder")
                 .foregroundColor(.secondary)
@@ -323,28 +328,28 @@ struct LoadingSpinner: View {
 struct FocusContentView: View {
     let data: [String: Any]
     let isDarkMode: Bool
+    let labels: [String: String]
     
     private var isActive: Bool { data["focusIsActive"] as? Bool ?? false }
     private var isRelaxing: Bool { data["focusIsRelaxing"] as? Bool ?? false }
     private var secondsRemaining: Int { data["focusSecondsRemaining"] as? Int ?? 0 }
     private var currentLoop: Int { data["focusCurrentLoop"] as? Int ?? 1 }
     private var totalLoops: Int { data["focusTotalLoops"] as? Int ?? 1 }
-    private var locale: String { data["locale"] as? String ?? "en" }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             InfoRow(
-                label: locale == "zh" ? "状态" : "Status",
+                label: labels["statusLabel"] ?? "Status",
                 value: stateLabel,
                 isDarkMode: isDarkMode
             )
             InfoRow(
-                label: locale == "zh" ? "剩余时间" : "Time Remaining",
+                label: labels["timeRemainingLabel"] ?? "Time Remaining",
                 value: timeString,
                 isDarkMode: isDarkMode
             )
             InfoRow(
-                label: locale == "zh" ? "循环" : "Loops",
+                label: labels["loopsLabel"] ?? "Loops",
                 value: "\(currentLoop)/\(totalLoops)",
                 isDarkMode: isDarkMode
             )
@@ -354,11 +359,11 @@ struct FocusContentView: View {
     
     private var stateLabel: String {
         if !isActive {
-            return locale == "zh" ? "空闲" : "Idle"
+            return labels["statusIdle"] ?? "Idle"
         } else if isRelaxing {
-            return locale == "zh" ? "休息中" : "Relaxing"
+            return labels["statusRelaxing"] ?? "Relaxing"
         }
-        return locale == "zh" ? "专注中" : "Focusing"
+        return labels["statusFocusing"] ?? "Focusing"
     }
     
     private var timeString: String {
@@ -612,8 +617,8 @@ struct NetworkContentView: View {
     private var isLoading: Bool {
         data["isLoading"] as? Bool ?? false
     }
-    private var locale: String {
-        data["locale"] as? String ?? "en"
+    private var labels: [String: String] {
+        data["labels"] as? [String: String] ?? [:]
     }
     
     var body: some View {
@@ -621,22 +626,22 @@ struct NetworkContentView: View {
             // Network info section
             VStack(alignment: .leading, spacing: 2) {
                 NetworkInfoRow(
-                    label: locale == "zh" ? "接口" : "Interface",
+                    label: labels["interfaceLabel"] ?? "Interface",
                     value: networkInfo["interfaceType"] ?? "-",
                     isDarkMode: isDarkMode
                 )
                 NetworkInfoRow(
-                    label: locale == "zh" ? "网络名称" : "Network",
+                    label: labels["networkNameLabel"] ?? "Network",
                     value: networkInfo["networkName"] ?? "-",
                     isDarkMode: isDarkMode
                 )
                 NetworkInfoRow(
-                    label: locale == "zh" ? "本地 IP" : "Local IP",
+                    label: labels["localIpLabel"] ?? "Local IP",
                     value: networkInfo["localIp"] ?? "-",
                     isDarkMode: isDarkMode
                 )
                 NetworkInfoRow(
-                    label: locale == "zh" ? "公网 IP" : "Public IP",
+                    label: labels["publicIpLabel"] ?? "Public IP",
                     value: networkInfo["publicIp"] ?? "-",
                     isDarkMode: isDarkMode
                 )
@@ -646,7 +651,7 @@ struct NetworkContentView: View {
                     isDarkMode: isDarkMode
                 )
                 NetworkInfoRow(
-                    label: locale == "zh" ? "网关" : "Gateway",
+                    label: labels["gatewayLabel"] ?? "Gateway",
                     value: networkInfo["gateway"] ?? "-",
                     isDarkMode: isDarkMode
                 )
@@ -866,26 +871,26 @@ struct TodoRow: View {
 struct LevelExpContentView: View {
     let data: [String: Any]
     let isDarkMode: Bool
+    let labels: [String: String]
     
     private var level: Int { data["level"] as? Int ?? 1 }
     private var currentExp: Double { (data["currentExp"] as? NSNumber)?.doubleValue ?? 0 }
     private var maxExp: Double { (data["maxExp"] as? NSNumber)?.doubleValue ?? 100 }
-    private var locale: String { data["locale"] as? String ?? "en" }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             InfoRow(
-                label: locale == "zh" ? "等级" : "Level",
+                label: labels["levelLabel"] ?? "Level",
                 value: "\(level)",
                 isDarkMode: isDarkMode
             )
             InfoRow(
-                label: locale == "zh" ? "当前经验" : "Current EXP",
+                label: labels["currentExpLabel"] ?? "Current EXP",
                 value: "\(Int(currentExp))",
                 isDarkMode: isDarkMode
             )
             InfoRow(
-                label: locale == "zh" ? "升级经验" : "Max EXP",
+                label: labels["maxExpLabel"] ?? "Max EXP",
                 value: "\(Int(maxExp))",
                 isDarkMode: isDarkMode
             )
@@ -899,12 +904,12 @@ struct LevelExpContentView: View {
 struct KeyboardContentView: View {
     let keyCount: Int
     let isDarkMode: Bool
-    let locale: String
+    let labels: [String: String]
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             InfoRow(
-                label: locale == "zh" ? "今日按键" : "Today Key Events",
+                label: labels["todayKeyEventsLabel"] ?? "Today Key Events",
                 value: formatNumber(keyCount),
                 isDarkMode: isDarkMode
             )
@@ -927,12 +932,12 @@ struct KeyboardContentView: View {
 struct MouseContentView: View {
     let distance: Int
     let isDarkMode: Bool
-    let locale: String
+    let labels: [String: String]
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             InfoRow(
-                label: locale == "zh" ? "今日鼠标距离" : "Today Mouse Distance",
+                label: labels["todayMouseDistanceLabel"] ?? "Today Mouse Distance",
                 value: formatDistance(distance),
                 isDarkMode: isDarkMode
             )
@@ -984,8 +989,7 @@ struct InfoRow: View {
 struct SystemInfoSectionView: View {
     let data: [String: Any]
     let isDarkMode: Bool
-    
-    private var locale: String { data["locale"] as? String ?? "en" }
+    let labels: [String: String]
     
     /// Build the list of info entries from the popover data.
     /// Each entry is a (label, value) pair. Add new entries here for extensibility.
@@ -995,7 +999,7 @@ struct SystemInfoSectionView: View {
         // Uptime
         if let uptime = data["uptime"] as? Double, uptime > 0 {
             items.append((
-                locale == "zh" ? "运行时间" : "Uptime",
+                labels["uptimeLabel"] ?? "Uptime",
                 formatUptime(uptime)
             ))
         }
@@ -1029,25 +1033,23 @@ struct SystemInfoSectionView: View {
         }
     }
     
-    /// Format uptime seconds into a human-readable string (e.g. "3d 5h 12m")
+    /// Format uptime seconds into a human-readable string using labels
     private func formatUptime(_ seconds: Double) -> String {
         let totalSeconds = Int(seconds)
         let days = totalSeconds / 86400
         let hours = (totalSeconds % 86400) / 3600
         let minutes = (totalSeconds % 3600) / 60
         
+        let daySuffix = labels["uptimeDaySuffix"] ?? "d"
+        let hourSuffix = labels["uptimeHourSuffix"] ?? "h"
+        let minuteSuffix = labels["uptimeMinuteSuffix"] ?? "m"
+        
         if days > 0 {
-            return locale == "zh"
-                ? "\(days)天 \(hours)小时 \(minutes)分钟"
-                : "\(days)d \(hours)h \(minutes)m"
+            return "\(days)\(daySuffix) \(hours)\(hourSuffix) \(minutes)\(minuteSuffix)"
         } else if hours > 0 {
-            return locale == "zh"
-                ? "\(hours)小时 \(minutes)分钟"
-                : "\(hours)h \(minutes)m"
+            return "\(hours)\(hourSuffix) \(minutes)\(minuteSuffix)"
         } else {
-            return locale == "zh"
-                ? "\(minutes)分钟"
-                : "\(minutes)m"
+            return "\(minutes)\(minuteSuffix)"
         }
     }
 }

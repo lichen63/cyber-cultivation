@@ -1745,5 +1745,142 @@
         "placeholders": {
             "count": { "type": "int" }
         }
+    },
+
+    "popoverTitleFocus": "Focus",
+    "@popoverTitleFocus": {
+        "description": "Title for Focus popover"
+    },
+    "popoverTitleRam": "RAM",
+    "@popoverTitleRam": {
+        "description": "Title for RAM popover"
+    },
+    "popoverTitleNetwork": "Network",
+    "@popoverTitleNetwork": {
+        "description": "Title for Network popover"
+    },
+    "popoverTitleDisk": "Disk",
+    "@popoverTitleDisk": {
+        "description": "Title for Disk popover"
+    },
+    "popoverTitleBattery": "Battery",
+    "@popoverTitleBattery": {
+        "description": "Title for Battery popover"
+    },
+    "popoverTitleTodo": "Todo",
+    "@popoverTitleTodo": {
+        "description": "Title for Todo popover"
+    },
+    "popoverTitleLevel": "Level",
+    "@popoverTitleLevel": {
+        "description": "Title for Level popover"
+    },
+    "popoverTitleKeyboard": "Keyboard",
+    "@popoverTitleKeyboard": {
+        "description": "Title for Keyboard popover"
+    },
+    "popoverTitleMouse": "Mouse",
+    "@popoverTitleMouse": {
+        "description": "Title for Mouse popover"
+    },
+    "popoverShowWindow": "Show Window",
+    "@popoverShowWindow": {
+        "description": "Tooltip for show window button in popover"
+    },
+    "popoverExitApp": "Exit App",
+    "@popoverExitApp": {
+        "description": "Tooltip for exit app button in popover"
+    },
+    "popoverStatusLabel": "Status",
+    "@popoverStatusLabel": {
+        "description": "Label for status row in focus popover"
+    },
+    "popoverTimeRemainingLabel": "Time Remaining",
+    "@popoverTimeRemainingLabel": {
+        "description": "Label for time remaining row in focus popover"
+    },
+    "popoverLoopsLabel": "Loops",
+    "@popoverLoopsLabel": {
+        "description": "Label for loops row in focus popover"
+    },
+    "popoverStatusIdle": "Idle",
+    "@popoverStatusIdle": {
+        "description": "Focus status when idle"
+    },
+    "popoverStatusRelaxing": "Relaxing",
+    "@popoverStatusRelaxing": {
+        "description": "Focus status when relaxing"
+    },
+    "popoverStatusFocusing": "Focusing",
+    "@popoverStatusFocusing": {
+        "description": "Focus status when focusing"
+    },
+    "popoverInterfaceLabel": "Interface",
+    "@popoverInterfaceLabel": {
+        "description": "Label for network interface type"
+    },
+    "popoverNetworkNameLabel": "Network",
+    "@popoverNetworkNameLabel": {
+        "description": "Label for network name"
+    },
+    "popoverLocalIpLabel": "Local IP",
+    "@popoverLocalIpLabel": {
+        "description": "Label for local IP address"
+    },
+    "popoverPublicIpLabel": "Public IP",
+    "@popoverPublicIpLabel": {
+        "description": "Label for public IP address"
+    },
+    "popoverGatewayLabel": "Gateway",
+    "@popoverGatewayLabel": {
+        "description": "Label for network gateway"
+    },
+    "popoverLevelLabel": "Level",
+    "@popoverLevelLabel": {
+        "description": "Label for level in level/exp popover"
+    },
+    "popoverCurrentExpLabel": "Current EXP",
+    "@popoverCurrentExpLabel": {
+        "description": "Label for current experience"
+    },
+    "popoverMaxExpLabel": "Max EXP",
+    "@popoverMaxExpLabel": {
+        "description": "Label for max experience needed to level up"
+    },
+    "popoverTodayKeyEventsLabel": "Today Key Events",
+    "@popoverTodayKeyEventsLabel": {
+        "description": "Label for today's keyboard events count"
+    },
+    "popoverTodayMouseDistanceLabel": "Today Mouse Distance",
+    "@popoverTodayMouseDistanceLabel": {
+        "description": "Label for today's mouse distance"
+    },
+    "popoverUptimeLabel": "Uptime",
+    "@popoverUptimeLabel": {
+        "description": "Label for system uptime"
+    },
+    "popoverUptimeDaySuffix": "d",
+    "@popoverUptimeDaySuffix": {
+        "description": "Day suffix for uptime format (e.g. 3d)"
+    },
+    "popoverUptimeHourSuffix": "h",
+    "@popoverUptimeHourSuffix": {
+        "description": "Hour suffix for uptime format (e.g. 5h)"
+    },
+    "popoverUptimeMinuteSuffix": "m",
+    "@popoverUptimeMinuteSuffix": {
+        "description": "Minute suffix for uptime format (e.g. 12m)"
+    },
+    "popoverPinWindow": "Pin Window",
+    "@popoverPinWindow": {
+        "description": "Tooltip for pin window button in tray popup"
+    },
+    "popoverUnpin": "Unpin",
+    "@popoverUnpin": {
+        "description": "Tooltip for unpin button in tray popup"
+    },
+    "popoverLoading": "Loading...",
+    "@popoverLoading": {
+        "description": "Loading text in tray popup preview"
     }
 }

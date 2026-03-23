@@ -1260,4 +1260,106 @@ class AppLocalizationsZh extends AppLocalizations {
   String npcEffectProgressBoostNegative(int count) {
     return '失忆：$count 个已探索格子被遗忘！';
   }
+
+  @override
+  String get popoverTitleFocus => '专注';
+
+  @override
+  String get popoverTitleRam => '内存';
+
+  @override
+  String get popoverTitleNetwork => '网络';
+
+  @override
+  String get popoverTitleDisk => '磁盘';
+
+  @override
+  String get popoverTitleBattery => '电池';
+
+  @override
+  String get popoverTitleTodo => '待办';
+
+  @override
+  String get popoverTitleLevel => '等级';
+
+  @override
+  String get popoverTitleKeyboard => '键盘';
+
+  @override
+  String get popoverTitleMouse => '鼠标';
+
+  @override
+  String get popoverShowWindow => '显示窗口';
+
+  @override
+  String get popoverExitApp => '退出应用';
+
+  @override
+  String get popoverStatusLabel => '状态';
+
+  @override
+  String get popoverTimeRemainingLabel => '剩余时间';
+
+  @override
+  String get popoverLoopsLabel => '循环';
+
+  @override
+  String get popoverStatusIdle => '空闲';
+
+  @override
+  String get popoverStatusRelaxing => '休息中';
+
+  @override
+  String get popoverStatusFocusing => '专注中';
+
+  @override
+  String get popoverInterfaceLabel => '接口';
+
+  @override
+  String get popoverNetworkNameLabel => '网络名称';
+
+  @override
+  String get popoverLocalIpLabel => '本地 IP';
+
+  @override
+  String get popoverPublicIpLabel => '公网 IP';
+
+  @override
+  String get popoverGatewayLabel => '网关';
+
+  @override
+  String get popoverLevelLabel => '等级';
+
+  @override
+  String get popoverCurrentExpLabel => '当前经验';
+
+  @override
+  String get popoverMaxExpLabel => '升级经验';
+
+  @override
+  String get popoverTodayKeyEventsLabel => '今日按键';
+
+  @override
+  String get popoverTodayMouseDistanceLabel => '今日鼠标距离';
+
+  @override
+  String get popoverUptimeLabel => '运行时间';
+
+  @override
+  String get popoverUptimeDaySuffix => '天';
+
+  @override
+  String get popoverUptimeHourSuffix => '小时';
+
+  @override
+  String get popoverUptimeMinuteSuffix => '分钟';
+
+  @override
+  String get popoverPinWindow => '固定窗口';
+
+  @override
+  String get popoverUnpin => '取消固定';
+
+  @override
+  String get popoverLoading => '加载中...';
 }

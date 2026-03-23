@@ -137,11 +137,17 @@ class MenuBarHelper {
   ///
   /// [isDark] - true for dark theme, false for light theme
   /// [locale] - locale code (e.g., 'en', 'zh')
-  static Future<bool> setTheme({required bool isDark, String? locale}) async {
+  /// [labels] - pre-resolved localized strings for native Swift views
+  static Future<bool> setTheme({
+    required bool isDark,
+    String? locale,
+    Map<String, String>? labels,
+  }) async {
     try {
       final result = await _channel.invokeMethod('setTheme', {
         'brightness': isDark ? 'dark' : 'light',
         if (locale != null) 'locale': locale,
+        if (labels != null) 'labels': labels,
       });
       return result == true;
     } catch (e) {
