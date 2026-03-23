@@ -980,9 +980,6 @@ class KeyShieldConstants {
   static const String keyShieldChannel =
       'com.lichen63.cyber_cultivation/key_shield';
 
-  // Default blocked modifiers
-  static const List<String> defaultBlockedModifiers = ['command'];
-
   // Modifier display names (for UI chips)
   static const Map<String, String> modifierSymbols = {
     'command': '⌘',

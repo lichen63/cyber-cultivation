@@ -186,10 +186,20 @@ class _MyAppState extends State<MyApp> with WindowListener, TrayListener {
   /// Handle Key Shield toggled from native keyboard popover
   void _onKeyShieldToggled(bool enabled) {
     _keyShieldConfig = _keyShieldConfig.copyWith(isEnabled: enabled);
-    // Propagate to MyHomePage via a rebuild — MyHomePage reads
-    // initialGameData on first load but we need to inform the child.
-    // The simplest approach: directly sync native and mark for save.
     _keyShieldService.syncConfig(_keyShieldConfig);
+    // Persist the toggle change to disk
+    _persistKeyShieldConfig();
+  }
+
+  /// Save only the Key Shield config change to game_save.json
+  Future<void> _persistKeyShieldConfig() async {
+    final gameDataService = GameDataService();
+    final gameData = await gameDataService.loadGameData();
+    if (gameData != null) {
+      await gameDataService.saveGameData(
+        gameData.copyWith(keyShieldConfig: _keyShieldConfig),
+      );
+    }
   }
 
   /// Hide any open popup window (used when native popup or tray menu is shown).
