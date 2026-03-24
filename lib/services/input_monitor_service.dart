@@ -125,7 +125,7 @@ class InputMonitorService extends ChangeNotifier {
           final type = event['type'] as String? ?? 'move';
 
           if (type == 'click') {
-            _handleClick();
+            _handleClick(absX, absY, screenMinX, screenMinY, event);
           } else {
             _handleMove(absX, absY, screenMinX, screenMinY, event);
           }
@@ -143,11 +143,27 @@ class InputMonitorService extends ChangeNotifier {
     );
   }
 
-  void _handleClick() {
+  void _handleClick(
+    double absX,
+    double absY,
+    double screenMinX,
+    double screenMinY,
+    Map<dynamic, dynamic> event,
+  ) {
     onExpGain?.call(AppConstants.expGainPerMouse);
     onStatsUpdate?.call(keyboardCount: 0, clickCount: 1, moveDistance: 0);
 
-    _mouseData = _mouseData.copyWith(isClicking: true);
+    // Update position tracking so next move distance is correct
+    _lastAbsX = absX;
+    _lastAbsY = absY;
+
+    _mouseData = MousePositionData(
+      mouseX: absX - screenMinX,
+      mouseY: absY - screenMinY,
+      screenWidth: (event['screenWidth'] as num?)?.toDouble() ?? 1,
+      screenHeight: (event['screenHeight'] as num?)?.toDouble() ?? 1,
+      isClicking: true,
+    );
     notifyListeners();
 
     _clickResetTimer?.cancel();
