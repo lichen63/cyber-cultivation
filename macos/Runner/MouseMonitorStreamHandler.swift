@@ -101,24 +101,37 @@ class MouseMonitorStreamHandler: NSObject, FlutterStreamHandler {
     sendMouseData(location: event.location, type: event.type, eventSink: eventSink)
   }
   
+  /// Convert an NSScreen frame (NS coordinates, Y-up from bottom-left) to
+  /// CG coordinates (Y-down from top-left of primary screen).
+  private func nsToCGFrame(_ nsFrame: NSRect, primaryHeight: CGFloat) -> NSRect {
+    let cgMinY = primaryHeight - nsFrame.maxY
+    return NSRect(x: nsFrame.minX, y: cgMinY, width: nsFrame.width, height: nsFrame.height)
+  }
+  
   private func sendMouseData(location: CGPoint, type: CGEventType, eventSink: @escaping FlutterEventSink) {
-    // Find which screen the mouse is currently on
+    // CGEvent.location uses CG coordinates (origin at top-left, Y increases downward).
+    // NSScreen.frame uses NS coordinates (origin at bottom-left, Y increases upward).
+    // We must convert NS frames to CG frames before comparing or sending.
     let screens = NSScreen.screens
+    guard let primaryScreen = screens.first else { return }
+    let primaryHeight = primaryScreen.frame.height
+    
+    // Find which screen the mouse is currently on (using CG coordinates)
     var currentScreen: NSScreen?
     
     for screen in screens {
-      let frame = screen.frame
-      if location.x >= frame.minX && location.x <= frame.maxX &&
-         location.y >= frame.minY && location.y <= frame.maxY {
+      let cgFrame = nsToCGFrame(screen.frame, primaryHeight: primaryHeight)
+      if location.x >= cgFrame.minX && location.x <= cgFrame.maxX &&
+         location.y >= cgFrame.minY && location.y <= cgFrame.maxY {
         currentScreen = screen
         break
       }
     }
     
-    // Default to main screen if not found
-    guard let screen = currentScreen ?? NSScreen.main else { return }
+    // Default to primary screen if not found
+    let screen = currentScreen ?? primaryScreen
     
-    let screenFrame = screen.frame
+    let cgFrame = nsToCGFrame(screen.frame, primaryHeight: primaryHeight)
     
     let eventTypeString: String
     switch type {
@@ -128,15 +141,15 @@ class MouseMonitorStreamHandler: NSObject, FlutterStreamHandler {
       eventTypeString = "move"
     }
     
-    // Send absolute position and screen info
+    // Send position relative to screen and screen dimensions, all in CG coordinates
     let data: [String: Any] = [
       "type": eventTypeString,
       "x": location.x,
       "y": location.y,
-      "screenMinX": screenFrame.minX,
-      "screenMinY": screenFrame.minY,
-      "screenWidth": screenFrame.width,
-      "screenHeight": screenFrame.height
+      "screenMinX": cgFrame.minX,
+      "screenMinY": cgFrame.minY,
+      "screenWidth": cgFrame.width,
+      "screenHeight": cgFrame.height
     ]
     
     eventSink(data)
