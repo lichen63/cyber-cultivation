@@ -3,9 +3,12 @@ import FlutterMacOS
 import QuartzCore
 import ApplicationServices
 import ServiceManagement
+import IOKit.pwr_mgt
 
 class MainFlutterWindow: NSWindow {
   private var layerObserver: NSKeyValueObservation?
+  private var antiSleepAssertionID: IOPMAssertionID = 0
+  private var isAntiSleepActive = false
   
   override func awakeFromNib() {
     let flutterViewController = FlutterViewController()
@@ -22,27 +25,36 @@ class MainFlutterWindow: NSWindow {
     mouseEventChannel.setStreamHandler(MouseMonitorStreamHandler())
 
     let mouseControlChannel = FlutterMethodChannel(name: "com.lichen63.cyber_cultivation/mouse_control", binaryMessenger: flutterViewController.engine.binaryMessenger)
-    mouseControlChannel.setMethodCallHandler { (call, result) in
-        if call.method == "moveMouse" {
-            if let args = call.arguments as? [String: Any],
-               let dx = args["dx"] as? Double,
-               let dy = args["dy"] as? Double {
-                
-                if let currentEvent = CGEvent(source: nil) {
-                    let currentPos = currentEvent.location
-                    let newPos = CGPoint(x: currentPos.x + dx, y: currentPos.y + dy)
-                    
-                    if let moveEvent = CGEvent(mouseEventSource: nil, mouseType: .mouseMoved, mouseCursorPosition: newPos, mouseButton: .left) {
-                        moveEvent.post(tap: .cghidEventTap)
-                        result(true)
-                        return
-                    }
-                }
-                result(FlutterError(code: "EVENT_CREATION_FAILED", message: "Failed to create mouse event", details: nil))
-            } else {
-                result(FlutterError(code: "INVALID_ARGUMENTS", message: "dx and dy are required", details: nil))
+    mouseControlChannel.setMethodCallHandler { [weak self] (call, result) in
+        guard let self = self else {
+            result(FlutterError(code: "DEALLOCATED", message: "Window deallocated", details: nil))
+            return
+        }
+        switch call.method {
+        case "setAntiSleep":
+            guard let args = call.arguments as? [String: Any],
+                  let enabled = args["enabled"] as? Bool else {
+                result(FlutterError(code: "INVALID_ARGUMENTS", message: "'enabled' bool is required", details: nil))
+                return
             }
-        } else {
+            if enabled && !self.isAntiSleepActive {
+                let success = IOPMAssertionCreateWithName(
+                    kIOPMAssertionTypePreventUserIdleDisplaySleep as CFString,
+                    IOPMAssertionLevel(kIOPMAssertionLevelOn),
+                    "Cyber Cultivation Anti-Sleep" as CFString,
+                    &self.antiSleepAssertionID
+                )
+                self.isAntiSleepActive = (success == kIOReturnSuccess)
+                result(self.isAntiSleepActive)
+            } else if !enabled && self.isAntiSleepActive {
+                IOPMAssertionRelease(self.antiSleepAssertionID)
+                self.antiSleepAssertionID = 0
+                self.isAntiSleepActive = false
+                result(true)
+            } else {
+                result(true)
+            }
+        default:
             result(FlutterMethodNotImplemented)
         }
     }

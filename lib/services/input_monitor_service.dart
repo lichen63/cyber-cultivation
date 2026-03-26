@@ -52,15 +52,12 @@ class InputMonitorService extends ChangeNotifier {
 
   StreamSubscription<dynamic>? _keySubscription;
   StreamSubscription<dynamic>? _mouseSubscription;
-  Timer? _idleCheckTimer;
   Timer? _clickResetTimer;
 
   String _currentKey = AppConstants.defaultKeyText;
   MousePositionData _mouseData = const MousePositionData();
-  DateTime _lastMouseMoveTime = DateTime.now();
   double? _lastAbsX;
   double? _lastAbsY;
-  bool _moveToggle = false;
   bool _enableAntiSleep = false;
   double _accumulatedMoveDistance = 0.0;
   bool _disposed = false;
@@ -78,6 +75,7 @@ class InputMonitorService extends ChangeNotifier {
 
   set enableAntiSleep(bool value) {
     _enableAntiSleep = value;
+    _setNativeAntiSleep(value);
     notifyListeners();
   }
 
@@ -85,7 +83,6 @@ class InputMonitorService extends ChangeNotifier {
   void initialize() {
     _setupKeyboardListener();
     _setupMouseListener();
-    _startIdleCheck();
   }
 
   void _setupKeyboardListener() {
@@ -115,8 +112,6 @@ class InputMonitorService extends ChangeNotifier {
     _mouseSubscription?.cancel();
     _mouseSubscription = _mouseEventChannel.receiveBroadcastStream().listen(
       (dynamic event) {
-        _lastMouseMoveTime = DateTime.now();
-
         if (event is Map) {
           final absX = (event['x'] as num?)?.toDouble() ?? 0;
           final absY = (event['y'] as num?)?.toDouble() ?? 0;
@@ -217,41 +212,26 @@ class InputMonitorService extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _startIdleCheck() {
-    _idleCheckTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (!_enableAntiSleep) return;
-
-      final diff = DateTime.now().difference(_lastMouseMoveTime);
-      if (diff.inSeconds >= AppConstants.antiSleepIdleIntervalSeconds) {
-        _performMouseMove();
-      }
-    });
-  }
-
-  Future<void> _performMouseMove() async {
+  /// Tell the native side to enable or disable the IOPMAssertion
+  /// that prevents display sleep.
+  Future<void> _setNativeAntiSleep(bool enabled) async {
     try {
-      _moveToggle = !_moveToggle;
-      final double offset = _moveToggle ? 1.0 : -1.0;
-
-      await _mouseControlChannel.invokeMethod('moveMouse', {
-        'dx': offset,
-        'dy': offset,
+      await _mouseControlChannel.invokeMethod('setAntiSleep', {
+        'enabled': enabled,
       });
-      // Update the last mouse move time to prevent immediate re-triggering
-      // This is needed because the synthetic move event may not be captured
-      // by the event stream, or there could be a race condition
-      _lastMouseMoveTime = DateTime.now();
     } catch (e) {
-      debugPrint("Failed to move mouse via channel: $e");
+      debugPrint('Failed to set anti-sleep assertion: $e');
     }
   }
 
   @override
   void dispose() {
     _disposed = true;
+    if (_enableAntiSleep) {
+      _setNativeAntiSleep(false);
+    }
     _keySubscription?.cancel();
     _mouseSubscription?.cancel();
-    _idleCheckTimer?.cancel();
     _clickResetTimer?.cancel();
     super.dispose();
   }
