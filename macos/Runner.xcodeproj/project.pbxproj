@@ -38,6 +38,17 @@
 		A1B2C3D401000007 /* SystemProcessHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000007 /* SystemProcessHelper.swift */; };
 		A1B2C3D401000008 /* TrayPopupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000008 /* TrayPopupView.swift */; };
 		A1B2C3D401000009 /* KeyShieldHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000009 /* KeyShieldHandler.swift */; };
+		A1B2C3D40100000A /* LunarService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D40000000A /* LunarService.swift */; };
+		A1B2C3D40100000B /* TraditionalFestivalResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D40000000B /* TraditionalFestivalResolver.swift */; };
+		A1B2C3D40100000C /* SolarTermResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D40000000C /* SolarTermResolver.swift */; };
+		A1B2C3D40100000D /* HolidayService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D40000000D /* HolidayService.swift */; };
+		A1B2C3D40100000E /* mainland-cn-2020.json in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D40000000E /* mainland-cn-2020.json */; };
+		A1B2C3D40100000F /* mainland-cn-2021.json in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D40000000F /* mainland-cn-2021.json */; };
+		A1B2C3D401000010 /* mainland-cn-2022.json in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000010 /* mainland-cn-2022.json */; };
+		A1B2C3D401000011 /* mainland-cn-2023.json in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000011 /* mainland-cn-2023.json */; };
+		A1B2C3D401000012 /* mainland-cn-2024.json in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000012 /* mainland-cn-2024.json */; };
+		A1B2C3D401000013 /* mainland-cn-2025.json in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000013 /* mainland-cn-2025.json */; };
+		A1B2C3D401000014 /* mainland-cn-2026.json in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000014 /* mainland-cn-2026.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -92,6 +103,17 @@
 		A1B2C3D400000007 /* SystemProcessHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemProcessHelper.swift; sourceTree = "<group>"; };
 		A1B2C3D400000008 /* TrayPopupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrayPopupView.swift; sourceTree = "<group>"; };
 		A1B2C3D400000009 /* KeyShieldHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyShieldHandler.swift; sourceTree = "<group>"; };
+		A1B2C3D40000000A /* LunarService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LunarService.swift; sourceTree = "<group>"; };
+		A1B2C3D40000000B /* TraditionalFestivalResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraditionalFestivalResolver.swift; sourceTree = "<group>"; };
+		A1B2C3D40000000C /* SolarTermResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolarTermResolver.swift; sourceTree = "<group>"; };
+		A1B2C3D40000000D /* HolidayService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HolidayService.swift; sourceTree = "<group>"; };
+		A1B2C3D40000000E /* mainland-cn-2020.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "mainland-cn-2020.json"; path = "Resources/mainland-cn-2020.json"; sourceTree = "<group>"; };
+		A1B2C3D40000000F /* mainland-cn-2021.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "mainland-cn-2021.json"; path = "Resources/mainland-cn-2021.json"; sourceTree = "<group>"; };
+		A1B2C3D400000010 /* mainland-cn-2022.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "mainland-cn-2022.json"; path = "Resources/mainland-cn-2022.json"; sourceTree = "<group>"; };
+		A1B2C3D400000011 /* mainland-cn-2023.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "mainland-cn-2023.json"; path = "Resources/mainland-cn-2023.json"; sourceTree = "<group>"; };
+		A1B2C3D400000012 /* mainland-cn-2024.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "mainland-cn-2024.json"; path = "Resources/mainland-cn-2024.json"; sourceTree = "<group>"; };
+		A1B2C3D400000013 /* mainland-cn-2025.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "mainland-cn-2025.json"; path = "Resources/mainland-cn-2025.json"; sourceTree = "<group>"; };
+		A1B2C3D400000014 /* mainland-cn-2026.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "mainland-cn-2026.json"; path = "Resources/mainland-cn-2026.json"; sourceTree = "<group>"; };
 		33CEB47222A05771004F2AC0 /* Flutter-Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Flutter-Debug.xcconfig"; sourceTree = "<group>"; };
 		33CEB47422A05771004F2AC0 /* Flutter-Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Flutter-Release.xcconfig"; sourceTree = "<group>"; };
 		33CEB47722A0578A004F2AC0 /* Flutter-Generated.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = "Flutter-Generated.xcconfig"; path = "ephemeral/Flutter-Generated.xcconfig"; sourceTree = "<group>"; };
@@ -204,6 +226,17 @@
 				A1B2C3D400000007 /* SystemProcessHelper.swift */,
 				A1B2C3D400000008 /* TrayPopupView.swift */,
 				A1B2C3D400000009 /* KeyShieldHandler.swift */,
+				A1B2C3D40000000A /* LunarService.swift */,
+				A1B2C3D40000000B /* TraditionalFestivalResolver.swift */,
+				A1B2C3D40000000C /* SolarTermResolver.swift */,
+				A1B2C3D40000000D /* HolidayService.swift */,
+				A1B2C3D40000000E /* mainland-cn-2020.json */,
+				A1B2C3D40000000F /* mainland-cn-2021.json */,
+				A1B2C3D400000010 /* mainland-cn-2022.json */,
+				A1B2C3D400000011 /* mainland-cn-2023.json */,
+				A1B2C3D400000012 /* mainland-cn-2024.json */,
+				A1B2C3D400000013 /* mainland-cn-2025.json */,
+				A1B2C3D400000014 /* mainland-cn-2026.json */,
 				33E51913231747F40026EE4D /* DebugProfile.entitlements */,
 				33E51914231749380026EE4D /* Release.entitlements */,
 				33CC11242044D66E0003C045 /* Resources */,
@@ -344,6 +377,13 @@
 			files = (
 				33CC10F32044A3C60003C045 /* Assets.xcassets in Resources */,
 				33CC10F62044A3C60003C045 /* MainMenu.xib in Resources */,
+				A1B2C3D40100000E /* mainland-cn-2020.json in Resources */,
+				A1B2C3D40100000F /* mainland-cn-2021.json in Resources */,
+				A1B2C3D401000010 /* mainland-cn-2022.json in Resources */,
+				A1B2C3D401000011 /* mainland-cn-2023.json in Resources */,
+				A1B2C3D401000012 /* mainland-cn-2024.json in Resources */,
+				A1B2C3D401000013 /* mainland-cn-2025.json in Resources */,
+				A1B2C3D401000014 /* mainland-cn-2026.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -476,6 +516,10 @@
 				A1B2C3D401000007 /* SystemProcessHelper.swift in Sources */,
 				A1B2C3D401000008 /* TrayPopupView.swift in Sources */,
 				A1B2C3D401000009 /* KeyShieldHandler.swift in Sources */,
+				A1B2C3D40100000A /* LunarService.swift in Sources */,
+				A1B2C3D40100000B /* TraditionalFestivalResolver.swift in Sources */,
+				A1B2C3D40100000C /* SolarTermResolver.swift in Sources */,
+				A1B2C3D40100000D /* HolidayService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

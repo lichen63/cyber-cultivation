@@ -648,6 +648,7 @@ class AppDelegate: FlutterAppDelegate {
     }
     // Update calendar view controller if it exists
     calendarViewController?.isDarkMode = isDarkMode
+    calendarViewController?.labels = currentLabels
     result(true)
   }
   
@@ -666,6 +667,7 @@ class AppDelegate: FlutterAppDelegate {
       calendarPopover = NSPopover()
       calendarViewController = CalendarViewController()
       calendarViewController?.isDarkMode = isDarkMode
+      calendarViewController?.labels = currentLabels
       calendarPopover?.contentViewController = calendarViewController
       calendarPopover?.behavior = .transient
       calendarPopover?.animates = true
@@ -673,6 +675,7 @@ class AppDelegate: FlutterAppDelegate {
     
     // Update theme in case it changed
     calendarViewController?.isDarkMode = isDarkMode
+    calendarViewController?.labels = currentLabels
     
     // Update calendar to current date
     calendarViewController?.updateToCurrentDate()

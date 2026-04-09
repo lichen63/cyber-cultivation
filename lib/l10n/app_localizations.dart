@@ -2863,6 +2863,186 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Allowing'**
   String get popoverKeyShieldAllowing;
+
+  /// Title for the calendar popover
+  ///
+  /// In en, this message translates to:
+  /// **'Calendar'**
+  String get calendarTitle;
+
+  /// Today button label in calendar navigation
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get calendarToday;
+
+  /// Tooltip for opening system Calendar app
+  ///
+  /// In en, this message translates to:
+  /// **'Open Calendar'**
+  String get calendarOpenCalendar;
+
+  /// Monday column header in calendar
+  ///
+  /// In en, this message translates to:
+  /// **'Mon'**
+  String get calendarWeekMon;
+
+  /// Tuesday column header in calendar
+  ///
+  /// In en, this message translates to:
+  /// **'Tue'**
+  String get calendarWeekTue;
+
+  /// Wednesday column header in calendar
+  ///
+  /// In en, this message translates to:
+  /// **'Wed'**
+  String get calendarWeekWed;
+
+  /// Thursday column header in calendar
+  ///
+  /// In en, this message translates to:
+  /// **'Thu'**
+  String get calendarWeekThu;
+
+  /// Friday column header in calendar
+  ///
+  /// In en, this message translates to:
+  /// **'Fri'**
+  String get calendarWeekFri;
+
+  /// Saturday column header in calendar
+  ///
+  /// In en, this message translates to:
+  /// **'Sat'**
+  String get calendarWeekSat;
+
+  /// Sunday column header in calendar
+  ///
+  /// In en, this message translates to:
+  /// **'Sun'**
+  String get calendarWeekSun;
+
+  /// Year and month display in calendar header
+  ///
+  /// In en, this message translates to:
+  /// **'{year} {month}'**
+  String calendarYearMonth(String year, String month);
+
+  /// January month name
+  ///
+  /// In en, this message translates to:
+  /// **'January'**
+  String get calendarMonthJan;
+
+  /// February month name
+  ///
+  /// In en, this message translates to:
+  /// **'February'**
+  String get calendarMonthFeb;
+
+  /// March month name
+  ///
+  /// In en, this message translates to:
+  /// **'March'**
+  String get calendarMonthMar;
+
+  /// April month name
+  ///
+  /// In en, this message translates to:
+  /// **'April'**
+  String get calendarMonthApr;
+
+  /// May month name
+  ///
+  /// In en, this message translates to:
+  /// **'May'**
+  String get calendarMonthMay;
+
+  /// June month name
+  ///
+  /// In en, this message translates to:
+  /// **'June'**
+  String get calendarMonthJun;
+
+  /// July month name
+  ///
+  /// In en, this message translates to:
+  /// **'July'**
+  String get calendarMonthJul;
+
+  /// August month name
+  ///
+  /// In en, this message translates to:
+  /// **'August'**
+  String get calendarMonthAug;
+
+  /// September month name
+  ///
+  /// In en, this message translates to:
+  /// **'September'**
+  String get calendarMonthSep;
+
+  /// October month name
+  ///
+  /// In en, this message translates to:
+  /// **'October'**
+  String get calendarMonthOct;
+
+  /// November month name
+  ///
+  /// In en, this message translates to:
+  /// **'November'**
+  String get calendarMonthNov;
+
+  /// December month name
+  ///
+  /// In en, this message translates to:
+  /// **'December'**
+  String get calendarMonthDec;
+
+  /// Sunday abbreviation for bottom date display
+  ///
+  /// In en, this message translates to:
+  /// **'Sun'**
+  String get calendarWeekdaySun;
+
+  /// Monday abbreviation for bottom date display
+  ///
+  /// In en, this message translates to:
+  /// **'Mon'**
+  String get calendarWeekdayMon;
+
+  /// Tuesday abbreviation for bottom date display
+  ///
+  /// In en, this message translates to:
+  /// **'Tue'**
+  String get calendarWeekdayTue;
+
+  /// Wednesday abbreviation for bottom date display
+  ///
+  /// In en, this message translates to:
+  /// **'Wed'**
+  String get calendarWeekdayWed;
+
+  /// Thursday abbreviation for bottom date display
+  ///
+  /// In en, this message translates to:
+  /// **'Thu'**
+  String get calendarWeekdayThu;
+
+  /// Friday abbreviation for bottom date display
+  ///
+  /// In en, this message translates to:
+  /// **'Fri'**
+  String get calendarWeekdayFri;
+
+  /// Saturday abbreviation for bottom date display
+  ///
+  /// In en, this message translates to:
+  /// **'Sat'**
+  String get calendarWeekdaySat;
 }
 
 class _AppLocalizationsDelegate

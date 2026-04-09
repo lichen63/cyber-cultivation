@@ -2072,5 +2072,129 @@
     "popoverKeyShieldAllowing": "Allowing",
     "@popoverKeyShieldAllowing": {
         "description": "Allowing label in keyboard popover Key Shield section"
+    },
+    "calendarTitle": "Calendar",
+    "@calendarTitle": {
+        "description": "Title for the calendar popover"
+    },
+    "calendarToday": "Today",
+    "@calendarToday": {
+        "description": "Today button label in calendar navigation"
+    },
+    "calendarOpenCalendar": "Open Calendar",
+    "@calendarOpenCalendar": {
+        "description": "Tooltip for opening system Calendar app"
+    },
+    "calendarWeekMon": "Mon",
+    "@calendarWeekMon": {
+        "description": "Monday column header in calendar"
+    },
+    "calendarWeekTue": "Tue",
+    "@calendarWeekTue": {
+        "description": "Tuesday column header in calendar"
+    },
+    "calendarWeekWed": "Wed",
+    "@calendarWeekWed": {
+        "description": "Wednesday column header in calendar"
+    },
+    "calendarWeekThu": "Thu",
+    "@calendarWeekThu": {
+        "description": "Thursday column header in calendar"
+    },
+    "calendarWeekFri": "Fri",
+    "@calendarWeekFri": {
+        "description": "Friday column header in calendar"
+    },
+    "calendarWeekSat": "Sat",
+    "@calendarWeekSat": {
+        "description": "Saturday column header in calendar"
+    },
+    "calendarWeekSun": "Sun",
+    "@calendarWeekSun": {
+        "description": "Sunday column header in calendar"
+    },
+    "calendarYearMonth": "{year} {month}",
+    "@calendarYearMonth": {
+        "description": "Year and month display in calendar header",
+        "placeholders": {
+            "year": {"type": "String"},
+            "month": {"type": "String"}
+        }
+    },
+    "calendarMonthJan": "January",
+    "@calendarMonthJan": {
+        "description": "January month name"
+    },
+    "calendarMonthFeb": "February",
+    "@calendarMonthFeb": {
+        "description": "February month name"
+    },
+    "calendarMonthMar": "March",
+    "@calendarMonthMar": {
+        "description": "March month name"
+    },
+    "calendarMonthApr": "April",
+    "@calendarMonthApr": {
+        "description": "April month name"
+    },
+    "calendarMonthMay": "May",
+    "@calendarMonthMay": {
+        "description": "May month name"
+    },
+    "calendarMonthJun": "June",
+    "@calendarMonthJun": {
+        "description": "June month name"
+    },
+    "calendarMonthJul": "July",
+    "@calendarMonthJul": {
+        "description": "July month name"
+    },
+    "calendarMonthAug": "August",
+    "@calendarMonthAug": {
+        "description": "August month name"
+    },
+    "calendarMonthSep": "September",
+    "@calendarMonthSep": {
+        "description": "September month name"
+    },
+    "calendarMonthOct": "October",
+    "@calendarMonthOct": {
+        "description": "October month name"
+    },
+    "calendarMonthNov": "November",
+    "@calendarMonthNov": {
+        "description": "November month name"
+    },
+    "calendarMonthDec": "December",
+    "@calendarMonthDec": {
+        "description": "December month name"
+    },
+    "calendarWeekdaySun": "Sun",
+    "@calendarWeekdaySun": {
+        "description": "Sunday abbreviation for bottom date display"
+    },
+    "calendarWeekdayMon": "Mon",
+    "@calendarWeekdayMon": {
+        "description": "Monday abbreviation for bottom date display"
+    },
+    "calendarWeekdayTue": "Tue",
+    "@calendarWeekdayTue": {
+        "description": "Tuesday abbreviation for bottom date display"
+    },
+    "calendarWeekdayWed": "Wed",
+    "@calendarWeekdayWed": {
+        "description": "Wednesday abbreviation for bottom date display"
+    },
+    "calendarWeekdayThu": "Thu",
+    "@calendarWeekdayThu": {
+        "description": "Thursday abbreviation for bottom date display"
+    },
+    "calendarWeekdayFri": "Fri",
+    "@calendarWeekdayFri": {
+        "description": "Friday abbreviation for bottom date display"
+    },
+    "calendarWeekdaySat": "Sat",
+    "@calendarWeekdaySat": {
+        "description": "Saturday abbreviation for bottom date display"
     }
 }
