@@ -413,6 +413,14 @@ class CalendarViewController: NSViewController {
     currentMonth = calendar.component(.month, from: now)
     updateCalendarDisplay()
     startTimeTimer()
+
+    // Refresh calendar when online holiday data arrives
+    holidayService.onDataUpdated = { [weak self] in
+      self?.updateCalendarDisplay()
+    }
+
+    // Prefetch visible years
+    holidayService.prefetch(years: [currentYear])
   }
 
   private func startTimeTimer() {
@@ -443,6 +451,7 @@ class CalendarViewController: NSViewController {
       currentMonth = 12
       currentYear -= 1
     }
+    holidayService.prefetch(years: [currentYear])
     updateCalendarDisplay()
   }
 
@@ -452,6 +461,7 @@ class CalendarViewController: NSViewController {
       currentMonth = 1
       currentYear += 1
     }
+    holidayService.prefetch(years: [currentYear])
     updateCalendarDisplay()
   }
 
