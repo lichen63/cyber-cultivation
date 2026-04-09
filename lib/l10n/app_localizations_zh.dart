@@ -1503,4 +1503,96 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get popoverKeyShieldAllowing => '放行';
+
+  @override
+  String get calendarTitle => '日历';
+
+  @override
+  String get calendarToday => '今';
+
+  @override
+  String get calendarOpenCalendar => '打开日历';
+
+  @override
+  String get calendarWeekMon => '周一';
+
+  @override
+  String get calendarWeekTue => '周二';
+
+  @override
+  String get calendarWeekWed => '周三';
+
+  @override
+  String get calendarWeekThu => '周四';
+
+  @override
+  String get calendarWeekFri => '周五';
+
+  @override
+  String get calendarWeekSat => '周六';
+
+  @override
+  String get calendarWeekSun => '周日';
+
+  @override
+  String calendarYearMonth(String year, String month) {
+    return '$year年 $month月';
+  }
+
+  @override
+  String get calendarMonthJan => '1';
+
+  @override
+  String get calendarMonthFeb => '2';
+
+  @override
+  String get calendarMonthMar => '3';
+
+  @override
+  String get calendarMonthApr => '4';
+
+  @override
+  String get calendarMonthMay => '5';
+
+  @override
+  String get calendarMonthJun => '6';
+
+  @override
+  String get calendarMonthJul => '7';
+
+  @override
+  String get calendarMonthAug => '8';
+
+  @override
+  String get calendarMonthSep => '9';
+
+  @override
+  String get calendarMonthOct => '10';
+
+  @override
+  String get calendarMonthNov => '11';
+
+  @override
+  String get calendarMonthDec => '12';
+
+  @override
+  String get calendarWeekdaySun => '周日';
+
+  @override
+  String get calendarWeekdayMon => '周一';
+
+  @override
+  String get calendarWeekdayTue => '周二';
+
+  @override
+  String get calendarWeekdayWed => '周三';
+
+  @override
+  String get calendarWeekdayThu => '周四';
+
+  @override
+  String get calendarWeekdayFri => '周五';
+
+  @override
+  String get calendarWeekdaySat => '周六';
 }

@@ -112,6 +112,7 @@ tccutil reset Accessibility com.lichen.cyberCultivation
 
 - [Stats](https://github.com/exelban/stats) — macOS 菜单栏系统监控工具
 - [vue-xiuxiangame](https://github.com/setube/vue-xiuxiangame) — 基于 Vue 的修仙放置游戏
+- [Calendar Pro](https://github.com/yelog/calendar-pro) — macOS 菜单栏日历工具，整合农历与中国节假日
 
 感谢这些优秀的开源项目！
 

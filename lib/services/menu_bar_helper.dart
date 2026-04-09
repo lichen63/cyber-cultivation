@@ -158,8 +158,8 @@ class MenuBarHelper {
     try {
       final result = await _channel.invokeMethod('setTheme', {
         'brightness': isDark ? 'dark' : 'light',
-        if (locale != null) 'locale': locale,
-        if (labels != null) 'labels': labels,
+        'locale': ?locale,
+        'labels': ?labels,
       });
       return result == true;
     } catch (e) {

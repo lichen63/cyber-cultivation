@@ -112,6 +112,7 @@ This project was inspired by and references code/insights from:
 
 - [Stats](https://github.com/exelban/stats) — macOS system monitor in the menu bar
 - [vue-xiuxiangame](https://github.com/setube/vue-xiuxiangame) — Vue-based cultivation idle game
+- [Calendar Pro](https://github.com/yelog/calendar-pro) — macOS menu bar calendar with lunar dates and Chinese holidays
 
 Thanks to these amazing open-source projects!
 

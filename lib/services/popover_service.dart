@@ -85,7 +85,7 @@ class PopoverService {
         'popupWidth': popupWidth,
         'popupHeight': popupHeight,
         'titleBarHeight': titleBarHeight,
-        if (labels != null) 'labels': labels,
+        'labels': ?labels,
       });
       return result == true;
     } catch (e) {

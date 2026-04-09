@@ -1567,4 +1567,96 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get popoverKeyShieldAllowing => 'Allowing';
+
+  @override
+  String get calendarTitle => 'Calendar';
+
+  @override
+  String get calendarToday => 'Today';
+
+  @override
+  String get calendarOpenCalendar => 'Open Calendar';
+
+  @override
+  String get calendarWeekMon => 'Mon';
+
+  @override
+  String get calendarWeekTue => 'Tue';
+
+  @override
+  String get calendarWeekWed => 'Wed';
+
+  @override
+  String get calendarWeekThu => 'Thu';
+
+  @override
+  String get calendarWeekFri => 'Fri';
+
+  @override
+  String get calendarWeekSat => 'Sat';
+
+  @override
+  String get calendarWeekSun => 'Sun';
+
+  @override
+  String calendarYearMonth(String year, String month) {
+    return '$year $month';
+  }
+
+  @override
+  String get calendarMonthJan => 'January';
+
+  @override
+  String get calendarMonthFeb => 'February';
+
+  @override
+  String get calendarMonthMar => 'March';
+
+  @override
+  String get calendarMonthApr => 'April';
+
+  @override
+  String get calendarMonthMay => 'May';
+
+  @override
+  String get calendarMonthJun => 'June';
+
+  @override
+  String get calendarMonthJul => 'July';
+
+  @override
+  String get calendarMonthAug => 'August';
+
+  @override
+  String get calendarMonthSep => 'September';
+
+  @override
+  String get calendarMonthOct => 'October';
+
+  @override
+  String get calendarMonthNov => 'November';
+
+  @override
+  String get calendarMonthDec => 'December';
+
+  @override
+  String get calendarWeekdaySun => 'Sun';
+
+  @override
+  String get calendarWeekdayMon => 'Mon';
+
+  @override
+  String get calendarWeekdayTue => 'Tue';
+
+  @override
+  String get calendarWeekdayWed => 'Wed';
+
+  @override
+  String get calendarWeekdayThu => 'Thu';
+
+  @override
+  String get calendarWeekdayFri => 'Fri';
+
+  @override
+  String get calendarWeekdaySat => 'Sat';
 }
