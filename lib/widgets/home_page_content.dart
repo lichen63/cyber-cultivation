@@ -6,6 +6,7 @@ import '../l10n/app_localizations.dart';
 import '../models/todo_item.dart';
 import '../services/pomodoro_service.dart';
 import 'action_buttons_row.dart';
+import 'clock_display.dart';
 import 'floating_exp_indicator.dart';
 import 'game_area_widget.dart';
 import 'level_up_effect.dart';
@@ -86,6 +87,7 @@ class HomePageContent extends StatelessWidget {
           return Stack(
             children: [
               _buildMainArea(windowScale),
+              _buildClock(windowScale),
               if (isHovering || isAlwaysShowActionButtons) ...[
                 _buildTopButtons(context, windowScale),
                 _buildBottomButtons(context, windowScale),
@@ -148,6 +150,20 @@ class HomePageContent extends StatelessWidget {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildClock(double windowScale) {
+    return Positioned(
+      bottom: AppConstants.clockBottomOffset * windowScale,
+      left: 0,
+      right: 0,
+      // Ignore pointer so the clock never blocks window dragging below it.
+      child: IgnorePointer(
+        child: Center(
+          child: ClockDisplay(scale: windowScale, themeColors: themeColors),
         ),
       ),
     );

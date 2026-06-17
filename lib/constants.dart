@@ -275,6 +275,20 @@ class AppConstants {
   static const double floatingExpBorderWidth = 1.5;
   static const double floatingExpShadowBlur = 8.0;
   static const double fontSizeFloatingExp = 18.0;
+
+  // Clock Display
+  /// `intl` pattern for the always-on clock, e.g. `2026-06-17 Wed 14:58:22`.
+  static const String clockDateTimeFormat = 'yyyy-MM-dd EEE HH:mm:ss';
+  static const Duration clockUpdateInterval = Duration(seconds: 1);
+  static const double fontSizeClock = 24.0;
+
+  /// Padding inside the clock's background box (button-style pill).
+  static const double clockPaddingHorizontal = 16.0;
+  static const double clockPaddingVertical = 6.0;
+
+  /// Distance (logical px, scaled by window size) from the window bottom to the
+  /// clock baseline. Sits just above the bottom action buttons (bottom: 10).
+  static const double clockBottomOffset = 60.0;
 }
 
 /// Constants for games list dialog
