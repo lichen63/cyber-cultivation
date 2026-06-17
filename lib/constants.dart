@@ -162,6 +162,15 @@ class AppConstants {
   static const String antiSleepText = 'Anti-Sleep';
   static const String toggleAntiSleepValue = 'toggle_anti_sleep';
 
+  /// Idle duration (seconds) without any real keyboard/mouse activity after
+  /// which the anti-sleep feature performs a synthetic mouse nudge. Kept just
+  /// below the common 60s display-sleep threshold.
+  static const int antiSleepIdleIntervalSeconds = 55;
+
+  /// Pixel offset used by each anti-sleep mouse nudge. The direction toggles
+  /// every nudge so the cursor oscillates in place instead of drifting away.
+  static const double antiSleepNudgeOffset = 1.0;
+
   static const String hideWindowValue = 'hide_window';
   static const String exitGameText = 'Exit Game';
   static const String exitGameValue = 'exit_game';
