@@ -3,12 +3,9 @@ import FlutterMacOS
 import QuartzCore
 import ApplicationServices
 import ServiceManagement
-import IOKit.pwr_mgt
 
 class MainFlutterWindow: NSWindow {
   private var layerObserver: NSKeyValueObservation?
-  private var antiSleepAssertionID: IOPMAssertionID = 0
-  private var isAntiSleepActive = false
   
   override func awakeFromNib() {
     let flutterViewController = FlutterViewController()
@@ -25,35 +22,35 @@ class MainFlutterWindow: NSWindow {
     mouseEventChannel.setStreamHandler(MouseMonitorStreamHandler())
 
     let mouseControlChannel = FlutterMethodChannel(name: "com.lichen63.cyber_cultivation/mouse_control", binaryMessenger: flutterViewController.engine.binaryMessenger)
-    mouseControlChannel.setMethodCallHandler { [weak self] (call, result) in
-        guard let self = self else {
-            result(FlutterError(code: "DEALLOCATED", message: "Window deallocated", details: nil))
-            return
-        }
+    mouseControlChannel.setMethodCallHandler { (call, result) in
         switch call.method {
-        case "setAntiSleep":
+        case "moveMouse":
             guard let args = call.arguments as? [String: Any],
-                  let enabled = args["enabled"] as? Bool else {
-                result(FlutterError(code: "INVALID_ARGUMENTS", message: "'enabled' bool is required", details: nil))
+                  let dx = args["dx"] as? Double,
+                  let dy = args["dy"] as? Double else {
+                result(FlutterError(code: "INVALID_ARGUMENTS", message: "dx and dy are required", details: nil))
                 return
             }
-            if enabled && !self.isAntiSleepActive {
-                let success = IOPMAssertionCreateWithName(
-                    kIOPMAssertionTypePreventUserIdleDisplaySleep as CFString,
-                    IOPMAssertionLevel(kIOPMAssertionLevelOn),
-                    "Cyber Cultivation Anti-Sleep" as CFString,
-                    &self.antiSleepAssertionID
-                )
-                self.isAntiSleepActive = (success == kIOReturnSuccess)
-                result(self.isAntiSleepActive)
-            } else if !enabled && self.isAntiSleepActive {
-                IOPMAssertionRelease(self.antiSleepAssertionID)
-                self.antiSleepAssertionID = 0
-                self.isAntiSleepActive = false
-                result(true)
-            } else {
-                result(true)
+            // Read the current cursor position so the nudge is relative.
+            guard let currentLocation = CGEvent(source: nil)?.location else {
+                result(FlutterError(code: "EVENT_CREATION_FAILED", message: "Failed to read cursor position", details: nil))
+                return
             }
+            let newPos = CGPoint(x: currentLocation.x + dx, y: currentLocation.y + dy)
+
+            // Tag the synthetic event (via the event source and the event field)
+            // so MouseMonitorStreamHandler can recognise and ignore it. Posting
+            // to the HID tap still resets the system idle timer that drives
+            // display sleep.
+            let source = CGEventSource(stateID: .combinedSessionState)
+            source?.userData = kAntiSleepSyntheticEventTag
+            guard let moveEvent = CGEvent(mouseEventSource: source, mouseType: .mouseMoved, mouseCursorPosition: newPos, mouseButton: .left) else {
+                result(FlutterError(code: "EVENT_CREATION_FAILED", message: "Failed to create mouse event", details: nil))
+                return
+            }
+            moveEvent.setIntegerValueField(.eventSourceUserData, value: kAntiSleepSyntheticEventTag)
+            moveEvent.post(tap: .cghidEventTap)
+            result(true)
         default:
             result(FlutterMethodNotImplemented)
         }

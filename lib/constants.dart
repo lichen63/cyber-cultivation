@@ -162,6 +162,15 @@ class AppConstants {
   static const String antiSleepText = 'Anti-Sleep';
   static const String toggleAntiSleepValue = 'toggle_anti_sleep';
 
+  /// Idle duration (seconds) without any real keyboard/mouse activity after
+  /// which the anti-sleep feature performs a synthetic mouse nudge. Kept just
+  /// below the common 60s display-sleep threshold.
+  static const int antiSleepIdleIntervalSeconds = 55;
+
+  /// Pixel offset used by each anti-sleep mouse nudge. The direction toggles
+  /// every nudge so the cursor oscillates in place instead of drifting away.
+  static const double antiSleepNudgeOffset = 1.0;
+
   static const String hideWindowValue = 'hide_window';
   static const String exitGameText = 'Exit Game';
   static const String exitGameValue = 'exit_game';
@@ -266,6 +275,20 @@ class AppConstants {
   static const double floatingExpBorderWidth = 1.5;
   static const double floatingExpShadowBlur = 8.0;
   static const double fontSizeFloatingExp = 18.0;
+
+  // Clock Display
+  /// `intl` pattern for the always-on clock, e.g. `2026-06-17 Wed 14:58:22`.
+  static const String clockDateTimeFormat = 'yyyy-MM-dd EEE HH:mm:ss';
+  static const Duration clockUpdateInterval = Duration(seconds: 1);
+  static const double fontSizeClock = 24.0;
+
+  /// Padding inside the clock's background box (button-style pill).
+  static const double clockPaddingHorizontal = 16.0;
+  static const double clockPaddingVertical = 6.0;
+
+  /// Distance (logical px, scaled by window size) from the window bottom to the
+  /// clock baseline. Sits just above the bottom action buttons (bottom: 10).
+  static const double clockBottomOffset = 60.0;
 }
 
 /// Constants for games list dialog
